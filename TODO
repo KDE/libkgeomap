@@ -1,0 +1,16 @@
+
+TODO
+- create directory structure
+- create stub widget
+- create demo application to load the widget
+- define the backend interface
+- create a Marble backend
+- create a Google Maps backend
+- provide basic control features in the demo: location, zoom, pan
+
+LATER
+- include .moc - this is somehow not working now...
+- create a model for the markers
+- re-implement clustering for the markers
+
+DONE

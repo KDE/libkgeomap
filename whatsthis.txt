@@ -1,0 +1,3 @@
+
+In this directory, a new version of the WorldMapWidget is developed. It contains the source code for the widget, the backends and a demo application.
+
