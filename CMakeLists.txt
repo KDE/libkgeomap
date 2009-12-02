@@ -49,8 +49,10 @@ SET( test_sources
 )
 
 
-kde4_add_executable( test ${widget_sources} ${backend_marble_sources} ${backend_googlemaps_sources} ${demo_sources} )
+kde4_add_executable( test ${widget_sources} ${backend_marble_sources} ${backend_googlemaps_sources} ${test_sources} )
+
 target_link_libraries( test ${KDE4_UI_LIBS} ${KDE4_KPARTS_LIBS} ${LIBMARBLEWIDGET_LIBRARY} ${KDE4_KPARTS_LIBS} ${KDE4_KHTML_LIBS} )
-SET_TARGET_PROPERTIES( test PROPERTIES COMPILE_FLAGS "${COMPILE_FLAGS} -Wall -Wold-style-cast -Wextra -pedantic")# -Weffc++")
+
+#SET_TARGET_PROPERTIES( test PROPERTIES COMPILE_FLAGS "${COMPILE_FLAGS} -Wall -Wold-style-cast -Wextra -pedantic")# -Weffc++")
 
 
