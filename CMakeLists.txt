@@ -43,13 +43,14 @@ SET( backend_googlemaps_sources
     backend-googlemaps/bgm_widget.cpp
 )
 
-SET( demo_sources
+SET( test_sources
     demo/main.cpp
     demo/mainwindow.cpp
 )
 
 
-kde4_add_executable( demo ${widget_sources} ${backend_marble_sources} ${backend_googlemaps_sources} ${demo_sources} )
-target_link_libraries( demo ${KDE4_UI_LIBS} ${KDE4_KPARTS_LIBS} ${LIBMARBLEWIDGET_LIBRARY} ${KDE4_KPARTS_LIBS} ${KDE4_KHTML_LIBS} )
-SET_TARGET_PROPERTIES( demo PROPERTIES COMPILE_FLAGS "${COMPILE_FLAGS} -Wall -Wold-style-cast -Wextra -pedantic")# -Weffc++")
+kde4_add_executable( test ${widget_sources} ${backend_marble_sources} ${backend_googlemaps_sources} ${demo_sources} )
+target_link_libraries( test ${KDE4_UI_LIBS} ${KDE4_KPARTS_LIBS} ${LIBMARBLEWIDGET_LIBRARY} ${KDE4_KPARTS_LIBS} ${KDE4_KHTML_LIBS} )
+SET_TARGET_PROPERTIES( test PROPERTIES COMPILE_FLAGS "${COMPILE_FLAGS} -Wall -Wold-style-cast -Wextra -pedantic")# -Weffc++")
+
 
