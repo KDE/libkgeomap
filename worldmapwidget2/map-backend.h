@@ -24,6 +24,10 @@
 
 #include <QWidget>
 
+// local includes
+
+#include "worldmapwidget2_primitives.h"
+
 namespace WMW2 {
 
 class MapBackendPrivate;
@@ -40,7 +44,15 @@ public:
 
     virtual QString backendName() const = 0;
     virtual QWidget* mapWidget() const = 0;
-    
+
+    virtual WMWGeoCoordinate getCenter() const = 0;
+    virtual void setCenter(const WMWGeoCoordinate& coordinate) = 0;
+
+    virtual bool isReady() const = 0;
+
+Q_SIGNALS:
+    void signalBackendReady(const QString& backendName);
+
 private:
     MapBackendPrivate* const d;
 };

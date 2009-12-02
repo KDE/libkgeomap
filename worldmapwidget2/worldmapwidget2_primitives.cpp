@@ -1,7 +1,7 @@
 /* ============================================================
  *
  * Date        : 2009-12-01
- * Description : Marble-backend for WorldMapWidget2
+ * Description : Primitive datatypes for WorldMapWidget2
  *
  * Copyright (C) 2009 by Michael G. Hansen <mike at mghansen dot de>
  *
@@ -17,38 +17,5 @@
  *
  * ============================================================ */
 
-#ifndef BACKEND_MARBLE_H
-#define BACKEND_MARBLE_H
-
-// local includes
-
-#include "map-backend.h"
-
-namespace WMW2 {
-
-class BackendMarblePrivate;
-
-class BackendMarble : public MapBackend
-{
-Q_OBJECT
-
-public:
-    BackendMarble(QObject* const parent = 0);
-    virtual ~BackendMarble();
-
-    virtual QString backendName() const;
-    virtual QWidget* mapWidget() const;
-
-    virtual WMWGeoCoordinate getCenter() const;
-    virtual void setCenter(const WMWGeoCoordinate& coordinate);
-
-    virtual bool isReady() const;
-
-private:
-    BackendMarblePrivate* const d;
-};
-
-} /* WMW2 */
-
-#endif /* BACKEND_MARBLE_H */
+// nothing to see here yet ...
 

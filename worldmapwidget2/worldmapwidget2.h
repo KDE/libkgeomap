@@ -25,6 +25,10 @@
 #include <QWidget>
 #include <QStringList>
 
+// local includes
+
+#include "worldmapwidget2_primitives.h"
+
 namespace WMW2 {
 
 class WorldMapWidget2Private;
@@ -39,6 +43,17 @@ public:
 
     QStringList availableBackends() const;
     bool setBackend(const QString& backendName);
+
+    WMWGeoCoordinate getCenter() const;
+    void setCenter(const WMWGeoCoordinate& coordinate);
+
+
+protected:
+    void applyCacheToBackend();
+    void saveBackendToCache();
+
+protected Q_SLOTS:
+    void slotBackendReady(const QString& backendName);
 
 private:
     WorldMapWidget2Private* const d;

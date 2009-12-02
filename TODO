@@ -1,16 +1,20 @@
 
 TODO
-- create directory structure
-- create stub widget
-- create demo application to load the widget
-- define the backend interface
-- create a Marble backend
-- create a Google Maps backend
 - provide basic control features in the demo: location, zoom, pan
 
 LATER
-- include .moc - this is somehow not working now...
+- include .moc - this is somehow not working now ...
 - create a model for the markers
 - re-implement clustering for the markers
+- don't crash on JavaScript errors ...
+- find out how to trigger signals from inside JavaScript ...
 
 DONE
+- create directory structure
+- create stub widget
+- create demo application to load the widget
+- create a basic Marble backend
+- create a basic Google Maps backend
+- define the basic backend interface
+- center of the map is synchronised between the two backends
+

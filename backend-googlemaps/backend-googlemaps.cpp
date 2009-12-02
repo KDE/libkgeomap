@@ -20,6 +20,7 @@
 // Qt includes
 
 #include <QPointer>
+#include <QTimer>
 
 // KDE includes
 
@@ -37,12 +38,14 @@ class BackendGoogleMapsPrivate
 public:
     BackendGoogleMapsPrivate()
     : bgmWidget(0),
-      bgmWidgetWrapper(0)
+      bgmWidgetWrapper(0),
+      isReady(false)
     {
     }
 
     QPointer<BGMWidget> bgmWidget;
     QPointer<QWidget> bgmWidgetWrapper;
+    bool isReady;
 };
 
 BackendGoogleMaps::BackendGoogleMaps(QObject* const parent)
@@ -50,9 +53,13 @@ BackendGoogleMaps::BackendGoogleMaps(QObject* const parent)
 {
     d->bgmWidgetWrapper = new QWidget();
     d->bgmWidgetWrapper->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    d->bgmWidgetWrapper->resize(256,256);
     d->bgmWidget = new BGMWidget(d->bgmWidgetWrapper);
-    d->bgmWidgetWrapper->resize(256,256);
+    d->bgmWidgetWrapper->resize(400,400);
+
+    connect(d->bgmWidget, SIGNAL(completed()),
+            this, SLOT(slotHTMLInitialized()));
+
+    d->bgmWidget->loadInitialHTML();
 }
 
 BackendGoogleMaps::~BackendGoogleMaps()
@@ -73,6 +80,52 @@ QWidget* BackendGoogleMaps::mapWidget() const
 //     return new QWidget();
     return d->bgmWidgetWrapper.data();
 }
+
+WMWGeoCoordinate BackendGoogleMaps::getCenter() const
+{
+    QVariant theCenter = d->bgmWidget->executeScript("wmwGetCenter();");
+    bool valid = ( theCenter.type()==QVariant::String );
+    if (valid)
+    {
+        QStringList coordinateStrings = theCenter.toString().split(',');
+        valid = ( coordinateStrings.size() == 2 );
+        if (valid)
+        {
+            double    ptLongitude = 0.0;
+            double    ptLatitude  = 0.0;
+
+            ptLatitude = coordinateStrings.at(0).toDouble(&valid);
+            if (valid)
+                ptLongitude = coordinateStrings.at(1).toDouble(&valid);
+
+            if (valid)
+            {
+                return WMWGeoCoordinate(ptLatitude, ptLongitude);
+            }
+        }
+    }
+
+    return WMWGeoCoordinate();
+}
+
+void BackendGoogleMaps::setCenter(const WMWGeoCoordinate& coordinate)
+{
+    d->bgmWidget->executeScript(QString("wmwSetCenter(%1, %2);").arg(coordinate.latString()).arg(coordinate.lonString()));
+}
+
+bool BackendGoogleMaps::isReady() const
+{
+    return d->isReady;
+}
+
+void BackendGoogleMaps::slotHTMLInitialized()
+{
+    kDebug()<<1;
+    d->isReady = true;
+    d->bgmWidget->executeScript(QString("document.getElementById(\"map_canvas\").style.height=\"%1px\"").arg(d->bgmWidgetWrapper->height()));
+    emit(signalBackendReady(backendName()));
+}
+
 
 } /* WMW2 */
 

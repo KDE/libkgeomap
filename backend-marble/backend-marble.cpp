@@ -54,6 +54,7 @@ BackendMarble::BackendMarble(QObject* const parent)
     d->marbleWidget->setShowScaleBar(false);
     d->marbleWidget->setShowOverviewMap(false);
 
+    emit(signalBackendReady(backendName()));
 }
 
 BackendMarble::~BackendMarble()
@@ -72,6 +73,22 @@ QString BackendMarble::backendName() const
 QWidget* BackendMarble::mapWidget() const
 {
     return d->marbleWidget;
+}
+
+WMWGeoCoordinate BackendMarble::getCenter() const
+{
+    return WMWGeoCoordinate(d->marbleWidget->centerLatitude(), d->marbleWidget->centerLongitude());
+}
+
+void BackendMarble::setCenter(const WMWGeoCoordinate& coordinate)
+{
+    d->marbleWidget->setCenterLatitude(coordinate.lat);
+    d->marbleWidget->setCenterLongitude(coordinate.lon);
+}
+
+bool BackendMarble::isReady() const
+{
+    return true;
 }
 
 } /* WMW2 */

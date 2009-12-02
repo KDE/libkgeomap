@@ -1,7 +1,7 @@
 /* ============================================================
  *
  * Date        : 2009-12-01
- * Description : Marble-backend for WorldMapWidget2
+ * Description : Primitive datatypes for WorldMapWidget2
  *
  * Copyright (C) 2009 by Michael G. Hansen <mike at mghansen dot de>
  *
@@ -17,38 +17,42 @@
  *
  * ============================================================ */
 
-#ifndef BACKEND_MARBLE_H
-#define BACKEND_MARBLE_H
-
-// local includes
-
-#include "map-backend.h"
+#ifndef WORLDMAPWIDGET2_PRIMITIVES_H
+#define WORLDMAPWIDGET2_PRIMITIVES_H
 
 namespace WMW2 {
 
-class BackendMarblePrivate;
-
-class BackendMarble : public MapBackend
+class WMWGeoCoordinate
 {
-Q_OBJECT
-
 public:
-    BackendMarble(QObject* const parent = 0);
-    virtual ~BackendMarble();
+    WMWGeoCoordinate()
+    : lat(0.0),
+      lon(0.0),
+      alt(0.0),
+      hasAlt(0.0)
+    {
+    }
 
-    virtual QString backendName() const;
-    virtual QWidget* mapWidget() const;
+    WMWGeoCoordinate(const double inLat, const double inLon)
+    : lat(inLat),
+      lon(inLon),
+      alt(0.0),
+      hasAlt(0.0)
+    {
+    }
+    
+    double lat;
+    double lon;
+    double alt;
+    bool hasAlt;
 
-    virtual WMWGeoCoordinate getCenter() const;
-    virtual void setCenter(const WMWGeoCoordinate& coordinate);
-
-    virtual bool isReady() const;
-
-private:
-    BackendMarblePrivate* const d;
+    QString altString() const { return QString::number(alt, 'g', 12); }
+    QString latString() const { return QString::number(lat, 'g', 12); }
+    QString lonString() const { return QString::number(lon, 'g', 12); }
 };
 
 } /* WMW2 */
 
-#endif /* BACKEND_MARBLE_H */
+// Q_DECLARE_METATYPE(WMW2::WMWGeoCoordinate)
 
+#endif /* WORLDMAPWIDGET2_PRIMITIVES_H */

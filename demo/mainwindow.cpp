@@ -23,10 +23,13 @@
 #include <QHBoxLayout>
 #include <QComboBox>
 #include <QLabel>
+#include <QPushButton>
 
 // KDE includes
 
 #include <klocale.h>
+#include <klineedit.h>
+#include <kiconloader.h>
 
 // local includes
 
@@ -40,13 +43,19 @@ class MainWindowPrivate
 public:
     MainWindowPrivate()
     : mapWidget(0),
-      backendSelector(0)
+      backendSelector(0),
+      inputLatitude(0),
+      inputLongitude(0),
+      buttonGo(0)
     {
 
     }
     
     WorldMapWidget2* mapWidget;
     QComboBox* backendSelector;
+    KLineEdit* inputLatitude;
+    KLineEdit* inputLongitude;
+    QPushButton* buttonGo;
     
 };
 
@@ -55,6 +64,7 @@ MainWindow::MainWindow(QWidget* const parent)
 {
     resize(512, 512);
     setWindowTitle(i18n("WorldMapWidget2 demo"));
+    setWindowIcon(SmallIcon("applications-internet"));
 
     QVBoxLayout* const vbox = new QVBoxLayout(this);
 
@@ -62,7 +72,11 @@ MainWindow::MainWindow(QWidget* const parent)
     vbox->addWidget(d->mapWidget);
     d->mapWidget->setBackend("marble");
 
-    QHBoxLayout* const hbox = new QHBoxLayout(this);
+    // backend selector
+    QWidget* dummyWidget = new QWidget(this);
+    QHBoxLayout* hbox = new QHBoxLayout(dummyWidget);
+    vbox->addWidget(dummyWidget);
+    
     hbox->addWidget(new QLabel(i18n("Backend:")));
     d->backendSelector = new QComboBox(this);
     hbox->addWidget(d->backendSelector);
@@ -74,14 +88,13 @@ MainWindow::MainWindow(QWidget* const parent)
     }
 
     hbox->addStretch();
-    QWidget* const dummyWidget = new QWidget(this);
-    dummyWidget->setLayout(hbox);
-    vbox->addWidget(dummyWidget);
-
-//     setLayout(vbox);
 
     connect(d->backendSelector, SIGNAL(currentIndexChanged(const QString&)),
             this, SLOT(slotBackendSelectionChanged(const QString&)));
+
+    slotBackendSelectionChanged(d->backendSelector->currentText());
+
+    d->mapWidget->setCenter(WMWGeoCoordinate(51.1, 6.9));
 }
 
 MainWindow::~MainWindow()
@@ -93,4 +106,6 @@ void MainWindow::slotBackendSelectionChanged(const QString& newBackendName)
 {
     d->mapWidget->setBackend(newBackendName);
 }
+
+
 

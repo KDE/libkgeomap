@@ -39,6 +39,14 @@ public:
     virtual QString backendName() const;
     virtual QWidget* mapWidget() const;
 
+    virtual WMWGeoCoordinate getCenter() const;
+    virtual void setCenter(const WMWGeoCoordinate& coordinate);
+
+    virtual bool isReady() const;
+
+private Q_SLOTS:
+    void slotHTMLInitialized();
+
 private:
     BackendGoogleMapsPrivate* const d;
 };

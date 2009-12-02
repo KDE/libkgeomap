@@ -26,17 +26,26 @@
 
 namespace WMW2 {
 
+class BGMWidgetPrivate;
+
 class BGMWidget : public KHTMLPart
 {
 Q_OBJECT
 
 public:
     BGMWidget(QWidget* const parent = 0);
+    ~BGMWidget();
 
-    QWidget* myParent;
+    void loadInitialHTML();
 
 protected:
     bool eventFilter(QObject* object, QEvent* event);
+
+protected Q_SLOTS:
+    void slotHTMLCompleted();
+
+private:
+    BGMWidgetPrivate* const d;
 };
 
 
