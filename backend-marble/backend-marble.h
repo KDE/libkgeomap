@@ -37,12 +37,30 @@ public:
     virtual ~BackendMarble();
 
     virtual QString backendName() const;
+    virtual QString backendHumanName() const;
     virtual QWidget* mapWidget() const;
 
     virtual WMWGeoCoordinate getCenter() const;
     virtual void setCenter(const WMWGeoCoordinate& coordinate);
 
     virtual bool isReady() const;
+
+    virtual void zoomIn();
+    virtual void zoomOut();
+
+    virtual void saveSettingsToGroup(KConfigGroup* const group);
+    virtual void readSettingsFromGroup(const KConfigGroup* const group);
+
+    virtual void addActionsToConfigurationMenu(QMenu* const configurationMenu);
+
+    QString getMapTheme() const;
+    void setMapTheme(const QString& newMapTheme);
+
+protected:
+    void updateActionsEnabled();
+
+protected Q_SLOTS:
+    void slotMapThemeActionTriggered(QAction* action);
 
 private:
     BackendMarblePrivate* const d;

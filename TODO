@@ -1,6 +1,9 @@
 
 TODO
-- provide basic control features in the demo: location, zoom, pan
+- synchronize zoom between the backends
+- save zoom settings
+- access to Marble projections
+- add basic markers
 
 LATER
 - include .moc - this is somehow not working now ...
@@ -8,6 +11,7 @@ LATER
 - re-implement clustering for the markers
 - don't crash on JavaScript errors ...
 - find out how to trigger signals from inside JavaScript ...
+- move from Q_ASSERT to some kde-thing
 
 DONE
 - create directory structure
@@ -17,4 +21,6 @@ DONE
 - create a basic Google Maps backend
 - define the basic backend interface
 - center of the map is synchronised between the two backends
+- provide basic control features in the demo: location, zoom, pan
+- save widget state to configuration file
 

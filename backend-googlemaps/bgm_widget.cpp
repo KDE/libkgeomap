@@ -64,7 +64,7 @@ BGMWidget::~BGMWidget()
     delete d;
 }
 
-void BGMWidget::loadInitialHTML()
+void BGMWidget::loadInitialHTML(const WMWGeoCoordinate& initialCenter, const QString& initialMapType)
 {
     QString mapHTMLCode =
 "<html>\n"
@@ -72,17 +72,7 @@ void BGMWidget::loadInitialHTML()
 "<script type=\"text/javascript\" src=\"http://maps.google.com/maps/api/js?sensor=false\"></script>\n"
 "<script type=\"text/javascript\">\n"
 "   var map;\n"
-"   function initialize() {\n"
-"       var latlng = new google.maps.LatLng(52.0, 6.0);\n"
-"       var myOptions = {\n"
-"           zoom: 8,\n"
-"           center: latlng,\n"
-"           mapTypeId: google.maps.MapTypeId.ROADMAP\n"
-"       };\n"
-"       var mapDiv = document.getElementById(\"map_canvas\");\n"
-// "       mapDiv.style.height=\"100%\"\n";
-"       map = new google.maps.Map(mapDiv, myOptions);\n"
-"   }\n"
+"   var eventBuffer = new Array();\n"
 "   function wmwSetZoom(zoomvalue) {\n"
 "       map.setZoom(zoomvalue);\n"
 "   }\n"
@@ -103,6 +93,44 @@ void BGMWidget::loadInitialHTML()
 "       var latlngString = map.getCenter().toUrlValue(12);\n"
 "       return latlngString;\n"
 "   }\n"
+    // parameter: "SATELLITE"/"ROADMAP"/"HYBRID"/"TERRAIN"
+"   function wmwSetMapType(newMapType) {\n"
+"       if (newMapType == \"SATELLITE\") { map.setMapTypeId(google.maps.MapTypeId.SATELLITE); }\n"
+"       if (newMapType == \"ROADMAP\")   { map.setMapTypeId(google.maps.MapTypeId.ROADMAP); }\n"
+"       if (newMapType == \"HYBRID\")    { map.setMapTypeId(google.maps.MapTypeId.HYBRID); }\n"
+"       if (newMapType == \"TERRAIN\")   { map.setMapTypeId(google.maps.MapTypeId.TERRAIN); }\n"
+"   }\n"
+"   function wmwGetMapType() {\n"
+"       var myMapType = map.getMapTypeId();\n"
+"       if (myMapType == google.maps.MapTypeId.SATELLITE) { return \"SATELLITE\"; }\n"
+"       if (myMapType == google.maps.MapTypeId.ROADMAP )  { return \"ROADMAP\"; }\n"
+"       if (myMapType == google.maps.MapTypeId.HYBRID )   { return \"HYBRID\"; }\n"
+"       if (myMapType == google.maps.MapTypeId.TERRAIN )  { return \"TERRAIN\"; }\n"
+"       return "";\n" // unexpected result
+"   }\n"
+"   function wmwPostEventString(eventString) {\n"
+"       eventBuffer.push(eventString);\n"
+"       window.status = '(event)';\n"
+"   }\n"
+"   function wmwReadEventStrings() {\n"
+"       var eventBufferString = eventBuffer.join('|');\n"
+"       eventBuffer = new Array();\n"
+"       return eventBufferString;\n"
+"   }\n"
+"   function initialize() {\n"
+"       var latlng = new google.maps.LatLng(%1, %2);\n"
+"       var myOptions = {\n"
+"           zoom: 8,\n"
+"           center: latlng,\n"
+"           mapTypeId: google.maps.MapTypeId.%3\n"
+"       };\n"
+"       var mapDiv = document.getElementById(\"map_canvas\");\n"
+// "       mapDiv.style.height=\"100%\"\n";
+"       map = new google.maps.Map(mapDiv, myOptions);\n"
+"       google.maps.event.addListener(map, 'maptypeid_changed', function() {\n"
+"           wmwPostEventString('MT'+wmwGetMapType());\n"
+"       });\n"
+"   }\n"
 "</script>\n"
 "</head>\n"
 "<body onload=\"initialize()\" style=\"padding: 0px; margin: 0px;\">\n"
@@ -111,6 +139,10 @@ void BGMWidget::loadInitialHTML()
 // "<div style=\"display: block;\" id=\"mydiv\">aoeu</div>\n"
 "</body>\n"
 "</html>\n";
+
+    mapHTMLCode = mapHTMLCode.arg(initialCenter.latString())
+                             .arg(initialCenter.lonString())
+                             .arg(initialMapType);
 
     kDebug()<<mapHTMLCode;
     begin();
@@ -146,6 +178,50 @@ void BGMWidget::slotHTMLCompleted()
 {
     d->isReady = true;
     executeScript(QString("document.getElementById(\"map_canvas\").style.height=\"%1px\"").arg(d->parent->height()));
+}
+
+void BGMWidget::khtmlMousePressEvent(khtml::MousePressEvent* e)
+{
+    scanForJSMessages();
+    KHTMLPart::khtmlMousePressEvent(e);
+}
+
+void BGMWidget::khtmlMouseReleaseEvent(khtml::MouseReleaseEvent* e)
+{
+    scanForJSMessages();
+    KHTMLPart::khtmlMouseReleaseEvent(e);
+}
+
+void BGMWidget::khtmlMouseMoveEvent(khtml::MouseMoveEvent *e)
+{
+    scanForJSMessages();
+    KHTMLPart::khtmlMouseMoveEvent(e);
+}
+
+void BGMWidget::scanForJSMessages()
+{
+    const QString status = jsStatusBarText();
+
+    if (status!="(event)")
+        return;
+
+    const QString eventBufferString = executeScript(QString("wmwReadEventStrings();")).toString();
+    if (eventBufferString.isEmpty())
+        return;
+
+    const QStringList events = eventBufferString.split('|');
+    for (QStringList::const_iterator it = events.constBegin(); it!=events.constEnd(); ++it)
+    {
+        const QString eventCode = it->left(2);
+        const QString eventParameter = it->mid(2);
+        const QStringList eventParameters = eventParameter.split('/');
+
+        if (eventCode=="MT")
+        {
+            // map type changed
+            emit(signalMapTypeChanged(eventParameter));
+        }
+    }
 }
 
 } /* WMW2 */

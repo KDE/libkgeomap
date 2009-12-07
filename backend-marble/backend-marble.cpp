@@ -19,10 +19,14 @@
 
 // Qt includes
 
+#include <QMenu>
 #include <QPointer>
 
 // KDE includes
 
+#include <kaction.h>
+#include <kconfiggroup.h>
+#include <klocale.h>
 #include <marble/MarbleWidget.h>
 
 // local includes
@@ -37,18 +41,24 @@ class BackendMarblePrivate
 {
 public:
     BackendMarblePrivate()
-    : marbleWidget(0)
+    : marbleWidget(0),
+      actionGroupMapTheme(0),
+      cacheMapTheme("atlas")
     {
     }
 
     QPointer<MarbleWidget> marbleWidget;
+
+    QPointer<QActionGroup> actionGroupMapTheme;
+
+    QString cacheMapTheme;
 };
 
 BackendMarble::BackendMarble(QObject* const parent)
 : MapBackend(parent), d(new BackendMarblePrivate())
 {
     d->marbleWidget = new MarbleWidget();
-    d->marbleWidget->setMapThemeId(QLatin1String("earth/srtm/srtm.dgml"));
+    setMapTheme(d->cacheMapTheme);
 
     d->marbleWidget->setShowCompass(false);
     d->marbleWidget->setShowScaleBar(false);
@@ -70,6 +80,11 @@ QString BackendMarble::backendName() const
     return "marble";
 }
 
+QString BackendMarble::backendHumanName() const
+{
+    return i18n("Marble Desktop Globe");
+}
+
 QWidget* BackendMarble::mapWidget() const
 {
     return d->marbleWidget;
@@ -89,6 +104,105 @@ void BackendMarble::setCenter(const WMWGeoCoordinate& coordinate)
 bool BackendMarble::isReady() const
 {
     return true;
+}
+
+void BackendMarble::zoomIn()
+{
+    d->marbleWidget->zoomIn();
+    d->marbleWidget->repaint();
+}
+
+void BackendMarble::zoomOut()
+{
+    d->marbleWidget->zoomOut();
+    d->marbleWidget->repaint();
+}
+
+void BackendMarble::addActionsToConfigurationMenu(QMenu* const configurationMenu)
+{
+    Q_ASSERT(configurationMenu!=0);
+
+    configurationMenu->addSeparator();
+
+    if (d->actionGroupMapTheme)
+    {
+        delete d->actionGroupMapTheme;
+    }
+    d->actionGroupMapTheme = new QActionGroup(this);
+    d->actionGroupMapTheme->setExclusive(true);
+
+    KAction* const actionAtlas = new KAction(d->actionGroupMapTheme);
+    actionAtlas->setCheckable(true);
+    actionAtlas->setText(i18n("Atlas map"));
+    actionAtlas->setData("atlas");
+    actionAtlas->setChecked(getMapTheme()=="atlas");
+    configurationMenu->addAction(actionAtlas);
+
+    KAction* const actionOpenStreetmap = new KAction(d->actionGroupMapTheme);
+    actionOpenStreetmap->setCheckable(true);
+    actionOpenStreetmap->setText(i18n("OpenStreetMap"));
+    actionOpenStreetmap->setData("openstreetmap");
+    actionOpenStreetmap->setChecked(getMapTheme()=="openstreetmap");
+    configurationMenu->addAction(actionOpenStreetmap);
+
+    connect(d->actionGroupMapTheme, SIGNAL(triggered(QAction*)),
+            this, SLOT(slotMapThemeActionTriggered(QAction*)));
+}
+
+void BackendMarble::slotMapThemeActionTriggered(QAction* action)
+{
+    setMapTheme(action->data().toString());
+}
+
+QString BackendMarble::getMapTheme() const
+{
+    return d->cacheMapTheme;
+}
+
+void BackendMarble::setMapTheme(const QString& newMapTheme)
+{
+    d->cacheMapTheme = newMapTheme;
+
+    if (newMapTheme=="atlas")
+    {
+        d->marbleWidget->setMapThemeId("earth/srtm/srtm.dgml");
+    }
+    else if (newMapTheme=="openstreetmap")
+    {
+        d->marbleWidget->setMapThemeId("earth/openstreetmap/openstreetmap.dgml");
+    }
+
+    updateActionsEnabled();
+}
+
+void BackendMarble::updateActionsEnabled()
+{
+    if (!d->actionGroupMapTheme)
+        return;
+
+    const QList<QAction*> mapThemeActions = d->actionGroupMapTheme->actions();
+    for (int i=0; i<mapThemeActions.size(); ++i)
+    {
+        mapThemeActions.at(i)->setChecked(mapThemeActions.at(i)->data().toString()==getMapTheme());
+    }
+}
+
+void BackendMarble::saveSettingsToGroup(KConfigGroup* const group)
+{
+    Q_ASSERT(group!=0);
+    if (!group)
+        return;
+
+    group->writeEntry("Marble Map Theme", getMapTheme());
+}
+
+void BackendMarble::readSettingsFromGroup(const KConfigGroup* const group)
+{
+    Q_ASSERT(group!=0);
+    if (!group)
+        return;
+
+    setMapTheme(group->readEntry("Marble Map Theme", "atlas"));
 }
 
 } /* WMW2 */

@@ -29,6 +29,9 @@
 
 #include "worldmapwidget2_primitives.h"
 
+class KAction;
+class KConfigGroup;
+
 namespace WMW2 {
 
 class WorldMapWidget2Private;
@@ -47,13 +50,25 @@ public:
     WMWGeoCoordinate getCenter() const;
     void setCenter(const WMWGeoCoordinate& coordinate);
 
+    void saveSettingsToGroup(KConfigGroup* const group);
+    void readSettingsFromGroup(const KConfigGroup* const group);
+
+    KAction* getControlAction(const QString& actionName);
+    QWidget* getControlWidget();
+
+public Q_SLOTS:
+    void slotZoomIn();
+    void slotZoomOut();
+    void slotUpdateActionsEnabled();
 
 protected:
     void applyCacheToBackend();
     void saveBackendToCache();
+    void rebuildConfigurationMenu();
 
 protected Q_SLOTS:
     void slotBackendReady(const QString& backendName);
+    void slotChangeBackend(QAction* action);
 
 private:
     WorldMapWidget2Private* const d;

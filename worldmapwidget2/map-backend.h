@@ -28,6 +28,9 @@
 
 #include "worldmapwidget2_primitives.h"
 
+class QMenu;
+class KConfigGroup;
+
 namespace WMW2 {
 
 class MapBackendPrivate;
@@ -43,12 +46,21 @@ public:
     virtual ~MapBackend();
 
     virtual QString backendName() const = 0;
+    virtual QString backendHumanName() const = 0;
     virtual QWidget* mapWidget() const = 0;
 
     virtual WMWGeoCoordinate getCenter() const = 0;
     virtual void setCenter(const WMWGeoCoordinate& coordinate) = 0;
 
     virtual bool isReady() const = 0;
+
+    virtual void zoomIn() = 0;
+    virtual void zoomOut() = 0;
+
+    virtual void saveSettingsToGroup(KConfigGroup* const group) = 0;
+    virtual void readSettingsFromGroup(const KConfigGroup* const group) = 0;
+
+    virtual void addActionsToConfigurationMenu(QMenu* const configurationMenu) = 0;
 
 Q_SIGNALS:
     void signalBackendReady(const QString& backendName);

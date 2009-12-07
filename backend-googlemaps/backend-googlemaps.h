@@ -37,6 +37,7 @@ public:
     virtual ~BackendGoogleMaps();
 
     virtual QString backendName() const;
+    virtual QString backendHumanName() const;
     virtual QWidget* mapWidget() const;
 
     virtual WMWGeoCoordinate getCenter() const;
@@ -44,8 +45,22 @@ public:
 
     virtual bool isReady() const;
 
+    virtual void zoomIn();
+    virtual void zoomOut();
+
+    virtual void saveSettingsToGroup(KConfigGroup* const group);
+    virtual void readSettingsFromGroup(const KConfigGroup* const group);
+
+    virtual void addActionsToConfigurationMenu(QMenu* const configurationMenu);
+
+    QString getMapType() const;
+    void setMapType(const QString& newMapType);
+
 private Q_SLOTS:
     void slotHTMLInitialized();
+    void updateActionsEnabled();
+    void slotMapTypeActionTriggered(QAction* action);
+    void slotMapTypeChanged(const QString& newMapType);
 
 private:
     BackendGoogleMapsPrivate* const d;

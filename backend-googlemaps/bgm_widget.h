@@ -24,6 +24,10 @@
 
 #include <khtml_part.h>
 
+// local includes
+
+#include "worldmapwidget2_primitives.h"
+
 namespace WMW2 {
 
 class BGMWidgetPrivate;
@@ -36,13 +40,20 @@ public:
     BGMWidget(QWidget* const parent = 0);
     ~BGMWidget();
 
-    void loadInitialHTML();
+    void loadInitialHTML(const WMWGeoCoordinate& initialCenter = WMWGeoCoordinate(52.0, 6.0), const QString& initialMapType = "ROADMAP");
 
 protected:
     bool eventFilter(QObject* object, QEvent* event);
+    void khtmlMousePressEvent(khtml::MousePressEvent* e);
+    void khtmlMouseReleaseEvent(khtml::MouseReleaseEvent* e);
+    void khtmlMouseMoveEvent(khtml::MouseMoveEvent *e);
+    void scanForJSMessages();
 
 protected Q_SLOTS:
     void slotHTMLCompleted();
+
+Q_SIGNALS:
+    void signalMapTypeChanged(const QString& newMapType);
 
 private:
     BGMWidgetPrivate* const d;

@@ -32,8 +32,10 @@ public:
     MainWindow(QWidget* const parent = 0);
     ~MainWindow();
 
-private Q_SLOTS:
-    void slotBackendSelectionChanged(const QString& newBackendName);
+protected:
+    void readSettings();
+    void saveSettings();
+    void closeEvent(QCloseEvent* e);
 
 private:
     MainWindowPrivate* const d;

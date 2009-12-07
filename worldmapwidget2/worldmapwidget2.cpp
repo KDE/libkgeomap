@@ -19,11 +19,19 @@
 
 // Qt includes
 
+#include <QMenu>
+#include <QPointer>
 #include <QStackedLayout>
+#include <QToolButton>
 
 // KDE includes
 
+#include <kaction.h>
+#include <kconfig.h>
+#include <kconfiggroup.h>
 #include <kdebug.h>
+#include <khbox.h>
+#include <klocale.h>
 
 // local includes
 
@@ -42,9 +50,11 @@ public:
       currentBackend(0),
       currentBackendReady(false),
       currentBackendName(),
-      currentlyActivatingBackendName(),
-      currentlyActivatingBackend(0),
-      stackedLayout(0)
+      stackedLayout(0),
+      actionConfigurationMenu(0),
+      actionZoomIn(0),
+      actionZoomOut(0),
+      controlWidget(0)
     {
     }
     
@@ -52,12 +62,16 @@ public:
     MapBackend* currentBackend;
     bool currentBackendReady;
     QString currentBackendName;
-    QString currentlyActivatingBackendName;
-    MapBackend* currentlyActivatingBackend;
     QStackedLayout* stackedLayout;
 
     // these values are cached in case the backend is not ready:
     WMWGeoCoordinate cacheCenterCoordinate;
+
+    // actions for controlling the widget
+    QPointer<KAction> actionConfigurationMenu;
+    QPointer<KAction> actionZoomIn;
+    QPointer<KAction> actionZoomOut;
+    QPointer<QWidget> controlWidget;
 
 };
 
@@ -109,19 +123,23 @@ bool WorldMapWidget2::setBackend(const QString& backendName)
         if (backend->backendName() == backendName)
         {
             kDebug()<<QString("setting backend %1").arg(backendName);
-            d->currentlyActivatingBackend = backend;
-            d->currentlyActivatingBackendName = backendName;
-            d->currentBackend = 0;
-            d->currentBackendName.clear();
+            d->currentBackend = backend;
+            d->currentBackendName = backendName;
             d->currentBackendReady = false;
 
-            connect(d->currentlyActivatingBackend, SIGNAL(signalBackendReady(const QString&)),
+            connect(d->currentBackend, SIGNAL(signalBackendReady(const QString&)),
                     this, SLOT(slotBackendReady(const QString&)));
 
             // call this slot manually in case the backend was ready right away:
-            if (d->currentlyActivatingBackend->isReady())
-                slotBackendReady(d->currentlyActivatingBackendName);
-            
+            if (d->currentBackend->isReady())
+            {
+                slotBackendReady(d->currentBackendName);
+            }
+            else
+            {
+                rebuildConfigurationMenu();
+            }
+
             return true;
         }
     }
@@ -157,7 +175,7 @@ WMWGeoCoordinate WorldMapWidget2::getCenter() const
 void WorldMapWidget2::setCenter(const WMWGeoCoordinate& coordinate)
 {
     d->cacheCenterCoordinate = coordinate;
-    
+
     if (!d->currentBackendReady)
         return;
 
@@ -167,14 +185,10 @@ void WorldMapWidget2::setCenter(const WMWGeoCoordinate& coordinate)
 void WorldMapWidget2::slotBackendReady(const QString& backendName)
 {
     kDebug()<<QString("backend %1 is ready!").arg(backendName);
-    if (backendName != d->currentlyActivatingBackendName)
+    if (backendName != d->currentBackendName)
         return;
-    
+
     d->currentBackendReady = true;
-    d->currentBackend = d->currentlyActivatingBackend;
-    d->currentBackendName = d->currentlyActivatingBackendName;
-    d->currentlyActivatingBackendName.clear();
-    d->currentlyActivatingBackend = 0;
 
     QWidget* const currentMapWidget = d->currentBackend->mapWidget();
     bool foundWidget = false;
@@ -193,6 +207,196 @@ void WorldMapWidget2::slotBackendReady(const QString& backendName)
     }
 
     applyCacheToBackend();
+
+    rebuildConfigurationMenu();
+}
+
+void WorldMapWidget2::saveSettingsToGroup(KConfigGroup* const group)
+{
+    Q_ASSERT(group != 0);
+    if (!group)
+        return;
+
+    if (!d->currentBackendName.isEmpty())
+    {
+        group->writeEntry("Backend", d->currentBackendName);
+    }
+    group->writeEntry("Center", getCenter().geoUrl());
+
+    for (int i=0; i<d->loadedBackends.size(); ++i)
+    {
+        d->loadedBackends.at(i)->saveSettingsToGroup(group);
+    }
+}
+
+void WorldMapWidget2::readSettingsFromGroup(const KConfigGroup* const group)
+{
+    Q_ASSERT(group != 0);
+    if (!group)
+        return;
+
+    const QString alternativeBackendName = d->loadedBackends.isEmpty() ? "" : d->loadedBackends.first()->backendName();
+    setBackend(group->readEntry("Backend", alternativeBackendName));
+
+    const WMWGeoCoordinate centerDefault = WMWGeoCoordinate(52.0, 6.0);
+    const QString centerGeoUrl = group->readEntry("Center", centerDefault.geoUrl());
+    bool centerGeoUrlValid = false;
+    const WMWGeoCoordinate centerCoordinate = WMWGeoCoordinate::fromGeoUrl(centerGeoUrl, &centerGeoUrlValid);
+    setCenter(centerGeoUrlValid ? centerCoordinate : centerDefault);
+
+    for (int i=0; i<d->loadedBackends.size(); ++i)
+    {
+        d->loadedBackends.at(i)->readSettingsFromGroup(group);
+    }
+}
+
+void WorldMapWidget2::rebuildConfigurationMenu()
+{
+    if (!d->actionConfigurationMenu)
+    {
+        d->actionConfigurationMenu = new KAction(this);
+    }
+
+    QMenu* configurationMenu = d->actionConfigurationMenu->menu();
+    if (!configurationMenu)
+    {
+        configurationMenu = new QMenu(this);
+        d->actionConfigurationMenu->setMenu(configurationMenu);
+    }
+    else
+    {
+        configurationMenu->clear();
+    }
+
+    // create backend selection entries:
+    QActionGroup* const backendActionGroup = new QActionGroup(this);
+    backendActionGroup->setExclusive(true);
+    for (int i = 0; i<d->loadedBackends.size(); ++i)
+    {
+        const QString backendName = d->loadedBackends.at(i)->backendName();
+        KAction* backendAction = new KAction(backendActionGroup);
+        backendAction->setData(backendName);
+        backendAction->setText(d->loadedBackends.at(i)->backendHumanName());
+        backendAction->setCheckable(true);
+        
+        if (backendName==d->currentBackendName)
+        {
+            backendAction->setChecked(true);
+        }
+
+        configurationMenu->addAction(backendAction);
+    }
+
+    if (d->currentBackendReady)
+    {
+        d->currentBackend->addActionsToConfigurationMenu(configurationMenu);
+    }
+
+    connect(backendActionGroup, SIGNAL(triggered(QAction*)),
+            this, SLOT(slotChangeBackend(QAction*)));
+}
+
+KAction* WorldMapWidget2::getControlAction(const QString& actionName)
+{
+    if (actionName=="configuration")
+    {
+        bool needToRebuildMenu = !d->actionConfigurationMenu;
+        if (!needToRebuildMenu)
+        {
+            needToRebuildMenu = !d->actionConfigurationMenu->menu();
+        }
+        if (needToRebuildMenu)
+        {
+            rebuildConfigurationMenu();
+        }
+        return d->actionConfigurationMenu;
+    }
+    else if (actionName=="zoomin")
+    {
+        if (!d->actionZoomIn)
+        {
+            d->actionZoomIn = new KAction(this);
+            d->actionZoomIn->setIcon(SmallIcon("zoom-in"));
+            d->actionZoomIn->setToolTip(i18n("Zoom in"));
+            connect(d->actionZoomIn, SIGNAL(triggered()),
+                    this, SLOT(slotZoomIn()));
+        }
+        return d->actionZoomIn;
+    }
+    else if (actionName=="zoomout")
+    {
+        if (!d->actionZoomOut)
+        {
+            d->actionZoomOut = new KAction(this);
+            d->actionZoomOut->setIcon(SmallIcon("zoom-out"));
+            d->actionZoomOut->setToolTip(i18n("Zoom out"));
+            connect(d->actionZoomOut, SIGNAL(triggered()),
+                    this, SLOT(slotZoomOut()));
+        }
+        return d->actionZoomOut;
+    }
+
+    return 0;
+}
+
+QWidget* WorldMapWidget2::getControlWidget()
+{
+    if (!d->controlWidget)
+    {
+        d->controlWidget = new KHBox(this);
+
+        QToolButton* const configurationButton = new QToolButton(d->controlWidget);
+        configurationButton->setToolTip(i18n("Map settings"));
+        configurationButton->setIcon(SmallIcon("applications-internet"));
+        configurationButton->setMenu(getControlAction("configuration")->menu());
+        configurationButton->setPopupMode(QToolButton::InstantPopup);
+
+        QToolButton* const zoomInButton = new QToolButton(d->controlWidget);
+        zoomInButton->setDefaultAction(getControlAction("zoomin"));
+
+        QToolButton* const zoomOutButton = new QToolButton(d->controlWidget);
+        zoomOutButton->setDefaultAction(getControlAction("zoomout"));
+
+        QHBoxLayout* const hBoxLayout = reinterpret_cast<QHBoxLayout*>(d->controlWidget->layout());
+        if (hBoxLayout)
+        {
+            hBoxLayout->addStretch();
+        }
+    }
+
+    return d->controlWidget;
+}
+
+void WorldMapWidget2::slotZoomIn()
+{
+    if (!d->currentBackendReady)
+        return;
+    
+    d->currentBackend->zoomIn();
+}
+
+void WorldMapWidget2::slotZoomOut()
+{
+    if (!d->currentBackendReady)
+        return;
+
+    d->currentBackend->zoomOut();
+}
+
+void WorldMapWidget2::slotUpdateActionsEnabled()
+{
+    
+}
+
+void WorldMapWidget2::slotChangeBackend(QAction* action)
+{
+    Q_ASSERT(action!=0);
+    
+    if (!action)
+        return;
+
+    const QString newBackendName = action->data().toString();
+    setBackend(newBackendName);
 }
 
 } /* WMW2 */

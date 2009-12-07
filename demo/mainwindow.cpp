@@ -24,12 +24,15 @@
 #include <QComboBox>
 #include <QLabel>
 #include <QPushButton>
+#include <QCloseEvent>
 
 // KDE includes
 
 #include <klocale.h>
 #include <klineedit.h>
 #include <kiconloader.h>
+#include <kconfig.h>
+#include <kconfiggroup.h>
 
 // local includes
 
@@ -42,21 +45,12 @@ class MainWindowPrivate
 {
 public:
     MainWindowPrivate()
-    : mapWidget(0),
-      backendSelector(0),
-      inputLatitude(0),
-      inputLongitude(0),
-      buttonGo(0)
+    : mapWidget(0)
     {
 
     }
-    
+
     WorldMapWidget2* mapWidget;
-    QComboBox* backendSelector;
-    KLineEdit* inputLatitude;
-    KLineEdit* inputLongitude;
-    QPushButton* buttonGo;
-    
 };
 
 MainWindow::MainWindow(QWidget* const parent)
@@ -70,31 +64,9 @@ MainWindow::MainWindow(QWidget* const parent)
 
     d->mapWidget = new WorldMapWidget2(this);
     vbox->addWidget(d->mapWidget);
-    d->mapWidget->setBackend("marble");
+    vbox->addWidget(d->mapWidget->getControlWidget());
 
-    // backend selector
-    QWidget* dummyWidget = new QWidget(this);
-    QHBoxLayout* hbox = new QHBoxLayout(dummyWidget);
-    vbox->addWidget(dummyWidget);
-    
-    hbox->addWidget(new QLabel(i18n("Backend:")));
-    d->backendSelector = new QComboBox(this);
-    hbox->addWidget(d->backendSelector);
-    const QStringList backends = d->mapWidget->availableBackends();
-    QString backendName;
-    foreach(backendName, backends)
-    {
-        d->backendSelector->addItem(backendName);
-    }
-
-    hbox->addStretch();
-
-    connect(d->backendSelector, SIGNAL(currentIndexChanged(const QString&)),
-            this, SLOT(slotBackendSelectionChanged(const QString&)));
-
-    slotBackendSelectionChanged(d->backendSelector->currentText());
-
-    d->mapWidget->setCenter(WMWGeoCoordinate(51.1, 6.9));
+    readSettings();
 }
 
 MainWindow::~MainWindow()
@@ -102,10 +74,27 @@ MainWindow::~MainWindow()
     delete d;
 }
 
-void MainWindow::slotBackendSelectionChanged(const QString& newBackendName)
+void MainWindow::readSettings()
 {
-    d->mapWidget->setBackend(newBackendName);
+    KConfig config("worldmapwidget2-demo-1");
+    const KConfigGroup groupWidgetConfig = config.group(QString("WidgetConfig"));
+    d->mapWidget->readSettingsFromGroup(&groupWidgetConfig);
+
 }
 
+void MainWindow::saveSettings()
+{
+    KConfig config("worldmapwidget2-demo-1");
+    KConfigGroup groupWidgetConfig = config.group(QString("WidgetConfig"));
+    d->mapWidget->saveSettingsToGroup(&groupWidgetConfig);
+}
 
+void MainWindow::closeEvent(QCloseEvent* e)
+{
+    if (!e)
+        return;
+
+    saveSettings();
+    e->accept();
+}
 
