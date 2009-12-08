@@ -44,15 +44,19 @@ public:
     BackendMarblePrivate()
     : marbleWidget(0),
       actionGroupMapTheme(0),
-      cacheMapTheme("atlas")
+      actionGroupProjection(0),
+      cacheMapTheme("atlas"),
+      cacheProjection("spherical")
     {
     }
 
     QPointer<BMWidget> marbleWidget;
 
     QPointer<QActionGroup> actionGroupMapTheme;
+    QPointer<QActionGroup> actionGroupProjection;
 
     QString cacheMapTheme;
+    QString cacheProjection;
 };
 
 BackendMarble::BackendMarble(WMWSharedData* const sharedData, QObject* const parent)
@@ -148,6 +152,43 @@ void BackendMarble::addActionsToConfigurationMenu(QMenu* const configurationMenu
 
     connect(d->actionGroupMapTheme, SIGNAL(triggered(QAction*)),
             this, SLOT(slotMapThemeActionTriggered(QAction*)));
+
+    configurationMenu->addSeparator();
+
+    if (d->actionGroupProjection)
+    {
+        delete d->actionGroupProjection;
+    }
+    d->actionGroupProjection = new QActionGroup(this);
+    d->actionGroupProjection->setExclusive(true);
+
+    // TODO: we need a parent for this guy!
+    QMenu* const projectionSubMenu = new QMenu(i18n("Projection")/*, this*/);
+    configurationMenu->addMenu(projectionSubMenu);
+
+    KAction* const actionSpherical = new KAction(d->actionGroupProjection);
+    actionSpherical->setCheckable(true);
+    actionSpherical->setText(i18n("Spherical"));
+    actionSpherical->setData("spherical");
+    actionSpherical->setChecked(getProjection()=="spherical");
+    projectionSubMenu->addAction(actionSpherical);
+
+    KAction* const actionMercator = new KAction(d->actionGroupProjection);
+    actionMercator->setCheckable(true);
+    actionMercator->setText(i18n("Mercator"));
+    actionMercator->setData("mercator");
+    actionMercator->setChecked(getProjection()=="spherical");
+    projectionSubMenu->addAction(actionMercator);
+
+    KAction* const actionEquirectangular = new KAction(d->actionGroupProjection);
+    actionEquirectangular->setCheckable(true);
+    actionEquirectangular->setText(i18n("Equirectangular"));
+    actionEquirectangular->setData("equirectangular");
+    actionEquirectangular->setChecked(getProjection()=="equirectangular");
+    projectionSubMenu->addAction(actionEquirectangular);
+
+    connect(d->actionGroupProjection, SIGNAL(triggered(QAction*)),
+            this, SLOT(slotProjectionActionTriggered(QAction*)));
 }
 
 void BackendMarble::slotMapThemeActionTriggered(QAction* action)
@@ -157,6 +198,7 @@ void BackendMarble::slotMapThemeActionTriggered(QAction* action)
 
 QString BackendMarble::getMapTheme() const
 {
+    // TODO: read the theme from the marblewidget!
     return d->cacheMapTheme;
 }
 
@@ -164,13 +206,16 @@ void BackendMarble::setMapTheme(const QString& newMapTheme)
 {
     d->cacheMapTheme = newMapTheme;
 
-    if (newMapTheme=="atlas")
+    if (d->marbleWidget)
     {
-        d->marbleWidget->setMapThemeId("earth/srtm/srtm.dgml");
-    }
-    else if (newMapTheme=="openstreetmap")
-    {
-        d->marbleWidget->setMapThemeId("earth/openstreetmap/openstreetmap.dgml");
+        if (newMapTheme=="atlas")
+        {
+            d->marbleWidget->setMapThemeId("earth/srtm/srtm.dgml");
+        }
+        else if (newMapTheme=="openstreetmap")
+        {
+            d->marbleWidget->setMapThemeId("earth/openstreetmap/openstreetmap.dgml");
+        }
     }
 
     updateActionsEnabled();
@@ -178,13 +223,22 @@ void BackendMarble::setMapTheme(const QString& newMapTheme)
 
 void BackendMarble::updateActionsEnabled()
 {
-    if (!d->actionGroupMapTheme)
-        return;
-
-    const QList<QAction*> mapThemeActions = d->actionGroupMapTheme->actions();
-    for (int i=0; i<mapThemeActions.size(); ++i)
+    if (d->actionGroupMapTheme)
     {
-        mapThemeActions.at(i)->setChecked(mapThemeActions.at(i)->data().toString()==getMapTheme());
+        const QList<QAction*> mapThemeActions = d->actionGroupMapTheme->actions();
+        for (int i=0; i<mapThemeActions.size(); ++i)
+        {
+            mapThemeActions.at(i)->setChecked(mapThemeActions.at(i)->data().toString()==getMapTheme());
+        }
+    }
+
+    if (d->actionGroupProjection)
+    {
+        const QList<QAction*> projectionActions = d->actionGroupProjection->actions();
+        for (int i=0; i<projectionActions.size(); ++i)
+        {
+            projectionActions.at(i)->setChecked(projectionActions.at(i)->data().toString()==getProjection());
+        }
     }
 }
 
@@ -195,6 +249,7 @@ void BackendMarble::saveSettingsToGroup(KConfigGroup* const group)
         return;
 
     group->writeEntry("Marble Map Theme", getMapTheme());
+    group->writeEntry("Marble Projection", getProjection());
 }
 
 void BackendMarble::readSettingsFromGroup(const KConfigGroup* const group)
@@ -204,6 +259,7 @@ void BackendMarble::readSettingsFromGroup(const KConfigGroup* const group)
         return;
 
     setMapTheme(group->readEntry("Marble Map Theme", "atlas"));
+    setProjection(group->readEntry("Marble Projection", "spherical"));
 }
 
 void BackendMarble::updateMarkers()
@@ -254,6 +310,59 @@ void BackendMarble::marbleCustomPaint(Marble::GeoPainter* painter)
     }
 
     painter->restore();
+}
+
+QString BackendMarble::getProjection() const
+{
+    if (d->marbleWidget)
+    {
+        const Projection currentProjection = d->marbleWidget->projection();
+        switch (currentProjection)
+        {
+        case Equirectangular:
+            d->cacheProjection = "equirectangular";
+            break;
+
+        case Mercator:
+            d->cacheProjection = "mercator";
+            break;
+
+        default:
+        case Spherical:
+            d->cacheProjection = "spherical";
+            break;
+        }
+    }
+
+    return d->cacheProjection;
+}
+
+void BackendMarble::setProjection(const QString& newProjection)
+{
+    d->cacheProjection = newProjection;
+    
+    if (d->marbleWidget)
+    {
+        if (newProjection=="equirectangular")
+        {
+            d->marbleWidget->setProjection(Equirectangular);
+        }
+        else if (newProjection=="mercator")
+        {
+            d->marbleWidget->setProjection(Mercator);
+        }
+        else /*if (newProjection=="spherical")*/
+        {
+            d->marbleWidget->setProjection(Spherical);
+        }
+    }
+
+    updateActionsEnabled();
+}
+
+void BackendMarble::slotProjectionActionTriggered(QAction* action)
+{
+    setProjection(action->data().toString());
 }
 
 } /* WMW2 */

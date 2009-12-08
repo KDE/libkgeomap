@@ -62,6 +62,9 @@ public:
     QString getMapTheme() const;
     void setMapTheme(const QString& newMapTheme);
 
+    QString getProjection() const;
+    void setProjection(const QString& newProjection);
+
     bool screenCoordinates(const WMWGeoCoordinate& coordinates, QPoint* const point);
 
     void marbleCustomPaint(Marble::GeoPainter* painter);
@@ -71,6 +74,7 @@ protected:
 
 protected Q_SLOTS:
     void slotMapThemeActionTriggered(QAction* action);
+    void slotProjectionActionTriggered(QAction* action);
 
 private:
     BackendMarblePrivate* const d;
