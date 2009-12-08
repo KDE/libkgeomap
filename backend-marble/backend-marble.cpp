@@ -27,11 +27,12 @@
 #include <kaction.h>
 #include <kconfiggroup.h>
 #include <klocale.h>
-#include <marble/MarbleWidget.h>
+#include <marble/GeoPainter.h>
 
 // local includes
 
 #include "backend-marble.h"
+#include "bm-widget.h"
 
 using namespace Marble;
 
@@ -47,17 +48,17 @@ public:
     {
     }
 
-    QPointer<MarbleWidget> marbleWidget;
+    QPointer<BMWidget> marbleWidget;
 
     QPointer<QActionGroup> actionGroupMapTheme;
 
     QString cacheMapTheme;
 };
 
-BackendMarble::BackendMarble(QObject* const parent)
-: MapBackend(parent), d(new BackendMarblePrivate())
+BackendMarble::BackendMarble(WMWSharedData* const sharedData, QObject* const parent)
+: MapBackend(sharedData, parent), d(new BackendMarblePrivate())
 {
-    d->marbleWidget = new MarbleWidget();
+    d->marbleWidget = new BMWidget(this);
     setMapTheme(d->cacheMapTheme);
 
     d->marbleWidget->setShowCompass(false);
@@ -203,6 +204,56 @@ void BackendMarble::readSettingsFromGroup(const KConfigGroup* const group)
         return;
 
     setMapTheme(group->readEntry("Marble Map Theme", "atlas"));
+}
+
+void BackendMarble::updateMarkers()
+{
+    // just redraw, that's it:
+    d->marbleWidget->update();
+}
+
+bool BackendMarble::screenCoordinates(const WMWGeoCoordinate& coordinates, QPoint* const point)
+{
+    if (!d->marbleWidget)
+        return false;
+
+    qreal x, y;
+    const bool isVisible = d->marbleWidget->screenCoordinates(coordinates.lon, coordinates.lat, x, y);
+    if (!isVisible)
+        return false;
+
+    if (point)
+    {
+        *point = QPoint(x, y);
+    }
+
+    return true;
+}
+
+void BackendMarble::marbleCustomPaint(Marble::GeoPainter* painter)
+{
+    painter->save();
+    painter->autoMapQuality();
+
+    QPen circlePen(Qt::cyan);
+    QBrush circleBrush(Qt::green);
+    const int circleRadius = 15;
+
+    // render all visible markers:
+    for (QIntList::const_iterator it = s->visibleMarkers.constBegin(); it!=s->visibleMarkers.constEnd(); ++it)
+    {
+        const int currentIndex = *it;
+        const WMWMarker* const currentMarker = &(s->markerList.at(currentIndex));
+        QPoint markerPoint;
+        if (!screenCoordinates(currentMarker->coordinates, &markerPoint))
+            continue;
+
+        painter->setPen(circlePen);
+        painter->setBrush(circleBrush);
+        painter->drawEllipse(markerPoint.x()-circleRadius, markerPoint.y()-circleRadius, 2*circleRadius, 2*circleRadius);
+    }
+
+    painter->restore();
 }
 
 } /* WMW2 */

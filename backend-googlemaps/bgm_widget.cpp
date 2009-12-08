@@ -73,6 +73,16 @@ void BGMWidget::loadInitialHTML(const WMWGeoCoordinate& initialCenter, const QSt
 "<script type=\"text/javascript\">\n"
 "   var map;\n"
 "   var eventBuffer = new Array();\n"
+"   var markerList = new Object();\n"
+"   function wmwPostEventString(eventString) {\n"
+"       eventBuffer.push(eventString);\n"
+"       window.status = '(event)';\n"
+"   }\n"
+"   function wmwReadEventStrings() {\n"
+"       var eventBufferString = eventBuffer.join('|');\n"
+"       eventBuffer = new Array();\n"
+"       return eventBufferString;\n"
+"   }\n"
 "   function wmwSetZoom(zoomvalue) {\n"
 "       map.setZoom(zoomvalue);\n"
 "   }\n"
@@ -108,14 +118,30 @@ void BGMWidget::loadInitialHTML(const WMWGeoCoordinate& initialCenter, const QSt
 "       if (myMapType == google.maps.MapTypeId.TERRAIN )  { return \"TERRAIN\"; }\n"
 "       return "";\n" // unexpected result
 "   }\n"
-"   function wmwPostEventString(eventString) {\n"
-"       eventBuffer.push(eventString);\n"
-"       window.status = '(event)';\n"
+"   function wmwClearMarkers() {\n"
+"       for (var i in markerList) {\n"
+"           markerList[i].setMap(null);\n"
+"       }\n"
+"       markerList = new Object();\n"
 "   }\n"
-"   function wmwReadEventStrings() {\n"
-"       var eventBufferString = eventBuffer.join('|');\n"
-"       eventBuffer = new Array();\n"
-"       return eventBufferString;\n"
+"   function wmwAddMarker(id, lat, lon, setDraggable) {\n"
+"       var latlng = new google.maps.LatLng(lat, lon);\n"
+"       var marker = new google.maps.Marker({\n"
+"           position: latlng,\n"
+"           map: map,\n"
+"           draggable: setDraggable\n"
+"       });\n"
+"       google.maps.event.addListener(marker, 'dragend', function() {\n"
+"           wmwPostEventString('mm'+id.toString());\n"
+"       });\n"
+"       markerList[id] = marker;\n"
+"   }\n"
+"   function wmwGetMarkerPosition(id) {\n"
+"       var latlngString;\n"
+"       if (markerList[id.toString()]) {\n"
+"           latlngString = markerList[id.toString()].getPosition().toUrlValue(12);\n"
+"       }\n"
+"       return latlngString;\n"
 "   }\n"
 "   function initialize() {\n"
 "       var latlng = new google.maps.LatLng(%1, %2);\n"
@@ -210,18 +236,8 @@ void BGMWidget::scanForJSMessages()
         return;
 
     const QStringList events = eventBufferString.split('|');
-    for (QStringList::const_iterator it = events.constBegin(); it!=events.constEnd(); ++it)
-    {
-        const QString eventCode = it->left(2);
-        const QString eventParameter = it->mid(2);
-        const QStringList eventParameters = eventParameter.split('/');
 
-        if (eventCode=="MT")
-        {
-            // map type changed
-            emit(signalMapTypeChanged(eventParameter));
-        }
-    }
+    emit(signalHTMLEvents(events));
 }
 
 } /* WMW2 */

@@ -24,6 +24,7 @@
 
 #include <QString>
 #include <QStringList>
+#include <QVariant>
 
 // Kde includes
 
@@ -143,7 +144,69 @@ public:
     }
 };
 
+class WMWMarker
+{
+public:
+    WMWMarker()
+    : coordinates(),
+      data(),
+      attributes()
+    {
+    }
+
+    WMWMarker(const WMWGeoCoordinate& geoCoordinate)
+    : coordinates(geoCoordinate),
+      data(),
+      attributes()
+    {
+    }
+
+    WMWGeoCoordinate coordinates;
+    QVariant data;
+
+    enum MarkerAttribute
+    {
+        MarkerDraggable = 1
+    };
+    Q_DECLARE_FLAGS(MarkerAttributes, MarkerAttribute)
+    MarkerAttributes attributes;
+
+    bool isDraggable() const { return attributes.testFlag(MarkerDraggable); }
+    void setDraggable(const bool state)
+    {
+        if (state)
+        {
+            attributes|=MarkerDraggable;
+        }
+        else
+        {
+            attributes&=~MarkerDraggable;
+        }
+    }
+
+    typedef QList<WMWMarker> List;
+
+};
+
+typedef QList<int> QIntList;
+
+class WMWSharedData
+{
+public:
+    WMWSharedData()
+    : markerList(),
+      visibleMarkers()
+    {
+    }
+
+    WMWMarker::List markerList;
+    QIntList visibleMarkers;
+
+};
+
 } /* WMW2 */
+
+Q_DECLARE_OPERATORS_FOR_FLAGS(WMW2::WMWMarker::MarkerAttributes)
 
 // Q_DECLARE_METATYPE(WMW2::WMWGeoCoordinate)
 

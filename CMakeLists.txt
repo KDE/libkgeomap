@@ -36,6 +36,7 @@ SET( widget_sources
 
 SET( backend_marble_sources
     backend-marble/backend-marble.cpp
+    backend-marble/bm-widget.cpp
 )
 
 SET( backend_googlemaps_sources

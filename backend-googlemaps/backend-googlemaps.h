@@ -33,7 +33,7 @@ class BackendGoogleMaps : public MapBackend
 Q_OBJECT
 
 public:
-    BackendGoogleMaps(QObject* const parent = 0);
+    BackendGoogleMaps(WMWSharedData* const sharedData, QObject* const parent = 0);
     virtual ~BackendGoogleMaps();
 
     virtual QString backendName() const;
@@ -53,6 +53,8 @@ public:
 
     virtual void addActionsToConfigurationMenu(QMenu* const configurationMenu);
 
+    virtual void updateMarkers();
+
     QString getMapType() const;
     void setMapType(const QString& newMapType);
 
@@ -61,9 +63,11 @@ private Q_SLOTS:
     void updateActionsEnabled();
     void slotMapTypeActionTriggered(QAction* action);
     void slotMapTypeChanged(const QString& newMapType);
+    void slotHTMLEvents(const QStringList& eventStrings);
 
 private:
     BackendGoogleMapsPrivate* const d;
+    bool googleVariantToCoordinates(const QVariant& googleVariant, WMWGeoCoordinate* const coordinates) const;
 };
 
 } /* WMW2 */

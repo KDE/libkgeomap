@@ -1,7 +1,7 @@
 /* ============================================================
  *
- * Date        : 2009-12-01
- * Description : Base-class for backends for WorldMapWidget2
+ * Date        : 2009-12-08
+ * Description : Marble-backend for WorldMapWidget2
  *
  * Copyright (C) 2009 by Michael G. Hansen <mike at mghansen dot de>
  *
@@ -17,30 +17,33 @@
  *
  * ============================================================ */
 
-// local includes
+#ifndef BM_MARBLE_H
+#define BM_MARBLE_H
 
-#include "map-backend.h"
+// KDE includes
+
+#include <marble/MarbleWidget.h>
 
 namespace WMW2 {
 
-class MapBackendPrivate
+class BackendMarble;
+
+class BMWidget : public Marble::MarbleWidget
 {
+Q_OBJECT
+
 public:
-    MapBackendPrivate()
-    {
-    }
+    BMWidget(BackendMarble* const pMarbleBackend, QWidget* const parent = 0);
+    virtual ~BMWidget();
+
+protected:
+    virtual void customPaint(Marble::GeoPainter* painter);
+
+private:
+    BackendMarble* const marbleBackend;
 };
 
-MapBackend::MapBackend(WMWSharedData* const sharedData, QObject* const parent)
-: QObject(parent), s(sharedData), d(new MapBackendPrivate())
-{
-
-}
-
-MapBackend::~MapBackend()
-{
-    delete d;
-}
-
 } /* WMW2 */
+
+#endif /* BM_MARBLE_H */
 

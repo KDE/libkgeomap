@@ -53,7 +53,7 @@ protected Q_SLOTS:
     void slotHTMLCompleted();
 
 Q_SIGNALS:
-    void signalMapTypeChanged(const QString& newMapType);
+    void signalHTMLEvents(const QStringList& events);
 
 private:
     BGMWidgetPrivate* const d;

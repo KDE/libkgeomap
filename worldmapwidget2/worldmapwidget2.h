@@ -56,6 +56,9 @@ public:
     KAction* getControlAction(const QString& actionName);
     QWidget* getControlWidget();
 
+    void addMarkers(const WMWMarker::List& markerList);
+    void updateMarkers();
+
 public Q_SLOTS:
     void slotZoomIn();
     void slotZoomOut();
@@ -71,6 +74,7 @@ protected Q_SLOTS:
     void slotChangeBackend(QAction* action);
 
 private:
+    WMWSharedData* const s;
     WorldMapWidget2Private* const d;
 };
 

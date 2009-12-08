@@ -67,6 +67,18 @@ MainWindow::MainWindow(QWidget* const parent)
     vbox->addWidget(d->mapWidget->getControlWidget());
 
     readSettings();
+
+    WMWMarker::List markerList;
+    for (double i = 0.0; i<6.0; ++i)
+    {
+        for (double j=0.0; j<6.0; ++j)
+        {
+            WMWMarker myMarker(WMWGeoCoordinate(52.0+i, 6.0+j));
+            myMarker.setDraggable(true);
+            markerList<<myMarker;
+        }
+    }
+    d->mapWidget->addMarkers(markerList);
 }
 
 MainWindow::~MainWindow()

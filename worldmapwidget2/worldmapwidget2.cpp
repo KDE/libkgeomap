@@ -72,17 +72,16 @@ public:
     QPointer<KAction> actionZoomIn;
     QPointer<KAction> actionZoomOut;
     QPointer<QWidget> controlWidget;
-
 };
 
 WorldMapWidget2::WorldMapWidget2(QWidget* const parent)
-: QWidget(parent), d(new WorldMapWidget2Private)
+: QWidget(parent), s(new WMWSharedData), d(new WorldMapWidget2Private)
 {
     d->stackedLayout = new QStackedLayout(this);
     setLayout(d->stackedLayout);
 
-    d->loadedBackends.append(new BackendGoogleMaps(this));
-    d->loadedBackends.append(new BackendMarble(this));
+    d->loadedBackends.append(new BackendGoogleMaps(s, this));
+    d->loadedBackends.append(new BackendMarble(s, this));
 }
 
 WorldMapWidget2::~WorldMapWidget2()
@@ -207,6 +206,8 @@ void WorldMapWidget2::slotBackendReady(const QString& backendName)
     }
 
     applyCacheToBackend();
+
+    updateMarkers();
 
     rebuildConfigurationMenu();
 }
@@ -397,6 +398,29 @@ void WorldMapWidget2::slotChangeBackend(QAction* action)
 
     const QString newBackendName = action->data().toString();
     setBackend(newBackendName);
+}
+
+void WorldMapWidget2::addMarkers(const WMWMarker::List& markerList)
+{
+    const int oldMarkerCount = s->markerList.count();
+    s->markerList << markerList;
+
+    // TODO: clustering
+    for (int i=0; i<markerList.count(); ++i)
+    {
+        s->visibleMarkers << oldMarkerCount + i;
+    }
+
+    updateMarkers();
+}
+
+void WorldMapWidget2::updateMarkers()
+{
+    if (!d->currentBackendReady)
+        return;
+
+    // tell the backend to update the markers
+    d->currentBackend->updateMarkers();
 }
 
 } /* WMW2 */

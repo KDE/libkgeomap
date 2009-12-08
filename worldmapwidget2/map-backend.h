@@ -42,7 +42,7 @@ Q_OBJECT
 
 public:
 
-    MapBackend(QObject* const parent);
+    MapBackend(WMWSharedData* const sharedData, QObject* const parent);
     virtual ~MapBackend();
 
     virtual QString backendName() const = 0;
@@ -62,8 +62,13 @@ public:
 
     virtual void addActionsToConfigurationMenu(QMenu* const configurationMenu) = 0;
 
+    virtual void updateMarkers() = 0;
+
+    WMWSharedData* const s;
+
 Q_SIGNALS:
     void signalBackendReady(const QString& backendName);
+    void signalMarkerMoved(const int markerIndex);
 
 private:
     MapBackendPrivate* const d;

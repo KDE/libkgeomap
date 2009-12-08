@@ -56,8 +56,8 @@ public:
     QString cacheMapType;
 };
 
-BackendGoogleMaps::BackendGoogleMaps(QObject* const parent)
-: MapBackend(parent), d(new BackendGoogleMapsPrivate())
+BackendGoogleMaps::BackendGoogleMaps(WMWSharedData* const sharedData, QObject* const parent)
+: MapBackend(sharedData, parent), d(new BackendGoogleMapsPrivate())
 {
     d->bgmWidgetWrapper = new QWidget();
     d->bgmWidgetWrapper->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
@@ -67,8 +67,8 @@ BackendGoogleMaps::BackendGoogleMaps(QObject* const parent)
     connect(d->bgmWidget, SIGNAL(completed()),
             this, SLOT(slotHTMLInitialized()));
 
-    connect(d->bgmWidget, SIGNAL(signalMapTypeChanged(const QString&)),
-            this, SLOT(slotMapTypeChanged(const QString&)));
+    connect(d->bgmWidget, SIGNAL(signalHTMLEvents(const QStringList&)),
+            this, SLOT(slotHTMLEvents(const QStringList&)));
 
     d->bgmWidget->loadInitialHTML();
 }
@@ -97,13 +97,12 @@ QWidget* BackendGoogleMaps::mapWidget() const
     return d->bgmWidgetWrapper.data();
 }
 
-WMWGeoCoordinate BackendGoogleMaps::getCenter() const
+bool BackendGoogleMaps::googleVariantToCoordinates(const QVariant& googleVariant, WMWGeoCoordinate* const coordinates) const
 {
-    QVariant theCenter = d->bgmWidget->executeScript("wmwGetCenter();");
-    bool valid = ( theCenter.type()==QVariant::String );
+    bool valid = ( googleVariant.type()==QVariant::String );
     if (valid)
     {
-        QStringList coordinateStrings = theCenter.toString().split(',');
+        QStringList coordinateStrings = googleVariant.toString().split(',');
         valid = ( coordinateStrings.size() == 2 );
         if (valid)
         {
@@ -116,12 +115,27 @@ WMWGeoCoordinate BackendGoogleMaps::getCenter() const
 
             if (valid)
             {
-                return WMWGeoCoordinate(ptLatitude, ptLongitude);
+                if (coordinates)
+                {
+                    *coordinates = WMWGeoCoordinate(ptLatitude, ptLongitude);
+                }
+                
+                return true;
             }
         }
     }
 
-    return WMWGeoCoordinate();
+    return false;
+}
+
+WMWGeoCoordinate BackendGoogleMaps::getCenter() const
+{
+    WMWGeoCoordinate centerCoordinates;
+
+    // there is nothing we can do if the coordinates are invalid
+    /*const bool isValid = */googleVariantToCoordinates(d->bgmWidget->executeScript("wmwGetCenter();"), &centerCoordinates);
+
+    return centerCoordinates;
 }
 
 void BackendGoogleMaps::setCenter(const WMWGeoCoordinate& coordinate)
@@ -267,6 +281,70 @@ void BackendGoogleMaps::slotMapTypeChanged(const QString& newMapType)
     d->cacheMapType = newMapType;
 
     updateActionsEnabled();
+}
+
+void BackendGoogleMaps::updateMarkers()
+{
+    Q_ASSERT(isReady());
+    if (!isReady())
+        return;
+    
+    // re-transfer all markers to the javascript-part:
+    d->bgmWidget->executeScript(QString("wmwClearMarkers();"));
+    for (QIntList::const_iterator it = s->visibleMarkers.constBegin(); it!=s->visibleMarkers.constEnd(); ++it)
+    {
+        const int currentIndex = *it;
+        const WMWMarker& currentMarker = s->markerList.at(currentIndex);
+
+        d->bgmWidget->executeScript(QString("wmwAddMarker(%1, %2, %3, %4);")
+                .arg(currentIndex)
+                .arg(currentMarker.coordinates.latString())
+                .arg(currentMarker.coordinates.lonString())
+                .arg(currentMarker.isDraggable()?"true":"false")
+            );
+    }
+    
+}
+
+void BackendGoogleMaps::slotHTMLEvents(const QStringList& events)
+{
+    for (QStringList::const_iterator it = events.constBegin(); it!=events.constEnd(); ++it)
+    {
+        const QString eventCode = it->left(2);
+        const QString eventParameter = it->mid(2);
+        const QStringList eventParameters = eventParameter.split('/');
+
+        if (eventCode=="MT")
+        {
+            // map type changed
+            slotMapTypeChanged(eventParameter);
+        }
+        else if (eventCode=="mm")
+        {
+            // marker moved
+            bool okay = false;
+            const int markerIndex = eventParameter.toInt(&okay);
+            if (!okay)
+                continue;
+
+            if ((markerIndex<0)||(markerIndex>s->markerList.size()))
+                continue;
+
+            // re-read the marker position:
+            WMWGeoCoordinate markerCoordinates;
+            const bool isValid = googleVariantToCoordinates(
+                d->bgmWidget->executeScript(QString("wmwGetMarkerPosition(%1);").arg(markerIndex)),
+                                                            &markerCoordinates);
+
+            if (!isValid)
+                continue;
+
+            // TODO: this discards the altitude!
+            s->markerList[markerIndex].coordinates = markerCoordinates;
+
+            emit(signalMarkerMoved(markerIndex));
+        }
+    }
 }
 
 } /* WMW2 */

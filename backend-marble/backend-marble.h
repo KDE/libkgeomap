@@ -24,6 +24,10 @@
 
 #include "map-backend.h"
 
+namespace Marble {
+    class GeoPainter;
+} /* Marble */
+
 namespace WMW2 {
 
 class BackendMarblePrivate;
@@ -33,7 +37,7 @@ class BackendMarble : public MapBackend
 Q_OBJECT
 
 public:
-    BackendMarble(QObject* const parent = 0);
+    BackendMarble(WMWSharedData* const sharedData, QObject* const parent = 0);
     virtual ~BackendMarble();
 
     virtual QString backendName() const;
@@ -53,8 +57,14 @@ public:
 
     virtual void addActionsToConfigurationMenu(QMenu* const configurationMenu);
 
+    virtual void updateMarkers();
+
     QString getMapTheme() const;
     void setMapTheme(const QString& newMapTheme);
+
+    bool screenCoordinates(const WMWGeoCoordinate& coordinates, QPoint* const point);
+
+    void marbleCustomPaint(Marble::GeoPainter* painter);
 
 protected:
     void updateActionsEnabled();

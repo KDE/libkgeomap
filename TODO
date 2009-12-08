@@ -2,8 +2,11 @@
 TODO
 - synchronize zoom between the backends
 - save zoom settings
-- access to Marble projections
-- add basic markers
+- access to Marble projections, float items
+- access to Google Maps float items
+- advance markers
+- check proper handling of marker movement on drop, not on subsequent mouse movement
+- make markers moveable in Marble
 
 LATER
 - include .moc - this is somehow not working now ...
@@ -12,6 +15,7 @@ LATER
 - don't crash on JavaScript errors ...
 - find out how to trigger signals from inside JavaScript ...
 - move from Q_ASSERT to some kde-thing
+- make sure altitude values are properly handled
 
 DONE
 - create directory structure
@@ -23,4 +27,4 @@ DONE
 - center of the map is synchronised between the two backends
 - provide basic control features in the demo: location, zoom, pan
 - save widget state to configuration file
-
+- add basic markers
