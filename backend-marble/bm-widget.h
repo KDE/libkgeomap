@@ -20,6 +20,10 @@
 #ifndef BM_MARBLE_H
 #define BM_MARBLE_H
 
+// Qt includes
+
+#include <QPointer>
+
 // KDE includes
 
 #include <marble/MarbleWidget.h>
@@ -40,7 +44,7 @@ protected:
     virtual void customPaint(Marble::GeoPainter* painter);
 
 private:
-    BackendMarble* const marbleBackend;
+    QPointer<BackendMarble> const marbleBackend;
 };
 
 } /* WMW2 */

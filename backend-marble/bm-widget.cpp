@@ -36,7 +36,10 @@ BMWidget::~BMWidget()
 
 void BMWidget::customPaint(Marble::GeoPainter* painter)
 {
-    marbleBackend->marbleCustomPaint(painter);
+    if (marbleBackend)
+    {
+        marbleBackend->marbleCustomPaint(painter);
+    }
 }
 
 } /* WMW2 */
