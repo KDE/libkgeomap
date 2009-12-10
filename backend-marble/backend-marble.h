@@ -68,6 +68,9 @@ public:
     bool screenCoordinates(const WMWGeoCoordinate& coordinates, QPoint* const point);
 
     void marbleCustomPaint(Marble::GeoPainter* painter);
+    void setShowCompass(const bool state);
+    void setShowOverviewMap(const bool state);
+    void setShowScaleBar(const bool state);
 
 protected:
     void updateActionsEnabled();
@@ -75,6 +78,7 @@ protected:
 protected Q_SLOTS:
     void slotMapThemeActionTriggered(QAction* action);
     void slotProjectionActionTriggered(QAction* action);
+    void slotFloatSettingsTriggered(QAction* action);
 
 private:
     BackendMarblePrivate* const d;

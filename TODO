@@ -2,7 +2,6 @@
 TODO
 - synchronize zoom between the backends
 - save zoom settings
-- access to Marble float items
 - access to Google Maps float items
 - advance markers
 - check proper handling of marker movement on drop, not on subsequent mouse movement
@@ -17,6 +16,7 @@ LATER
 - find out how to trigger signals from inside JavaScript ...
 - move from Q_ASSERT to some kde-thing
 - make sure altitude values are properly handled
+- find out what causes the Marble dbus errors
 
 DONE
 - create directory structure
@@ -30,3 +30,4 @@ DONE
 - save widget state to configuration file
 - add basic markers
 - access to Marble projections
+- access to Marble float items

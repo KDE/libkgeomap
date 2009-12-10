@@ -261,6 +261,7 @@ void WorldMapWidget2::rebuildConfigurationMenu()
     QMenu* configurationMenu = d->actionConfigurationMenu->menu();
     if (!configurationMenu)
     {
+        // TODO: will the menu be deleted when the action is deleted?
         configurationMenu = new QMenu(this);
         d->actionConfigurationMenu->setMenu(configurationMenu);
     }
@@ -270,7 +271,7 @@ void WorldMapWidget2::rebuildConfigurationMenu()
     }
 
     // create backend selection entries:
-    QActionGroup* const backendActionGroup = new QActionGroup(this);
+    QActionGroup* const backendActionGroup = new QActionGroup(configurationMenu);
     backendActionGroup->setExclusive(true);
     for (int i = 0; i<d->loadedBackends.size(); ++i)
     {

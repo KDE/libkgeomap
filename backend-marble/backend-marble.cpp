@@ -45,8 +45,15 @@ public:
     : marbleWidget(0),
       actionGroupMapTheme(0),
       actionGroupProjection(0),
+      actionGroupFloatItems(0),
+      actionShowCompass(0),
+      actionShowOverviewMap(0),
+      actionShowScaleBar(0),
       cacheMapTheme("atlas"),
-      cacheProjection("spherical")
+      cacheProjection("spherical"),
+      cacheShowCompass(false),
+      cacheShowScaleBar(false),
+      cacheShowOverviewMap(false)
     {
     }
 
@@ -54,20 +61,25 @@ public:
 
     QPointer<QActionGroup> actionGroupMapTheme;
     QPointer<QActionGroup> actionGroupProjection;
+    QPointer<QActionGroup> actionGroupFloatItems;
+    QPointer<KAction> actionShowCompass;
+    QPointer<KAction> actionShowOverviewMap;
+    QPointer<KAction> actionShowScaleBar;
 
     QString cacheMapTheme;
     QString cacheProjection;
+    bool cacheShowCompass;
+    bool cacheShowScaleBar;
+    bool cacheShowOverviewMap;
 };
 
 BackendMarble::BackendMarble(WMWSharedData* const sharedData, QObject* const parent)
 : MapBackend(sharedData, parent), d(new BackendMarblePrivate())
 {
     d->marbleWidget = new BMWidget(this);
-    setMapTheme(d->cacheMapTheme);
 
-    d->marbleWidget->setShowCompass(false);
-    d->marbleWidget->setShowScaleBar(false);
-    d->marbleWidget->setShowOverviewMap(false);
+    // set a backend first
+    setMapTheme(d->cacheMapTheme);
 
     emit(signalBackendReady(backendName()));
 }
@@ -133,21 +145,21 @@ void BackendMarble::addActionsToConfigurationMenu(QMenu* const configurationMenu
     {
         delete d->actionGroupMapTheme;
     }
-    d->actionGroupMapTheme = new QActionGroup(this);
+    d->actionGroupMapTheme = new QActionGroup(configurationMenu);
     d->actionGroupMapTheme->setExclusive(true);
 
     KAction* const actionAtlas = new KAction(d->actionGroupMapTheme);
     actionAtlas->setCheckable(true);
     actionAtlas->setText(i18n("Atlas map"));
     actionAtlas->setData("atlas");
-    actionAtlas->setChecked(getMapTheme()=="atlas");
+//     actionAtlas->setChecked(getMapTheme()=="atlas");
     configurationMenu->addAction(actionAtlas);
 
     KAction* const actionOpenStreetmap = new KAction(d->actionGroupMapTheme);
     actionOpenStreetmap->setCheckable(true);
     actionOpenStreetmap->setText(i18n("OpenStreetMap"));
     actionOpenStreetmap->setData("openstreetmap");
-    actionOpenStreetmap->setChecked(getMapTheme()=="openstreetmap");
+//     actionOpenStreetmap->setChecked(getMapTheme()=="openstreetmap");
     configurationMenu->addAction(actionOpenStreetmap);
 
     connect(d->actionGroupMapTheme, SIGNAL(triggered(QAction*)),
@@ -159,36 +171,64 @@ void BackendMarble::addActionsToConfigurationMenu(QMenu* const configurationMenu
     {
         delete d->actionGroupProjection;
     }
-    d->actionGroupProjection = new QActionGroup(this);
+    d->actionGroupProjection = new QActionGroup(configurationMenu);
     d->actionGroupProjection->setExclusive(true);
 
     // TODO: we need a parent for this guy!
-    QMenu* const projectionSubMenu = new QMenu(i18n("Projection")/*, this*/);
+    QMenu* const projectionSubMenu = new QMenu(i18n("Projection"), configurationMenu);
     configurationMenu->addMenu(projectionSubMenu);
 
     KAction* const actionSpherical = new KAction(d->actionGroupProjection);
     actionSpherical->setCheckable(true);
     actionSpherical->setText(i18n("Spherical"));
     actionSpherical->setData("spherical");
-    actionSpherical->setChecked(getProjection()=="spherical");
     projectionSubMenu->addAction(actionSpherical);
 
     KAction* const actionMercator = new KAction(d->actionGroupProjection);
     actionMercator->setCheckable(true);
     actionMercator->setText(i18n("Mercator"));
     actionMercator->setData("mercator");
-    actionMercator->setChecked(getProjection()=="spherical");
     projectionSubMenu->addAction(actionMercator);
 
     KAction* const actionEquirectangular = new KAction(d->actionGroupProjection);
     actionEquirectangular->setCheckable(true);
     actionEquirectangular->setText(i18n("Equirectangular"));
     actionEquirectangular->setData("equirectangular");
-    actionEquirectangular->setChecked(getProjection()=="equirectangular");
     projectionSubMenu->addAction(actionEquirectangular);
 
     connect(d->actionGroupProjection, SIGNAL(triggered(QAction*)),
             this, SLOT(slotProjectionActionTriggered(QAction*)));
+
+    if (!d->actionGroupFloatItems)
+    {
+        d->actionGroupFloatItems = new QActionGroup(this);
+        d->actionGroupFloatItems->setExclusive(false);
+        connect(d->actionGroupFloatItems, SIGNAL(triggered(QAction*)),
+                this, SLOT(slotFloatSettingsTriggered(QAction*)));
+    }
+
+    QMenu* const floatItemsSubMenu = new QMenu(i18n("Float items"), configurationMenu);
+    configurationMenu->addMenu(floatItemsSubMenu);
+
+    d->actionShowCompass = new KAction(i18n("Show compass"), floatItemsSubMenu);
+    d->actionShowCompass->setData("showcompass");
+    d->actionShowCompass->setCheckable(true);
+    d->actionGroupFloatItems->addAction(d->actionShowCompass);
+    floatItemsSubMenu->addAction(d->actionShowCompass);
+
+    d->actionShowOverviewMap = new KAction(i18n("Show overview map"), floatItemsSubMenu);
+    d->actionShowOverviewMap->setData("showoverviewmap");
+    d->actionShowOverviewMap->setCheckable(true);
+    d->actionGroupFloatItems->addAction(d->actionShowOverviewMap);
+    floatItemsSubMenu->addAction(d->actionShowOverviewMap);
+
+    d->actionShowScaleBar = new KAction(i18n("Show scale bar"), floatItemsSubMenu);
+    d->actionShowScaleBar->setData("showscalebar");
+    d->actionShowScaleBar->setCheckable(true);
+    d->actionGroupFloatItems->addAction(d->actionShowScaleBar);
+    floatItemsSubMenu->addAction(d->actionShowScaleBar);
+
+    updateActionsEnabled();
 }
 
 void BackendMarble::slotMapThemeActionTriggered(QAction* action)
@@ -240,6 +280,21 @@ void BackendMarble::updateActionsEnabled()
             projectionActions.at(i)->setChecked(projectionActions.at(i)->data().toString()==getProjection());
         }
     }
+
+    if (d->actionShowCompass)
+    {
+        d->actionShowCompass->setChecked(d->cacheShowCompass);
+    }
+
+    if (d->actionShowScaleBar)
+    {
+        d->actionShowScaleBar->setChecked(d->cacheShowScaleBar);
+    }
+
+    if (d->actionShowOverviewMap)
+    {
+        d->actionShowOverviewMap->setChecked(d->cacheShowOverviewMap);
+    }
 }
 
 void BackendMarble::saveSettingsToGroup(KConfigGroup* const group)
@@ -250,6 +305,9 @@ void BackendMarble::saveSettingsToGroup(KConfigGroup* const group)
 
     group->writeEntry("Marble Map Theme", getMapTheme());
     group->writeEntry("Marble Projection", getProjection());
+    group->writeEntry("Marble Show Scale Bar", d->cacheShowScaleBar);
+    group->writeEntry("Marble Show Compass", d->cacheShowCompass);
+    group->writeEntry("Marble Show Overview Map", d->cacheShowOverviewMap);
 }
 
 void BackendMarble::readSettingsFromGroup(const KConfigGroup* const group)
@@ -260,6 +318,9 @@ void BackendMarble::readSettingsFromGroup(const KConfigGroup* const group)
 
     setMapTheme(group->readEntry("Marble Map Theme", "atlas"));
     setProjection(group->readEntry("Marble Projection", "spherical"));
+    setShowScaleBar(group->readEntry("Marble Show Scale Bar", d->cacheShowScaleBar));
+    setShowCompass(group->readEntry("Marble Show Compass", d->cacheShowCompass));
+    setShowOverviewMap(group->readEntry("Marble Show Overview Map", d->cacheShowOverviewMap));
 }
 
 void BackendMarble::updateMarkers()
@@ -363,6 +424,58 @@ void BackendMarble::setProjection(const QString& newProjection)
 void BackendMarble::slotProjectionActionTriggered(QAction* action)
 {
     setProjection(action->data().toString());
+}
+
+void BackendMarble::setShowCompass(const bool state)
+{
+    d->cacheShowCompass = state;
+    updateActionsEnabled();
+
+    if (d->marbleWidget)
+    {
+        d->marbleWidget->setShowCompass(state);
+    }
+}
+
+void BackendMarble::setShowOverviewMap(const bool state)
+{
+    d->cacheShowOverviewMap = state;
+    updateActionsEnabled();
+
+    if (d->marbleWidget)
+    {
+        d->marbleWidget->setShowOverviewMap(state);
+    }
+}
+
+void BackendMarble::setShowScaleBar(const bool state)
+{
+    d->cacheShowScaleBar = state;
+    updateActionsEnabled();
+
+    if (d->marbleWidget)
+    {
+        d->marbleWidget->setShowScaleBar(state);
+    }
+}
+
+void BackendMarble::slotFloatSettingsTriggered(QAction* action)
+{
+    const QString actionIdString = action->data().toString();
+    const bool actionState = action->isChecked();
+    
+    if (actionIdString=="showcompass")
+    {
+        setShowCompass(actionState);
+    }
+    else if (actionIdString=="showscalebar")
+    {
+        setShowScaleBar(actionState);
+    }
+    else if (actionIdString=="showoverviewmap")
+    {
+        setShowOverviewMap(actionState);
+    }
 }
 
 } /* WMW2 */

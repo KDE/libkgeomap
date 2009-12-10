@@ -234,7 +234,7 @@ void BackendGoogleMaps::addActionsToConfigurationMenu(QMenu* const configuration
     {
         delete d->mapTypeActionGroup;
     }
-    d->mapTypeActionGroup = new QActionGroup(this);
+    d->mapTypeActionGroup = new QActionGroup(configurationMenu);
     d->mapTypeActionGroup->setExclusive(true);
     connect(d->mapTypeActionGroup, SIGNAL(triggered(QAction*)),
             this, SLOT(slotMapTypeActionTriggered(QAction*)));
