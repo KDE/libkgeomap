@@ -16,6 +16,10 @@
 
 project(worldmapwidget2)
 
+SET( MY_COMPILER_WARNINGS
+    "-Wall -Wold-style-cast -Wextra -pedantic"
+)
+
 find_package( KDE4 REQUIRED )
 include_directories( ${KDE4_INCLUDES} )
 FIND_PACKAGE(MarbleWidget REQUIRED)
@@ -32,6 +36,7 @@ INCLUDE_DIRECTORIES(
 SET( widget_sources
     worldmapwidget2/worldmapwidget2.cpp
     worldmapwidget2/map-backend.cpp
+    worldmapwidget2/markermodel.cpp
 )
 
 SET( backend_marble_sources
@@ -44,16 +49,29 @@ SET( backend_googlemaps_sources
     backend-googlemaps/bgm_widget.cpp
 )
 
-SET( test_sources
-    demo/main.cpp
-    demo/mainwindow.cpp
+KDE4_ADD_LIBRARY( worldmapwidget2library STATIC ${widget_sources} ${backend_marble_sources} ${backend_googlemaps_sources})
+SET( worldmapwidget2library_libs
+    ${KDE4_UI_LIBS} ${KDE4_KPARTS_LIBS} ${LIBMARBLEWIDGET_LIBRARY} ${KDE4_KPARTS_LIBS} ${KDE4_KHTML_LIBS}
+)
+target_link_libraries( worldmapwidget2library ${KDE4_UI_LIBS} ${KDE4_KPARTS_LIBS} ${LIBMARBLEWIDGET_LIBRARY} ${KDE4_KPARTS_LIBS} ${KDE4_KHTML_LIBS} )
+SET_TARGET_PROPERTIES( worldmapwidget2library PROPERTIES COMPILE_FLAGS "${COMPILE_FLAGS} ${MY_COMPILER_WARNINGS}")
+SET( worldmapwidget2library_libs
+    worldmapwidget2library ${worldmapwidget2library_libs}
 )
 
+# demo widget
+SET( demo_widget_sources
+    demo-widget/demo-main.cpp
+    demo-widget/mainwindow.cpp
+)
+kde4_add_executable( demo_widget  ${demo_widget_sources} )
+target_link_libraries( demo_widget ${worldmapwidget2library_libs})
+SET_TARGET_PROPERTIES( demo_widget PROPERTIES COMPILE_FLAGS "${COMPILE_FLAGS} ${MY_COMPILER_WARNINGS}")
 
-kde4_add_executable( test ${widget_sources} ${backend_marble_sources} ${backend_googlemaps_sources} ${test_sources} )
-
-target_link_libraries( test ${KDE4_UI_LIBS} ${KDE4_KPARTS_LIBS} ${LIBMARBLEWIDGET_LIBRARY} ${KDE4_KPARTS_LIBS} ${KDE4_KHTML_LIBS} )
-
-#SET_TARGET_PROPERTIES( test PROPERTIES COMPILE_FLAGS "${COMPILE_FLAGS} -Wall -Wold-style-cast -Wextra -pedantic")# -Weffc++")
-
-
+# test the marker model
+SET( test_model_sources
+    tests/test-model.cpp
+)
+kde4_add_executable( test_model ${test_model_sources} )
+target_link_libraries( test_model ${worldmapwidget2library_libs} )
+SET_TARGET_PROPERTIES( test_model PROPERTIES COMPILE_FLAGS "${COMPILE_FLAGS} ${MY_COMPILER_WARNINGS}")

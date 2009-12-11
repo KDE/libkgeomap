@@ -27,7 +27,7 @@ namespace WMW2 {
 BMWidget::BMWidget(BackendMarble* const pMarbleBackend, QWidget* const parent)
 : Marble::MarbleWidget(parent), marbleBackend(pMarbleBackend)
 {
-    Q_ASSERT(marbleBackend!=0);
+    WMW2_ASSERT(marbleBackend!=0);
 }
 
 BMWidget::~BMWidget()

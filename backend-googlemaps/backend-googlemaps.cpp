@@ -216,7 +216,7 @@ void BackendGoogleMaps::slotMapTypeActionTriggered(QAction* action)
 
 void BackendGoogleMaps::addActionsToConfigurationMenu(QMenu* const configurationMenu)
 {
-    Q_ASSERT(configurationMenu!=0);
+    WMW2_ASSERT(configurationMenu!=0);
 
     if (!d->isReady)
         return;
@@ -259,7 +259,7 @@ void BackendGoogleMaps::addActionsToConfigurationMenu(QMenu* const configuration
 
 void BackendGoogleMaps::saveSettingsToGroup(KConfigGroup* const group)
 {
-    Q_ASSERT(group != 0);
+    WMW2_ASSERT(group != 0);
     if (!group)
         return;
 
@@ -268,7 +268,7 @@ void BackendGoogleMaps::saveSettingsToGroup(KConfigGroup* const group)
 
 void BackendGoogleMaps::readSettingsFromGroup(const KConfigGroup* const group)
 {
-    Q_ASSERT(group != 0);
+    WMW2_ASSERT(group != 0);
     if (!group)
         return;
 
@@ -285,7 +285,7 @@ void BackendGoogleMaps::slotMapTypeChanged(const QString& newMapType)
 
 void BackendGoogleMaps::updateMarkers()
 {
-    Q_ASSERT(isReady());
+    WMW2_ASSERT(isReady());
     if (!isReady())
         return;
     

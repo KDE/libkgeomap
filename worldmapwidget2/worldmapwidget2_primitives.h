@@ -30,7 +30,14 @@
 
 #include <kdebug.h>
 
+#define WMW2_ASSERT(cond) ((!(cond)) ? WMW2::WMW2_assert(#cond,__FILE__,__LINE__) : qt_noop())
+
 namespace WMW2 {
+
+inline void WMW2_assert(const char* const condition, const char* const filename, const int lineNumber)
+{
+    kDebug()<<QString("ASSERT: %1 - %2:%3").arg(condition).arg(filename).arg(lineNumber);
+}
 
 class WMWGeoCoordinate
 {
@@ -86,10 +93,8 @@ public:
         }
     }
 
-    static WMWGeoCoordinate fromGeoUrl(const QString& url, bool* const parsedOkay)
+    static WMWGeoCoordinate fromGeoUrl(const QString& url, bool* const parsedOkay = 0)
     {
-        Q_ASSERT(parsedOkay != 0);
-
         // parse geo:-uri according to (only partially implemented):
         // http://tools.ietf.org/html/draft-ietf-geopriv-geo-uri-04
         // TODO: verify that we follow the spec fully!

@@ -32,29 +32,31 @@
 
 #include "mainwindow.h"
 
+using namespace WMW2;
+
 int main(int argc, char* argv[])
 {
     const KAboutData aboutData(
-    "demo-worldmapwidget2",
-    0,
-    ki18n("WorldMapWidget2 demo application"),
-    "0.1", // version
-    ki18n("Presents the WorldMapWidget2"),
-    KAboutData::License_GPL,
-    ki18n("(c) 2009 Michael G. Hansen"),
-    ki18n(""), // optional text
-    "", // URI of homepage
-    "" // bugs e-mail address
-  );
+        "demo-worldmapwidget2",
+        0,
+        ki18n("WorldMapWidget2 demo application"),
+        "0.1", // version
+        ki18n("Presents the WorldMapWidget2"),
+        KAboutData::License_GPL,
+        ki18n("(c) 2009 Michael G. Hansen"),
+        ki18n(""), // optional text
+        "", // URI of homepage
+        "" // bugs e-mail address
+    );
 
-  KCmdLineArgs::init(argc, argv, &aboutData);
+    KCmdLineArgs::init(argc, argv, &aboutData);
 
-  KApplication app;
+    KApplication app;
 
-  MainWindow myMainWindow;
-  myMainWindow.show();
+    MainWindow myMainWindow;
+    myMainWindow.show();
 
-  return app.exec();
+    return app.exec();
 }
 
 

@@ -137,7 +137,7 @@ void BackendMarble::zoomOut()
 
 void BackendMarble::addActionsToConfigurationMenu(QMenu* const configurationMenu)
 {
-    Q_ASSERT(configurationMenu!=0);
+    WMW2_ASSERT(configurationMenu!=0);
 
     configurationMenu->addSeparator();
 
@@ -299,7 +299,7 @@ void BackendMarble::updateActionsEnabled()
 
 void BackendMarble::saveSettingsToGroup(KConfigGroup* const group)
 {
-    Q_ASSERT(group!=0);
+    WMW2_ASSERT(group!=0);
     if (!group)
         return;
 
@@ -312,7 +312,7 @@ void BackendMarble::saveSettingsToGroup(KConfigGroup* const group)
 
 void BackendMarble::readSettingsFromGroup(const KConfigGroup* const group)
 {
-    Q_ASSERT(group!=0);
+    WMW2_ASSERT(group!=0);
     if (!group)
         return;
 

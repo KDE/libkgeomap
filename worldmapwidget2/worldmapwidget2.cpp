@@ -214,7 +214,7 @@ void WorldMapWidget2::slotBackendReady(const QString& backendName)
 
 void WorldMapWidget2::saveSettingsToGroup(KConfigGroup* const group)
 {
-    Q_ASSERT(group != 0);
+    WMW2_ASSERT(group != 0);
     if (!group)
         return;
 
@@ -232,7 +232,7 @@ void WorldMapWidget2::saveSettingsToGroup(KConfigGroup* const group)
 
 void WorldMapWidget2::readSettingsFromGroup(const KConfigGroup* const group)
 {
-    Q_ASSERT(group != 0);
+    WMW2_ASSERT(group != 0);
     if (!group)
         return;
 
@@ -392,8 +392,8 @@ void WorldMapWidget2::slotUpdateActionsEnabled()
 
 void WorldMapWidget2::slotChangeBackend(QAction* action)
 {
-    Q_ASSERT(action!=0);
-    
+    WMW2_ASSERT(action!=0);
+
     if (!action)
         return;
 

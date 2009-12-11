@@ -1,4 +1,7 @@
 
+IN PROGRESS
+- create a model for the markers
+
 TODO
 - synchronize zoom between the backends
 - save zoom settings
@@ -10,11 +13,10 @@ TODO
 
 LATER
 - include .moc - this is somehow not working now ...
-- create a model for the markers
 - re-implement clustering for the markers
 - don't crash on JavaScript errors ...
 - find out how to trigger signals from inside JavaScript ...
-- move from Q_ASSERT to some kde-thing
+- move from WMW2_ASSERT to some kde-thing
 - make sure altitude values are properly handled
 - find out what causes the Marble dbus errors
 
