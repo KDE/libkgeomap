@@ -194,19 +194,43 @@ public:
 };
 
 typedef QList<int> QIntList;
+typedef QPair<int, int> QIntPair;
+
+class WMWCluster
+{
+public:
+
+    typedef QList<WMWCluster> List;
+
+    WMWCluster()
+    : tileIndicesList(),
+      markerCount(0),
+      coordinates()
+    {
+    }
+
+    QList<QIntList> tileIndicesList;
+    int markerCount;
+    WMWGeoCoordinate coordinates;
+};
+
+class MarkerModel;
 
 class WMWSharedData
 {
 public:
     WMWSharedData()
     : markerList(),
-      visibleMarkers()
+      visibleMarkers(),
+      markerModel(0),
+      clusterList()
     {
     }
 
     WMWMarker::List markerList;
     QIntList visibleMarkers;
-
+    MarkerModel* markerModel;
+    WMWCluster::List clusterList;
 };
 
 } /* WMW2 */

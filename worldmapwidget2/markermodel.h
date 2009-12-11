@@ -31,6 +31,7 @@
 namespace WMW2 {
 
 class MarkerModelPrivate;
+class MarkerModelNonEmptyIteratorPrivate;
 
 class MarkerModel
 {
@@ -88,16 +89,37 @@ public:
     WMWGeoCoordinate tileIndexToCoordinate(const QIntList& tileIndex);
     QIntList coordinateToTileIndex(const WMWGeoCoordinate& coordinate, const int level);
 
-    int latLonIndexToLinearIndex(const int latIndex, const int lonIndex, const int level);
-    void linearIndexToLatLonIndex(const int linearIndex, const int level, int* const latIndex, int* const lonIndex);
+    int latLonIndexToLinearIndex(const int latIndex, const int lonIndex, const int level) const;
+    void linearIndexToLatLonIndex(const int linearIndex, const int level, int* const latIndex, int* const lonIndex) const;
+    bool indicesEqual(const QIntList& a, const QIntList& b, const int upToLevel) const;
+    QList<QIntPair> linearIndexToLatLonIndex(const QIntList& linearIndex) const;
+    QIntList latLonIndexToLinearIndex(const QList<QIntPair>& latLonIndex) const;
 
     int addMarker(const WMWMarker& newMarker);
+    void addMarkers(const WMWMarker::List& newMarkers);
     int getTileMarkerCount(const QIntList& tileIndex);
-    Tile* getTile(const QIntList& tileIndex);
+    Tile* getTile(const QIntList& tileIndex, const bool stopIfEmpty = false);
     int maxLevel() const;
     int maxIndexCount() const;
+    Tile* rootTile() const;
+    QPair<int, int> getTesselationSizes(const int level) const;
 
     WMWMarker::List markerList;
+
+    class NonEmptyIterator
+    {
+    public:
+        NonEmptyIterator(MarkerModel* const model, const int level);
+        NonEmptyIterator(MarkerModel* const model, const int level, const QIntList& startIndex, const QIntList& endIndex);
+
+        bool atEnd() const;
+        QIntList nextIndex();
+        QIntList currentIndex() const;
+
+    private:
+        void initializeIterator();
+        MarkerModelNonEmptyIteratorPrivate* const d;
+    };
 
 private:
     MarkerModelPrivate* const d;

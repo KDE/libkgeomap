@@ -55,13 +55,24 @@ int main(int argc, char* argv[])
 
     MarkerModel mm;
 
+    // ice cafe
+    WMWGeoCoordinate iceCoordinates = WMWGeoCoordinate::fromGeoUrl("geo:51.0913031421,6.88878178596,44");
+
+    // there should be no level 0 tiles:
+    WMW2_ASSERT(mm.getTile(mm.coordinateToTileIndex(iceCoordinates, 0), true) == 0);
+
+    // there should be no markers:
+    WMW2_ASSERT(mm.getTileMarkerCount(mm.coordinateToTileIndex(iceCoordinates, 0)) == 0);
+
+    // ice cafe
+    mm.addMarker(WMWMarker(iceCoordinates));
+
+    // there should be no level 1 tiles yet:
+    WMW2_ASSERT(mm.getTile(mm.coordinateToTileIndex(iceCoordinates, 0), true)->children.isEmpty());
+
     // bar
     WMWGeoCoordinate barCoordinates = WMWGeoCoordinate::fromGeoUrl("geo:51.06711205,6.90020261667,43");
     mm.addMarker(WMWMarker(barCoordinates));
-
-    // ice cafe
-    WMWGeoCoordinate iceCoordinates = WMWGeoCoordinate::fromGeoUrl("geo:51.0913031421,6.88878178596,44");
-    mm.addMarker(WMWMarker(iceCoordinates));
 
     // Marienburg castle
     mm.addMarker(WMWMarker(WMWGeoCoordinate::fromGeoUrl("geo:51.087647318,6.88282728201,44")));
@@ -81,14 +92,23 @@ int main(int argc, char* argv[])
     // Sagrada Familia in Spain
     mm.addMarker(WMWMarker(WMWGeoCoordinate::fromGeoUrl("geo:41.4036480511,2.1743756533,46")));
 
-    for (int level=0; level<=mm.maxLevel(); ++level)
+//     for (int level=0; level<=mm.maxLevel(); ++level)
+//     {
+//         QIntList tileIndex = mm.coordinateToTileIndex(barCoordinates, level);
+//         kDebug()<<QString("level: %1 count: %2 bar").arg(level).arg(mm.getTileMarkerCount(tileIndex));
+// 
+//         tileIndex = mm.coordinateToTileIndex(iceCoordinates, level);
+//         kDebug()<<QString("level: %1 count: %2 ice").arg(level).arg(mm.getTileMarkerCount(tileIndex));
+// 
+//     }
+
+    // now iterate over the non-empty tiles:
+    MarkerModel::NonEmptyIterator it(&mm, 4);
+    while (!it.atEnd())
     {
-        QIntList tileIndex = mm.coordinateToTileIndex(barCoordinates, level);
-        kDebug()<<QString("level: %1 count: %2 bar").arg(level).arg(mm.getTileMarkerCount(tileIndex));
-
-        tileIndex = mm.coordinateToTileIndex(iceCoordinates, level);
-        kDebug()<<QString("level: %1 count: %2 ice").arg(level).arg(mm.getTileMarkerCount(tileIndex));
-
+        QIntList currentIndex = it.currentIndex();
+        kDebug()<<currentIndex<<mm.getTileMarkerCount(currentIndex);
+        it.nextIndex();
     }
 
     return 0;

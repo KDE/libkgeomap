@@ -56,8 +56,10 @@ public:
     KAction* getControlAction(const QString& actionName);
     QWidget* getControlWidget();
 
-    void addMarkers(const WMWMarker::List& markerList);
+    void addClusterableMarkers(const WMWMarker::List& markerList);
+    void addSingleMarkers(const WMWMarker::List& markerList);
     void updateMarkers();
+    void updateClusters();
 
 public Q_SLOTS:
     void slotZoomIn();

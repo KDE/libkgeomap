@@ -63,6 +63,7 @@ public:
     virtual void addActionsToConfigurationMenu(QMenu* const configurationMenu) = 0;
 
     virtual void updateMarkers() = 0;
+    virtual void updateClusters() = 0;
 
     WMWSharedData* const s;
 

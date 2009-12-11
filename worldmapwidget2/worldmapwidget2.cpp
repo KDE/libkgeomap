@@ -39,6 +39,7 @@
 #include "map-backend.h"
 #include "backend-marble.h"
 #include "backend-googlemaps.h"
+#include "markermodel.h"
 
 namespace WMW2 {
 
@@ -77,6 +78,8 @@ public:
 WorldMapWidget2::WorldMapWidget2(QWidget* const parent)
 : QWidget(parent), s(new WMWSharedData), d(new WorldMapWidget2Private)
 {
+    s->markerModel = new MarkerModel;
+
     d->stackedLayout = new QStackedLayout(this);
     setLayout(d->stackedLayout);
 
@@ -401,7 +404,14 @@ void WorldMapWidget2::slotChangeBackend(QAction* action)
     setBackend(newBackendName);
 }
 
-void WorldMapWidget2::addMarkers(const WMWMarker::List& markerList)
+void WorldMapWidget2::addClusterableMarkers(const WMWMarker::List& markerList)
+{
+    s->markerModel->addMarkers(markerList);
+
+    updateClusters();
+}
+
+void WorldMapWidget2::addSingleMarkers(const WMWMarker::List& markerList)
 {
     const int oldMarkerCount = s->markerList.count();
     s->markerList << markerList;
@@ -422,6 +432,16 @@ void WorldMapWidget2::updateMarkers()
 
     // tell the backend to update the markers
     d->currentBackend->updateMarkers();
+}
+
+void WorldMapWidget2::updateClusters()
+{
+    if (!d->currentBackendReady)
+        return;
+
+    s->clusterList.clear();
+
+    d->currentBackend->updateClusters();
 }
 
 } /* WMW2 */

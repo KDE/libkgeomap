@@ -58,6 +58,7 @@ public:
     virtual void addActionsToConfigurationMenu(QMenu* const configurationMenu);
 
     virtual void updateMarkers();
+    virtual void updateClusters();
 
     QString getMapTheme() const;
     void setMapTheme(const QString& newMapTheme);
@@ -74,6 +75,7 @@ public:
 
 protected:
     void updateActionsEnabled();
+    void generateClusters();
 
 protected Q_SLOTS:
     void slotMapThemeActionTriggered(QAction* action);

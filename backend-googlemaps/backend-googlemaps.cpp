@@ -347,5 +347,12 @@ void BackendGoogleMaps::slotHTMLEvents(const QStringList& events)
     }
 }
 
+void BackendGoogleMaps::updateClusters()
+{
+    s->clusterList.clear();
+
+    // TODO: generate clusters
+}
+
 } /* WMW2 */
 

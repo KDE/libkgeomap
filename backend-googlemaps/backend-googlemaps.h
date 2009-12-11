@@ -54,6 +54,7 @@ public:
     virtual void addActionsToConfigurationMenu(QMenu* const configurationMenu);
 
     virtual void updateMarkers();
+    virtual void updateClusters();
 
     QString getMapType() const;
     void setMapType(const QString& newMapType);

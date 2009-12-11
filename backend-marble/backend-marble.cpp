@@ -33,6 +33,7 @@
 
 #include "backend-marble.h"
 #include "bm-widget.h"
+#include "markermodel.h"
 
 using namespace Marble;
 
@@ -370,7 +371,62 @@ void BackendMarble::marbleCustomPaint(Marble::GeoPainter* painter)
         painter->drawEllipse(markerPoint.x()-circleRadius, markerPoint.y()-circleRadius, 2*circleRadius, 2*circleRadius);
     }
 
+    // now for the clusters:
+    generateClusters();
+
+    Q_FOREACH(const WMWCluster& cluster, s->clusterList)
+    {
+        QPoint clusterPoint;
+        if (!screenCoordinates(cluster.coordinates, &clusterPoint))
+            continue;
+
+        painter->setPen(circlePen);
+        painter->setBrush(circleBrush);
+        painter->drawEllipse(clusterPoint.x()-circleRadius, clusterPoint.y()-circleRadius, 2*circleRadius, 2*circleRadius);
+    }
+
     painter->restore();
+}
+
+void BackendMarble::generateClusters()
+{
+    s->clusterList.clear();
+    
+    // determine the tile-level:
+    const int level = 4;
+
+    // get the map bounds:
+
+    // collect and the non-empty tiles:
+    QList<QPair<int, QIntList> > tileCollection;
+    MarkerModel::NonEmptyIterator it(s->markerModel, level);
+    while (!it.atEnd())
+    {
+        const QIntList tileIndex = it.currentIndex();
+        const int tileCount = s->markerModel->getTileMarkerCount(tileIndex);
+        kDebug()<<tileCount<<tileIndex;
+
+        tileCollection << QPair<int, QIntList>(tileCount, tileIndex);
+
+        it.nextIndex();
+    }
+
+    // sort:
+    
+    // now create the clusters:
+    for (int i=0; i<tileCollection.size(); ++i)
+    {
+        const int tileCount = tileCollection.at(i).first;
+        const QIntList tileIndex = tileCollection.at(i).second;
+
+        WMWCluster myCluster;
+        myCluster.markerCount = tileCount;
+        myCluster.coordinates = s->markerModel->tileIndexToCoordinate(tileIndex);
+        myCluster.tileIndicesList << tileIndex;
+
+        s->clusterList << myCluster;
+    }
+    
 }
 
 QString BackendMarble::getProjection() const
@@ -476,6 +532,13 @@ void BackendMarble::slotFloatSettingsTriggered(QAction* action)
     {
         setShowOverviewMap(actionState);
     }
+}
+
+void BackendMarble::updateClusters()
+{
+    s->clusterList.clear();
+
+    // clusters are generated on demand when painting ...
 }
 
 } /* WMW2 */

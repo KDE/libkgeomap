@@ -69,16 +69,38 @@ MainWindow::MainWindow(QWidget* const parent)
     readSettings();
 
     WMWMarker::List markerList;
-    for (double i = 0.0; i<6.0; ++i)
-    {
-        for (double j=0.0; j<6.0; ++j)
-        {
-            WMWMarker myMarker(WMWGeoCoordinate(52.0+i, 6.0+j));
-            myMarker.setDraggable(true);
-            markerList<<myMarker;
-        }
-    }
-    d->mapWidget->addMarkers(markerList);
+//     for (double i = 0.0; i<6.0; ++i)
+//     {
+//         for (double j=0.0; j<6.0; ++j)
+//         {
+//             WMWMarker myMarker(WMWGeoCoordinate(52.0+i, 6.0+j));
+//             myMarker.setDraggable(true);
+//             markerList<<myMarker;
+//         }
+//     }
+//     d->mapWidget->addSingleMarkers(markerList);
+
+    markerList.clear();
+    
+    // ice cafe
+    markerList<<WMWMarker(WMWGeoCoordinate::fromGeoUrl("geo:51.0913031421,6.88878178596,44"));
+
+    // bar
+    markerList<<WMWMarker(WMWGeoCoordinate::fromGeoUrl("geo:51.06711205,6.90020261667,43"));
+
+    // Marienburg castle
+    markerList<<WMWMarker(WMWGeoCoordinate::fromGeoUrl("geo:51.087647318,6.88282728201,44"));
+
+    // head of monster
+    markerList<<WMWMarker(WMWGeoCoordinate::fromGeoUrl("geo:51.0889433167,6.88000331667,39.6"));
+
+    // Langenfeld
+    markerList<<WMWMarker(WMWGeoCoordinate::fromGeoUrl("geo:51.1100157609,6.94911003113,51"));
+
+    // Sagrada Familia in Spain
+    markerList<<WMWMarker(WMWGeoCoordinate::fromGeoUrl("geo:41.4036480511,2.1743756533,46"));
+
+    d->mapWidget->addClusterableMarkers(markerList);
 }
 
 MainWindow::~MainWindow()
