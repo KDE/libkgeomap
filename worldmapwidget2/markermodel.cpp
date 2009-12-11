@@ -56,7 +56,8 @@ MarkerModel::MarkerModel()
 
 MarkerModel::~MarkerModel()
 {
-    // todo: delete all tiles
+    // delete all tiles
+    delete d->tile0;
 
     delete d;
 }
@@ -69,7 +70,9 @@ WMWGeoCoordinate MarkerModel::tileIndexToCoordinate(const QIntList& tileIndex)
     qreal tileLatHeight = 180.0;
     qreal tileLonWidth = 360.0;
 
-    for (int l = 0; l < tileIndex.count(); ++l)
+    WMW2_ASSERT(tileIndex.count()<=maxLevel());
+
+    for (int l = 0; l < qMin(tileIndex.count(), maxLevel()-1); ++l)
     {
         // how many tiles are at this level?
         const QIntPair tesselationSizes = d->tesselationSizes.at(l);
@@ -96,7 +99,8 @@ WMWGeoCoordinate MarkerModel::tileIndexToCoordinate(const QIntList& tileIndex)
 
 QIntList MarkerModel::coordinateToTileIndex(const WMWGeoCoordinate& coordinate, const int level)
 {
-    // TODO: safeguards against rounding errors!
+    WMW2_ASSERT(level<=maxLevel());
+
     qreal tileLatBL = -90.0;
     qreal tileLonBL = -180.0;
     qreal tileLatHeight = 180.0;
@@ -113,12 +117,35 @@ QIntList MarkerModel::coordinateToTileIndex(const WMWGeoCoordinate& coordinate, 
         const qreal dLat = tileLatHeight / latDivisor;
         const qreal dLon = tileLonWidth / lonDivisor;
 
-        const int latIndex = int( (coordinate.lat - tileLatBL ) / dLat );
-        const int lonIndex = int( (coordinate.lon - tileLonBL ) / dLon );
-        WMW2_ASSERT(latIndex>=0);
-        WMW2_ASSERT(latIndex<latDivisor);
-        WMW2_ASSERT(lonIndex>=0);
-        WMW2_ASSERT(lonIndex<lonDivisor);
+        int latIndex = int( (coordinate.lat - tileLatBL ) / dLat );
+        int lonIndex = int( (coordinate.lon - tileLonBL ) / dLon );
+
+        // protect against invalid indices due to rounding errors
+        bool haveRoundingErrors = false;
+        if (latIndex<0)
+        {
+            haveRoundingErrors = true;
+            latIndex = 0;
+        }
+        if (lonIndex<0)
+        {
+            haveRoundingErrors = true;
+            lonIndex = 0;
+        }
+        if (latIndex>=latDivisor)
+        {
+            haveRoundingErrors = true;
+            latIndex = latDivisor-1;
+        }
+        if (lonIndex>=lonDivisor)
+        {
+            haveRoundingErrors = true;
+            lonIndex = lonDivisor-1;
+        }
+        if (haveRoundingErrors)
+        {
+            kDebug()<<QString("Rounding errors at level %1!").arg(l);
+        }
 
         const int linearIndex = latLonIndexToLinearIndex(latIndex, lonIndex, l);
         WMW2_ASSERT(linearIndex<(latDivisor*lonDivisor));
@@ -126,37 +153,50 @@ QIntList MarkerModel::coordinateToTileIndex(const WMWGeoCoordinate& coordinate, 
         indices << linearIndex;
 
         // update the start position for the next tile:
+        // TODO: rounding errors
         tileLatBL+=latIndex*dLat;
         tileLonBL+=lonIndex*dLon;
         tileLatHeight/=latDivisor;
         tileLonWidth/=lonDivisor;
     }
 
+    WMW2_ASSERT(indices.count()==level+1);
     return indices;
 }
 
 int MarkerModel::latLonIndexToLinearIndex(const int latIndex, const int lonIndex, const int level)
 {
+    WMW2_ASSERT(level<=maxLevel());
+
     const QIntPair tesselationSizes = d->tesselationSizes.at(level);
     const int nLon = tesselationSizes.second;
     const int linearIndex = latIndex*nLon + lonIndex;
+
     WMW2_ASSERT(linearIndex<(tesselationSizes.first*tesselationSizes.second));
+
     return linearIndex;
 }
 
 void MarkerModel::linearIndexToLatLonIndex(const int linearIndex, const int level, int* const latIndex, int* const lonIndex)
 {
-    const int nLon = d->tesselationSizes.at(level).second;
+    WMW2_ASSERT(level<=maxLevel());
+
+    const QIntPair tesselationSizes = d->tesselationSizes.at(level);
+    const int nLon = tesselationSizes.second;
     *latIndex = linearIndex/nLon;
     *lonIndex = linearIndex%nLon;
+    WMW2_ASSERT(*latIndex<tesselationSizes.first);
+    WMW2_ASSERT(*lonIndex<tesselationSizes.second);
 }
 
 int MarkerModel::addMarker(const WMWMarker& newMarker)
 {
     const int markerIndex = markerList.count();
     markerList<<newMarker;
+
     const QIntList tileIndex = coordinateToTileIndex(newMarker.coordinates, maxLevel());
-    
+    WMW2_ASSERT(tileIndex.count()==maxIndexCount());
+
     // add the marker to all existing tiles:
     Tile* currentTile = d->tile0;
     for (int l = 0; l<=maxLevel(); ++l)
@@ -184,12 +224,18 @@ int MarkerModel::addMarker(const WMWMarker& newMarker)
 
 int MarkerModel::getTileMarkerCount(const QIntList& tileIndex)
 {
+    WMW2_ASSERT(tileIndex.count()<=maxIndexCount());
+
     Tile* const myTile = getTile(tileIndex);
+    WMW2_ASSERT(myTile!=0);
+
     return myTile->markerIndices.count();
 }
 
 MarkerModel::Tile* MarkerModel::getTile(const QIntList& tileIndex)
 {
+    WMW2_ASSERT(tileIndex.count()<=maxIndexCount());
+
     Tile* tile = d->tile0;
     for (int level = 0; level < tileIndex.size(); ++level)
     {
@@ -238,6 +284,11 @@ MarkerModel::Tile* MarkerModel::getTile(const QIntList& tileIndex)
 int MarkerModel::maxLevel() const
 {
     return d->tesselationSizes.count()-1;
+}
+
+int MarkerModel::maxIndexCount() const
+{
+    return d->tesselationSizes.count();
 }
 
 } /* WMW2 */

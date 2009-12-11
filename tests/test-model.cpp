@@ -58,7 +58,7 @@ int main(int argc, char* argv[])
     // bar
     WMWGeoCoordinate barCoordinates = WMWGeoCoordinate::fromGeoUrl("geo:51.06711205,6.90020261667,43");
     mm.addMarker(WMWMarker(barCoordinates));
-    
+
     // ice cafe
     WMWGeoCoordinate iceCoordinates = WMWGeoCoordinate::fromGeoUrl("geo:51.0913031421,6.88878178596,44");
     mm.addMarker(WMWMarker(iceCoordinates));
@@ -81,13 +81,13 @@ int main(int argc, char* argv[])
     // Sagrada Familia in Spain
     mm.addMarker(WMWMarker(WMWGeoCoordinate::fromGeoUrl("geo:41.4036480511,2.1743756533,46")));
 
-    for (int i=0; i<=mm.maxLevel(); ++i)
+    for (int level=0; level<=mm.maxLevel(); ++level)
     {
-        QIntList tileIndex = mm.coordinateToTileIndex(barCoordinates, i);
-        kDebug()<<QString("level: %1 count: %2 bar").arg(i).arg(mm.getTileMarkerCount(tileIndex));
+        QIntList tileIndex = mm.coordinateToTileIndex(barCoordinates, level);
+        kDebug()<<QString("level: %1 count: %2 bar").arg(level).arg(mm.getTileMarkerCount(tileIndex));
 
-        tileIndex = mm.coordinateToTileIndex(iceCoordinates, i);
-        kDebug()<<QString("level: %1 count: %2 ice").arg(i).arg(mm.getTileMarkerCount(tileIndex));
+        tileIndex = mm.coordinateToTileIndex(iceCoordinates, level);
+        kDebug()<<QString("level: %1 count: %2 ice").arg(level).arg(mm.getTileMarkerCount(tileIndex));
 
     }
 

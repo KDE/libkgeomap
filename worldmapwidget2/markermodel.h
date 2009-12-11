@@ -46,6 +46,15 @@ public:
         {
         }
 
+        ~Tile()
+        {
+            // delete all children
+            foreach(const Tile* tile, children)
+            {
+                delete tile;
+            }
+        }
+
         void prepareForChildren(const QPair<int, int>& childCount)
         {
             prepareForChildren(childCount.first*childCount.second);
@@ -86,6 +95,7 @@ public:
     int getTileMarkerCount(const QIntList& tileIndex);
     Tile* getTile(const QIntList& tileIndex);
     int maxLevel() const;
+    int maxIndexCount() const;
 
     WMWMarker::List markerList;
 
