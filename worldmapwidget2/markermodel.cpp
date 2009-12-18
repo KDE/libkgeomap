@@ -401,7 +401,7 @@ MarkerModel::NonEmptyIterator::NonEmptyIterator(MarkerModel* const model, const 
         QIntPair currentSizes = d->model->getTesselationSizes(i);
         d->endIndexLinear<<currentSizes.first*currentSizes.second - 1;
     }
-    kDebug()<<d->startIndexLinear<<d->endIndexLinear;
+//     kDebug()<<d->startIndexLinear<<d->endIndexLinear;
 
     initializeIterator();
 }
@@ -443,9 +443,9 @@ QIntList MarkerModel::NonEmptyIterator::nextIndex()
     }
 
     // TODO: stoppedhere
-    bool doContinue = true;
     int progressLevel = d->level;
-    do {
+    Q_FOREVER
+    {
 //         kDebug()<<d->currentIndexLinear<<progressLevel;
         // determine the limits in the current tile:
         int limitLatBL = 0;
@@ -523,7 +523,7 @@ QIntList MarkerModel::NonEmptyIterator::nextIndex()
                         return d->currentIndexLinear;
                     }
 
-                    kDebug()<<"up one!";
+//                     kDebug()<<"up one!";
                     // we need to go one level up:
                     progressLevel--;
 
@@ -542,7 +542,7 @@ QIntList MarkerModel::NonEmptyIterator::nextIndex()
         // is there anything in this tile?
         if (d->model->getTileMarkerCount(d->currentIndexLinear)>0)
         {
-            kDebug()<<"hit: "<<d->currentIndexLinear<<progressLevel;
+//             kDebug()<<"hit: "<<d->currentIndexLinear<<progressLevel;
             // are we at the target level?
             if (progressLevel == d->level)
             {
@@ -557,7 +557,7 @@ QIntList MarkerModel::NonEmptyIterator::nextIndex()
         }
 
         // no, the tile is empty. go to the next tile!
-    } while (doContinue);
+    }
 }
 
 QIntList MarkerModel::NonEmptyIterator::currentIndex() const

@@ -22,6 +22,7 @@
 
 // Qt includes
 
+#include <QPoint>
 #include <QString>
 #include <QStringList>
 #include <QVariant>
@@ -205,28 +206,33 @@ public:
     WMWCluster()
     : tileIndicesList(),
       markerCount(0),
-      coordinates()
+      coordinates(),
+      pixelPos()
     {
     }
 
     QList<QIntList> tileIndicesList;
     int markerCount;
     WMWGeoCoordinate coordinates;
+    QPoint pixelPos;
 };
 
 class MarkerModel;
+class WorldMapWidget2;
 
 class WMWSharedData
 {
 public:
     WMWSharedData()
-    : markerList(),
+    : worldMapWidget(0),
+      markerList(),
       visibleMarkers(),
       markerModel(0),
       clusterList()
     {
     }
 
+    WorldMapWidget2* worldMapWidget;
     WMWMarker::List markerList;
     QIntList visibleMarkers;
     MarkerModel* markerModel;

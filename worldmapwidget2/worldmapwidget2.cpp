@@ -17,6 +17,10 @@
  *
  * ============================================================ */
 
+// C++ includes
+
+#include <math.h>
+
 // Qt includes
 
 #include <QMenu>
@@ -42,6 +46,18 @@
 #include "markermodel.h"
 
 namespace WMW2 {
+
+/**
+ * @brief Helper function, returns the square of the distance between two points
+ *
+ * @param a Point a
+ * @param b Point b
+ * @return Square of the distance between a and b
+ */
+inline int QPointSquareDistance(const QPoint& a, const QPoint& b)
+{
+    return (a.x()-b.x())*(a.x()-b.x()) + (a.y()-b.y())*(a.y()-b.y());
+}
 
 class WorldMapWidget2Private
 {
@@ -79,6 +95,7 @@ WorldMapWidget2::WorldMapWidget2(QWidget* const parent)
 : QWidget(parent), s(new WMWSharedData), d(new WorldMapWidget2Private)
 {
     s->markerModel = new MarkerModel;
+    s->worldMapWidget = this;
 
     d->stackedLayout = new QStackedLayout(this);
     setLayout(d->stackedLayout);
@@ -434,12 +451,193 @@ void WorldMapWidget2::updateMarkers()
     d->currentBackend->updateMarkers();
 }
 
+// constants for clusters
+const int ClusterRadius          = 15;
+const QSize ClusterDefaultSize   = QSize(2*ClusterRadius, 2*ClusterRadius);
+const int ClusterGridSizeScreen  = 60;
+const QSize ClusterMaxPixmapSize = QSize(60, 60);
+
 void WorldMapWidget2::updateClusters()
 {
+    kDebug()<<"updateClusters starting...";
+    s->clusterList.clear();
+
     if (!d->currentBackendReady)
         return;
 
-    s->clusterList.clear();
+    const int gridSize = ClusterGridSizeScreen;
+    const QSize mapSize  = d->currentBackend->mapSize();
+    const int gridWidth  = mapSize.width();
+    const int gridHeight = mapSize.height();
+    QVector<QList<QIntList> > pixelIndexGrid(gridWidth*gridHeight, QList<QIntList>());
+    QVector<int> pixelCountGrid(gridWidth*gridHeight, 0);
+    QList<QPair<QPoint, QPair<int, QList<QIntList> > > > leftOverList;
+    // TODO: which level?
+    const int markerLevel = s->markerModel->maxLevel()-1;
+
+    // TODO: iterate only over the visible part of the map
+    for (MarkerModel::NonEmptyIterator tileIterator(s->markerModel, markerLevel); !tileIterator.atEnd(); tileIterator.nextIndex())
+    {
+        const QIntList tileIndex = tileIterator.currentIndex();
+
+        // find out where the tile is on the map:
+        const WMWGeoCoordinate tileCoordinate = s->markerModel->tileIndexToCoordinate(tileIndex);
+
+        QPoint tilePoint;
+        if (!d->currentBackend->screenCoordinates(tileCoordinate, &tilePoint))
+        {
+            continue;
+        }
+
+        // make sure we are in the grid (in case there are rounding errors somewhere in the backend
+        if ((tilePoint.x()<0)||(tilePoint.y()<0)||(tilePoint.x()>=gridWidth)||(tilePoint.y()>=gridHeight))
+            continue;
+
+        pixelIndexGrid[tilePoint.x() + tilePoint.y()*gridWidth] << tileIndex;
+        pixelCountGrid[tilePoint.x() + tilePoint.y()*gridWidth]+= s->markerModel->getTileMarkerCount(tileIndex);
+    }
+
+    // TODO: cleanup this list every ... iterations in the next loop, too
+    QIntList pixelGridIndices;
+
+    for (int i=0; i<gridWidth*gridHeight; ++i)
+    {
+        if (pixelCountGrid.at(i)>0)
+            pixelGridIndices << i;
+    }
+
+    // re-add the markers to clusters:
+    int lastTooCloseClusterIndex = 0;
+    Q_FOREVER
+    {
+        int markerMax = 0;
+        int markerX = 0;
+        int markerY = 0;
+        int pixelGridMetaIndexMax = 0;
+
+        for (int pixelGridMetaIndex = 0; pixelGridMetaIndex<pixelGridIndices.size(); ++pixelGridMetaIndex)
+        {
+            const int index = pixelGridIndices[pixelGridMetaIndex];
+            if (index<0)
+                continue;
+
+            if (pixelCountGrid.at(index)==0)
+            {
+                // TODO: also remove this entry from the list to speed up the loop!
+                pixelGridIndices[pixelGridMetaIndex] = -1;
+                continue;
+            }
+
+            // calculate x,y from the linear index:
+            const int x = index % gridWidth;
+            const int y = (index-x)/gridWidth;
+            const QPoint markerPosition(x, y);
+
+            if (pixelCountGrid.at(index)>markerMax)
+            {
+                // only create a cluster here if it is not too close to another cluster:
+                bool tooClose = false;
+
+                // check the cluster that was a problem last time first:
+                if (lastTooCloseClusterIndex<s->clusterList.size())
+                {
+                    tooClose = QPointSquareDistance(s->clusterList.at(lastTooCloseClusterIndex).pixelPos, markerPosition) < pow(ClusterGridSizeScreen/2, 2);
+                }
+
+                // now check all other clusters:
+                for (int i=0; (!tooClose)&&(i<s->clusterList.size()); ++i)
+                {
+                    if (i==lastTooCloseClusterIndex)
+                        continue;
+
+                    tooClose = QPointSquareDistance(s->clusterList.at(i).pixelPos, markerPosition) < pow(ClusterGridSizeScreen/2, 2);
+                    if (tooClose)
+                        lastTooCloseClusterIndex = i;
+                }
+
+                if (tooClose)
+                {
+                    // move markers into leftover list
+                    leftOverList << QPair<QPoint, QPair<int, QList<QIntList> > >(QPoint(x,y), QPair<int, QList<QIntList> >(pixelCountGrid.at(index), pixelIndexGrid.at(index)));
+                    pixelCountGrid[index] = 0;
+                    pixelIndexGrid[index].clear();
+                    pixelGridIndices[pixelGridMetaIndex] = -1;
+                }
+                else
+                {
+                    markerMax=pixelCountGrid.at(x+y*gridWidth);
+                    markerX=x;
+                    markerY=y;
+                    pixelGridMetaIndexMax = pixelGridMetaIndex;
+                }
+            }
+        }
+        
+        if (markerMax==0)
+            break;
+
+        WMWGeoCoordinate clusterCoordinates = s->markerModel->tileIndexToCoordinate( pixelIndexGrid.at(markerX+markerY*gridWidth).first() );
+        WMWCluster cluster;
+        cluster.coordinates = clusterCoordinates;
+        cluster.pixelPos = QPoint(markerX, markerY);
+        cluster.tileIndicesList = pixelIndexGrid.at(markerX+markerY*gridWidth);
+        cluster.markerCount = pixelCountGrid.at(markerX+markerY*gridWidth);
+
+        // mark the pixel as done:
+        pixelCountGrid[markerX+markerY*gridWidth] = 0;
+        pixelIndexGrid[markerX+markerY*gridWidth].clear();
+        pixelGridIndices[pixelGridMetaIndexMax] = -1;
+
+        // absorb all markers around it:
+        // Now we only remove the markers from the pixelgrid. They will be cleared from the
+        // pixelGridIndices in the loop above
+        // make sure we do not go over the grid boundaries:
+        const int eatRadius = gridSize/4;
+        const int xStart    = qMax( (markerX-eatRadius), 0);
+        const int yStart    = qMax( (markerY-eatRadius), 0);
+        const int xEnd      = qMin( (markerX+eatRadius), gridWidth-1);
+        const int yEnd      = qMin( (markerY+eatRadius), gridHeight-1);
+        for (int indexX = xStart; indexX <= xEnd; ++indexX)
+        {
+            for (int indexY = yStart; indexY <= yEnd; ++indexY)
+            {
+                const int index = indexX + indexY*gridWidth;
+                cluster.tileIndicesList << pixelIndexGrid.at(index);
+                pixelIndexGrid[index].clear();
+                cluster.markerCount+= pixelCountGrid.at(index);
+            }
+        }
+
+        s->clusterList << cluster;
+    }
+
+    // now move all leftover markers into clusters:
+    for (QList<QPair<QPoint, QPair<int, QList<QIntList> > > >::const_iterator it = leftOverList.constBegin();
+         it!=leftOverList.constEnd(); ++it)
+    {
+        const QPoint markerPosition = it->first;
+
+        // find the closest cluster:
+        int closestSquareDistance = 0;
+        int closestIndex = -1;
+        for (int i=0; i<s->clusterList.size(); ++i)
+        {
+            const int squareDistance = QPointSquareDistance(s->clusterList.at(i).pixelPos, markerPosition);
+            if ((closestIndex < 0) || (squareDistance < closestSquareDistance))
+            {
+                closestSquareDistance = squareDistance;
+                closestIndex          = i;
+            }
+        }
+
+        if (closestIndex>=0)
+        {
+            s->clusterList[closestIndex].markerCount+= it->second.first;
+            s->clusterList[closestIndex].tileIndicesList << it->second.second;
+        }
+    }
+
+    kDebug()<<s->clusterList.size();
 
     d->currentBackend->updateClusters();
 }

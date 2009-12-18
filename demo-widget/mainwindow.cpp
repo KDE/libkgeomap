@@ -69,16 +69,17 @@ MainWindow::MainWindow(QWidget* const parent)
     readSettings();
 
     WMWMarker::List markerList;
-//     for (double i = 0.0; i<6.0; ++i)
-//     {
-//         for (double j=0.0; j<6.0; ++j)
-//         {
-//             WMWMarker myMarker(WMWGeoCoordinate(52.0+i, 6.0+j));
-//             myMarker.setDraggable(true);
-//             markerList<<myMarker;
-//         }
-//     }
+    for (double i = 0.0; i<6.0; ++i)
+    {
+        for (double j=0.0; j<6.0; ++j)
+        {
+            WMWMarker myMarker(WMWGeoCoordinate(52.0+i, 6.0+j));
+            myMarker.setDraggable(true);
+            markerList<<myMarker;
+        }
+    }
 //     d->mapWidget->addSingleMarkers(markerList);
+    d->mapWidget->addClusterableMarkers(markerList);
 
     markerList.clear();
     

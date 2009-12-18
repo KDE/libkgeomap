@@ -65,6 +65,9 @@ public:
     virtual void updateMarkers() = 0;
     virtual void updateClusters() = 0;
 
+    virtual bool screenCoordinates(const WMWGeoCoordinate& coordinates, QPoint* const point) = 0;
+    virtual QSize mapSize() const = 0;
+
     WMWSharedData* const s;
 
 Q_SIGNALS:

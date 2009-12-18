@@ -33,6 +33,7 @@
 
 #include "backend-googlemaps.h"
 #include "bgm_widget.h"
+#include "worldmapwidget2.h"
 
 namespace WMW2 {
 
@@ -120,6 +121,44 @@ bool BackendGoogleMaps::googleVariantToCoordinates(const QVariant& googleVariant
                     *coordinates = WMWGeoCoordinate(ptLatitude, ptLongitude);
                 }
                 
+                return true;
+            }
+        }
+    }
+
+    return false;
+}
+
+bool BackendGoogleMaps::googleVariantToPoint(const QVariant& googleVariant, QPoint* const point) const
+{
+    // a point is returned as (x, y)
+    bool valid = ( googleVariant.type()==QVariant::String );
+    if (valid)
+    {
+        QString pointString = googleVariant.toString();
+        valid = pointString.startsWith('(')&&pointString.endsWith(')');
+        QStringList pointStrings;
+        if (valid)
+        {
+            pointStrings = pointString.mid(1, pointString.length()-2).split(',');
+            valid = ( pointStrings.size() == 2 );
+        }
+        if (valid)
+        {
+            int ptX = 0;
+            int ptY = 0;
+
+            ptX = pointStrings.at(0).toInt(&valid);
+            if (valid)
+                ptY = pointStrings.at(1).toInt(&valid);
+
+            if (valid)
+            {
+                if (point)
+                {
+                    *point = QPoint(ptX, ptY);
+                }
+
                 return true;
             }
         }
@@ -283,6 +322,13 @@ void BackendGoogleMaps::slotMapTypeChanged(const QString& newMapType)
     updateActionsEnabled();
 }
 
+void BackendGoogleMaps::slotMapBoundsChanged()
+{
+    s->worldMapWidget->updateClusters();
+
+    updateActionsEnabled();
+}
+
 void BackendGoogleMaps::updateMarkers()
 {
     WMW2_ASSERT(isReady());
@@ -308,19 +354,38 @@ void BackendGoogleMaps::updateMarkers()
 
 void BackendGoogleMaps::slotHTMLEvents(const QStringList& events)
 {
+    QPoint point(0,0);
+    WMWGeoCoordinate coordinate(10.0, 0.0);
+    {
+        bool screenValid = screenCoordinates(WMWGeoCoordinate(52.0,6.0), &point);
+        kDebug()<<screenValid<<point;
+    }
+    {
+        bool screenValid = screenCoordinates(WMWGeoCoordinate(52.0,6.0), &point);
+        kDebug()<<screenValid<<point;
+    }
+    bool coordinateValid = geoCoordinates(QPoint(10,10), &coordinate);
+    kDebug()<<coordinateValid<<coordinate.geoUrl();
+
+    // some events can be buffered:
+    // TODO: verify that they are stored in the correct order
+    QMap<QString, QString> bufferedEvents;
+    QStringList bufferableEvents;
+    bufferableEvents<<"MT"<<"MB";
+
     for (QStringList::const_iterator it = events.constBegin(); it!=events.constEnd(); ++it)
     {
         const QString eventCode = it->left(2);
         const QString eventParameter = it->mid(2);
         const QStringList eventParameters = eventParameter.split('/');
 
-        if (eventCode=="MT")
+        if (bufferableEvents.contains(eventCode))
         {
-            // map type changed
-            slotMapTypeChanged(eventParameter);
+            bufferedEvents[eventCode] = eventParameter;
         }
         else if (eventCode=="mm")
         {
+            // TODO: buffer this event type!
             // marker moved
             bool okay = false;
             const int markerIndex = eventParameter.toInt(&okay);
@@ -345,13 +410,85 @@ void BackendGoogleMaps::slotHTMLEvents(const QStringList& events)
             emit(signalMarkerMoved(markerIndex));
         }
     }
+
+    // now process the buffered events:
+    for (QMap<QString, QString>::const_iterator it = bufferedEvents.constBegin(); it!=bufferedEvents.constEnd(); ++it)
+    {
+        const QString eventCode = it.key();
+        const QString eventParameter = it.value();
+
+        if (eventCode=="MT")
+        {
+            // map type changed
+            slotMapTypeChanged(eventParameter);
+        }
+        else if (eventCode == "MB")
+        {
+            // map bounds changed
+            slotMapBoundsChanged();
+        }
+    }
 }
 
 void BackendGoogleMaps::updateClusters()
 {
-    s->clusterList.clear();
+    // re-transfer the clusters to the map:
+    WMW2_ASSERT(isReady());
+    if (!isReady())
+        return;
 
-    // TODO: generate clusters
+    // re-transfer all markers to the javascript-part:
+    d->bgmWidget->executeScript(QString("wmwClearClusters();"));
+    for (int currentIndex = 0; currentIndex<s->clusterList.size(); ++currentIndex)
+    {
+        const WMWCluster& currentCluster = s->clusterList.at(currentIndex);
+
+        d->bgmWidget->executeScript(QString("wmwAddCluster(%1, %2, %3, %4);")
+                .arg(currentIndex)
+                .arg(currentCluster.coordinates.latString())
+                .arg(currentCluster.coordinates.lonString())
+                .arg(true?"true":"false") // TODO: just for now, for testing
+            );
+    }
+    
+}
+
+bool BackendGoogleMaps::screenCoordinates(const WMWGeoCoordinate& coordinates, QPoint* const point)
+{
+    if (!d->isReady)
+        return false;
+
+    const bool isValid = googleVariantToPoint(d->bgmWidget->executeScript(
+            QString("wmwLatLngToPixel(%1, %2);")
+                .arg(coordinates.latString())
+                .arg(coordinates.lonString())
+                ),
+            point);
+
+    // TODO: apparently, even points outside the visible area are returned as valid
+    // check whether they are actually visible
+    return isValid;
+}
+
+bool BackendGoogleMaps::geoCoordinates(const QPoint point, WMWGeoCoordinate* const coordinates) const
+{
+    if (!d->isReady)
+        return false;
+
+    const QVariant coordinatesVariant = d->bgmWidget->executeScript(
+            QString("wmwPixelToLatLng(%1, %2);")
+                .arg(point.x())
+                .arg(point.y()));
+    const bool isValid = googleVariantToCoordinates(coordinatesVariant, coordinates);
+
+    return isValid;
+}
+
+QSize BackendGoogleMaps::mapSize() const
+{
+    WMW2_ASSERT(d->bgmWidgetWrapper!=0);
+
+    return d->bgmWidgetWrapper->size();
 }
 
 } /* WMW2 */

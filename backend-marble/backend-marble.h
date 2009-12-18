@@ -66,7 +66,8 @@ public:
     QString getProjection() const;
     void setProjection(const QString& newProjection);
 
-    bool screenCoordinates(const WMWGeoCoordinate& coordinates, QPoint* const point);
+    virtual bool screenCoordinates(const WMWGeoCoordinate& coordinates, QPoint* const point);
+    virtual QSize mapSize() const;
 
     void marbleCustomPaint(Marble::GeoPainter* painter);
     void setShowCompass(const bool state);

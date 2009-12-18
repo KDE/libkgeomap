@@ -56,6 +56,10 @@ public:
     virtual void updateMarkers();
     virtual void updateClusters();
 
+    virtual bool screenCoordinates(const WMWGeoCoordinate& coordinates, QPoint* const point);
+    virtual bool geoCoordinates(const QPoint point, WMWGeoCoordinate* const coordinates) const;
+    virtual QSize mapSize() const;
+
     QString getMapType() const;
     void setMapType(const QString& newMapType);
 
@@ -64,11 +68,13 @@ private Q_SLOTS:
     void updateActionsEnabled();
     void slotMapTypeActionTriggered(QAction* action);
     void slotMapTypeChanged(const QString& newMapType);
+    void slotMapBoundsChanged();
     void slotHTMLEvents(const QStringList& eventStrings);
 
 private:
     BackendGoogleMapsPrivate* const d;
     bool googleVariantToCoordinates(const QVariant& googleVariant, WMWGeoCoordinate* const coordinates) const;
+    bool googleVariantToPoint(const QVariant& googleVariant, QPoint* const point) const;
 };
 
 } /* WMW2 */

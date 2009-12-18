@@ -28,12 +28,14 @@
 #include <kconfiggroup.h>
 #include <klocale.h>
 #include <marble/GeoPainter.h>
+#include <marble/MarbleMap.h>
 
 // local includes
 
 #include "backend-marble.h"
 #include "bm-widget.h"
 #include "markermodel.h"
+#include "worldmapwidget2.h"
 
 using namespace Marble;
 
@@ -353,8 +355,8 @@ void BackendMarble::marbleCustomPaint(Marble::GeoPainter* painter)
     painter->save();
     painter->autoMapQuality();
 
-    QPen circlePen(Qt::cyan);
-    QBrush circleBrush(Qt::green);
+    QPen circlePen(Qt::green);
+    QBrush circleBrush(Qt::blue);
     const int circleRadius = 15;
 
     // render all visible markers:
@@ -390,6 +392,8 @@ void BackendMarble::marbleCustomPaint(Marble::GeoPainter* painter)
 
 void BackendMarble::generateClusters()
 {
+    s->worldMapWidget->updateClusters();
+    return;
     s->clusterList.clear();
     
     // determine the tile-level:
@@ -536,9 +540,12 @@ void BackendMarble::slotFloatSettingsTriggered(QAction* action)
 
 void BackendMarble::updateClusters()
 {
-    s->clusterList.clear();
+    // clusters are only needed during redraw
+}
 
-    // clusters are generated on demand when painting ...
+QSize BackendMarble::mapSize() const
+{
+    return d->marbleWidget->map()->size();
 }
 
 } /* WMW2 */
