@@ -20,11 +20,13 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-#include <QWidget>
+// KDE includes
+
+#include <kmainwindow.h>
 
 class MainWindowPrivate;
 
-class MainWindow : public QWidget
+class MainWindow : public KMainWindow
 {
 Q_OBJECT
 

@@ -45,7 +45,14 @@ public:
       bgmWidgetWrapper(0),
       isReady(false),
       mapTypeActionGroup(0),
-      cacheMapType("ROADMAP")
+      floatItemsActionGroup(0),
+      showMapTypeControlAction(0),
+      showNavigationControlAction(0),
+      showScaleControlAction(0),
+      cacheMapType("ROADMAP"),
+      cacheShowMapTypeControl(true),
+      cacheShowNavigationControl(true),
+      cacheShowScaleControl(true)
     {
     }
 
@@ -53,8 +60,15 @@ public:
     QPointer<QWidget> bgmWidgetWrapper;
     bool isReady;
     QPointer<QActionGroup> mapTypeActionGroup;
+    QPointer<QActionGroup> floatItemsActionGroup;
+    QPointer<KAction> showMapTypeControlAction;
+    QPointer<KAction> showNavigationControlAction;
+    QPointer<KAction> showScaleControlAction;
 
     QString cacheMapType;
+    bool cacheShowMapTypeControl;
+    bool cacheShowNavigationControl;
+    bool cacheShowScaleControl;
 };
 
 BackendGoogleMaps::BackendGoogleMaps(WMWSharedData* const sharedData, QObject* const parent)
@@ -193,6 +207,9 @@ void BackendGoogleMaps::slotHTMLInitialized()
     d->isReady = true;
     d->bgmWidget->executeScript(QString("document.getElementById(\"map_canvas\").style.height=\"%1px\"").arg(d->bgmWidgetWrapper->height()));
     setMapType(d->cacheMapType);
+    setShowMapTypeControl(d->cacheShowMapTypeControl);
+    setShowNavigationControl(d->cacheShowNavigationControl);
+    setShowScaleControl(d->cacheShowNavigationControl);
     emit(signalBackendReady(backendName()));
 }
 
@@ -293,7 +310,39 @@ void BackendGoogleMaps::addActionsToConfigurationMenu(QMenu* const configuration
 
         configurationMenu->addAction(mapTypeAction);
     }
-    
+
+    configurationMenu->addSeparator();
+
+    if (d->floatItemsActionGroup)
+    {
+        delete d->floatItemsActionGroup;
+    }
+    d->floatItemsActionGroup = new QActionGroup(configurationMenu);
+    d->floatItemsActionGroup->setExclusive(false);
+    connect(d->floatItemsActionGroup, SIGNAL(triggered(QAction*)),
+            this, SLOT(slotFloatSettingsTriggered(QAction*)));
+
+    // TODO: we need a parent for this guy!
+    QMenu* const floatItemsSubMenu = new QMenu(i18n("Float items"), configurationMenu);
+    configurationMenu->addMenu(floatItemsSubMenu);
+
+    d->showMapTypeControlAction = new KAction(i18n("Show Map Type Control"), d->floatItemsActionGroup);
+    d->showMapTypeControlAction->setCheckable(true);
+    d->showMapTypeControlAction->setChecked(d->cacheShowMapTypeControl);
+    d->showMapTypeControlAction->setData("showmaptypecontrol");
+    floatItemsSubMenu->addAction(d->showMapTypeControlAction);
+
+    d->showNavigationControlAction = new KAction(i18n("Show Navigation Control"), d->floatItemsActionGroup);
+    d->showNavigationControlAction->setCheckable(true);
+    d->showNavigationControlAction->setChecked(d->cacheShowNavigationControl);
+    d->showNavigationControlAction->setData("shownavigationcontrol");
+    floatItemsSubMenu->addAction(d->showNavigationControlAction);
+
+    d->showScaleControlAction = new KAction(i18n("Show Scale Control"), d->floatItemsActionGroup);
+    d->showScaleControlAction->setCheckable(true);
+    d->showScaleControlAction->setChecked(d->cacheShowScaleControl);
+    d->showScaleControlAction->setData("showscalecontrol");
+    floatItemsSubMenu->addAction(d->showScaleControlAction);
 }
 
 void BackendGoogleMaps::saveSettingsToGroup(KConfigGroup* const group)
@@ -303,6 +352,9 @@ void BackendGoogleMaps::saveSettingsToGroup(KConfigGroup* const group)
         return;
 
     group->writeEntry("GoogleMaps Map Type", getMapType());
+    group->writeEntry("GoogleMaps Show Map Type Control", d->cacheShowMapTypeControl);
+    group->writeEntry("GoogleMaps Show Navigation Control", d->cacheShowNavigationControl);
+    group->writeEntry("GoogleMaps Show Scale Control", d->cacheShowScaleControl);
 }
 
 void BackendGoogleMaps::readSettingsFromGroup(const KConfigGroup* const group)
@@ -313,6 +365,9 @@ void BackendGoogleMaps::readSettingsFromGroup(const KConfigGroup* const group)
 
     const QString mapType = group->readEntry("GoogleMaps Map Type", "ROADMAP");
     setMapType(mapType);
+    setShowMapTypeControl(group->readEntry("GoogleMaps Show Map Type Control", true));
+    setShowNavigationControl(group->readEntry("GoogleMaps Show Navigation Control", true));
+    setShowScaleControl(group->readEntry("GoogleMaps Show Scale Control", true));
 }
 
 void BackendGoogleMaps::slotMapTypeChanged(const QString& newMapType)
@@ -490,6 +545,65 @@ QSize BackendGoogleMaps::mapSize() const
 
     return d->bgmWidgetWrapper->size();
 }
+
+void BackendGoogleMaps::slotFloatSettingsTriggered(QAction* action)
+{
+    const QString actionIdString = action->data().toString();
+    const bool actionState = action->isChecked();
+
+    if (actionIdString=="showmaptypecontrol")
+    {
+        setShowMapTypeControl(actionState);
+    }
+    else if (actionIdString=="shownavigationcontrol")
+    {
+        setShowNavigationControl(actionState);
+    }
+    else if (actionIdString=="showscalecontrol")
+    {
+        setShowScaleControl(actionState);
+    }
+}
+
+void BackendGoogleMaps::setShowScaleControl(const bool state)
+{
+    d->cacheShowScaleControl = state;
+
+    if (d->showScaleControlAction)
+        d->showScaleControlAction->setChecked(state);
+
+    if (!isReady())
+        return;
+
+    d->bgmWidget->executeScript(QString("wmwSetShowScaleControl(%1);").arg(state?"true":"false"));
+}
+
+void BackendGoogleMaps::setShowNavigationControl(const bool state)
+{
+    d->cacheShowNavigationControl = state;
+
+    if (d->showNavigationControlAction)
+        d->showNavigationControlAction->setChecked(state);
+
+    if (!isReady())
+        return;
+
+    d->bgmWidget->executeScript(QString("wmwSetShowNavigationControl(%1);").arg(state?"true":"false"));
+}
+
+void BackendGoogleMaps::setShowMapTypeControl(const bool state)
+{
+    d->cacheShowMapTypeControl = state;
+
+    if (d->showMapTypeControlAction)
+        d->showMapTypeControlAction->setChecked(state);
+
+    if (!isReady())
+        return;
+
+    d->bgmWidget->executeScript(QString("wmwSetShowMapTypeControl(%1);").arg(state?"true":"false"));
+}
+
 
 } /* WMW2 */
 

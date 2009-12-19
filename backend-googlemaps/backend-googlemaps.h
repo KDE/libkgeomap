@@ -62,6 +62,9 @@ public:
 
     QString getMapType() const;
     void setMapType(const QString& newMapType);
+    void setShowMapTypeControl(const bool state);
+    void setShowScaleControl(const bool state);
+    void setShowNavigationControl(const bool state);
 
 private Q_SLOTS:
     void slotHTMLInitialized();
@@ -70,6 +73,7 @@ private Q_SLOTS:
     void slotMapTypeChanged(const QString& newMapType);
     void slotMapBoundsChanged();
     void slotHTMLEvents(const QStringList& eventStrings);
+    void slotFloatSettingsTriggered(QAction* action);
 
 private:
     BackendGoogleMapsPrivate* const d;

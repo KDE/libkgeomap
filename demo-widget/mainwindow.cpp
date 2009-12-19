@@ -54,13 +54,19 @@ public:
 };
 
 MainWindow::MainWindow(QWidget* const parent)
-: QWidget(parent), d(new MainWindowPrivate())
+: KMainWindow(parent), d(new MainWindowPrivate())
 {
     resize(512, 512);
     setWindowTitle(i18n("WorldMapWidget2 demo"));
     setWindowIcon(SmallIcon("applications-internet"));
+    setObjectName("Demo-WorldMapWidget2");
 
-    QVBoxLayout* const vbox = new QVBoxLayout(this);
+    // create a status bar:
+    statusBar();
+
+    QWidget* const dummyWidget = new QWidget(this);
+    setCentralWidget(dummyWidget);
+    QVBoxLayout* const vbox = new QVBoxLayout(dummyWidget);
 
     d->mapWidget = new WorldMapWidget2(this);
     vbox->addWidget(d->mapWidget);

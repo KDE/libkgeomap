@@ -51,8 +51,8 @@ int main(int argc, char* argv[])
 
     KApplication app;
 
-    MainWindow myMainWindow;
-    myMainWindow.show();
+    MainWindow* myMainWindow = new MainWindow;
+    myMainWindow->show();
 
     return app.exec();
 }
