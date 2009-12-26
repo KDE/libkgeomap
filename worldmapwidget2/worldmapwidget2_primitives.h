@@ -37,7 +37,7 @@ namespace WMW2 {
 
 inline void WMW2_assert(const char* const condition, const char* const filename, const int lineNumber)
 {
-    kDebug()<<QString("ASSERT: %1 - %2:%3").arg(condition).arg(filename).arg(lineNumber);
+    kDebug(0)<<QString("ASSERT: %1 - %2:%3").arg(condition).arg(filename).arg(lineNumber);
 }
 
 class WMWGeoCoordinate
