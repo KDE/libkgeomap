@@ -37,12 +37,14 @@ class BGMWidgetPrivate
 public:
     BGMWidgetPrivate()
     : parent(0),
-      isReady(false)
+      isReady(false),
+      javascriptScanTimer(0)
     {
     }
 
     QWidget* parent;
     bool isReady;
+    QTimer* javascriptScanTimer;
 };
 
 BGMWidget::BGMWidget(QWidget* const parent)
@@ -54,6 +56,13 @@ BGMWidget::BGMWidget(QWidget* const parent)
 
     // TODO: the khtmlpart-widget does not resize automatically, we have to do it manually???
     parent->installEventFilter(this);
+
+    // create a timer for monitoring for javascript events, but do not start it yet:
+    d->javascriptScanTimer = new QTimer(this);
+    d->javascriptScanTimer->setSingleShot(false);
+    d->javascriptScanTimer->setInterval(300);
+    connect(d->javascriptScanTimer, SIGNAL(timeout()),
+            this, SLOT(slotScanForJSMessages()));
 
     connect(this, SIGNAL(completed()),
             this, SLOT(slotHTMLCompleted()));
@@ -92,6 +101,8 @@ void BGMWidget::loadInitialHTML(const WMWGeoCoordinate& initialCenter, const QSt
 "   function wmwReadEventStrings() {\n"
 "       var eventBufferString = eventBuffer.join('|');\n"
 "       eventBuffer = new Array();\n"
+// let the application know that there are no more events waiting:
+"       window.status = '()';\n"
 "       return eventBufferString;\n"
 "   }\n"
 "   function wmwSetZoom(zoomvalue) {\n"
@@ -264,33 +275,37 @@ void BGMWidget::slotHTMLCompleted()
 {
     d->isReady = true;
     executeScript(QString("document.getElementById(\"map_canvas\").style.height=\"%1px\"").arg(d->parent->height()));
+
+    // start monitoring for javascript events using a timer:
+    d->javascriptScanTimer->start();
 }
 
 void BGMWidget::khtmlMousePressEvent(khtml::MousePressEvent* e)
 {
-    scanForJSMessages();
+    slotScanForJSMessages();
     KHTMLPart::khtmlMousePressEvent(e);
 }
 
 void BGMWidget::khtmlMouseReleaseEvent(khtml::MouseReleaseEvent* e)
 {
-    scanForJSMessages();
+    slotScanForJSMessages();
     KHTMLPart::khtmlMouseReleaseEvent(e);
 }
 
 void BGMWidget::khtmlMouseMoveEvent(khtml::MouseMoveEvent *e)
 {
-    scanForJSMessages();
+    slotScanForJSMessages();
     KHTMLPart::khtmlMouseMoveEvent(e);
 }
 
-void BGMWidget::scanForJSMessages()
+void BGMWidget::slotScanForJSMessages()
 {
     const QString status = jsStatusBarText();
 
     if (status!="(event)")
         return;
 
+    kDebug()<<status;
     const QString eventBufferString = executeScript(QString("wmwReadEventStrings();")).toString();
     if (eventBufferString.isEmpty())
         return;

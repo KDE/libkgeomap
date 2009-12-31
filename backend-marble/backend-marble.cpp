@@ -376,15 +376,39 @@ void BackendMarble::marbleCustomPaint(Marble::GeoPainter* painter)
     // now for the clusters:
     generateClusters();
 
-    Q_FOREACH(const WMWCluster& cluster, s->clusterList)
+    for (int i = 0; i<s->clusterList.size(); ++i)
     {
+        const WMWCluster& cluster = s->clusterList.at(i);
         QPoint clusterPoint;
         if (!screenCoordinates(cluster.coordinates, &clusterPoint))
             continue;
 
+        // determine the colors:
+        QColor       fillColor;
+        QColor       strokeColor;
+        Qt::PenStyle strokeStyle;
+        QColor       labelColor;
+        QString      labelText;
+        s->worldMapWidget->getColorInfos(i, &fillColor, &strokeColor,
+                              &strokeStyle, &labelText, &labelColor);
+
+        QPen circlePen;
+        circlePen.setColor(strokeColor);
+        circlePen.setStyle(strokeStyle);
+        circlePen.setWidth(2);
+        QBrush circleBrush(fillColor);
+        QPen labelPen;
+        labelPen.setColor(labelColor);
+                              
+        const QRect circleRect(clusterPoint.x()-circleRadius, clusterPoint.y()-circleRadius, 2*circleRadius, 2*circleRadius);
+
         painter->setPen(circlePen);
         painter->setBrush(circleBrush);
-        painter->drawEllipse(clusterPoint.x()-circleRadius, clusterPoint.y()-circleRadius, 2*circleRadius, 2*circleRadius);
+        painter->drawEllipse(circleRect);
+
+        painter->setPen(labelPen);
+        painter->setBrush(Qt::NoBrush);
+        painter->drawText(circleRect, Qt::AlignHCenter|Qt::AlignVCenter, labelText);
     }
 
     painter->restore();
@@ -393,44 +417,6 @@ void BackendMarble::marbleCustomPaint(Marble::GeoPainter* painter)
 void BackendMarble::generateClusters()
 {
     s->worldMapWidget->updateClusters();
-    return;
-    s->clusterList.clear();
-    
-    // determine the tile-level:
-    const int level = 4;
-
-    // get the map bounds:
-
-    // collect and the non-empty tiles:
-    QList<QPair<int, QIntList> > tileCollection;
-    MarkerModel::NonEmptyIterator it(s->markerModel, level);
-    while (!it.atEnd())
-    {
-        const QIntList tileIndex = it.currentIndex();
-        const int tileCount = s->markerModel->getTileMarkerCount(tileIndex);
-        kDebug()<<tileCount<<tileIndex;
-
-        tileCollection << QPair<int, QIntList>(tileCount, tileIndex);
-
-        it.nextIndex();
-    }
-
-    // sort:
-    
-    // now create the clusters:
-    for (int i=0; i<tileCollection.size(); ++i)
-    {
-        const int tileCount = tileCollection.at(i).first;
-        const QIntList tileIndex = tileCollection.at(i).second;
-
-        WMWCluster myCluster;
-        myCluster.markerCount = tileCount;
-        myCluster.coordinates = s->markerModel->tileIndexToCoordinate(tileIndex);
-        myCluster.tileIndicesList << tileIndex;
-
-        s->clusterList << myCluster;
-    }
-    
 }
 
 QString BackendMarble::getProjection() const

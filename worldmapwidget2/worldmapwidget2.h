@@ -61,6 +61,9 @@ public:
     void updateMarkers();
     void updateClusters();
 
+    void getColorInfos(const int clusterIndex, QColor *fillColor, QColor *strokeColor,
+                       Qt::PenStyle *strokeStyle, QString *labelText, QColor *labelColor) const;
+
 public Q_SLOTS:
     void slotZoomIn();
     void slotZoomOut();

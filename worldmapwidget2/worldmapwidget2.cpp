@@ -469,7 +469,7 @@ void WorldMapWidget2::updateClusters()
     const QSize mapSize  = d->currentBackend->mapSize();
     const int gridWidth  = mapSize.width();
     const int gridHeight = mapSize.height();
-    QVector<QList<QIntList> > pixelIndexGrid(gridWidth*gridHeight, QList<QIntList>());
+    QVector<QList<QIntList> > pixelNonEmptyTileIndexGrid(gridWidth*gridHeight, QList<QIntList>());
     QVector<int> pixelCountGrid(gridWidth*gridHeight, 0);
     QList<QPair<QPoint, QPair<int, QList<QIntList> > > > leftOverList;
     // TODO: which level?
@@ -493,61 +493,65 @@ void WorldMapWidget2::updateClusters()
         if ((tilePoint.x()<0)||(tilePoint.y()<0)||(tilePoint.x()>=gridWidth)||(tilePoint.y()>=gridHeight))
             continue;
 
-        pixelIndexGrid[tilePoint.x() + tilePoint.y()*gridWidth] << tileIndex;
-        pixelCountGrid[tilePoint.x() + tilePoint.y()*gridWidth]+= s->markerModel->getTileMarkerCount(tileIndex);
+        const int linearIndex = tilePoint.x() + tilePoint.y()*gridWidth;
+        pixelNonEmptyTileIndexGrid[linearIndex] << tileIndex;
+        pixelCountGrid[linearIndex]+= s->markerModel->getTileMarkerCount(tileIndex);
+
+        kDebug()<<QString("pixel at: %1, %2 (%3): %4 markers").arg(tilePoint.x()).arg(tilePoint.y()).arg(linearIndex).arg(pixelCountGrid[linearIndex]);
     }
 
     // TODO: cleanup this list every ... iterations in the next loop, too
-    QIntList pixelGridIndices;
+    QIntList nonEmptyPixelIndices;
 
     for (int i=0; i<gridWidth*gridHeight; ++i)
     {
         if (pixelCountGrid.at(i)>0)
-            pixelGridIndices << i;
+            nonEmptyPixelIndices << i;
     }
 
     // re-add the markers to clusters:
     int lastTooCloseClusterIndex = 0;
     Q_FOREVER
     {
+        // here we store candidates for clusters:
         int markerMax = 0;
         int markerX = 0;
         int markerY = 0;
         int pixelGridMetaIndexMax = 0;
 
-        for (int pixelGridMetaIndex = 0; pixelGridMetaIndex<pixelGridIndices.size(); ++pixelGridMetaIndex)
+        for (int pixelGridMetaIndex = 0; pixelGridMetaIndex<nonEmptyPixelIndices.size(); ++pixelGridMetaIndex)
         {
-            const int index = pixelGridIndices[pixelGridMetaIndex];
+            const int index = nonEmptyPixelIndices.at(pixelGridMetaIndex);
             if (index<0)
                 continue;
 
             if (pixelCountGrid.at(index)==0)
             {
                 // TODO: also remove this entry from the list to speed up the loop!
-                pixelGridIndices[pixelGridMetaIndex] = -1;
+                nonEmptyPixelIndices[pixelGridMetaIndex] = -1;
                 continue;
             }
 
-            // calculate x,y from the linear index:
-            const int x = index % gridWidth;
-            const int y = (index-x)/gridWidth;
-            const QPoint markerPosition(x, y);
-
             if (pixelCountGrid.at(index)>markerMax)
             {
-                // only create a cluster here if it is not too close to another cluster:
+                // calculate x,y from the linear index:
+                const int x = index % gridWidth;
+                const int y = (index-x)/gridWidth;
+                const QPoint markerPosition(x, y);
+
+                // only use this as a candidate for a cluster if it is not too close to another cluster:
                 bool tooClose = false;
 
-                // check the cluster that was a problem last time first:
-                if (lastTooCloseClusterIndex<s->clusterList.size())
-                {
-                    tooClose = QPointSquareDistance(s->clusterList.at(lastTooCloseClusterIndex).pixelPos, markerPosition) < pow(ClusterGridSizeScreen/2, 2);
-                }
+                // TODO: check the cluster that was a problem last time first:
+//                 if (lastTooCloseClusterIndex<s->clusterList.size())
+//                 {
+//                     tooClose = QPointSquareDistance(s->clusterList.at(lastTooCloseClusterIndex).pixelPos, markerPosition) < pow(ClusterGridSizeScreen/2, 2);
+//                 }
 
                 // now check all other clusters:
                 for (int i=0; (!tooClose)&&(i<s->clusterList.size()); ++i)
                 {
-                    if (i==lastTooCloseClusterIndex)
+                    if (i==index)
                         continue;
 
                     tooClose = QPointSquareDistance(s->clusterList.at(i).pixelPos, markerPosition) < pow(ClusterGridSizeScreen/2, 2);
@@ -558,14 +562,14 @@ void WorldMapWidget2::updateClusters()
                 if (tooClose)
                 {
                     // move markers into leftover list
-                    leftOverList << QPair<QPoint, QPair<int, QList<QIntList> > >(QPoint(x,y), QPair<int, QList<QIntList> >(pixelCountGrid.at(index), pixelIndexGrid.at(index)));
+                    leftOverList << QPair<QPoint, QPair<int, QList<QIntList> > >(QPoint(x,y), QPair<int, QList<QIntList> >(pixelCountGrid.at(index), pixelNonEmptyTileIndexGrid.at(index)));
                     pixelCountGrid[index] = 0;
-                    pixelIndexGrid[index].clear();
-                    pixelGridIndices[pixelGridMetaIndex] = -1;
+                    pixelNonEmptyTileIndexGrid[index].clear();
+                    nonEmptyPixelIndices[pixelGridMetaIndex] = -1;
                 }
                 else
                 {
-                    markerMax=pixelCountGrid.at(x+y*gridWidth);
+                    markerMax=pixelCountGrid.at(index);
                     markerX=x;
                     markerY=y;
                     pixelGridMetaIndexMax = pixelGridMetaIndex;
@@ -576,17 +580,19 @@ void WorldMapWidget2::updateClusters()
         if (markerMax==0)
             break;
 
-        WMWGeoCoordinate clusterCoordinates = s->markerModel->tileIndexToCoordinate( pixelIndexGrid.at(markerX+markerY*gridWidth).first() );
+        WMWGeoCoordinate clusterCoordinates = s->markerModel->tileIndexToCoordinate( pixelNonEmptyTileIndexGrid.at(markerX+markerY*gridWidth).first() );
         WMWCluster cluster;
         cluster.coordinates = clusterCoordinates;
         cluster.pixelPos = QPoint(markerX, markerY);
-        cluster.tileIndicesList = pixelIndexGrid.at(markerX+markerY*gridWidth);
+        cluster.tileIndicesList = pixelNonEmptyTileIndexGrid.at(markerX+markerY*gridWidth);
         cluster.markerCount = pixelCountGrid.at(markerX+markerY*gridWidth);
+
+        kDebug()<<QString("created cluster %1: %2 markers").arg(s->clusterList.size()).arg(cluster.markerCount);
 
         // mark the pixel as done:
         pixelCountGrid[markerX+markerY*gridWidth] = 0;
-        pixelIndexGrid[markerX+markerY*gridWidth].clear();
-        pixelGridIndices[pixelGridMetaIndexMax] = -1;
+        pixelNonEmptyTileIndexGrid[markerX+markerY*gridWidth].clear();
+        nonEmptyPixelIndices[pixelGridMetaIndexMax] = -1;
 
         // absorb all markers around it:
         // Now we only remove the markers from the pixelgrid. They will be cleared from the
@@ -602,9 +608,10 @@ void WorldMapWidget2::updateClusters()
             for (int indexY = yStart; indexY <= yEnd; ++indexY)
             {
                 const int index = indexX + indexY*gridWidth;
-                cluster.tileIndicesList << pixelIndexGrid.at(index);
-                pixelIndexGrid[index].clear();
+                cluster.tileIndicesList << pixelNonEmptyTileIndexGrid.at(index);
+                pixelNonEmptyTileIndexGrid[index].clear();
                 cluster.markerCount+= pixelCountGrid.at(index);
+                pixelCountGrid[index] = 0;
             }
         }
 
@@ -640,6 +647,122 @@ void WorldMapWidget2::updateClusters()
     kDebug()<<s->clusterList.size();
 
     d->currentBackend->updateClusters();
+}
+
+/**
+ * @brief Return color and style information for rendering the cluster
+ * @param clusterIndex Index of the cluster
+ * @param fillColor Color used to fill the circle
+ * @param strokeColor Color used for the stroke around the circle
+ * @param strokeStyle Style used to draw the stroke around the crircle
+ * @param labelText Text for the label
+ * @param labelColor Color for the label text
+ */
+void WorldMapWidget2::getColorInfos(const int clusterIndex, QColor *fillColor, QColor *strokeColor,
+                                    Qt::PenStyle *strokeStyle, QString *labelText, QColor *labelColor) const
+{
+    const WMWCluster& cluster = s->clusterList.at(clusterIndex);
+
+    // TODO: check that this number is already valid!
+    const int nMarkers = cluster.markerCount;
+
+    if (nMarkers<1000)
+    {
+        *labelText = QString::number(nMarkers);
+    }
+    else if ((nMarkers>=1000)&&(nMarkers<=1950))
+    {
+        // TODO: use KDE-versions instead
+        *labelText = QString("%L1k").arg(qreal(nMarkers)/1000.0, 0, 'f', 1);
+    }
+    else if ((nMarkers>=1951)&&(nMarkers<19500))
+    {
+        // TODO: use KDE-versions instead
+        *labelText = QString("%L1k").arg(qreal(nMarkers)/1000.0, 0, 'f', 0);
+    }
+    else
+    {
+        // convert to "1E5" notation for numbers >=20k:
+        qreal exponent = floor(log(nMarkers)/log(10));
+        qreal nMarkersFirstDigit=round(qreal(nMarkers)/pow(10,exponent));
+        if (nMarkersFirstDigit>=10)
+        {
+            nMarkersFirstDigit=round(nMarkersFirstDigit/10.0);
+            exponent++;
+        }
+        *labelText = QString("%1E%2").arg(int(nMarkersFirstDigit)).arg(int(exponent));
+    }
+    *labelColor = QColor(Qt::black);
+
+    // TODO: 'solo' and 'selected' properties have not yet been defined,
+    //       therefore use the default colors
+    *strokeStyle = Qt::NoPen;
+//     switch (selected)
+//     {
+//         case PartialNone:
+//             *strokeStyle = Qt::NoPen;
+//             break;
+//         case PartialSome:
+//             *strokeStyle = Qt::DotLine;
+//             break;
+//         case PartialAll:
+//             *strokeStyle = Qt::SolidLine;
+//             break;
+//     }
+    *strokeColor = QColor(Qt::blue);
+
+    QColor fillAll, fillSome, fillNone;
+    if (nMarkers>=100)
+    {
+        fillAll  = QColor(255, 0, 0);
+        fillSome = QColor(255, 188, 125);
+        fillNone = QColor(255, 185, 185);
+    }
+    else if (nMarkers>=50)
+    {
+        fillAll  = QColor(255, 127, 0);
+        fillSome = QColor(255, 190, 125);
+        fillNone = QColor(255, 220, 185);
+    }
+    else if (nMarkers>=10)
+    {
+        fillAll  = QColor(255, 255, 0);
+        fillSome = QColor(255, 255, 105);
+        fillNone = QColor(255, 255, 185);
+    }
+    else if (nMarkers>=2)
+    {
+        fillAll  = QColor(0, 255, 0);
+        fillSome = QColor(125, 255, 125);
+        fillNone = QColor(185, 255, 255);
+    }
+    else
+    {
+        fillAll  = QColor(0, 255, 255);
+        fillSome = QColor(125, 255, 255);
+        fillNone = QColor(185, 255, 255);
+    }
+
+    *fillColor = fillAll;
+//     switch (solo)
+//     {
+//         case PartialAll:
+//             *fillColor = fillAll;
+//             break;
+//         case PartialSome:
+//             *fillColor = fillSome;
+//             break;
+//         case PartialNone:
+//             if (haveAnySolo)
+//             {
+//                 *fillColor = fillNone;
+//             }
+//             else
+//             {
+//                 *fillColor = fillAll;
+//             }
+//             break;
+//     }
 }
 
 } /* WMW2 */

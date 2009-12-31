@@ -5,11 +5,13 @@ IN PROGRESS
 TODO
 - synchronize zoom between the backends
 - save zoom settings
-- access to Google Maps float items
 - advance markers
 - check proper handling of marker movement on drop, not on subsequent mouse movement
 - make markers moveable in Marble
 - check for memory leaks when handling menus and actions
+- calls to wmwLatLngToPixel are not correct when panning in Google Maps until a zoom is performed
+- use appropriate levels in the marker model when scanning for visible markers
+- panning in Google Maps is quite slow with many clusters, find out whether the bottleneck is adding the clusters to the html-part or finding the positions of the markers (probably both :-( )
 
 LATER
 - include .moc - this is somehow not working now ...
@@ -33,3 +35,4 @@ DONE
 - add basic markers
 - access to Marble projections
 - access to Marble float items
+- access to Google Maps float items

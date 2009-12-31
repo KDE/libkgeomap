@@ -47,10 +47,10 @@ protected:
     void khtmlMousePressEvent(khtml::MousePressEvent* e);
     void khtmlMouseReleaseEvent(khtml::MouseReleaseEvent* e);
     void khtmlMouseMoveEvent(khtml::MouseMoveEvent *e);
-    void scanForJSMessages();
 
 protected Q_SLOTS:
     void slotHTMLCompleted();
+    void slotScanForJSMessages();
 
 Q_SIGNALS:
     void signalHTMLEvents(const QStringList& events);
