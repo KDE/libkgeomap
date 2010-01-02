@@ -114,6 +114,8 @@ WorldMapWidget2::~WorldMapWidget2()
     
     qDeleteAll(d->loadedBackends);
     delete d;
+
+    // TODO: delete s, but make sure it is not accessed by any other objects any more!
 }
 
 QStringList WorldMapWidget2::availableBackends() const
@@ -179,7 +181,6 @@ void WorldMapWidget2::saveBackendToCache()
     if (!d->currentBackendReady)
         return;
 
-    kDebug()<<1;
     d->cacheCenterCoordinate = getCenter();
 }
 
@@ -425,7 +426,7 @@ void WorldMapWidget2::addClusterableMarkers(const WMWMarker::List& markerList)
 {
     s->markerModel->addMarkers(markerList);
 
-    updateClusters();
+    slotClustersNeedUpdating();
 }
 
 void WorldMapWidget2::addSingleMarkers(const WMWMarker::List& markerList)
@@ -459,7 +460,7 @@ const QSize ClusterMaxPixmapSize = QSize(60, 60);
 
 void WorldMapWidget2::updateClusters()
 {
-    kDebug()<<"updateClusters starting...";
+//     kDebug()<<"updateClusters starting...";
     s->clusterList.clear();
 
     if (!d->currentBackendReady)
@@ -497,7 +498,7 @@ void WorldMapWidget2::updateClusters()
         pixelNonEmptyTileIndexGrid[linearIndex] << tileIndex;
         pixelCountGrid[linearIndex]+= s->markerModel->getTileMarkerCount(tileIndex);
 
-        kDebug()<<QString("pixel at: %1, %2 (%3): %4 markers").arg(tilePoint.x()).arg(tilePoint.y()).arg(linearIndex).arg(pixelCountGrid[linearIndex]);
+//         kDebug()<<QString("pixel at: %1, %2 (%3): %4 markers").arg(tilePoint.x()).arg(tilePoint.y()).arg(linearIndex).arg(pixelCountGrid[linearIndex]);
     }
 
     // TODO: cleanup this list every ... iterations in the next loop, too
@@ -587,7 +588,7 @@ void WorldMapWidget2::updateClusters()
         cluster.tileIndicesList = pixelNonEmptyTileIndexGrid.at(markerX+markerY*gridWidth);
         cluster.markerCount = pixelCountGrid.at(markerX+markerY*gridWidth);
 
-        kDebug()<<QString("created cluster %1: %2 markers").arg(s->clusterList.size()).arg(cluster.markerCount);
+//         kDebug()<<QString("created cluster %1: %2 markers").arg(s->clusterList.size()).arg(cluster.markerCount);
 
         // mark the pixel as done:
         pixelCountGrid[markerX+markerY*gridWidth] = 0;
@@ -644,9 +645,17 @@ void WorldMapWidget2::updateClusters()
         }
     }
 
-    kDebug()<<s->clusterList.size();
+//     kDebug()<<s->clusterList.size();
 
     d->currentBackend->updateClusters();
+}
+
+void WorldMapWidget2::slotClustersNeedUpdating()
+{
+    if (d->currentBackendReady)
+    {
+        d->currentBackend->slotClustersNeedUpdating();
+    }
 }
 
 /**

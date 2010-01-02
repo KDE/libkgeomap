@@ -524,6 +524,12 @@ void BackendMarble::slotFloatSettingsTriggered(QAction* action)
     }
 }
 
+void BackendMarble::slotClustersNeedUpdating()
+{
+    // tell the widget to redraw:
+    d->marbleWidget->update();
+}
+
 void BackendMarble::updateClusters()
 {
     // clusters are only needed during redraw

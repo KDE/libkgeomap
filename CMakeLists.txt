@@ -23,6 +23,10 @@ SET( MY_COMPILER_WARNINGS
 find_package( KDE4 REQUIRED )
 include_directories( ${KDE4_INCLUDES} )
 FIND_PACKAGE(MarbleWidget REQUIRED)
+FIND_PACKAGE(Kexiv2 REQUIRED)
+INCLUDE_DIRECTORIES(
+    ${KEXIV2_INCLUDE_DIR}
+)
 
 ADD_DEFINITIONS(-Wall)
 
@@ -65,7 +69,7 @@ SET( demo_widget_sources
     demo-widget/mainwindow.cpp
 )
 kde4_add_executable( demo_widget  ${demo_widget_sources} )
-target_link_libraries( demo_widget ${worldmapwidget2library_libs})
+target_link_libraries( demo_widget ${worldmapwidget2library_libs} ${KEXIV2_LIBRARIES})
 SET_TARGET_PROPERTIES( demo_widget PROPERTIES COMPILE_FLAGS "${COMPILE_FLAGS} ${MY_COMPILER_WARNINGS}")
 
 # test the marker model

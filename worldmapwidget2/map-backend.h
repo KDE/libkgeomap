@@ -70,6 +70,9 @@ public:
 
     WMWSharedData* const s;
 
+public Q_SLOTS:
+    virtual void slotClustersNeedUpdating() = 0;
+
 Q_SIGNALS:
     void signalBackendReady(const QString& backendName);
     void signalMarkerMoved(const int markerIndex);

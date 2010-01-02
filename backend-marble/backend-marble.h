@@ -74,6 +74,9 @@ public:
     void setShowOverviewMap(const bool state);
     void setShowScaleBar(const bool state);
 
+public Q_SLOTS:
+    virtual void slotClustersNeedUpdating();
+
 protected:
     void updateActionsEnabled();
     void generateClusters();

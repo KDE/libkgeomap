@@ -68,6 +68,7 @@ public Q_SLOTS:
     void slotZoomIn();
     void slotZoomOut();
     void slotUpdateActionsEnabled();
+    void slotClustersNeedUpdating();
 
 protected:
     void applyCacheToBackend();

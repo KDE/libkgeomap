@@ -66,6 +66,9 @@ public:
     void setShowScaleControl(const bool state);
     void setShowNavigationControl(const bool state);
 
+public Q_SLOTS:
+    virtual void slotClustersNeedUpdating();
+
 private Q_SLOTS:
     void slotHTMLInitialized();
     void updateActionsEnabled();

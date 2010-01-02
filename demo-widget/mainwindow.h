@@ -23,6 +23,7 @@
 // KDE includes
 
 #include <kmainwindow.h>
+#include <kurl.h>
 
 class MainWindowPrivate;
 
@@ -34,10 +35,16 @@ public:
     MainWindow(QWidget* const parent = 0);
     ~MainWindow();
 
+public Q_SLOTS:
+    void slotScheduleImagesForLoading(const KUrl::List imagesToSchedule);
+
 protected:
     void readSettings();
     void saveSettings();
     void closeEvent(QCloseEvent* e);
+
+private Q_SLOTS:
+    void slotFutureResultsReadyAt(int startIndex, int endIndex);
 
 private:
     MainWindowPrivate* const d;

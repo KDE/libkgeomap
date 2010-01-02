@@ -604,6 +604,10 @@ void BackendGoogleMaps::setShowMapTypeControl(const bool state)
     d->bgmWidget->executeScript(QString("wmwSetShowMapTypeControl(%1);").arg(state?"true":"false"));
 }
 
+void BackendGoogleMaps::slotClustersNeedUpdating()
+{
+    s->worldMapWidget->updateClusters();
+}
 
 } /* WMW2 */
 
