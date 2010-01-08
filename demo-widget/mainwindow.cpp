@@ -28,6 +28,7 @@
 #include <QProgressBar>
 #include <QPushButton>
 #include <QSplitter>
+#include <QTimer>
 #include <QTreeWidget>
 #include <QVBoxLayout>
 #include <qtconcurrentmap.h>
@@ -72,7 +73,8 @@ public:
         imageLoadingFutureWatchers(),
         imageLoadingTotalCount(0),
         imageLoadingCurrentCount(0),
-        imageLoadingCountMutex()
+        imageLoadingBuncher(),
+        imageLoadingBunchTimer(0)
     {
 
     }
@@ -85,7 +87,8 @@ public:
     QList<QFutureWatcher<MyImageData>*> imageLoadingFutureWatchers;
     int imageLoadingTotalCount;
     int imageLoadingCurrentCount;
-    QMutex imageLoadingCountMutex;
+    QList<MyImageData> imageLoadingBuncher;
+    QTimer* imageLoadingBunchTimer;
 };
 
 MainWindow::MainWindow(QWidget* const parent)
@@ -95,6 +98,11 @@ MainWindow::MainWindow(QWidget* const parent)
     setWindowTitle(i18n("WorldMapWidget2 demo"));
     setWindowIcon(SmallIcon("applications-internet"));
     setObjectName("Demo-WorldMapWidget2");
+
+    d->imageLoadingBunchTimer = new QTimer(this);
+    d->imageLoadingBunchTimer->setSingleShot(false);
+    connect(d->imageLoadingBunchTimer, SIGNAL(timeout()),
+            this, SLOT(slotImageLoadingBunchReady()));
 
     // create a status bar:
     statusBar();
@@ -227,7 +235,6 @@ MyImageData LoadImageData(const KUrl& urlToLoad)
 void MainWindow::slotFutureResultsReadyAt(int startIndex, int endIndex)
 {
     kDebug()<<"future"<<startIndex<<endIndex;
-    QMutexLocker(&(d->imageLoadingCountMutex));
 
     // determine the sender:
     QFutureWatcher<MyImageData>* const futureSender = reinterpret_cast<QFutureWatcher<MyImageData>*>(sender());
@@ -251,15 +258,7 @@ void MainWindow::slotFutureResultsReadyAt(int startIndex, int endIndex)
         MyImageData newData = d->imageLoadingRunningFutures.at(futureIndex).resultAt(index);
         kDebug()<<"future"<<newData.url<<newData.coordinates.geoUrl();
 
-        // TODO: bunch these!
-        d->mapWidget->addClusterableMarkers(WMWMarker::List()<<WMWMarker(newData.coordinates));
-
-        // add the item to the tree widget:
-        QTreeWidgetItem* const treeItem = new QTreeWidgetItem();
-        treeItem->setText(0, newData.url.fileName());
-        treeItem->setText(1, newData.coordinates.geoUrl());
-        
-        d->treeWidget->addTopLevelItem(treeItem);
+        d->imageLoadingBuncher << newData;
     }
 
     d->imageLoadingCurrentCount+= endIndex-startIndex;
@@ -278,16 +277,20 @@ void MainWindow::slotFutureResultsReadyAt(int startIndex, int endIndex)
         qDeleteAll(d->imageLoadingFutureWatchers);
         d->imageLoadingFutureWatchers.clear();
         d->imageLoadingRunningFutures.clear();
+
+        d->imageLoadingBunchTimer->stop();
+
+        // force display of all images:
+        QTimer::singleShot(0, this, SLOT(slotImageLoadingBunchReady()));;
     }
 }
 
 void MainWindow::slotScheduleImagesForLoading(const KUrl::List imagesToSchedule)
 {
-    QMutexLocker(&(d->imageLoadingCountMutex));
-
     if (d->imageLoadingTotalCount==0)
     {
         statusBar()->addWidget(d->progressBar);
+        d->imageLoadingBunchTimer->start(30);
     }
     d->imageLoadingTotalCount+=imagesToSchedule.count();
     d->progressBar->setRange(0, d->imageLoadingTotalCount);
@@ -302,4 +305,25 @@ void MainWindow::slotScheduleImagesForLoading(const KUrl::List imagesToSchedule)
 
     d->imageLoadingRunningFutures << future;
     d->imageLoadingFutureWatchers << watcher;
+}
+
+void MainWindow::slotImageLoadingBunchReady()
+{
+    kDebug()<<"slotImageLoadingBunchReady";
+
+    for (int i=0; i<d->imageLoadingBuncher.count(); ++i)
+    {
+        const MyImageData& currentInfo = d->imageLoadingBuncher.at(i);
+
+        d->mapWidget->addClusterableMarkers(WMWMarker::List()<<WMWMarker(currentInfo.coordinates));
+
+        // add the item to the tree widget:
+        QTreeWidgetItem* const treeItem = new QTreeWidgetItem();
+        treeItem->setText(0, currentInfo.url.fileName());
+        treeItem->setText(1, currentInfo.coordinates.geoUrl());
+
+        d->treeWidget->addTopLevelItem(treeItem);
+    }
+
+    d->imageLoadingBuncher.clear();
 }

@@ -45,6 +45,7 @@ protected:
 
 private Q_SLOTS:
     void slotFutureResultsReadyAt(int startIndex, int endIndex);
+    void slotImageLoadingBunchReady();
 
 private:
     MainWindowPrivate* const d;
