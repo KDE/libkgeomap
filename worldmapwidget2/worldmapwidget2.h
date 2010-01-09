@@ -64,6 +64,8 @@ public:
     void getColorInfos(const int clusterIndex, QColor *fillColor, QColor *strokeColor,
                        Qt::PenStyle *strokeStyle, QString *labelText, QColor *labelColor) const;
 
+    QString convertZoomToBackendZoom(const QString& someZoom, const QString& targetBackend) const;
+
 public Q_SLOTS:
     void slotZoomIn();
     void slotZoomOut();
@@ -78,6 +80,7 @@ protected:
 protected Q_SLOTS:
     void slotBackendReady(const QString& backendName);
     void slotChangeBackend(QAction* action);
+    void slotBackendZoomChanged(const QString& newZoom);
 
 private:
     WMWSharedData* const s;

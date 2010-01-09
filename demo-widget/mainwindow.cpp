@@ -82,7 +82,7 @@ public:
     QSplitter* splitter;
     WorldMapWidget2* mapWidget;
     QTreeWidget* treeWidget;
-    QProgressBar* progressBar;
+    QPointer<QProgressBar> progressBar;
     QList<QFuture<MyImageData> > imageLoadingRunningFutures;
     QList<QFutureWatcher<MyImageData>*> imageLoadingFutureWatchers;
     int imageLoadingTotalCount;
@@ -127,7 +127,7 @@ MainWindow::MainWindow(QWidget* const parent)
     d->treeWidget->setHeaderLabels(QStringList()<<i18n("Filename")<<i18n("Coordinates"));
     vbox->addWidget(d->treeWidget);
 
-    d->progressBar = new QProgressBar(this);
+    d->progressBar = new QProgressBar();
     d->progressBar->setFormat(i18n("Loading images - %p%"));
 
     d->splitter->addWidget(dummyWidget);
@@ -172,6 +172,11 @@ MainWindow::MainWindow(QWidget* const parent)
 
 MainWindow::~MainWindow()
 {
+    if (d->progressBar)
+    {
+        delete d->progressBar;
+    }
+
     delete d;
 }
 
@@ -287,6 +292,9 @@ void MainWindow::slotFutureResultsReadyAt(int startIndex, int endIndex)
 
 void MainWindow::slotScheduleImagesForLoading(const KUrl::List imagesToSchedule)
 {
+    if (imagesToSchedule.isEmpty())
+        return;
+
     if (d->imageLoadingTotalCount==0)
     {
         statusBar()->addWidget(d->progressBar);

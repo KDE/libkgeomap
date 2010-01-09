@@ -3,8 +3,7 @@ IN PROGRESS
 - create a model for the markers
 
 TODO
-- synchronize zoom between the backends
-- save zoom settings
+- synchronize zoom between the backends above Google Maps level 20
 - advance markers
 - check proper handling of marker movement on drop, not on subsequent mouse movement
 - make markers moveable in Marble
@@ -38,3 +37,4 @@ DONE
 - access to Marble projections
 - access to Marble float items
 - access to Google Maps float items
+- synchronize zoom between the backends up to Google Maps level 19

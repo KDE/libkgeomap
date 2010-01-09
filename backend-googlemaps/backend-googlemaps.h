@@ -60,6 +60,9 @@ public:
     virtual bool geoCoordinates(const QPoint point, WMWGeoCoordinate* const coordinates) const;
     virtual QSize mapSize() const;
 
+    virtual void setZoom(const QString& newZoom);
+    virtual QString getZoom() const;
+
     QString getMapType() const;
     void setMapType(const QString& newMapType);
     void setShowMapTypeControl(const bool state);
@@ -77,6 +80,7 @@ private Q_SLOTS:
     void slotMapBoundsChanged();
     void slotHTMLEvents(const QStringList& eventStrings);
     void slotFloatSettingsTriggered(QAction* action);
+    void slotZoomChanged();
 
 private:
     BackendGoogleMapsPrivate* const d;

@@ -56,7 +56,8 @@ public:
       cacheProjection("spherical"),
       cacheShowCompass(false),
       cacheShowScaleBar(false),
-      cacheShowOverviewMap(false)
+      cacheShowOverviewMap(false),
+      cacheZoom(900)
     {
     }
 
@@ -74,12 +75,16 @@ public:
     bool cacheShowCompass;
     bool cacheShowScaleBar;
     bool cacheShowOverviewMap;
+    int cacheZoom;
 };
 
 BackendMarble::BackendMarble(WMWSharedData* const sharedData, QObject* const parent)
 : MapBackend(sharedData, parent), d(new BackendMarblePrivate())
 {
     d->marbleWidget = new BMWidget(this);
+
+    connect(d->marbleWidget, SIGNAL(zoomChanged(int)),
+            this, SLOT(slotMarbleZoomChanged(int)));
 
     // set a backend first
     setMapTheme(d->cacheMapTheme);
@@ -261,6 +266,11 @@ void BackendMarble::setMapTheme(const QString& newMapTheme)
         }
     }
 
+    // the float items are reset when the theme is changed:
+    setShowScaleBar(d->cacheShowScaleBar);
+    setShowCompass(d->cacheShowCompass);
+    setShowOverviewMap(d->cacheShowOverviewMap);
+
     updateActionsEnabled();
 }
 
@@ -311,6 +321,7 @@ void BackendMarble::saveSettingsToGroup(KConfigGroup* const group)
     group->writeEntry("Marble Show Scale Bar", d->cacheShowScaleBar);
     group->writeEntry("Marble Show Compass", d->cacheShowCompass);
     group->writeEntry("Marble Show Overview Map", d->cacheShowOverviewMap);
+    group->writeEntry("Marble Zoom", getZoom());
 }
 
 void BackendMarble::readSettingsFromGroup(const KConfigGroup* const group)
@@ -324,6 +335,7 @@ void BackendMarble::readSettingsFromGroup(const KConfigGroup* const group)
     setShowScaleBar(group->readEntry("Marble Show Scale Bar", d->cacheShowScaleBar));
     setShowCompass(group->readEntry("Marble Show Compass", d->cacheShowCompass));
     setShowOverviewMap(group->readEntry("Marble Show Overview Map", d->cacheShowOverviewMap));
+    setZoom(group->readEntry("Marble Zoom", QString("marble:%1").arg(d->cacheZoom)));
 }
 
 void BackendMarble::updateMarkers()
@@ -538,6 +550,32 @@ void BackendMarble::updateClusters()
 QSize BackendMarble::mapSize() const
 {
     return d->marbleWidget->map()->size();
+}
+
+void BackendMarble::slotMarbleZoomChanged(int newZoom)
+{
+    Q_UNUSED(newZoom);
+
+    kDebug()<<getZoom();
+    emit(signalZoomChanged(getZoom()));
+}
+
+void BackendMarble::setZoom(const QString& newZoom)
+{
+    const QString myZoomString = s->worldMapWidget->convertZoomToBackendZoom(newZoom, "marble");
+    WMW2_ASSERT(myZoomString.startsWith("marble:"));
+
+    const int myZoom = myZoomString.mid(QString("marble:").length()).toInt();
+    kDebug()<<myZoom;
+
+    d->cacheZoom = myZoom;
+    d->marbleWidget->zoomView(myZoom);
+}
+
+QString BackendMarble::getZoom() const
+{
+    d->cacheZoom = d->marbleWidget->zoom();
+    return QString("marble:%1").arg(d->cacheZoom);
 }
 
 } /* WMW2 */

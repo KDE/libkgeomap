@@ -225,6 +225,9 @@ void BGMWidget::loadInitialHTML(const WMWGeoCoordinate& initialCenter, const QSt
 "       google.maps.event.addListener(map, 'bounds_changed', function() {\n"
 "           wmwPostEventString('MB');\n"
 "       });\n"
+"       google.maps.event.addListener(map, 'zoom_changed', function() {\n"
+"           wmwPostEventString('ZC');\n"
+"       });\n"
 // source: http://taapps-javalibs.blogspot.com/2009/10/google-map-v3how-to-use-overlayviews.html
 "       projectionHelper = new ProjectionHelper(map);\n"
 "   }\n"
@@ -241,7 +244,7 @@ void BGMWidget::loadInitialHTML(const WMWGeoCoordinate& initialCenter, const QSt
                              .arg(initialCenter.lonString())
                              .arg(initialMapType);
 
-    kDebug()<<mapHTMLCode;
+//     kDebug()<<mapHTMLCode;
     begin();
     write(mapHTMLCode);
     end();

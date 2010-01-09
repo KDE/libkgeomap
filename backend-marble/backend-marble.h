@@ -69,6 +69,9 @@ public:
     virtual bool screenCoordinates(const WMWGeoCoordinate& coordinates, QPoint* const point);
     virtual QSize mapSize() const;
 
+    virtual void setZoom(const QString& newZoom);
+    virtual QString getZoom() const;
+
     void marbleCustomPaint(Marble::GeoPainter* painter);
     void setShowCompass(const bool state);
     void setShowOverviewMap(const bool state);
@@ -85,6 +88,7 @@ protected Q_SLOTS:
     void slotMapThemeActionTriggered(QAction* action);
     void slotProjectionActionTriggered(QAction* action);
     void slotFloatSettingsTriggered(QAction* action);
+    void slotMarbleZoomChanged(int newZoom);
 
 private:
     BackendMarblePrivate* const d;

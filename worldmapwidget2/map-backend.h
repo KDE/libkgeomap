@@ -68,6 +68,9 @@ public:
     virtual bool screenCoordinates(const WMWGeoCoordinate& coordinates, QPoint* const point) = 0;
     virtual QSize mapSize() const = 0;
 
+    virtual void setZoom(const QString& newZoom) = 0;
+    virtual QString getZoom() const = 0;
+
     WMWSharedData* const s;
 
 public Q_SLOTS:
@@ -76,6 +79,7 @@ public Q_SLOTS:
 Q_SIGNALS:
     void signalBackendReady(const QString& backendName);
     void signalMarkerMoved(const int markerIndex);
+    void signalZoomChanged(const QString& newZoom);
 
 private:
     MapBackendPrivate* const d;

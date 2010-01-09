@@ -31,13 +31,32 @@
 
 #include <kdebug.h>
 
+#ifdef WMW2_HAVE_VALGRIND
+#include <valgrind/valgrind.h>
+#endif /* WMW2_HAVE_VALGRIND */
+
 #define WMW2_ASSERT(cond) ((!(cond)) ? WMW2::WMW2_assert(#cond,__FILE__,__LINE__) : qt_noop())
 
 namespace WMW2 {
 
 inline void WMW2_assert(const char* const condition, const char* const filename, const int lineNumber)
 {
-    kDebug(0)<<QString("ASSERT: %1 - %2:%3").arg(condition).arg(filename).arg(lineNumber);
+    const QString debugString = QString("ASSERT: %1 - %2:%3").arg(condition).arg(filename).arg(lineNumber);
+#ifdef WMW2_HAVE_VALGRIND
+    if (RUNNING_ON_VALGRIND>0)
+    {
+        // TODO: which encoding?
+        const QByteArray dummyArray = debugString.toUtf8();
+        VALGRIND_PRINTF_BACKTRACE("%s", dummyArray.constData());
+    }
+    else
+    {
+        kDebug(0)<<debugString;
+    }
+#else
+    kDebug(0)<<debugString;
+#endif /* WMW2_HAVE_VALGRIND */
+    
 }
 
 class WMWGeoCoordinate

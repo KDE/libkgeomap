@@ -68,6 +68,8 @@ public:
       currentBackendReady(false),
       currentBackendName(),
       stackedLayout(0),
+      cacheCenterCoordinate(52.0,6.0),
+      cacheZoom("marble:900"),
       actionConfigurationMenu(0),
       actionZoomIn(0),
       actionZoomOut(0),
@@ -83,6 +85,7 @@ public:
 
     // these values are cached in case the backend is not ready:
     WMWGeoCoordinate cacheCenterCoordinate;
+    QString cacheZoom;
 
     // actions for controlling the widget
     QPointer<KAction> actionConfigurationMenu;
@@ -138,6 +141,16 @@ bool WorldMapWidget2::setBackend(const QString& backendName)
 
     saveBackendToCache();
 
+    // disconnect signals from old backend:
+    if (d->currentBackend)
+    {
+        connect(d->currentBackend, SIGNAL(signalBackendReady(const QString&)),
+                    this, SLOT(slotBackendReady(const QString&)));
+
+        connect(d->currentBackend, SIGNAL(signalZoomChanged(const QString&)),
+                this, SLOT(slotBackendZoomChanged(const QString&)));
+    }
+
     MapBackend* backend;
     foreach(backend, d->loadedBackends)
     {
@@ -150,6 +163,9 @@ bool WorldMapWidget2::setBackend(const QString& backendName)
 
             connect(d->currentBackend, SIGNAL(signalBackendReady(const QString&)),
                     this, SLOT(slotBackendReady(const QString&)));
+
+            connect(d->currentBackend, SIGNAL(signalZoomChanged(const QString&)),
+                    this, SLOT(slotBackendZoomChanged(const QString&)));
 
             // call this slot manually in case the backend was ready right away:
             if (d->currentBackend->isReady())
@@ -172,8 +188,10 @@ void WorldMapWidget2::applyCacheToBackend()
 {
     if (!d->currentBackendReady)
         return;
-    
+
     setCenter(d->cacheCenterCoordinate);
+    // TODO: only do this if the zoom was changed!
+    d->currentBackend->setZoom(d->cacheZoom);
 }
 
 void WorldMapWidget2::saveBackendToCache()
@@ -182,6 +200,7 @@ void WorldMapWidget2::saveBackendToCache()
         return;
 
     d->cacheCenterCoordinate = getCenter();
+    d->cacheZoom = d->currentBackend->getZoom();
 }
 
 WMWGeoCoordinate WorldMapWidget2::getCenter() const
@@ -772,6 +791,83 @@ void WorldMapWidget2::getColorInfos(const int clusterIndex, QColor *fillColor, Q
 //             }
 //             break;
 //     }
+}
+
+QString WorldMapWidget2::convertZoomToBackendZoom(const QString& someZoom, const QString& targetBackend) const
+{
+    const QStringList zoomParts = someZoom.split(':');
+    WMW2_ASSERT(zoomParts.count()==2);
+    const QString sourceBackend = zoomParts.first();
+
+    if (sourceBackend==targetBackend)
+    {
+        return someZoom;
+    }
+
+    const int sourceZoom = zoomParts.last().toInt();
+
+    int targetZoom = -1;
+
+    // all of these values were found experimentally!
+    if (targetBackend=="marble")
+    {
+             if (sourceZoom== 0) { targetZoom =  900; }
+        else if (sourceZoom== 1) { targetZoom =  970; }
+        else if (sourceZoom== 2) { targetZoom = 1108; }
+        else if (sourceZoom== 3) { targetZoom = 1250; }
+        else if (sourceZoom== 4) { targetZoom = 1384; }
+        else if (sourceZoom== 5) { targetZoom = 1520; }
+        else if (sourceZoom== 6) { targetZoom = 1665; }
+        else if (sourceZoom== 7) { targetZoom = 1800; }
+        else if (sourceZoom== 8) { targetZoom = 1940; }
+        else if (sourceZoom== 9) { targetZoom = 2070; }
+        else if (sourceZoom==10) { targetZoom = 2220; }
+        else if (sourceZoom==11) { targetZoom = 2357; }
+        else if (sourceZoom==12) { targetZoom = 2510; }
+        else if (sourceZoom==13) { targetZoom = 2635; }
+        else if (sourceZoom==14) { targetZoom = 2775; }
+        else if (sourceZoom==15) { targetZoom = 2900; }
+        else if (sourceZoom==16) { targetZoom = 3051; }
+        else if (sourceZoom==17) { targetZoom = 3180; }
+        else if (sourceZoom==18) { targetZoom = 3295; }
+        else if (sourceZoom==19) { targetZoom = 3450; }
+        else { targetZoom = 3500; } // TODO: find values for level 20 and up
+    }
+
+    if (targetBackend=="googlemaps")
+    {
+             if (sourceZoom<= 900) { targetZoom =  0; }
+        else if (sourceZoom<= 970) { targetZoom =  1; }
+        else if (sourceZoom<=1108) { targetZoom =  2; }
+        else if (sourceZoom<=1250) { targetZoom =  3; }
+        else if (sourceZoom<=1384) { targetZoom =  4; }
+        else if (sourceZoom<=1520) { targetZoom =  5; }
+        else if (sourceZoom<=1665) { targetZoom =  6; }
+        else if (sourceZoom<=1800) { targetZoom =  7; }
+        else if (sourceZoom<=1940) { targetZoom =  8; }
+        else if (sourceZoom<=2070) { targetZoom =  9; }
+        else if (sourceZoom<=2220) { targetZoom = 10; }
+        else if (sourceZoom<=2357) { targetZoom = 11; }
+        else if (sourceZoom<=2510) { targetZoom = 12; }
+        else if (sourceZoom<=2635) { targetZoom = 13; }
+        else if (sourceZoom<=2775) { targetZoom = 14; }
+        else if (sourceZoom<=2900) { targetZoom = 15; }
+        else if (sourceZoom<=3051) { targetZoom = 16; }
+        else if (sourceZoom<=3180) { targetZoom = 17; }
+        else if (sourceZoom<=3295) { targetZoom = 18; }
+        else if (sourceZoom<=3450) { targetZoom = 19; }
+        else { targetZoom = 20; } // TODO: find values for level 20 and up
+    }
+
+    WMW2_ASSERT(targetZoom>=0);
+
+    return QString("%1:%2").arg(targetBackend).arg(targetZoom);
+}
+
+void WorldMapWidget2::slotBackendZoomChanged(const QString& newZoom)
+{
+    kDebug()<<newZoom;
+    d->cacheZoom = newZoom;
 }
 
 } /* WMW2 */

@@ -52,7 +52,8 @@ public:
       cacheMapType("ROADMAP"),
       cacheShowMapTypeControl(true),
       cacheShowNavigationControl(true),
-      cacheShowScaleControl(true)
+      cacheShowScaleControl(true),
+      cacheZoom(1)
     {
     }
 
@@ -69,6 +70,7 @@ public:
     bool cacheShowMapTypeControl;
     bool cacheShowNavigationControl;
     bool cacheShowScaleControl;
+    int cacheZoom;
 };
 
 BackendGoogleMaps::BackendGoogleMaps(WMWSharedData* const sharedData, QObject* const parent)
@@ -384,6 +386,12 @@ void BackendGoogleMaps::slotMapBoundsChanged()
     updateActionsEnabled();
 }
 
+void BackendGoogleMaps::slotZoomChanged()
+{
+    d->cacheZoom = d->bgmWidget->executeScript(QString("wmwGetZoom();")).toInt();
+    emit(signalZoomChanged(QString("googlemaps:%1").arg(d->cacheZoom)));
+}
+
 void BackendGoogleMaps::updateMarkers()
 {
     WMW2_ASSERT(isReady());
@@ -409,24 +417,11 @@ void BackendGoogleMaps::updateMarkers()
 
 void BackendGoogleMaps::slotHTMLEvents(const QStringList& events)
 {
-    QPoint point(0,0);
-    WMWGeoCoordinate coordinate(10.0, 0.0);
-    {
-        bool screenValid = screenCoordinates(WMWGeoCoordinate(52.0,6.0), &point);
-        kDebug()<<screenValid<<point;
-    }
-    {
-        bool screenValid = screenCoordinates(WMWGeoCoordinate(52.0,6.0), &point);
-        kDebug()<<screenValid<<point;
-    }
-    bool coordinateValid = geoCoordinates(QPoint(10,10), &coordinate);
-    kDebug()<<coordinateValid<<coordinate.geoUrl();
-
     // some events can be buffered:
     // TODO: verify that they are stored in the correct order
     QMap<QString, QString> bufferedEvents;
     QStringList bufferableEvents;
-    bufferableEvents<<"MT"<<"MB";
+    bufferableEvents<<"MT"<<"MB"<<"ZC";
 
     for (QStringList::const_iterator it = events.constBegin(); it!=events.constEnd(); ++it)
     {
@@ -481,6 +476,11 @@ void BackendGoogleMaps::slotHTMLEvents(const QStringList& events)
         {
             // map bounds changed
             slotMapBoundsChanged();
+        }
+        else if (eventCode == "ZC")
+        {
+            // zoom changed
+            slotZoomChanged();
         }
     }
 }
@@ -607,6 +607,32 @@ void BackendGoogleMaps::setShowMapTypeControl(const bool state)
 void BackendGoogleMaps::slotClustersNeedUpdating()
 {
     s->worldMapWidget->updateClusters();
+}
+
+void BackendGoogleMaps::setZoom(const QString& newZoom)
+{
+    const QString myZoomString = s->worldMapWidget->convertZoomToBackendZoom(newZoom, "googlemaps");
+    WMW2_ASSERT(myZoomString.startsWith("googlemaps:"));
+
+    const int myZoom = myZoomString.mid(QString("googlemaps:").length()).toInt();
+    kDebug()<<myZoom;
+
+    d->cacheZoom = myZoom;
+
+    if (isReady())
+    {
+        d->bgmWidget->executeScript(QString("wmwSetZoom(%1);").arg(d->cacheZoom));
+    }
+}
+
+QString BackendGoogleMaps::getZoom() const
+{
+    if (isReady())
+    {
+        d->cacheZoom = d->bgmWidget->executeScript(QString("wmwGetZoom();")).toInt();
+    }
+
+    return QString("googlemaps:%1").arg(d->cacheZoom);
 }
 
 } /* WMW2 */
