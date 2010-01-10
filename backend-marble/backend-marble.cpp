@@ -321,7 +321,6 @@ void BackendMarble::saveSettingsToGroup(KConfigGroup* const group)
     group->writeEntry("Marble Show Scale Bar", d->cacheShowScaleBar);
     group->writeEntry("Marble Show Compass", d->cacheShowCompass);
     group->writeEntry("Marble Show Overview Map", d->cacheShowOverviewMap);
-    group->writeEntry("Marble Zoom", getZoom());
 }
 
 void BackendMarble::readSettingsFromGroup(const KConfigGroup* const group)
@@ -335,7 +334,6 @@ void BackendMarble::readSettingsFromGroup(const KConfigGroup* const group)
     setShowScaleBar(group->readEntry("Marble Show Scale Bar", d->cacheShowScaleBar));
     setShowCompass(group->readEntry("Marble Show Compass", d->cacheShowCompass));
     setShowOverviewMap(group->readEntry("Marble Show Overview Map", d->cacheShowOverviewMap));
-    setZoom(group->readEntry("Marble Zoom", QString("marble:%1").arg(d->cacheZoom)));
 }
 
 void BackendMarble::updateMarkers()

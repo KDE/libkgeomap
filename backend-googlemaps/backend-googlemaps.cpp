@@ -212,6 +212,7 @@ void BackendGoogleMaps::slotHTMLInitialized()
     setShowMapTypeControl(d->cacheShowMapTypeControl);
     setShowNavigationControl(d->cacheShowNavigationControl);
     setShowScaleControl(d->cacheShowNavigationControl);
+    d->bgmWidget->runScript(QString("wmwSetZoom(%1);").arg(d->cacheZoom));
     emit(signalBackendReady(backendName()));
 }
 

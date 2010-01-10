@@ -50,6 +50,9 @@ public:
     WMWGeoCoordinate getCenter() const;
     void setCenter(const WMWGeoCoordinate& coordinate);
 
+    void setZoom(const QString& newZoom);
+    QString getZoom();
+
     void saveSettingsToGroup(KConfigGroup* const group);
     void readSettingsFromGroup(const KConfigGroup* const group);
 

@@ -191,7 +191,7 @@ void WorldMapWidget2::applyCacheToBackend()
 
     setCenter(d->cacheCenterCoordinate);
     // TODO: only do this if the zoom was changed!
-    d->currentBackend->setZoom(d->cacheZoom);
+    setZoom(d->cacheZoom);
 }
 
 void WorldMapWidget2::saveBackendToCache()
@@ -200,7 +200,7 @@ void WorldMapWidget2::saveBackendToCache()
         return;
 
     d->cacheCenterCoordinate = getCenter();
-    d->cacheZoom = d->currentBackend->getZoom();
+    d->cacheZoom = getZoom();
 }
 
 WMWGeoCoordinate WorldMapWidget2::getCenter() const
@@ -263,6 +263,7 @@ void WorldMapWidget2::saveSettingsToGroup(KConfigGroup* const group)
         group->writeEntry("Backend", d->currentBackendName);
     }
     group->writeEntry("Center", getCenter().geoUrl());
+    group->writeEntry("Zoom", getZoom());
 
     for (int i=0; i<d->loadedBackends.size(); ++i)
     {
@@ -284,6 +285,7 @@ void WorldMapWidget2::readSettingsFromGroup(const KConfigGroup* const group)
     bool centerGeoUrlValid = false;
     const WMWGeoCoordinate centerCoordinate = WMWGeoCoordinate::fromGeoUrl(centerGeoUrl, &centerGeoUrlValid);
     setCenter(centerGeoUrlValid ? centerCoordinate : centerDefault);
+    setZoom(group->readEntry("Zoom", d->cacheZoom));
 
     for (int i=0; i<d->loadedBackends.size(); ++i)
     {
@@ -868,6 +870,26 @@ void WorldMapWidget2::slotBackendZoomChanged(const QString& newZoom)
 {
     kDebug()<<newZoom;
     d->cacheZoom = newZoom;
+}
+
+void WorldMapWidget2::setZoom(const QString& newZoom)
+{
+    d->cacheZoom = newZoom;
+
+    if (d->currentBackendReady)
+    {
+        d->currentBackend->setZoom(d->cacheZoom);
+    }
+}
+
+QString WorldMapWidget2::getZoom()
+{
+    if (d->currentBackendReady)
+    {
+        d->cacheZoom = d->currentBackend->getZoom();
+    }
+
+    return d->cacheZoom;
 }
 
 } /* WMW2 */
