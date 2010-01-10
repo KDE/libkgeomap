@@ -8,7 +8,6 @@ TODO
 - check proper handling of marker movement on drop, not on subsequent mouse movement
 - make markers moveable in Marble
 - check for memory leaks when handling menus and actions
-- calls to wmwLatLngToPixel are not correct when panning in Google Maps until a zoom is performed
 - use appropriate levels in the marker model when scanning for visible markers
 - panning in Google Maps is quite slow with many clusters, find out whether the bottleneck is adding the clusters to the html-part or finding the positions of the markers (probably both :-( )
 - clean up ways to re-create the clusters (generateClusters, updateClusters, clustersNeedUpdating...)
@@ -38,3 +37,4 @@ DONE
 - access to Marble float items
 - access to Google Maps float items
 - synchronize zoom between the backends up to Google Maps level 19
+- calls to wmwLatLngToPixel are not correct when panning in Google Maps until a zoom is performed

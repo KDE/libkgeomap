@@ -243,6 +243,10 @@ void MainWindow::slotFutureResultsReadyAt(int startIndex, int endIndex)
 
     // determine the sender:
     QFutureWatcher<MyImageData>* const futureSender = reinterpret_cast<QFutureWatcher<MyImageData>*>(sender());
+    WMW2_ASSERT(futureSender!=0);
+    if (futureSender==0)
+        return;
+
     int futureIndex = -1;
     for (int i = 0; i<d->imageLoadingFutureWatchers.size(); ++i)
     {
@@ -252,6 +256,7 @@ void MainWindow::slotFutureResultsReadyAt(int startIndex, int endIndex)
             break;
         }
     }
+    WMW2_ASSERT(futureIndex>=0);
     if (futureIndex<0)
     {
         // TODO: error!
@@ -274,7 +279,7 @@ void MainWindow::slotFutureResultsReadyAt(int startIndex, int endIndex)
     else
     {
         statusBar()->removeWidget(d->progressBar);
-        statusBar()->showMessage(i18n("%1 image have been loaded.", d->imageLoadingTotalCount), 3000);
+        statusBar()->showMessage(i18np("%1 image has been loaded.", "%1 images have been loaded.", d->imageLoadingTotalCount), 3000);
         d->imageLoadingCurrentCount = 0;
         d->imageLoadingTotalCount = 0;
 
@@ -298,7 +303,7 @@ void MainWindow::slotScheduleImagesForLoading(const KUrl::List imagesToSchedule)
     if (d->imageLoadingTotalCount==0)
     {
         statusBar()->addWidget(d->progressBar);
-        d->imageLoadingBunchTimer->start(30);
+        d->imageLoadingBunchTimer->start(100);
     }
     d->imageLoadingTotalCount+=imagesToSchedule.count();
     d->progressBar->setRange(0, d->imageLoadingTotalCount);

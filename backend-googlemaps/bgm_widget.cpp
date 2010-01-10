@@ -337,7 +337,7 @@ void BGMWidget::slotScanForJSMessages()
 }
 
 /**
- * \brief Wrapper around executeScript to catch more errors
+ * @brief Wrapper around executeScript to catch more errors
  */
 QVariant BGMWidget::runScript(const QString& scriptCode)
 {
