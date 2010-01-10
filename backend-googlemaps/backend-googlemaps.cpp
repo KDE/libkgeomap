@@ -419,6 +419,7 @@ void BackendGoogleMaps::slotHTMLEvents(const QStringList& events)
 {
     // some events can be buffered:
     // TODO: verify that they are stored in the correct order
+    //       or that the order does not matter!
     QMap<QString, QString> bufferedEvents;
     QStringList bufferableEvents;
     bufferableEvents<<"MT"<<"MB"<<"ZC";
@@ -458,6 +459,11 @@ void BackendGoogleMaps::slotHTMLEvents(const QStringList& events)
             s->markerList[markerIndex].coordinates = markerCoordinates;
 
             emit(signalMarkerMoved(markerIndex));
+        }
+        else if (eventCode=="do")
+        {
+            // debug output:
+            kDebug()<<QString("javascript:%1").arg(eventParameter);
         }
     }
 
