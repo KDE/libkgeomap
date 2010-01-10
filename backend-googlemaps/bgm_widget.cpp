@@ -130,6 +130,7 @@ void BGMWidget::loadInitialHTML(const WMWGeoCoordinate& initialCenter, const QSt
 "       return latlngString;\n"
 "   }\n"
 "   function wmwLatLngToPixel(lat, lon) {\n"
+//      There is an offset in fromLatLngToDivPixel once the map has been panned
 "       var latlng = new google.maps.LatLng(lat, lon);\n"
 "       var myPoint = projectionHelper.getProjection().fromLatLngToDivPixel(latlng);\n"
 "       var centerPoint = projectionHelper.getProjection().fromLatLngToDivPixel(map.getCenter());\n"
@@ -141,7 +142,13 @@ void BGMWidget::loadInitialHTML(const WMWGeoCoordinate& initialCenter, const QSt
 // "       return projectionHelper.getProjection().fromLatLngToDivPixel(latlng).toString();\n"
 "   }\n"
 "   function wmwPixelToLatLng(x, y) {\n"
-"       var point = new google.maps.Point(x, y); \n"
+//      There is an offset in fromDivPixelToLatLng once the map has been panned
+"       var centerPoint = projectionHelper.getProjection().fromLatLngToDivPixel(map.getCenter());\n"
+"       var centerOffsetX = mapDiv.offsetWidth / 2;\n"
+"       var centerOffsetY = mapDiv.offsetHeight / 2;\n"
+"       var pointX = x+centerPoint.x-centerOffsetX;\n"
+"       var pointY = y+centerPoint.y-centerOffsetY;\n"
+"       var point = new google.maps.Point(pointX, pointY); \n"
 "       return projectionHelper.getProjection().fromDivPixelToLatLng(point).toUrlValue(12);\n"
 "   }\n"
     // parameter: "SATELLITE"/"ROADMAP"/"HYBRID"/"TERRAIN"
