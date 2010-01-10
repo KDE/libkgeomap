@@ -188,14 +188,14 @@ WMWGeoCoordinate BackendGoogleMaps::getCenter() const
     WMWGeoCoordinate centerCoordinates;
 
     // there is nothing we can do if the coordinates are invalid
-    /*const bool isValid = */googleVariantToCoordinates(d->bgmWidget->executeScript("wmwGetCenter();"), &centerCoordinates);
+    /*const bool isValid = */googleVariantToCoordinates(d->bgmWidget->runScript("wmwGetCenter();"), &centerCoordinates);
 
     return centerCoordinates;
 }
 
 void BackendGoogleMaps::setCenter(const WMWGeoCoordinate& coordinate)
 {
-    d->bgmWidget->executeScript(QString("wmwSetCenter(%1, %2);").arg(coordinate.latString()).arg(coordinate.lonString()));
+    d->bgmWidget->runScript(QString("wmwSetCenter(%1, %2);").arg(coordinate.latString()).arg(coordinate.lonString()));
 }
 
 bool BackendGoogleMaps::isReady() const
@@ -207,7 +207,7 @@ void BackendGoogleMaps::slotHTMLInitialized()
 {
     kDebug()<<1;
     d->isReady = true;
-    d->bgmWidget->executeScript(QString("document.getElementById(\"map_canvas\").style.height=\"%1px\"").arg(d->bgmWidgetWrapper->height()));
+    d->bgmWidget->runScript(QString("document.getElementById(\"map_canvas\").style.height=\"%1px\"").arg(d->bgmWidgetWrapper->height()));
     setMapType(d->cacheMapType);
     setShowMapTypeControl(d->cacheShowMapTypeControl);
     setShowNavigationControl(d->cacheShowNavigationControl);
@@ -220,7 +220,7 @@ void BackendGoogleMaps::zoomIn()
     if (!d->isReady)
         return;
     
-    d->bgmWidget->executeScript(QString("wmwZoomIn();"));
+    d->bgmWidget->runScript(QString("wmwZoomIn();"));
 }
 
 void BackendGoogleMaps::zoomOut()
@@ -228,14 +228,14 @@ void BackendGoogleMaps::zoomOut()
     if (!d->isReady)
         return;
 
-    d->bgmWidget->executeScript(QString("wmwZoomOut();"));
+    d->bgmWidget->runScript(QString("wmwZoomOut();"));
 }
 
 QString BackendGoogleMaps::getMapType() const
 {
     if (isReady())
     {
-        d->cacheMapType = d->bgmWidget->executeScript(QString("wmwGetMapType();")).toString();
+        d->cacheMapType = d->bgmWidget->runScript(QString("wmwGetMapType();")).toString();
     }
 
     return d->cacheMapType;
@@ -248,7 +248,7 @@ void BackendGoogleMaps::setMapType(const QString& newMapType)
 
     if (isReady())
     {
-        d->bgmWidget->executeScript(QString("wmwSetMapType(\"%1\");").arg(newMapType));
+        d->bgmWidget->runScript(QString("wmwSetMapType(\"%1\");").arg(newMapType));
         updateActionsEnabled();
     }
 }
@@ -388,7 +388,7 @@ void BackendGoogleMaps::slotMapBoundsChanged()
 
 void BackendGoogleMaps::slotZoomChanged()
 {
-    d->cacheZoom = d->bgmWidget->executeScript(QString("wmwGetZoom();")).toInt();
+    d->cacheZoom = d->bgmWidget->runScript(QString("wmwGetZoom();")).toInt();
     emit(signalZoomChanged(QString("googlemaps:%1").arg(d->cacheZoom)));
 }
 
@@ -399,13 +399,13 @@ void BackendGoogleMaps::updateMarkers()
         return;
     
     // re-transfer all markers to the javascript-part:
-    d->bgmWidget->executeScript(QString("wmwClearMarkers();"));
+    d->bgmWidget->runScript(QString("wmwClearMarkers();"));
     for (QIntList::const_iterator it = s->visibleMarkers.constBegin(); it!=s->visibleMarkers.constEnd(); ++it)
     {
         const int currentIndex = *it;
         const WMWMarker& currentMarker = s->markerList.at(currentIndex);
 
-        d->bgmWidget->executeScript(QString("wmwAddMarker(%1, %2, %3, %4);")
+        d->bgmWidget->runScript(QString("wmwAddMarker(%1, %2, %3, %4);")
                 .arg(currentIndex)
                 .arg(currentMarker.coordinates.latString())
                 .arg(currentMarker.coordinates.lonString())
@@ -449,7 +449,7 @@ void BackendGoogleMaps::slotHTMLEvents(const QStringList& events)
             // re-read the marker position:
             WMWGeoCoordinate markerCoordinates;
             const bool isValid = googleVariantToCoordinates(
-                d->bgmWidget->executeScript(QString("wmwGetMarkerPosition(%1);").arg(markerIndex)),
+                d->bgmWidget->runScript(QString("wmwGetMarkerPosition(%1);").arg(markerIndex)),
                                                             &markerCoordinates);
 
             if (!isValid)
@@ -499,12 +499,12 @@ void BackendGoogleMaps::updateClusters()
         return;
 
     // re-transfer all markers to the javascript-part:
-    d->bgmWidget->executeScript(QString("wmwClearClusters();"));
+    d->bgmWidget->runScript(QString("wmwClearClusters();"));
     for (int currentIndex = 0; currentIndex<s->clusterList.size(); ++currentIndex)
     {
         const WMWCluster& currentCluster = s->clusterList.at(currentIndex);
 
-        d->bgmWidget->executeScript(QString("wmwAddCluster(%1, %2, %3, %4);")
+        d->bgmWidget->runScript(QString("wmwAddCluster(%1, %2, %3, %4);")
                 .arg(currentIndex)
                 .arg(currentCluster.coordinates.latString())
                 .arg(currentCluster.coordinates.lonString())
@@ -519,7 +519,7 @@ bool BackendGoogleMaps::screenCoordinates(const WMWGeoCoordinate& coordinates, Q
     if (!d->isReady)
         return false;
 
-    const bool isValid = googleVariantToPoint(d->bgmWidget->executeScript(
+    const bool isValid = googleVariantToPoint(d->bgmWidget->runScript(
             QString("wmwLatLngToPixel(%1, %2);")
                 .arg(coordinates.latString())
                 .arg(coordinates.lonString())
@@ -536,7 +536,7 @@ bool BackendGoogleMaps::geoCoordinates(const QPoint point, WMWGeoCoordinate* con
     if (!d->isReady)
         return false;
 
-    const QVariant coordinatesVariant = d->bgmWidget->executeScript(
+    const QVariant coordinatesVariant = d->bgmWidget->runScript(
             QString("wmwPixelToLatLng(%1, %2);")
                 .arg(point.x())
                 .arg(point.y()));
@@ -581,7 +581,7 @@ void BackendGoogleMaps::setShowScaleControl(const bool state)
     if (!isReady())
         return;
 
-    d->bgmWidget->executeScript(QString("wmwSetShowScaleControl(%1);").arg(state?"true":"false"));
+    d->bgmWidget->runScript(QString("wmwSetShowScaleControl(%1);").arg(state?"true":"false"));
 }
 
 void BackendGoogleMaps::setShowNavigationControl(const bool state)
@@ -594,7 +594,7 @@ void BackendGoogleMaps::setShowNavigationControl(const bool state)
     if (!isReady())
         return;
 
-    d->bgmWidget->executeScript(QString("wmwSetShowNavigationControl(%1);").arg(state?"true":"false"));
+    d->bgmWidget->runScript(QString("wmwSetShowNavigationControl(%1);").arg(state?"true":"false"));
 }
 
 void BackendGoogleMaps::setShowMapTypeControl(const bool state)
@@ -607,7 +607,7 @@ void BackendGoogleMaps::setShowMapTypeControl(const bool state)
     if (!isReady())
         return;
 
-    d->bgmWidget->executeScript(QString("wmwSetShowMapTypeControl(%1);").arg(state?"true":"false"));
+    d->bgmWidget->runScript(QString("wmwSetShowMapTypeControl(%1);").arg(state?"true":"false"));
 }
 
 void BackendGoogleMaps::slotClustersNeedUpdating()
@@ -627,7 +627,7 @@ void BackendGoogleMaps::setZoom(const QString& newZoom)
 
     if (isReady())
     {
-        d->bgmWidget->executeScript(QString("wmwSetZoom(%1);").arg(d->cacheZoom));
+        d->bgmWidget->runScript(QString("wmwSetZoom(%1);").arg(d->cacheZoom));
     }
 }
 
@@ -635,7 +635,7 @@ QString BackendGoogleMaps::getZoom() const
 {
     if (isReady())
     {
-        d->cacheZoom = d->bgmWidget->executeScript(QString("wmwGetZoom();")).toInt();
+        d->cacheZoom = d->bgmWidget->runScript(QString("wmwGetZoom();")).toInt();
     }
 
     return QString("googlemaps:%1").arg(d->cacheZoom);

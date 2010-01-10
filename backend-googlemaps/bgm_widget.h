@@ -41,6 +41,7 @@ public:
     ~BGMWidget();
 
     void loadInitialHTML(const WMWGeoCoordinate& initialCenter = WMWGeoCoordinate(52.0, 6.0), const QString& initialMapType = "ROADMAP");
+    QVariant runScript(const QString& scriptCode);
 
 protected:
     bool eventFilter(QObject* object, QEvent* event);

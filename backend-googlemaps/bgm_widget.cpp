@@ -284,7 +284,7 @@ bool BGMWidget::eventFilter(QObject* object, QEvent* event)
                 //       therefore we adjust it manually here
                 if (d->isReady)
                 {
-                    executeScript(QString("document.getElementById(\"map_canvas\").style.height=\"%1px\"").arg(d->parent->height()));
+                    runScript(QString("document.getElementById(\"map_canvas\").style.height=\"%1px\"").arg(d->parent->height()));
                 }
             }
         }
@@ -295,7 +295,7 @@ bool BGMWidget::eventFilter(QObject* object, QEvent* event)
 void BGMWidget::slotHTMLCompleted()
 {
     d->isReady = true;
-    executeScript(QString("document.getElementById(\"map_canvas\").style.height=\"%1px\"").arg(d->parent->height()));
+    runScript(QString("document.getElementById(\"map_canvas\").style.height=\"%1px\"").arg(d->parent->height()));
 
     // start monitoring for javascript events using a timer:
     d->javascriptScanTimer->start();
@@ -327,13 +327,26 @@ void BGMWidget::slotScanForJSMessages()
         return;
 
     kDebug()<<status;
-    const QString eventBufferString = executeScript(QString("wmwReadEventStrings();")).toString();
+    const QString eventBufferString = runScript(QString("wmwReadEventStrings();")).toString();
     if (eventBufferString.isEmpty())
         return;
 
     const QStringList events = eventBufferString.split('|');
 
     emit(signalHTMLEvents(events));
+}
+
+/**
+ * \brief Wrapper around executeScript to catch more errors
+ */
+QVariant BGMWidget::runScript(const QString& scriptCode)
+{
+    WMW2_ASSERT(d->isReady);
+
+    if (!d->isReady)
+        return QVariant();
+
+    return executeScript(scriptCode);
 }
 
 } /* WMW2 */
