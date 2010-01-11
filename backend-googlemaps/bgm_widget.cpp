@@ -134,8 +134,8 @@ void BGMWidget::loadInitialHTML(const WMWGeoCoordinate& initialCenter, const QSt
 "       var latlng = new google.maps.LatLng(lat, lon);\n"
 "       var myPoint = projectionHelper.getProjection().fromLatLngToDivPixel(latlng);\n"
 "       var centerPoint = projectionHelper.getProjection().fromLatLngToDivPixel(map.getCenter());\n"
-"       var centerOffsetX = mapDiv.offsetWidth / 2;\n"
-"       var centerOffsetY = mapDiv.offsetHeight / 2;\n"
+"       var centerOffsetX = Math.floor(mapDiv.offsetWidth / 2);\n"
+"       var centerOffsetY = Math.floor(mapDiv.offsetHeight / 2);\n"
 "       var pointX = myPoint.x-centerPoint.x+centerOffsetX;\n"
 "       var pointY = myPoint.y-centerPoint.y+centerOffsetY;\n"
 "       return new google.maps.Point(pointX, pointY).toString();\n"
@@ -346,6 +346,7 @@ QVariant BGMWidget::runScript(const QString& scriptCode)
     if (!d->isReady)
         return QVariant();
 
+    kDebug()<<scriptCode;
     return executeScript(scriptCode);
 }
 

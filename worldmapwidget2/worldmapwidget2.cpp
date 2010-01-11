@@ -482,10 +482,30 @@ const QSize ClusterMaxPixmapSize = QSize(60, 60);
 void WorldMapWidget2::updateClusters()
 {
 //     kDebug()<<"updateClusters starting...";
+
     s->clusterList.clear();
 
     if (!d->currentBackendReady)
         return;
+
+    const int markerLevel = d->currentBackend->getMarkerModelLevel();
+
+//     // debug output for tile level diagnostics:
+//     QIntList tile1;
+//     tile1<<520;
+//     QIntList tile2 = tile1;
+//     for (int i=1; i<=s->markerModel->maxLevel()-1; ++i)
+//     {
+//         tile2 = tile1;
+//         tile2<<0;
+//         tile1<<1;
+//         const WMWGeoCoordinate tile1Coordinate = s->markerModel->tileIndexToCoordinate(tile1);
+//         const WMWGeoCoordinate tile2Coordinate = s->markerModel->tileIndexToCoordinate(tile2);
+//         QPoint tile1Point, tile2Point;
+//         d->currentBackend->screenCoordinates(tile1Coordinate, &tile1Point);
+//         d->currentBackend->screenCoordinates(tile2Coordinate, &tile2Point);
+//         kDebug()<<i<<tile1Point<<tile2Point<<(tile1Point-tile2Point);
+//     }
 
     const int gridSize = ClusterGridSizeScreen;
     const QSize mapSize  = d->currentBackend->mapSize();
@@ -494,10 +514,9 @@ void WorldMapWidget2::updateClusters()
     QVector<QList<QIntList> > pixelNonEmptyTileIndexGrid(gridWidth*gridHeight, QList<QIntList>());
     QVector<int> pixelCountGrid(gridWidth*gridHeight, 0);
     QList<QPair<QPoint, QPair<int, QList<QIntList> > > > leftOverList;
-    // TODO: which level?
-    const int markerLevel = s->markerModel->maxLevel()-1;
 
     // TODO: iterate only over the visible part of the map
+    int debugCountNonEmptyTiles = 0;
     for (MarkerModel::NonEmptyIterator tileIterator(s->markerModel, markerLevel); !tileIterator.atEnd(); tileIterator.nextIndex())
     {
         const QIntList tileIndex = tileIterator.currentIndex();
@@ -515,6 +534,7 @@ void WorldMapWidget2::updateClusters()
         if ((tilePoint.x()<0)||(tilePoint.y()<0)||(tilePoint.x()>=gridWidth)||(tilePoint.y()>=gridHeight))
             continue;
 
+        debugCountNonEmptyTiles++;
         const int linearIndex = tilePoint.x() + tilePoint.y()*gridWidth;
         pixelNonEmptyTileIndexGrid[linearIndex] << tileIndex;
         pixelCountGrid[linearIndex]+= s->markerModel->getTileMarkerCount(tileIndex);
@@ -667,6 +687,7 @@ void WorldMapWidget2::updateClusters()
     }
 
 //     kDebug()<<s->clusterList.size();
+    kDebug()<<QString("level %1: %2 non empty tiles sorted into %3 clusters").arg(markerLevel).arg(debugCountNonEmptyTiles).arg(s->clusterList.count());
 
     d->currentBackend->updateClusters();
 }

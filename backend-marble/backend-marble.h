@@ -67,10 +67,13 @@ public:
     void setProjection(const QString& newProjection);
 
     virtual bool screenCoordinates(const WMWGeoCoordinate& coordinates, QPoint* const point);
+    virtual bool geoCoordinates(const QPoint& point, WMWGeoCoordinate* const coordinates) const;
     virtual QSize mapSize() const;
 
     virtual void setZoom(const QString& newZoom);
     virtual QString getZoom() const;
+
+    virtual int getMarkerModelLevel();
 
     void marbleCustomPaint(Marble::GeoPainter* painter);
     void setShowCompass(const bool state);

@@ -360,6 +360,24 @@ bool BackendMarble::screenCoordinates(const WMWGeoCoordinate& coordinates, QPoin
     return true;
 }
 
+bool BackendMarble::geoCoordinates(const QPoint& point, WMWGeoCoordinate* const coordinates) const
+{
+    if (!d->marbleWidget)
+        return false;
+
+    qreal lat, lon;
+    const bool isVisible = d->marbleWidget->geoCoordinates(point.x(), point.y(), lon, lat, GeoDataCoordinates::Degree);
+    if (!isVisible)
+        return false;
+
+    if (coordinates)
+    {
+        *coordinates = WMWGeoCoordinate(lat, lon);
+    }
+
+    return true;
+}
+
 void BackendMarble::marbleCustomPaint(Marble::GeoPainter* painter)
 {
     painter->save();
@@ -574,6 +592,11 @@ QString BackendMarble::getZoom() const
 {
     d->cacheZoom = d->marbleWidget->zoom();
     return QString("marble:%1").arg(d->cacheZoom);
+}
+
+int BackendMarble::getMarkerModelLevel()
+{
+    return s->markerModel->maxLevel()-1;
 }
 
 } /* WMW2 */

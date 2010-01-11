@@ -66,10 +66,13 @@ public:
     virtual void updateClusters() = 0;
 
     virtual bool screenCoordinates(const WMWGeoCoordinate& coordinates, QPoint* const point) = 0;
+    virtual bool geoCoordinates(const QPoint& point, WMWGeoCoordinate* const coordinates) const = 0;
     virtual QSize mapSize() const = 0;
 
     virtual void setZoom(const QString& newZoom) = 0;
     virtual QString getZoom() const = 0;
+
+    virtual int getMarkerModelLevel() = 0;
 
     WMWSharedData* const s;
 

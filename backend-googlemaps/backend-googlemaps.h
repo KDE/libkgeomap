@@ -57,11 +57,13 @@ public:
     virtual void updateClusters();
 
     virtual bool screenCoordinates(const WMWGeoCoordinate& coordinates, QPoint* const point);
-    virtual bool geoCoordinates(const QPoint point, WMWGeoCoordinate* const coordinates) const;
+    virtual bool geoCoordinates(const QPoint& point, WMWGeoCoordinate* const coordinates) const;
     virtual QSize mapSize() const;
 
     virtual void setZoom(const QString& newZoom);
     virtual QString getZoom() const;
+
+    virtual int getMarkerModelLevel();
 
     QString getMapType() const;
     void setMapType(const QString& newMapType);
