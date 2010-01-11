@@ -54,7 +54,8 @@ public:
       cacheShowMapTypeControl(true),
       cacheShowNavigationControl(true),
       cacheShowScaleControl(true),
-      cacheZoom(1)
+      cacheZoom(1),
+      cacheCenter(0.0,0.0)
     {
     }
 
@@ -72,6 +73,7 @@ public:
     bool cacheShowNavigationControl;
     bool cacheShowScaleControl;
     int cacheZoom;
+    WMWGeoCoordinate cacheCenter;
 };
 
 BackendGoogleMaps::BackendGoogleMaps(WMWSharedData* const sharedData, QObject* const parent)
@@ -111,7 +113,6 @@ QString BackendGoogleMaps::backendHumanName() const
 
 QWidget* BackendGoogleMaps::mapWidget() const
 {
-//     return new QWidget();
     return d->bgmWidgetWrapper.data();
 }
 
@@ -186,17 +187,17 @@ bool BackendGoogleMaps::googleVariantToPoint(const QVariant& googleVariant, QPoi
 
 WMWGeoCoordinate BackendGoogleMaps::getCenter() const
 {
-    WMWGeoCoordinate centerCoordinates;
-
-    // there is nothing we can do if the coordinates are invalid
-    /*const bool isValid = */googleVariantToCoordinates(d->bgmWidget->runScript("wmwGetCenter();"), &centerCoordinates);
-
-    return centerCoordinates;
+    return d->cacheCenter;
 }
 
 void BackendGoogleMaps::setCenter(const WMWGeoCoordinate& coordinate)
 {
-    d->bgmWidget->runScript(QString("wmwSetCenter(%1, %2);").arg(coordinate.latString()).arg(coordinate.lonString()));
+    d->cacheCenter = coordinate;
+
+    if (isReady())
+    {
+        d->bgmWidget->runScript(QString("wmwSetCenter(%1, %2);").arg(d->cacheCenter.latString()).arg(d->cacheCenter.lonString()));
+    }
 }
 
 bool BackendGoogleMaps::isReady() const
@@ -209,10 +210,13 @@ void BackendGoogleMaps::slotHTMLInitialized()
     kDebug()<<1;
     d->isReady = true;
     d->bgmWidget->runScript(QString("document.getElementById(\"map_canvas\").style.height=\"%1px\"").arg(d->bgmWidgetWrapper->height()));
+
+    // TODO: call javascript directly here and update action availability in one shot
     setMapType(d->cacheMapType);
     setShowMapTypeControl(d->cacheShowMapTypeControl);
     setShowNavigationControl(d->cacheShowNavigationControl);
     setShowScaleControl(d->cacheShowNavigationControl);
+    setCenter(d->cacheCenter);
     d->bgmWidget->runScript(QString("wmwSetZoom(%1);").arg(d->cacheZoom));
     emit(signalBackendReady(backendName()));
 }
@@ -235,11 +239,6 @@ void BackendGoogleMaps::zoomOut()
 
 QString BackendGoogleMaps::getMapType() const
 {
-    if (isReady())
-    {
-        d->cacheMapType = d->bgmWidget->runScript(QString("wmwGetMapType();")).toString();
-    }
-
     return d->cacheMapType;
 }
 
@@ -266,6 +265,8 @@ void BackendGoogleMaps::updateActionsEnabled()
             mapTypeActions.at(i)->setChecked(mapTypeActions.at(i)->data().toString()==currentMapType);
         }
     }
+
+    // TODO: manage state of the zoom buttons
 }
 
 void BackendGoogleMaps::slotMapTypeActionTriggered(QAction* action)
@@ -374,26 +375,6 @@ void BackendGoogleMaps::readSettingsFromGroup(const KConfigGroup* const group)
     setShowScaleControl(group->readEntry("GoogleMaps Show Scale Control", true));
 }
 
-void BackendGoogleMaps::slotMapTypeChanged(const QString& newMapType)
-{
-    d->cacheMapType = newMapType;
-
-    updateActionsEnabled();
-}
-
-void BackendGoogleMaps::slotMapBoundsChanged()
-{
-    s->worldMapWidget->updateClusters();
-
-    updateActionsEnabled();
-}
-
-void BackendGoogleMaps::slotZoomChanged()
-{
-    d->cacheZoom = d->bgmWidget->runScript(QString("wmwGetZoom();")).toInt();
-    emit(signalZoomChanged(QString("googlemaps:%1").arg(d->cacheZoom)));
-}
-
 void BackendGoogleMaps::updateMarkers()
 {
     WMW2_ASSERT(isReady());
@@ -419,22 +400,35 @@ void BackendGoogleMaps::updateMarkers()
 
 void BackendGoogleMaps::slotHTMLEvents(const QStringList& events)
 {
-    // some events can be buffered:
-    // TODO: verify that they are stored in the correct order
-    //       or that the order does not matter!
-    QMap<QString, QString> bufferedEvents;
-    QStringList bufferableEvents;
-    bufferableEvents<<"MT"<<"MB"<<"ZC";
-
+    // for some events, we just note that they appeared and then process them later on:
+    bool centerProbablyChanged = false;
+    bool mapTypeChanged = false;
+    bool zoomProbablyChanged = false;
+    bool mapBoundsProbablyChanged = false;
     for (QStringList::const_iterator it = events.constBegin(); it!=events.constEnd(); ++it)
     {
         const QString eventCode = it->left(2);
         const QString eventParameter = it->mid(2);
         const QStringList eventParameters = eventParameter.split('/');
 
-        if (bufferableEvents.contains(eventCode))
+        if (eventCode=="MT")
         {
-            bufferedEvents[eventCode] = eventParameter;
+            // map type changed
+            mapTypeChanged = true;
+            d->cacheMapType = eventParameter;
+        }
+        else if (eventCode=="MB")
+        {
+            // map bounds changed
+            centerProbablyChanged = true;
+            zoomProbablyChanged = true;
+            mapBoundsProbablyChanged = true;
+        }
+        else if (eventCode == "ZC")
+        {
+            // zoom changed
+            zoomProbablyChanged = true;
+            mapBoundsProbablyChanged = true;
         }
         else if (eventCode=="mm")
         {
@@ -470,26 +464,26 @@ void BackendGoogleMaps::slotHTMLEvents(const QStringList& events)
     }
 
     // now process the buffered events:
-    for (QMap<QString, QString>::const_iterator it = bufferedEvents.constBegin(); it!=bufferedEvents.constEnd(); ++it)
+    if (zoomProbablyChanged)
     {
-        const QString eventCode = it.key();
-        const QString eventParameter = it.value();
+        d->cacheZoom = d->bgmWidget->runScript(QString("wmwGetZoom();")).toInt();
+        emit(signalZoomChanged(QString("googlemaps:%1").arg(d->cacheZoom)));
+    }
+    if (centerProbablyChanged)
+    {
+        // there is nothing we can do if the coordinates are invalid
+        /*const bool isValid = */googleVariantToCoordinates(d->bgmWidget->runScript("wmwGetCenter();"), &(d->cacheCenter));
+    }
 
-        if (eventCode=="MT")
-        {
-            // map type changed
-            slotMapTypeChanged(eventParameter);
-        }
-        else if (eventCode == "MB")
-        {
-            // map bounds changed
-            slotMapBoundsChanged();
-        }
-        else if (eventCode == "ZC")
-        {
-            // zoom changed
-            slotZoomChanged();
-        }
+    // update the actions if necessary:
+    if (zoomProbablyChanged||mapTypeChanged||centerProbablyChanged)
+    {
+        updateActionsEnabled();
+    }
+
+    if (mapBoundsProbablyChanged)
+    {
+        s->worldMapWidget->updateClusters();
     }
 }
 
@@ -499,6 +493,8 @@ void BackendGoogleMaps::updateClusters()
     WMW2_ASSERT(isReady());
     if (!isReady())
         return;
+
+    // TODO: only update clusters that have actually changed!
 
     // re-transfer all markers to the javascript-part:
     d->bgmWidget->runScript(QString("wmwClearClusters();"));
@@ -635,11 +631,6 @@ void BackendGoogleMaps::setZoom(const QString& newZoom)
 
 QString BackendGoogleMaps::getZoom() const
 {
-//     if (isReady())
-//     {
-//         d->cacheZoom = d->bgmWidget->runScript(QString("wmwGetZoom();")).toInt();
-//     }
-
     return QString("googlemaps:%1").arg(d->cacheZoom);
 }
 
@@ -652,7 +643,7 @@ int BackendGoogleMaps::getMarkerModelLevel()
     }
 
     // get the current zoom level:
-    const int currentZoom = d->bgmWidget->runScript(QString("wmwGetZoom();")).toInt();
+    const int currentZoom = d->cacheZoom;
 
     int tileLevel = 0;
          if (currentZoom== 0) { tileLevel = 1; }

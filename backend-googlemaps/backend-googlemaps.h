@@ -78,11 +78,8 @@ private Q_SLOTS:
     void slotHTMLInitialized();
     void updateActionsEnabled();
     void slotMapTypeActionTriggered(QAction* action);
-    void slotMapTypeChanged(const QString& newMapType);
-    void slotMapBoundsChanged();
     void slotHTMLEvents(const QStringList& eventStrings);
     void slotFloatSettingsTriggered(QAction* action);
-    void slotZoomChanged();
 
 private:
     BackendGoogleMapsPrivate* const d;
