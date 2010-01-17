@@ -3,7 +3,7 @@
  * Date        : 2009-12-01
  * Description : Google-Maps-backend for WorldMapWidget2
  *
- * Copyright (C) 2009 by Michael G. Hansen <mike at mghansen dot de>
+ * Copyright (C) 2009,2010 by Michael G. Hansen <mike at mghansen dot de>
  *
  * This program is free software; you can redistribute it
  * and/or modify it under the terms of the GNU General
@@ -240,11 +240,15 @@ void BGMWidget::loadInitialHTML(const WMWGeoCoordinate& initialCenter, const QSt
 "       google.maps.event.addListener(map, 'maptypeid_changed', function() {\n"
 "           wmwPostEventString('MT'+wmwGetMapType());\n"
 "       });\n"
-"       google.maps.event.addListener(map, 'bounds_changed', function() {\n"
-"           wmwPostEventString('MB');\n"
-"       });\n"
-"       google.maps.event.addListener(map, 'zoom_changed', function() {\n"
-"           wmwPostEventString('ZC');\n"
+//  these are too heavy on the performance. monitor 'idle' event only for now:
+// "       google.maps.event.addListener(map, 'bounds_changed', function() {\n"
+// "           wmwPostEventString('MB');\n"
+// "       });\n"
+// "       google.maps.event.addListener(map, 'zoom_changed', function() {\n"
+// "           wmwPostEventString('ZC');\n"
+// "       });\n"
+"       google.maps.event.addListener(map, 'idle', function() {\n"
+"           wmwPostEventString('id');\n"
 "       });\n"
 // source: http://taapps-javalibs.blogspot.com/2009/10/google-map-v3how-to-use-overlayviews.html
 "       projectionHelper = new ProjectionHelper(map);\n"

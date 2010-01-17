@@ -3,7 +3,7 @@
  * Date        : 2009-12-01
  * Description : A model to hold the markers
  *
- * Copyright (C) 2009 by Michael G. Hansen <mike at mghansen dot de>
+ * Copyright (C) 2009,2010 by Michael G. Hansen <mike at mghansen dot de>
  *
  * This program is free software; you can redistribute it
  * and/or modify it under the terms of the GNU General
@@ -378,6 +378,8 @@ public:
     MarkerModel* model;
     int level;
 
+    QList<QPair<QIntList, QIntList> > boundsList;
+
     QIntList startIndexLinear;
     QIntList endIndexLinear;
     QIntList currentIndexLinear;
@@ -387,52 +389,97 @@ public:
     QList<QIntPair> currentIndices;
 
     bool atEnd;
+    bool atStartOfLevel;
 };
 
 MarkerModel::NonEmptyIterator::NonEmptyIterator(MarkerModel* const model, const int level)
 : d(new MarkerModelNonEmptyIteratorPrivate())
 {
     d->model = model;
+    WMW2_ASSERT(level<=model->maxLevel());
     d->level = level;
 
+    QIntList startIndexLinear;
+    QIntList endIndexLinear;
     for (int i=0; i<=level; ++i)
     {
-        d->startIndexLinear<<0;
+        startIndexLinear<<0;
         QIntPair currentSizes = d->model->getTesselationSizes(i);
-        d->endIndexLinear<<currentSizes.first*currentSizes.second - 1;
+        endIndexLinear<<currentSizes.first*currentSizes.second - 1;
     }
 //     kDebug()<<d->startIndexLinear<<d->endIndexLinear;
 
-    initializeIterator();
+    d->boundsList << QPair<QIntList, QIntList>(startIndexLinear, endIndexLinear);
+
+    initializeNextBounds();
 }
 
 MarkerModel::NonEmptyIterator::NonEmptyIterator(MarkerModel* const model, const int level, const QIntList& startIndex, const QIntList& endIndex)
 : d(new MarkerModelNonEmptyIteratorPrivate())
 {
     d->model = model;
+    WMW2_ASSERT(level<=model->maxLevel());
     d->level = level;
-    d->startIndexLinear = startIndex;
-    d->endIndexLinear = endIndex;
 
-    initializeIterator();
+    WMW2_ASSERT(startIndex.count()==(level+1));
+    WMW2_ASSERT(endIndex.count()==(level+1));
+    d->boundsList << QPair<QIntList, QIntList>(startIndex, endIndex);
+
+    initializeNextBounds();
 }
 
-void MarkerModel::NonEmptyIterator::initializeIterator()
+MarkerModel::NonEmptyIterator::NonEmptyIterator(MarkerModel* const model, const int level, const QList<QPair<WMWGeoCoordinate, WMWGeoCoordinate> >& normalizedMapBounds)
+: d(new MarkerModelNonEmptyIteratorPrivate())
 {
+    d->model = model;
+    WMW2_ASSERT(level<=model->maxLevel());
+    d->level = level;
+
+    // store the coordinates of the bounds as indices:
+    for (int i=0; i<normalizedMapBounds.count(); ++i)
+    {
+        QPair<WMWGeoCoordinate, WMWGeoCoordinate> currentBounds = normalizedMapBounds.at(i);
+        WMW2_ASSERT(currentBounds.first.lat<currentBounds.second.lat);
+        WMW2_ASSERT(currentBounds.first.lon<currentBounds.second.lon);
+
+        const QIntList startIndex = d->model->coordinateToTileIndex(currentBounds.first, d->level);
+        const QIntList endIndex = d->model->coordinateToTileIndex(currentBounds.second, d->level);
+
+//         kDebug()<<currentBounds.first.geoUrl()<<startIndex<<currentBounds.second.geoUrl()<<endIndex;
+        d->boundsList << QPair<QIntList, QIntList>(startIndex, endIndex);
+    }
+
+    initializeNextBounds();
+}
+
+bool MarkerModel::NonEmptyIterator::initializeNextBounds()
+{
+    if (d->boundsList.isEmpty())
+    {
+        d->atEnd = true;
+        return false;
+    }
+
+    QPair<QIntList, QIntList> nextBounds = d->boundsList.takeFirst();
+    d->startIndexLinear = nextBounds.first;
+    d->endIndexLinear = nextBounds.second;
+
     WMW2_ASSERT(d->startIndexLinear.count() == d->level + 1);
     WMW2_ASSERT(d->endIndexLinear.count() == d->level + 1);
 
     // calculate the 'cartesian' start/end indices:
     d->startIndices = d->model->linearIndexToLatLonIndex(d->startIndexLinear);
     d->endIndices = d->model->linearIndexToLatLonIndex(d->endIndexLinear);
+//     kDebug()<<d->startIndices<<d->startIndexLinear;
+//     kDebug()<<d->endIndices<<d->endIndexLinear;
 
-    d->currentIndexLinear = d->startIndexLinear;
-    d->currentIndices = d->startIndices;
+    d->currentIndexLinear = d->startIndexLinear.mid(0, 1);
+    d->currentIndices = d->startIndices.mid(0, 1);
+    d->atStartOfLevel = true;
 
-    if (d->model->getTileMarkerCount(d->currentIndexLinear)==0)
-    {
-        nextIndex();
-    }
+    nextIndex();
+
+    return d->atEnd;
 }
 
 QIntList MarkerModel::NonEmptyIterator::nextIndex()
@@ -442,70 +489,75 @@ QIntList MarkerModel::NonEmptyIterator::nextIndex()
         return d->currentIndexLinear;
     }
 
-    // TODO: stoppedhere
-    int progressLevel = d->level;
     Q_FOREVER
     {
-//         kDebug()<<d->currentIndexLinear<<progressLevel;
-        // determine the limits in the current tile:
-        int limitLatBL = 0;
-        int limitLonBL = 0;
-        int limitLatTR = d->model->getTesselationSizes(progressLevel).first-1;
-        int limitLonTR = d->model->getTesselationSizes(progressLevel).second-1;
+        const int currentLevel = d->currentIndexLinear.count() - 1;
+//         kDebug() << d->level << currentLevel << d->atStartOfLevel << d->currentIndexLinear;
 
-        // check limit on the left side:
-        int compareLevel = d->currentIndices.count();
-        bool onLimit = true;
-        for (int i=0; onLimit&&(i<compareLevel); ++i)
+        if (d->atStartOfLevel)
         {
-            onLimit = d->currentIndices.at(i).first==d->startIndices.at(i).first;
-        }
-        if (onLimit)
-        {
-            limitLatBL = d->startIndices.at(progressLevel).first;
-        }
-
-        // check limit on the bottom side:
-        onLimit = true;
-        for (int i=0; onLimit&&(i<compareLevel); ++i)
-        {
-            onLimit = d->currentIndices.at(i).first==d->startIndices.at(i).second;
-        }
-        if (onLimit)
-        {
-            limitLonBL = d->startIndices.at(progressLevel).second;
-        }
-
-        // check limit on the right side:
-        onLimit = true;
-        for (int i=0; onLimit&&(i<compareLevel); ++i)
-        {
-            onLimit = d->currentIndices.at(i).first==d->endIndices.at(i).first;
-        }
-        if (onLimit)
-        {
-            limitLatTR = d->endIndices.at(progressLevel).first;
-        }
-
-        // check limit on the top side:
-        onLimit = true;
-        for (int i=0; onLimit&&(i<compareLevel); ++i)
-        {
-            onLimit = d->currentIndices.at(i).first==d->endIndices.at(i).second;
-        }
-        if (onLimit)
-        {
-            limitLonTR = d->endIndices.at(progressLevel).second;
-        }
-
-//         kDebug()<<limitLatBL<<limitLonBL<<limitLatTR<<limitLonTR;
-        
-        if (d->currentIndices.count()<progressLevel+1)
-        {
-            d->currentIndices<<QIntPair(limitLatBL, limitLonBL);
+            d->atStartOfLevel = false;
         }
         else
         {
+            // go to the next tile at the current level, if that is possible:
+
+            // determine the limits in the current tile:
+            int limitLatBL = 0;
+            int limitLonBL = 0;
+            int limitLatTR = d->model->getTesselationSizes(currentLevel).first-1;
+            int limitLonTR = d->model->getTesselationSizes(currentLevel).second-1;
+
+            int compareLevel = currentLevel - 1;
+
+            // check limit on the left side:
+            bool onLimit = true;
+            for (int i=0; onLimit&&(i<=compareLevel); ++i)
+            {
+                onLimit = d->currentIndices.at(i).first==d->startIndices.at(i).first;
+            }
+            if (onLimit)
+            {
+                limitLatBL = d->startIndices.at(currentLevel).first;
+            }
+
+            // check limit on the bottom side:
+            onLimit = true;
+            for (int i=0; onLimit&&(i<=compareLevel); ++i)
+            {
+                onLimit = d->currentIndices.at(i).second==d->startIndices.at(i).second;
+            }
+            if (onLimit)
+            {
+                limitLonBL = d->startIndices.at(currentLevel).second;
+            }
+
+            // check limit on the right side:
+            onLimit = true;
+            for (int i=0; onLimit&&(i<=compareLevel); ++i)
+            {
+                onLimit = d->currentIndices.at(i).first==d->endIndices.at(i).first;
+            }
+            if (onLimit)
+            {
+                limitLatTR = d->endIndices.at(currentLevel).first;
+            }
+
+            // check limit on the top side:
+            onLimit = true;
+            for (int i=0; onLimit&&(i<=compareLevel); ++i)
+            {
+                onLimit = d->currentIndices.at(i).second==d->endIndices.at(i).second;
+            }
+            if (onLimit)
+            {
+                limitLonTR = d->endIndices.at(currentLevel).second;
+            }
+
+            WMW2_ASSERT(limitLatBL<=limitLatTR);
+            WMW2_ASSERT(limitLonBL<=limitLonTR);
+//             kDebug() << limitLatBL << limitLonBL << limitLatTR << limitLonTR << compareLevel << currentLevel;
+
             int currentLat = d->currentIndices.last().first;
             int currentLon = d->currentIndices.last().second;
 
@@ -516,18 +568,17 @@ QIntList MarkerModel::NonEmptyIterator::nextIndex()
                 currentLat++;
                 if (currentLat>limitLatTR)
                 {
-                    if (progressLevel == 0)
+                    if (currentLevel == 0)
                     {
                         // we are at the end!
-                        d->atEnd = true;
+                        // are there other bounds to iterate over?
+                        initializeNextBounds();
+
+                        // initializeNextBounds() call nextIndex which updates d->currentIndexLinear, if possible:
                         return d->currentIndexLinear;
                     }
 
-//                     kDebug()<<"up one!";
-                    // we need to go one level up:
-                    progressLevel--;
-
-                    // trim the indices:
+                    // we need to go one level up, trim the indices:
                     d->currentIndexLinear.removeLast();
                     d->currentIndices.removeLast();
 
@@ -535,28 +586,84 @@ QIntList MarkerModel::NonEmptyIterator::nextIndex()
                 }
             }
 
+            // save the new position:
             d->currentIndices.last() = QIntPair(currentLat, currentLon);
+            d->currentIndexLinear = d->model->latLonIndexToLinearIndex(d->currentIndices);
         }
-        d->currentIndexLinear = d->model->latLonIndexToLinearIndex(d->currentIndices);
 
-        // is there anything in this tile?
-        if (d->model->getTileMarkerCount(d->currentIndexLinear)>0)
+        // is the tile empty?
+        if (d->model->getTileMarkerCount(d->currentIndexLinear)==0)
         {
-//             kDebug()<<"hit: "<<d->currentIndexLinear<<progressLevel;
-            // are we at the target level?
-            if (progressLevel == d->level)
-            {
-                // yes, return the current index:
-                return d->currentIndexLinear;
-            }
-
-            // no, go one level down:
-            progressLevel++;
-
             continue;
         }
 
-        // no, the tile is empty. go to the next tile!
+        // are we at the target level?
+        if (currentLevel == d->level)
+        {
+            // yes, return the current index:
+            return d->currentIndexLinear;
+        }
+
+        // go one level down:
+        int compareLevel = currentLevel;
+
+        // determine the limits for the next level:
+        int limitLatBL = 0;
+        int limitLonBL = 0;
+        int limitLatTR = d->model->getTesselationSizes(compareLevel).first-1;
+        int limitLonTR = d->model->getTesselationSizes(compareLevel).second-1;
+
+        // check limit on the left side:
+        bool onLimit = true;
+        for (int i=0; onLimit&&(i<=compareLevel); ++i)
+        {
+            onLimit = d->currentIndices.at(i).first==d->startIndices.at(i).first;
+        }
+        if (onLimit)
+        {
+            limitLatBL = d->startIndices.at(currentLevel+1).first;
+        }
+
+        // check limit on the bottom side:
+        onLimit = true;
+        for (int i=0; onLimit&&(i<=compareLevel); ++i)
+        {
+            onLimit = d->currentIndices.at(i).second==d->startIndices.at(i).second;
+        }
+        if (onLimit)
+        {
+            limitLonBL = d->startIndices.at(currentLevel+1).second;
+        }
+
+        // check limit on the right side:
+        onLimit = true;
+        for (int i=0; onLimit&&(i<=compareLevel); ++i)
+        {
+            onLimit = d->currentIndices.at(i).first==d->endIndices.at(i).first;
+        }
+        if (onLimit)
+        {
+            limitLatTR = d->endIndices.at(currentLevel+1).first;
+        }
+
+        // check limit on the top side:
+        onLimit = true;
+        for (int i=0; onLimit&&(i<=compareLevel); ++i)
+        {
+            onLimit = d->currentIndices.at(i).second==d->endIndices.at(i).second;
+        }
+        if (onLimit)
+        {
+            limitLonTR = d->endIndices.at(currentLevel+1).second;
+        }
+
+        WMW2_ASSERT(limitLatBL<=limitLatTR);
+        WMW2_ASSERT(limitLonBL<=limitLonTR);
+
+        // go one level down:
+        d->currentIndices << QIntPair(limitLatBL, limitLonBL);
+        d->currentIndexLinear = d->model->latLonIndexToLinearIndex(d->currentIndices);
+        d->atStartOfLevel = true;
     }
 }
 
@@ -570,6 +677,10 @@ bool MarkerModel::NonEmptyIterator::atEnd() const
     return d->atEnd;
 }
 
+MarkerModel* MarkerModel::NonEmptyIterator::model() const
+{
+    return d->model;
+}
 
 } /* WMW2 */
 

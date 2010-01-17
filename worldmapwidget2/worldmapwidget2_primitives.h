@@ -3,7 +3,7 @@
  * Date        : 2009-12-01
  * Description : Primitive datatypes for WorldMapWidget2
  *
- * Copyright (C) 2009 by Michael G. Hansen <mike at mghansen dot de>
+ * Copyright (C) 2009,2010 by Michael G. Hansen <mike at mghansen dot de>
  *
  * This program is free software; you can redistribute it
  * and/or modify it under the terms of the GNU General
@@ -62,6 +62,13 @@ inline void WMW2_assert(const char* const condition, const char* const filename,
 class WMWGeoCoordinate
 {
 public:
+
+    typedef QPair<WMWGeoCoordinate, WMWGeoCoordinate> Pair;
+    static Pair pair(const qreal lat1, const qreal lon1, const qreal lat2, const qreal lon2)
+    {
+        return Pair(WMWGeoCoordinate(lat1, lon1), WMWGeoCoordinate(lat2, lon2));
+    }
+
     WMWGeoCoordinate()
     : lat(0.0),
       lon(0.0),
@@ -261,6 +268,12 @@ public:
 } /* WMW2 */
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(WMW2::WMWMarker::MarkerAttributes)
+
+inline QDebug operator<<(QDebug debugOut, const WMW2::WMWGeoCoordinate& coordinate)
+{
+    debugOut << coordinate.geoUrl();
+    return debugOut;
+}
 
 // Q_DECLARE_METATYPE(WMW2::WMWGeoCoordinate)
 

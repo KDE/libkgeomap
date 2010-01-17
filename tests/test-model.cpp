@@ -1,9 +1,9 @@
 /* ============================================================
  *
- * Date        : 2009-12-01
- * Description : demo-program for WorldMapWidget2
+ * Date        : 2010-01-16
+ * Description : test for the model holding markers
  *
-* Copyright (C) 2009 by Michael G. Hansen <mike at mghansen dot de>
+* Copyright (C) 2010 by Michael G. Hansen <mike at mghansen dot de>
  *
  * This program is free software; you can redistribute it
  * and/or modify it under the terms of the GNU General
@@ -17,101 +17,183 @@
  *
  * ============================================================ */
 
-// Qt includes
-
-
-// KDE includes
-
-#include <KApplication>
-#include <KAboutData>
-#include <KCmdLineArgs>
-#include <KCmdLineOptions>
-#include <KDebug>
-
 // local includes
 
-#include "markermodel.h"
+#include "test-model.h"
 
 using namespace WMW2;
 
-int main(int argc, char* argv[])
+/**
+ * @brief Helper function: count the number of markers found by an iterator
+ */
+int CountMarkersInIterator(MarkerModel::NonEmptyIterator* const it)
 {
-    const KAboutData aboutData(
-        "demo-worldmapwidget2",
-        0,
-        ki18n("marker-model test application"),
-        "0.1", // version
-        ki18n("Tests the marker-model"),
-        KAboutData::License_GPL,
-        ki18n("(c) 2009 Michael G. Hansen"),
-        ki18n(""), // optional text
-        "", // URI of homepage
-        "" // bugs e-mail address
-    );
-
-    KCmdLineArgs::init(argc, argv, &aboutData);
-
-    KApplication app;
-
-    MarkerModel mm;
-
-    // ice cafe
-    WMWGeoCoordinate iceCoordinates = WMWGeoCoordinate::fromGeoUrl("geo:51.0913031421,6.88878178596,44");
-
-    // there should be no level 0 tiles:
-    WMW2_ASSERT(mm.getTile(mm.coordinateToTileIndex(iceCoordinates, 0), true) == 0);
-
-    // there should be no markers:
-    WMW2_ASSERT(mm.getTileMarkerCount(mm.coordinateToTileIndex(iceCoordinates, 0)) == 0);
-
-    // ice cafe
-    mm.addMarker(WMWMarker(iceCoordinates));
-
-    // there should be no level 1 tiles yet:
-    WMW2_ASSERT(mm.getTile(mm.coordinateToTileIndex(iceCoordinates, 0), true)->children.isEmpty());
-
-    // bar
-    WMWGeoCoordinate barCoordinates = WMWGeoCoordinate::fromGeoUrl("geo:51.06711205,6.90020261667,43");
-    mm.addMarker(WMWMarker(barCoordinates));
-
-    // Marienburg castle
-    mm.addMarker(WMWMarker(WMWGeoCoordinate::fromGeoUrl("geo:51.087647318,6.88282728201,44")));
-
-    // there should be 2 markers in the tile of the cafe here
-    WMW2_ASSERT(mm.getTileMarkerCount(mm.coordinateToTileIndex(iceCoordinates, 2)) == 2);
-
-    // head of monster
-    mm.addMarker(WMWMarker(WMWGeoCoordinate::fromGeoUrl("geo:51.0889433167,6.88000331667,39.6")));
-
-    // now there should be 3 tiles
-    WMW2_ASSERT(mm.getTileMarkerCount(mm.coordinateToTileIndex(iceCoordinates, 2)) == 3);
-
-    // Langenfeld
-    mm.addMarker(WMWMarker(WMWGeoCoordinate::fromGeoUrl("geo:51.1100157609,6.94911003113,51")));
-
-    // Sagrada Familia in Spain
-    mm.addMarker(WMWMarker(WMWGeoCoordinate::fromGeoUrl("geo:41.4036480511,2.1743756533,46")));
-
-//     for (int level=0; level<=mm.maxLevel(); ++level)
-//     {
-//         QIntList tileIndex = mm.coordinateToTileIndex(barCoordinates, level);
-//         kDebug()<<QString("level: %1 count: %2 bar").arg(level).arg(mm.getTileMarkerCount(tileIndex));
-// 
-//         tileIndex = mm.coordinateToTileIndex(iceCoordinates, level);
-//         kDebug()<<QString("level: %1 count: %2 ice").arg(level).arg(mm.getTileMarkerCount(tileIndex));
-// 
-//     }
-
-    // now iterate over the non-empty tiles:
-    MarkerModel::NonEmptyIterator it(&mm, 4);
-    while (!it.atEnd())
+    int markerCount = 0;
+    while (!it->atEnd())
     {
-        QIntList currentIndex = it.currentIndex();
-        kDebug()<<currentIndex<<mm.getTileMarkerCount(currentIndex);
-        it.nextIndex();
+        const QIntList currentIndex = it->currentIndex();
+        markerCount += it->model()->getTileMarkerCount(currentIndex);
+        it->nextIndex();
+//         kDebug()<<currentIndex;
     }
 
-    return 0;
+    return markerCount;
 }
 
+void TestModel::testIndices()
+{
+    MarkerModel mm;
+    const int maxLevel = mm.maxLevel();
+
+    const WMWGeoCoordinate coord_1_2 = WMWGeoCoordinate(1.0, 2.0);
+
+    for (int l = 0; l<=maxLevel; ++l)
+    {
+        const QIntList tileIndex = mm.coordinateToTileIndex(coord_1_2, l);
+        QVERIFY( tileIndex.count() == (l+1));
+    }
+}
+
+void TestModel::testBasicModel()
+{
+    MarkerModel mm;
+
+    const int maxLevel = mm.maxLevel();
+
+    const WMWGeoCoordinate coord_1_2 = WMWGeoCoordinate(1.0, 2.0);
+
+    // there should be no tiles in the model yet:
+    for (int l = 0; l<=maxLevel; ++l)
+    {
+        QVERIFY(mm.getTile(mm.coordinateToTileIndex(coord_1_2, l), true) == 0);
+    }
+
+    mm.addMarker(WMWMarker(coord_1_2));
+
+    // now there should be tiles with one marker:
+    for (int l = 0; l<=maxLevel; ++l)
+    {
+        const QIntList tileIndex = mm.coordinateToTileIndex(coord_1_2, l);
+        QVERIFY(mm.getTile(tileIndex, true) != 0);
+        QVERIFY(mm.getTileMarkerCount(tileIndex) == 1);
+    }
+}
+
+void TestModel::testIteratorWholeWorld()
+{
+    MarkerModel mm;
+    const int maxLevel = mm.maxLevel();
+
+    for (int l = 0; l<=maxLevel; ++l)
+    {
+        MarkerModel::NonEmptyIterator it(&mm, l);
+        QVERIFY( CountMarkersInIterator(&it) == 0 );
+    }
+
+    const WMWGeoCoordinate coord_1_2 = WMWGeoCoordinate(1.0, 2.0);
+    const WMWGeoCoordinate coord_50_60 = WMWGeoCoordinate(50.0, 60.0);
+    mm.addMarker(WMWMarker(coord_1_2));
+    mm.addMarker(WMWMarker(coord_50_60));
+    for (int l = 0; l<=maxLevel; ++l)
+    {
+        // iterate over the whole world:
+        MarkerModel::NonEmptyIterator it(&mm, l);
+        QVERIFY( CountMarkersInIterator(&it) == 2 );
+    }
+}
+
+void TestModel::testIteratorPartial1()
+{
+    MarkerModel mm;
+    const int maxLevel = mm.maxLevel();
+
+    const WMWGeoCoordinate coord_1_2 = WMWGeoCoordinate(1.0, 2.0);
+    const WMWGeoCoordinate coord_50_60 = WMWGeoCoordinate(50.0, 60.0);
+    mm.addMarker(WMWMarker(coord_1_2));
+    mm.addMarker(WMWMarker(coord_50_60));
+    for (int l = 0; l<=maxLevel; ++l)
+    {
+        {
+            // iterate over a part which should be empty:
+            QList<WMWGeoCoordinate::Pair> boundsList;
+            boundsList << WMWGeoCoordinate::pair(-10.0, -10.0, -5.0, -5.0);
+            MarkerModel::NonEmptyIterator it(&mm, l, boundsList);
+            QVERIFY( CountMarkersInIterator(&it) == 0 );
+        }
+
+        {
+            // iterate over a part which should contain one marker:
+            QList<WMWGeoCoordinate::Pair> boundsList;
+            boundsList << WMWGeoCoordinate::pair(-10.0, -10.0, 5.0, 5.0);
+            MarkerModel::NonEmptyIterator it(&mm, l, boundsList);
+            QVERIFY( CountMarkersInIterator(&it) == 1 );
+
+            // iterate over a part which should contain one marker:
+            QList<WMWGeoCoordinate::Pair> boundsList1;
+            boundsList1 << WMWGeoCoordinate::pair(1.0, 2.0, 5.0, 5.0);
+            MarkerModel::NonEmptyIterator it1(&mm, l, boundsList1);
+            QVERIFY( CountMarkersInIterator(&it1) == 1 );
+
+            QList<WMWGeoCoordinate::Pair> boundsList2;
+            boundsList2 << WMWGeoCoordinate::pair(-1.0, -2.0, 1.0, 2.0);
+            MarkerModel::NonEmptyIterator it2(&mm, l, boundsList2);
+            QVERIFY( CountMarkersInIterator(&it2) == 1 );
+        }
+
+        {
+            // iterate over a part which should contain two markers:
+            QList<WMWGeoCoordinate::Pair> boundsList;
+            boundsList << WMWGeoCoordinate::pair(0.0, 0.0, 60.0, 60.0);
+            MarkerModel::NonEmptyIterator it(&mm, l, boundsList);
+            QVERIFY( CountMarkersInIterator(&it) == 2 );
+        }
+
+        {
+            // iterate over two parts which should contain two markers:
+            QList<WMWGeoCoordinate::Pair> boundsList;
+            boundsList << WMWGeoCoordinate::pair(0.0, 0.0, 5.0, 5.0);
+            boundsList << WMWGeoCoordinate::pair(49.0, 59.0, 51.0, 61.0);
+            MarkerModel::NonEmptyIterator it(&mm, l, boundsList);
+            QVERIFY( CountMarkersInIterator(&it) == 2 );
+        }
+    }
+
+    const WMWGeoCoordinate coord_2_2 = WMWGeoCoordinate(2.0, 2.0);
+    mm.addMarker(WMWMarker(coord_2_2));
+    {
+        // at level 1, the iterator should find only one marker:
+        QList<WMWGeoCoordinate::Pair> boundsList;
+        boundsList << WMWGeoCoordinate::pair(0.0, 0.0, 1.0, 2.0);
+        MarkerModel::NonEmptyIterator it(&mm, 1, boundsList);
+        QVERIFY( CountMarkersInIterator(&it) == 1 );
+    }
+}
+
+void TestModel::testIteratorPartial2()
+{
+    MarkerModel mm;
+    const int maxLevel = mm.maxLevel();
+
+    QList<WMWGeoCoordinate::Pair> boundsList;
+    boundsList << WMWGeoCoordinate::pair(0.55, 1.55, 0.56, 1.56);
+
+    const WMWGeoCoordinate coordInBounds1 = WMWGeoCoordinate(0.556, 1.556);
+    const WMWGeoCoordinate coordOutOfBounds1 = WMWGeoCoordinate(0.5, 1.5);
+    const WMWGeoCoordinate coordOutOfBounds2 = WMWGeoCoordinate(0.5, 1.6);
+    const WMWGeoCoordinate coordOutOfBounds3 = WMWGeoCoordinate(0.6, 1.5);
+    const WMWGeoCoordinate coordOutOfBounds4 = WMWGeoCoordinate(0.6, 1.6);
+    mm.addMarker(WMWMarker(coordInBounds1));
+    mm.addMarker(WMWMarker(coordOutOfBounds1));
+    mm.addMarker(WMWMarker(coordOutOfBounds2));
+    mm.addMarker(WMWMarker(coordOutOfBounds3));
+    mm.addMarker(WMWMarker(coordOutOfBounds4));
+
+    for (int l = 3; l<=maxLevel; ++l)
+    {
+        MarkerModel::NonEmptyIterator it(&mm, l, boundsList);
+        QVERIFY( CountMarkersInIterator(&it) == 1 );
+    }
+}
+
+QTEST_MAIN(TestModel)
 

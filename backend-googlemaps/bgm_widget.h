@@ -3,7 +3,7 @@
  * Date        : 2009-12-01
  * Description : Google-Maps-backend for WorldMapWidget2
  *
- * Copyright (C) 2009 by Michael G. Hansen <mike at mghansen dot de>
+ * Copyright (C) 2009,2010 by Michael G. Hansen <mike at mghansen dot de>
  *
  * This program is free software; you can redistribute it
  * and/or modify it under the terms of the GNU General

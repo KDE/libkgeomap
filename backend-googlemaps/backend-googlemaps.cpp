@@ -3,7 +3,7 @@
  * Date        : 2009-12-01
  * Description : Google-Maps-backend for WorldMapWidget2
  *
- * Copyright (C) 2009 by Michael G. Hansen <mike at mghansen dot de>
+ * Copyright (C) 2009,2010 by Michael G. Hansen <mike at mghansen dot de>
  *
  * This program is free software; you can redistribute it
  * and/or modify it under the terms of the GNU General
@@ -55,7 +55,8 @@ public:
       cacheShowNavigationControl(true),
       cacheShowScaleControl(true),
       cacheZoom(1),
-      cacheCenter(0.0,0.0)
+      cacheCenter(0.0,0.0),
+      cacheBounds()
     {
     }
 
@@ -74,6 +75,7 @@ public:
     bool cacheShowScaleControl;
     int cacheZoom;
     WMWGeoCoordinate cacheCenter;
+    QPair<WMWGeoCoordinate, WMWGeoCoordinate> cacheBounds;
 };
 
 BackendGoogleMaps::BackendGoogleMaps(WMWSharedData* const sharedData, QObject* const parent)
@@ -418,15 +420,22 @@ void BackendGoogleMaps::slotHTMLEvents(const QStringList& events)
             d->cacheMapType = eventParameter;
         }
         else if (eventCode=="MB")
-        {
+        {   // NOTE: event currently disabled in javascript part
             // map bounds changed
             centerProbablyChanged = true;
             zoomProbablyChanged = true;
             mapBoundsProbablyChanged = true;
         }
         else if (eventCode == "ZC")
-        {
+        {   // NOTE: event currently disabled in javascript part
             // zoom changed
+            zoomProbablyChanged = true;
+            mapBoundsProbablyChanged = true;
+        }
+        else if (eventCode == "id")
+        {
+            // idle after drastic map changes
+            centerProbablyChanged = true;
             zoomProbablyChanged = true;
             mapBoundsProbablyChanged = true;
         }
@@ -483,12 +492,30 @@ void BackendGoogleMaps::slotHTMLEvents(const QStringList& events)
 
     if (mapBoundsProbablyChanged)
     {
+        kDebug()<<"getbounds";
+        // TODO: parse this better!!!
+        const QString mapBoundsString = d->bgmWidget->runScript("map.getBounds().toString();").toString();
+//         kDebug()<<mapBoundsString;
+        const QString string1 = mapBoundsString.mid(1, mapBoundsString.length()-2);
+        int dumpComma = string1.indexOf(",", 0);
+        int splitComma = string1.indexOf(",", dumpComma+1);
+        QString coord1String = string1.mid(0, splitComma);
+        QString coord2String = string1.mid(splitComma+2);
+        WMWGeoCoordinate coord1, coord2;
+        googleVariantToCoordinates(QVariant(coord1String.mid(1, coord1String.length()-2)), &coord1);
+        googleVariantToCoordinates(QVariant(coord2String.mid(1, coord2String.length()-2)), &coord2);
+        d->cacheBounds = QPair<WMWGeoCoordinate, WMWGeoCoordinate>(coord1, coord2);
+//         kDebug()<<coord1String<<coord2String;
+//         QStringList mapBoundsStrings = mapBoundsString.split
+        kDebug()<<"gotbounds";
         s->worldMapWidget->updateClusters();
+        
     }
 }
 
 void BackendGoogleMaps::updateClusters()
 {
+    kDebug()<<"start updateclusters";
     // re-transfer the clusters to the map:
     WMW2_ASSERT(isReady());
     if (!isReady())
@@ -509,7 +536,7 @@ void BackendGoogleMaps::updateClusters()
                 .arg(true?"true":"false") // TODO: just for now, for testing
             );
     }
-    
+    kDebug()<<"end updateclusters";
 }
 
 bool BackendGoogleMaps::screenCoordinates(const WMWGeoCoordinate& coordinates, QPoint* const point)
@@ -674,6 +701,29 @@ int BackendGoogleMaps::getMarkerModelLevel()
     WMW2_ASSERT(tileLevel<=s->markerModel->maxLevel()-1);
     
     return tileLevel;
+}
+
+QList<QPair<WMWGeoCoordinate, WMWGeoCoordinate> > BackendGoogleMaps::getNormalizedBounds()
+{
+    QList<QPair<WMWGeoCoordinate, WMWGeoCoordinate> > boundsList;
+
+    const qreal bWest = d->cacheBounds.first.lon;
+    const qreal bEast = d->cacheBounds.second.lon;
+    const qreal bNorth = d->cacheBounds.second.lat;
+    const qreal bSouth = d->cacheBounds.first.lat;
+    kDebug()<<bWest<<bEast<<bNorth<<bSouth;
+
+    if (bEast<bWest)
+    {
+        boundsList << QPair<WMWGeoCoordinate, WMWGeoCoordinate>(WMWGeoCoordinate(bSouth, bEast), WMWGeoCoordinate(bNorth, 0));
+        boundsList << QPair<WMWGeoCoordinate, WMWGeoCoordinate>(WMWGeoCoordinate(bSouth, 0), WMWGeoCoordinate(bNorth, bWest));
+    }
+    else
+    {
+        boundsList << QPair<WMWGeoCoordinate, WMWGeoCoordinate>(WMWGeoCoordinate(bSouth, bWest), WMWGeoCoordinate(bNorth, bEast));
+    }
+    kDebug()<<boundsList;
+    return boundsList;
 }
 
 } /* WMW2 */

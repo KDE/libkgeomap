@@ -3,7 +3,7 @@
  * Date        : 2009-12-01
  * Description : Marble-backend for WorldMapWidget2
  *
- * Copyright (C) 2009 by Michael G. Hansen <mike at mghansen dot de>
+ * Copyright (C) 2009,2010 by Michael G. Hansen <mike at mghansen dot de>
  *
  * This program is free software; you can redistribute it
  * and/or modify it under the terms of the GNU General
@@ -29,6 +29,8 @@
 #include <klocale.h>
 #include <marble/GeoPainter.h>
 #include <marble/MarbleMap.h>
+#include <marble/ViewParams.h>
+#include <marble/ViewportParams.h>
 
 // local includes
 
@@ -597,6 +599,31 @@ QString BackendMarble::getZoom() const
 int BackendMarble::getMarkerModelLevel()
 {
     return s->markerModel->maxLevel()-1;
+}
+
+QList<QPair<WMWGeoCoordinate, WMWGeoCoordinate> > BackendMarble::getNormalizedBounds()
+{
+    QList<QPair<WMWGeoCoordinate, WMWGeoCoordinate> > boundsList;
+
+    const GeoDataLatLonAltBox marbleBounds = d->marbleWidget->map()->viewParams()->viewport()->viewLatLonAltBox();
+    kDebug()<<marbleBounds.toString(GeoDataCoordinates::Degree);
+
+    const qreal bWest = marbleBounds.west(GeoDataCoordinates::Degree);
+    const qreal bEast = marbleBounds.east(GeoDataCoordinates::Degree);
+    const qreal bNorth = marbleBounds.north(GeoDataCoordinates::Degree);
+    const qreal bSouth = marbleBounds.south(GeoDataCoordinates::Degree);
+
+    // TODO: does this cover all cases?
+    if (bEast<bWest)
+    {
+        boundsList << QPair<WMWGeoCoordinate, WMWGeoCoordinate>(WMWGeoCoordinate(bSouth, bWest), WMWGeoCoordinate(bNorth, 180.0));
+        boundsList << QPair<WMWGeoCoordinate, WMWGeoCoordinate>(WMWGeoCoordinate(bSouth, -180.0), WMWGeoCoordinate(bNorth, bEast));
+    }
+    else
+    {
+        boundsList << QPair<WMWGeoCoordinate, WMWGeoCoordinate>(WMWGeoCoordinate(bSouth, bWest), WMWGeoCoordinate(bNorth, bEast));
+    }
+    return boundsList;
 }
 
 } /* WMW2 */

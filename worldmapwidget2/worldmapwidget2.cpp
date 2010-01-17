@@ -3,7 +3,7 @@
  * Date        : 2009-12-01
  * Description : WorldMapWidget2
  *
- * Copyright (C) 2009 by Michael G. Hansen <mike at mghansen dot de>
+ * Copyright (C) 2009,2010 by Michael G. Hansen <mike at mghansen dot de>
  *
  * This program is free software; you can redistribute it
  * and/or modify it under the terms of the GNU General
@@ -489,6 +489,7 @@ void WorldMapWidget2::updateClusters()
         return;
 
     const int markerLevel = d->currentBackend->getMarkerModelLevel();
+    QList<QPair<WMWGeoCoordinate, WMWGeoCoordinate> > mapBounds = d->currentBackend->getNormalizedBounds();
 
 //     // debug output for tile level diagnostics:
 //     QIntList tile1;
@@ -517,13 +518,14 @@ void WorldMapWidget2::updateClusters()
 
     // TODO: iterate only over the visible part of the map
     int debugCountNonEmptyTiles = 0;
-    for (MarkerModel::NonEmptyIterator tileIterator(s->markerModel, markerLevel); !tileIterator.atEnd(); tileIterator.nextIndex())
+    int debugTilesSearched = 0;
+    for (MarkerModel::NonEmptyIterator tileIterator(s->markerModel, markerLevel, mapBounds); !tileIterator.atEnd(); tileIterator.nextIndex())
     {
         const QIntList tileIndex = tileIterator.currentIndex();
 
         // find out where the tile is on the map:
         const WMWGeoCoordinate tileCoordinate = s->markerModel->tileIndexToCoordinate(tileIndex);
-
+        debugTilesSearched++;
         QPoint tilePoint;
         if (!d->currentBackend->screenCoordinates(tileCoordinate, &tilePoint))
         {
@@ -687,7 +689,7 @@ void WorldMapWidget2::updateClusters()
     }
 
 //     kDebug()<<s->clusterList.size();
-    kDebug()<<QString("level %1: %2 non empty tiles sorted into %3 clusters").arg(markerLevel).arg(debugCountNonEmptyTiles).arg(s->clusterList.count());
+    kDebug()<<QString("level %1: %2 non empty tiles sorted into %3 clusters (%4 searched)").arg(markerLevel).arg(debugCountNonEmptyTiles).arg(s->clusterList.count()).arg(debugTilesSearched);
 
     d->currentBackend->updateClusters();
 }

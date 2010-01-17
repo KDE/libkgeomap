@@ -1,6 +1,6 @@
 # * ============================================================
 # *
-# * Copyright (C) 2009 by Michael G. Hansen http://www.mghansen.de/
+# * Copyright (C) 2009,2010 by Michael G. Hansen <mike at mghansen dot de>
 # *
 # * This program is free software; you can redistribute it
 # * and/or modify it under the terms of the GNU General
@@ -15,6 +15,9 @@
 # * ============================================================
 
 project(worldmapwidget2)
+
+INCLUDE(CTest)
+ENABLE_TESTING()
 
 SET( MY_COMPILER_WARNINGS
     "-Wall -Wold-style-cast -Wextra -pedantic"
@@ -82,5 +85,6 @@ SET( test_model_sources
     tests/test-model.cpp
 )
 kde4_add_executable( test_model ${test_model_sources} )
-target_link_libraries( test_model ${worldmapwidget2library_libs} )
+target_link_libraries( test_model ${worldmapwidget2library_libs} ${QT_QTTEST_LIBRARY} )
 SET_TARGET_PROPERTIES( test_model PROPERTIES COMPILE_FLAGS "${COMPILE_FLAGS} ${MY_COMPILER_WARNINGS}")
+ADD_TEST( test_model ${EXECUTABLE_OUTPUT_PATH}/test_model )

@@ -3,7 +3,7 @@
  * Date        : 2009-12-01
  * Description : A model to hold the markers
  *
- * Copyright (C) 2009 by Michael G. Hansen <mike at mghansen dot de>
+ * Copyright (C) 2009,2010 by Michael G. Hansen <mike at mghansen dot de>
  *
  * This program is free software; you can redistribute it
  * and/or modify it under the terms of the GNU General
@@ -111,13 +111,15 @@ public:
     public:
         NonEmptyIterator(MarkerModel* const model, const int level);
         NonEmptyIterator(MarkerModel* const model, const int level, const QIntList& startIndex, const QIntList& endIndex);
+        NonEmptyIterator(MarkerModel* const model, const int level, const QList<QPair<WMWGeoCoordinate, WMWGeoCoordinate> >& normalizedMapBounds);
 
         bool atEnd() const;
         QIntList nextIndex();
         QIntList currentIndex() const;
+        MarkerModel* model() const;
 
     private:
-        void initializeIterator();
+        bool initializeNextBounds();
         MarkerModelNonEmptyIteratorPrivate* const d;
     };
 

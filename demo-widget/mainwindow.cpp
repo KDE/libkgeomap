@@ -3,7 +3,7 @@
  * Date        : 2009-12-01
  * Description : main-window of the demo application
  *
-* Copyright (C) 2009 by Michael G. Hansen <mike at mghansen dot de>
+ * Copyright (C) 2009,2010 by Michael G. Hansen <mike at mghansen dot de>
  *
  * This program is free software; you can redistribute it
  * and/or modify it under the terms of the GNU General
@@ -239,7 +239,7 @@ MyImageData LoadImageData(const KUrl& urlToLoad)
 
 void MainWindow::slotFutureResultsReadyAt(int startIndex, int endIndex)
 {
-    kDebug()<<"future"<<startIndex<<endIndex;
+//     kDebug()<<"future"<<startIndex<<endIndex;
 
     // determine the sender:
     QFutureWatcher<MyImageData>* const futureSender = reinterpret_cast<QFutureWatcher<MyImageData>*>(sender());
@@ -266,7 +266,7 @@ void MainWindow::slotFutureResultsReadyAt(int startIndex, int endIndex)
     for (int index = startIndex; index<endIndex; ++index)
     {
         MyImageData newData = d->imageLoadingRunningFutures.at(futureIndex).resultAt(index);
-        kDebug()<<"future"<<newData.url<<newData.coordinates.geoUrl();
+//         kDebug()<<"future"<<newData.url<<newData.coordinates.geoUrl();
 
         d->imageLoadingBuncher << newData;
     }
