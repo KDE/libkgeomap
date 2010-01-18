@@ -16,9 +16,6 @@
 
 project(worldmapwidget2)
 
-INCLUDE(CTest)
-ENABLE_TESTING()
-
 SET( MY_COMPILER_WARNINGS
     "-Wall -Wold-style-cast -Wextra -pedantic"
 )
@@ -63,9 +60,9 @@ SET( backend_googlemaps_sources
 
 KDE4_ADD_LIBRARY( worldmapwidget2library STATIC ${widget_sources} ${backend_marble_sources} ${backend_googlemaps_sources})
 SET( worldmapwidget2library_libs
-    ${KDE4_UI_LIBS} ${KDE4_KPARTS_LIBS} ${LIBMARBLEWIDGET_LIBRARY} ${KDE4_KPARTS_LIBS} ${KDE4_KHTML_LIBS}
+    ${KDE4_UI_LIBS} ${KDE4_KPARTS_LIBS} ${LIBMARBLEWIDGET_LIBRARY} ${KDE4_KHTML_LIBS}
 )
-target_link_libraries( worldmapwidget2library ${KDE4_UI_LIBS} ${KDE4_KPARTS_LIBS} ${LIBMARBLEWIDGET_LIBRARY} ${KDE4_KPARTS_LIBS} ${KDE4_KHTML_LIBS} )
+target_link_libraries( worldmapwidget2library ${KDE4_UI_LIBS} ${KDE4_KPARTS_LIBS} ${LIBMARBLEWIDGET_LIBRARY} ${KDE4_KHTML_LIBS} )
 SET_TARGET_PROPERTIES( worldmapwidget2library PROPERTIES COMPILE_FLAGS "${COMPILE_FLAGS} ${MY_COMPILER_WARNINGS}")
 SET( worldmapwidget2library_libs
     worldmapwidget2library ${worldmapwidget2library_libs}
@@ -80,11 +77,17 @@ kde4_add_executable( demo_widget  ${demo_widget_sources} )
 target_link_libraries( demo_widget ${worldmapwidget2library_libs} ${KEXIV2_LIBRARIES})
 SET_TARGET_PROPERTIES( demo_widget PROPERTIES COMPILE_FLAGS "${COMPILE_FLAGS} ${MY_COMPILER_WARNINGS}")
 
-# test the marker model
-SET( test_model_sources
-    tests/test-model.cpp
-)
-kde4_add_executable( test_model ${test_model_sources} )
-target_link_libraries( test_model ${worldmapwidget2library_libs} ${QT_QTTEST_LIBRARY} )
-SET_TARGET_PROPERTIES( test_model PROPERTIES COMPILE_FLAGS "${COMPILE_FLAGS} ${MY_COMPILER_WARNINGS}")
-ADD_TEST( test_model ${EXECUTABLE_OUTPUT_PATH}/test_model )
+IF(KDE4_BUILD_TESTS)
+
+    INCLUDE(CTest)
+    ENABLE_TESTING()
+
+    # test the marker model
+    SET( test_model_sources
+        tests/test-model.cpp
+    )
+    kde4_add_executable( test_model ${test_model_sources} )
+    target_link_libraries( test_model ${worldmapwidget2library_libs} ${QT_QTTEST_LIBRARY} )
+    SET_TARGET_PROPERTIES( test_model PROPERTIES COMPILE_FLAGS "${COMPILE_FLAGS} ${MY_COMPILER_WARNINGS}")
+    ADD_TEST( test_model ${EXECUTABLE_OUTPUT_PATH}/test_model )
+ENDIF(KDE4_BUILD_TESTS)
