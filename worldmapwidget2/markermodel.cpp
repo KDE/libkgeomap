@@ -207,7 +207,14 @@ int MarkerModel::addMarker(const WMWMarker& newMarker)
     const int markerIndex = markerList.count();
     markerList<<newMarker;
 
-    const QIntList tileIndex = coordinateToTileIndex(newMarker.coordinates, maxLevel());
+    addMarkerIndexToGrid(markerIndex);
+
+    return markerIndex;
+}
+
+void MarkerModel::addMarkerIndexToGrid(const int markerIndex)
+{
+    const QIntList tileIndex = coordinateToTileIndex(markerList.at(markerIndex).coordinates, maxLevel());
     WMW2_ASSERT(tileIndex.count()==maxIndexCount());
 
     // add the marker to all existing tiles:
@@ -230,9 +237,7 @@ int MarkerModel::addMarker(const WMWMarker& newMarker)
             currentTile->addChild(nextIndex, nextTile);
         }
         currentTile = nextTile;
-    }
-
-    return markerIndex;
+    }   
 }
 
 int MarkerModel::getTileMarkerCount(const QIntList& tileIndex)
@@ -254,13 +259,14 @@ MarkerModel::Tile* MarkerModel::getTile(const QIntList& tileIndex, const bool st
     WMW2_ASSERT(tileIndex.count()<=maxIndexCount());
 
     Tile* tile = d->rootTile;
-    for (int level = 0; level < tileIndex.size(); ++level)
+    for (int level = 0; level < tileIndex.count(); ++level)
     {
         const int currentIndex = tileIndex.at(level);
 
         Tile* childTile = 0;
         if (tile->children.isEmpty())
         {
+            WMW2_ASSERT(level<d->tesselationSizes.count());
             tile->prepareForChildren(d->tesselationSizes.at(level));
 
             // if there are any markers in the tile,
@@ -270,6 +276,7 @@ MarkerModel::Tile* MarkerModel::getTile(const QIntList& tileIndex, const bool st
                 for (int i=0; i<tile->markerIndices.count(); ++i)
                 {
                     const int currentMarkerIndex = tile->markerIndices.at(i);
+                    WMW2_ASSERT(currentMarkerIndex<markerList.count());
                     
                     // get the tile index for this marker:
                     const QIntList markerTileIndex = coordinateToTileIndex(markerList.at(currentMarkerIndex).coordinates, level);
@@ -680,6 +687,55 @@ bool MarkerModel::NonEmptyIterator::atEnd() const
 MarkerModel* MarkerModel::NonEmptyIterator::model() const
 {
     return d->model;
+}
+
+void MarkerModel::removeMarkerIndexFromGrid(const int markerIndex)
+{
+    WMW2_ASSERT(markerIndex<markerList.count());
+    WMW2_ASSERT(markerIndex>=0);
+
+    // remove the marker from the grid:
+    const WMWGeoCoordinate markerCoordinates = markerList.at(markerIndex).coordinates;
+    const QIntList tileIndex = coordinateToTileIndex(markerCoordinates, maxLevel());
+    QList<Tile*> tiles;
+    for (int l=0; l<=maxLevel(); ++l)
+    {
+        Tile* const currentTile = getTile(tileIndex.mid(0, l), true);
+        if (!currentTile)
+            break;
+
+        tiles << currentTile;
+
+        currentTile->markerIndices.removeOne(markerIndex);
+    }
+
+    // delete the tiles which are now empty!
+    for (int l = tiles.count()-1; l>0; --l)
+    {
+        Tile* const currentTile = tiles.at(l);
+
+        if (!currentTile->markerIndices.isEmpty())
+            break;
+
+        Tile* const parentTile = tiles.at(l-1);
+        parentTile->deleteChild(currentTile);
+    }
+
+}
+
+void MarkerModel::moveMarker(const int markerIndex, const WMWGeoCoordinate& newPosition)
+{
+    removeMarkerIndexFromGrid(markerIndex);
+
+    markerList[markerIndex].coordinates = newPosition;
+
+    addMarkerIndexToGrid(markerIndex);
+}
+
+void MarkerModel::clear()
+{
+    markerList.clear();
+    d->rootTile->deleteChildren();
 }
 
 } /* WMW2 */

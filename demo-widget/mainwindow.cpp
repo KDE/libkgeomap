@@ -52,6 +52,8 @@
 #include "mainwindow.h"
 #include "worldmapwidget2.h"
 
+Q_DECLARE_METATYPE(QTreeWidgetItem*)
+
 using namespace WMW2;
 
 class MyImageData
@@ -111,6 +113,9 @@ MainWindow::MainWindow(QWidget* const parent)
     setCentralWidget(d->splitter);
 
     d->mapWidget = new WorldMapWidget2(d->splitter);
+
+    connect(d->mapWidget, SIGNAL(signalGroupableMarkersMoved(const QList<int>&)),
+            this, SLOT(slotGroupableMarkersMoved(const QList<int>&)));
 //     d->mapWidget->resize(d->mapWidget->width(), 200);
     d->splitter->addWidget(d->mapWidget);
     d->splitter->setCollapsible(0, false);
@@ -328,15 +333,35 @@ void MainWindow::slotImageLoadingBunchReady()
     {
         const MyImageData& currentInfo = d->imageLoadingBuncher.at(i);
 
-        d->mapWidget->addClusterableMarkers(WMWMarker::List()<<WMWMarker(currentInfo.coordinates));
-
         // add the item to the tree widget:
         QTreeWidgetItem* const treeItem = new QTreeWidgetItem();
         treeItem->setText(0, currentInfo.url.fileName());
         treeItem->setText(1, currentInfo.coordinates.geoUrl());
 
         d->treeWidget->addTopLevelItem(treeItem);
+
+        WMWMarker myMarker(currentInfo.coordinates);
+        myMarker.data.setValue(treeItem);
+        d->mapWidget->addClusterableMarkers(WMWMarker::List()<<myMarker);
     }
 
     d->imageLoadingBuncher.clear();
+}
+
+void MainWindow::slotGroupableMarkersMoved(const QList<int>& markerIndices)
+{
+    kDebug()<<"markers moved: "<<markerIndices;
+
+    // update the treewidget items:
+    for (int i=0; i<markerIndices.count(); ++i)
+    {
+        const WMWMarker& myMarker = d->mapWidget->getClusterableMarker(markerIndices.at(i));
+
+        QTreeWidgetItem* const treeItem = myMarker.data.value<QTreeWidgetItem*>();
+        if (!treeItem)
+            continue;
+
+        treeItem->setText(1, myMarker.coordinates.geoUrl());
+    }
+    
 }

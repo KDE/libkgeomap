@@ -19,7 +19,6 @@
 
 #ifndef WORLDMAPWIDGET2_H
 #define WORLDMAPWIDGET2_H
-
 // Qt includes
 
 #include <QWidget>
@@ -60,6 +59,7 @@ public:
     QWidget* getControlWidget();
 
     void addClusterableMarkers(const WMWMarker::List& markerList);
+    WMWMarker getClusterableMarker(const int markerIndex);
     void addSingleMarkers(const WMWMarker::List& markerList);
     void updateMarkers();
     void updateClusters();
@@ -75,6 +75,9 @@ public Q_SLOTS:
     void slotUpdateActionsEnabled();
     void slotClustersNeedUpdating();
 
+Q_SIGNALS:
+    void signalGroupableMarkersMoved(const QList<int>& markerIndices);
+
 protected:
     void applyCacheToBackend();
     void saveBackendToCache();
@@ -84,6 +87,7 @@ protected Q_SLOTS:
     void slotBackendReady(const QString& backendName);
     void slotChangeBackend(QAction* action);
     void slotBackendZoomChanged(const QString& newZoom);
+    void slotClustersMoved(const QIntList& clusterIndices);
 
 private:
     WMWSharedData* const s;

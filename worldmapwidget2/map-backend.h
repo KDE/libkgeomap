@@ -82,7 +82,7 @@ public Q_SLOTS:
 
 Q_SIGNALS:
     void signalBackendReady(const QString& backendName);
-    void signalMarkerMoved(const int markerIndex);
+    void signalClustersMoved(const QIntList& clusterIndices);
     void signalZoomChanged(const QString& newZoom);
 
 private:

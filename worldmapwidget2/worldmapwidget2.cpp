@@ -144,11 +144,14 @@ bool WorldMapWidget2::setBackend(const QString& backendName)
     // disconnect signals from old backend:
     if (d->currentBackend)
     {
-        connect(d->currentBackend, SIGNAL(signalBackendReady(const QString&)),
-                    this, SLOT(slotBackendReady(const QString&)));
+        disconnect(d->currentBackend, SIGNAL(signalBackendReady(const QString&)),
+                this, SLOT(slotBackendReady(const QString&)));
 
-        connect(d->currentBackend, SIGNAL(signalZoomChanged(const QString&)),
+        disconnect(d->currentBackend, SIGNAL(signalZoomChanged(const QString&)),
                 this, SLOT(slotBackendZoomChanged(const QString&)));
+
+        disconnect(d->currentBackend, SIGNAL(signalClustersMoved(const QIntList&)),
+                this, SLOT(slotClustersMoved(const QIntList&)));
     }
 
     MapBackend* backend;
@@ -166,6 +169,9 @@ bool WorldMapWidget2::setBackend(const QString& backendName)
 
             connect(d->currentBackend, SIGNAL(signalZoomChanged(const QString&)),
                     this, SLOT(slotBackendZoomChanged(const QString&)));
+
+            connect(d->currentBackend, SIGNAL(signalClustersMoved(const QIntList&)),
+                    this, SLOT(slotClustersMoved(const QIntList&)));
 
             // call this slot manually in case the backend was ready right away:
             if (d->currentBackend->isReady())
@@ -913,6 +919,56 @@ QString WorldMapWidget2::getZoom()
     }
 
     return d->cacheZoom;
+}
+
+void WorldMapWidget2::slotClustersMoved(const QIntList& clusterIndices)
+{
+    kDebug()<<clusterIndices;
+
+    QIntList markerIndices;
+    // update the positions of the markers held by the clusters:
+    for (int cii=0; cii<clusterIndices.count(); ++cii)
+    {
+        const int clusterIndex = clusterIndices.at(cii);
+
+        const WMWCluster& cluster = s->clusterList.at(clusterIndex);
+
+        // remove all the markers in the cluster from the model and then add them again:
+        QIntList movedMarkers;
+        for (int i=0; i<cluster.tileIndicesList.count(); ++i)
+        {
+            const QIntList tileIndex = cluster.tileIndicesList.at(i);
+            MarkerModel::Tile* const sourceTile = s->markerModel->getTile(tileIndex, true);
+            if (!sourceTile)
+            {
+                continue;
+            }
+
+            movedMarkers << sourceTile->markerIndices;
+        }
+
+        // update the positions of the markers:
+        for (int i=0; i<movedMarkers.count(); ++i)
+        {
+            s->markerModel->moveMarker(movedMarkers.at(i), cluster.coordinates);
+        }
+
+        markerIndices << movedMarkers;
+    }
+
+    kDebug()<<markerIndices;
+    if (!markerIndices.isEmpty())
+    {
+        emit(signalGroupableMarkersMoved(markerIndices));
+    }
+
+    // TODO: who calls updateClusters? Right now, the google maps backend does that
+}
+
+WMWMarker WorldMapWidget2::getClusterableMarker(const int markerIndex)
+{
+    WMW2_ASSERT(markerIndex<s->markerModel->markerList.count());
+    return s->markerModel->markerList.at(markerIndex);
 }
 
 } /* WMW2 */

@@ -49,13 +49,19 @@ public:
 
         ~Tile()
         {
-            // delete all children
+            deleteChildren();
+        }
+
+        void deleteChildren()
+        {
             foreach(const Tile* tile, children)
             {
                 delete tile;
             }
+            children.clear();
+            childrenMask.clear();
         }
-
+    
         void prepareForChildren(const QPair<int, int>& childCount)
         {
             prepareForChildren(childCount.first*childCount.second);
@@ -78,6 +84,17 @@ public:
             return childrenMask.testBit(linearIndex);
         }
 
+        void deleteChild(Tile* const childTile, const int knownLinearIndex = -1)
+        {
+            int tileIndex = knownLinearIndex;
+            if (tileIndex<0)
+            {
+                tileIndex = children.indexOf(childTile);
+            }
+            children.replace(tileIndex, 0);
+            delete childTile;
+        }
+
         QVector<Tile*> children;
         QBitArray childrenMask;
         QIntList markerIndices;
@@ -96,7 +113,11 @@ public:
     QIntList latLonIndexToLinearIndex(const QList<QIntPair>& latLonIndex) const;
 
     int addMarker(const WMWMarker& newMarker);
+    void removeMarkerIndexFromGrid(const int markerIndex);
     void addMarkers(const WMWMarker::List& newMarkers);
+    void addMarkerIndexToGrid(const int markerIndex);
+    void moveMarker(const int markerIndex, const WMWGeoCoordinate& newPosition);
+    void clear();
     int getTileMarkerCount(const QIntList& tileIndex);
     Tile* getTile(const QIntList& tileIndex, const bool stopIfEmpty = false);
     int maxLevel() const;

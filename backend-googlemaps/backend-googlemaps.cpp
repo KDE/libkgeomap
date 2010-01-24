@@ -407,6 +407,7 @@ void BackendGoogleMaps::slotHTMLEvents(const QStringList& events)
     bool mapTypeChanged = false;
     bool zoomProbablyChanged = false;
     bool mapBoundsProbablyChanged = false;
+    QIntList movedClusters;
     for (QStringList::const_iterator it = events.constBegin(); it!=events.constEnd(); ++it)
     {
         const QString eventCode = it->left(2);
@@ -439,37 +440,43 @@ void BackendGoogleMaps::slotHTMLEvents(const QStringList& events)
             zoomProbablyChanged = true;
             mapBoundsProbablyChanged = true;
         }
-        else if (eventCode=="mm")
+        else if (eventCode=="cm")
         {
             // TODO: buffer this event type!
-            // marker moved
+            // cluster moved
             bool okay = false;
-            const int markerIndex = eventParameter.toInt(&okay);
+            const int clusterIndex = eventParameter.toInt(&okay);
             if (!okay)
                 continue;
 
-            if ((markerIndex<0)||(markerIndex>s->markerList.size()))
+            if ((clusterIndex<0)||(clusterIndex>s->clusterList.size()))
                 continue;
 
             // re-read the marker position:
-            WMWGeoCoordinate markerCoordinates;
+            WMWGeoCoordinate clusterCoordinates;
             const bool isValid = googleVariantToCoordinates(
-                d->bgmWidget->runScript(QString("wmwGetMarkerPosition(%1);").arg(markerIndex)),
-                                                            &markerCoordinates);
+                d->bgmWidget->runScript(QString("wmwGetClusterPosition(%1);").arg(clusterIndex)),
+                                                            &clusterCoordinates);
 
             if (!isValid)
                 continue;
 
             // TODO: this discards the altitude!
-            s->markerList[markerIndex].coordinates = markerCoordinates;
+            s->clusterList[clusterIndex].coordinates = clusterCoordinates;
 
-            emit(signalMarkerMoved(markerIndex));
+            movedClusters << clusterIndex;
         }
         else if (eventCode=="do")
         {
             // debug output:
             kDebug()<<QString("javascript:%1").arg(eventParameter);
         }
+    }
+
+    if (!movedClusters.isEmpty())
+    {
+        kDebug()<<movedClusters;
+        emit(signalClustersMoved(movedClusters));
     }
 
     // now process the buffered events:
@@ -508,8 +515,11 @@ void BackendGoogleMaps::slotHTMLEvents(const QStringList& events)
 //         kDebug()<<coord1String<<coord2String;
 //         QStringList mapBoundsStrings = mapBoundsString.split
         kDebug()<<"gotbounds";
+    }
+
+    if (mapBoundsProbablyChanged||!movedClusters.isEmpty())
+    {
         s->worldMapWidget->updateClusters();
-        
     }
 }
 

@@ -40,6 +40,10 @@ int CountMarkersInIterator(MarkerModel::NonEmptyIterator* const it)
     return markerCount;
 }
 
+void TestModel::testNoOp()
+{
+}
+
 void TestModel::testIndices()
 {
     MarkerModel mm;
@@ -74,9 +78,106 @@ void TestModel::testBasicModel()
     for (int l = 0; l<=maxLevel; ++l)
     {
         const QIntList tileIndex = mm.coordinateToTileIndex(coord_1_2, l);
-        QVERIFY(mm.getTile(tileIndex, true) != 0);
+        MarkerModel::Tile* const myTile = mm.getTile(tileIndex, true);
+        QVERIFY(myTile != 0);
+        QVERIFY(myTile->children.count()==0);
         QVERIFY(mm.getTileMarkerCount(tileIndex) == 1);
     }
+}
+
+void TestModel::testMoveMarkers1()
+{
+    MarkerModel mm;
+    const int maxLevel = mm.maxLevel();
+
+    const int fillLevel = maxLevel - 2;
+
+    // add a marker to the model and create tiles up to a certain level:
+    const WMWGeoCoordinate coord_1_2 = WMWGeoCoordinate(1.0, 2.0);
+    const int markerIndex1 = mm.addMarker(WMWMarker(coord_1_2));
+    for (int l = 1; l<=fillLevel; ++l)
+    {
+        const QIntList tileIndex = mm.coordinateToTileIndex(coord_1_2, l);
+        MarkerModel::Tile* const myTile = mm.getTile(tileIndex, true);
+        QVERIFY(myTile != 0);
+        QVERIFY(myTile->children.count()==0);
+        QVERIFY(mm.getTileMarkerCount(tileIndex) == 1);
+    }
+
+    // now move marker 1:
+    const WMWGeoCoordinate coord_50_60 = WMWGeoCoordinate(50.0, 60.0);
+    mm.moveMarker(markerIndex1, coord_50_60);
+
+    for (int l = 0; l<=fillLevel; ++l)
+    {
+        // make sure the marker can not be found at the old position any more
+        QIntList tileIndex = mm.coordinateToTileIndex(coord_1_2, l);
+        QVERIFY(mm.getTile(tileIndex, true) == 0);
+        QVERIFY(mm.getTileMarkerCount(tileIndex) == 0);
+        QVERIFY(mm.getTile(tileIndex, true) == 0);
+
+        // find it at the new position:
+        tileIndex = mm.coordinateToTileIndex(coord_50_60, l);
+        MarkerModel::Tile* const myTile = mm.getTile(tileIndex, true);
+        QVERIFY(myTile != 0);
+        QVERIFY(myTile->children.isEmpty());
+        QVERIFY(mm.getTileMarkerCount(tileIndex) == 1);
+    }
+
+    mm.clear();
+}
+
+void TestModel::testMoveMarkers2()
+{
+    MarkerModel mm;
+    const int maxLevel = mm.maxLevel();
+
+    const int fillLevel = maxLevel - 2;
+    const WMWGeoCoordinate coord_1_2 = WMWGeoCoordinate(1.0, 2.0);
+    const WMWGeoCoordinate coord_50_60 = WMWGeoCoordinate(50.0, 60.0);
+
+    // add markers to the model and create tiles up to a certain level:
+    const int markerIndex1 = mm.addMarker(WMWMarker(coord_1_2));
+    const int markerIndex2 = mm.addMarker(WMWMarker(coord_1_2));
+    for (int l = 1; l<=fillLevel; ++l)
+    {
+        const QIntList tileIndex = mm.coordinateToTileIndex(coord_1_2, l);
+        MarkerModel::Tile* const myTile = mm.getTile(tileIndex, true);
+        QVERIFY(myTile != 0);
+        QVERIFY(myTile->children.count()==0);
+        QVERIFY(mm.getTileMarkerCount(tileIndex) == 2);
+    }
+    const int markerIndex3 = mm.addMarker(WMWMarker(coord_50_60));
+    for (int l = 1; l<=fillLevel; ++l)
+    {
+        const QIntList tileIndex = mm.coordinateToTileIndex(coord_50_60, l);
+        MarkerModel::Tile* const myTile = mm.getTile(tileIndex, true);
+        QVERIFY(myTile != 0);
+        QVERIFY(myTile->children.count()==0);
+        QVERIFY(mm.getTileMarkerCount(tileIndex) == 1);
+    }
+
+    // now move marker 1:
+    mm.moveMarker(markerIndex1, coord_50_60);
+
+    for (int l = 0; l<=fillLevel; ++l)
+    {
+        // make sure there is only one marker left at the old position:
+        QIntList tileIndex = mm.coordinateToTileIndex(coord_1_2, l);
+        QVERIFY(mm.getTileMarkerCount(tileIndex) == 1);
+
+        // find it at the new position:
+        tileIndex = mm.coordinateToTileIndex(coord_50_60, l);
+        MarkerModel::Tile* const myTile = mm.getTile(tileIndex, true);
+        QVERIFY(myTile != 0);
+        if (l>fillLevel)
+        {
+            QVERIFY(myTile->children.isEmpty());
+        }
+        QVERIFY(mm.getTileMarkerCount(tileIndex) == 2);
+    }
+
+    mm.clear();
 }
 
 void TestModel::testIteratorWholeWorld()

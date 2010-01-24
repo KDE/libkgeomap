@@ -35,8 +35,11 @@ class TestModel : public QObject
     Q_OBJECT
 
 private Q_SLOTS:
+    void testNoOp();
     void testIndices();
     void testBasicModel();
+    void testMoveMarkers1();
+    void testMoveMarkers2();
     void testIteratorWholeWorld();
     void testIteratorPartial1();
     void testIteratorPartial2();

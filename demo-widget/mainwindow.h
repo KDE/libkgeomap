@@ -46,6 +46,7 @@ protected:
 private Q_SLOTS:
     void slotFutureResultsReadyAt(int startIndex, int endIndex);
     void slotImageLoadingBunchReady();
+    void slotGroupableMarkersMoved(const QList<int>& markerIndices);
 
 private:
     MainWindowPrivate* const d;
