@@ -43,6 +43,7 @@
 #include "map-backend.h"
 #include "backend-marble.h"
 #include "backend-googlemaps.h"
+#include "backend-osm.h"
 #include "markermodel.h"
 
 namespace WMW2 {
@@ -105,6 +106,7 @@ WorldMapWidget2::WorldMapWidget2(QWidget* const parent)
 
     d->loadedBackends.append(new BackendGoogleMaps(s, this));
     d->loadedBackends.append(new BackendMarble(s, this));
+    d->loadedBackends.append(new BackendOSM(s, this));
 }
 
 WorldMapWidget2::~WorldMapWidget2()

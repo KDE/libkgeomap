@@ -181,16 +181,19 @@ MainWindow::MainWindow(KCmdLineArgs* const cmdLineArgs, QWidget* const parent)
     // Sagrada Familia in Spain
     markerList<<WMWMarker(WMWGeoCoordinate::fromGeoUrl("geo:41.4036480511,2.1743756533,46"));
 
-    for (int i=0; i<markerList.count(); ++i)
+    if (cmdLineArgs->isSet("demopoints_single")||cmdLineArgs->isSet("demopoints_group"))
     {
-        markerList[i].setDraggable(true);
+        for (int i=0; i<markerList.count(); ++i)
+        {
+            markerList[i].setDraggable(true);
 
-        QTreeWidgetItem* const treeItem = new QTreeWidgetItem();
-        treeItem->setText(0, QString("item %1").arg(i));
-        treeItem->setText(1, markerList.at(i).coordinates.geoUrl());
+            QTreeWidgetItem* const treeItem = new QTreeWidgetItem();
+            treeItem->setText(0, QString("item %1").arg(i));
+            treeItem->setText(1, markerList.at(i).coordinates.geoUrl());
 
-        d->treeWidget->addTopLevelItem(treeItem);
-        markerList[i].data.setValue(treeItem);
+            d->treeWidget->addTopLevelItem(treeItem);
+            markerList[i].data.setValue(treeItem);
+        }
     }
 
     if (cmdLineArgs->isSet("demopoints_single"))

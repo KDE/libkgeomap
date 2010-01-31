@@ -40,6 +40,7 @@ INCLUDE_DIRECTORIES(
     ${CMAKE_CURRENT_SOURCE_DIR}/worldmapwidget2
     ${CMAKE_CURRENT_SOURCE_DIR}/backend-marble
     ${CMAKE_CURRENT_SOURCE_DIR}/backend-googlemaps
+    ${CMAKE_CURRENT_SOURCE_DIR}/backend-osm
 )
 
 SET( widget_sources
@@ -58,7 +59,11 @@ SET( backend_googlemaps_sources
     backend-googlemaps/backend-googlemaps.cpp
 )
 
-KDE4_ADD_LIBRARY( worldmapwidget2library STATIC ${widget_sources} ${backend_marble_sources} ${backend_googlemaps_sources})
+SET( backend_osm_sources
+    backend-osm/backend-osm.cpp
+)
+
+KDE4_ADD_LIBRARY( worldmapwidget2library STATIC ${widget_sources} ${backend_marble_sources} ${backend_googlemaps_sources} ${backend_osm_sources})
 SET( worldmapwidget2library_libs
     ${KDE4_UI_LIBS} ${KDE4_KPARTS_LIBS} ${LIBMARBLEWIDGET_LIBRARY} ${KDE4_KHTML_LIBS}
 )

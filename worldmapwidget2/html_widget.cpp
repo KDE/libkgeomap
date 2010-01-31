@@ -159,7 +159,7 @@ QVariant HTMLWidget::runScript(const QString& scriptCode)
     if (!d->isReady)
         return QVariant();
 
-//     kDebug()<<scriptCode;
+    kDebug()<<scriptCode;
     return executeScript(scriptCode);
 }
 
