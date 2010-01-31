@@ -32,7 +32,7 @@
 // local includes
 
 #include "backend-googlemaps.h"
-#include "bgm_widget.h"
+#include "html_widget.h"
 #include "worldmapwidget2.h"
 #include "markermodel.h"
 
@@ -42,8 +42,8 @@ class BackendGoogleMapsPrivate
 {
 public:
     BackendGoogleMapsPrivate()
-    : bgmWidget(0),
-      bgmWidgetWrapper(0),
+    : htmlWidget(0),
+      htmlWidgetWrapper(0),
       isReady(false),
       mapTypeActionGroup(0),
       floatItemsActionGroup(0),
@@ -60,8 +60,8 @@ public:
     {
     }
 
-    QPointer<BGMWidget> bgmWidget;
-    QPointer<QWidget> bgmWidgetWrapper;
+    QPointer<HTMLWidget> htmlWidget;
+    QPointer<QWidget> htmlWidgetWrapper;
     bool isReady;
     QPointer<QActionGroup> mapTypeActionGroup;
     QPointer<QActionGroup> floatItemsActionGroup;
@@ -81,24 +81,232 @@ public:
 BackendGoogleMaps::BackendGoogleMaps(WMWSharedData* const sharedData, QObject* const parent)
 : MapBackend(sharedData, parent), d(new BackendGoogleMapsPrivate())
 {
-    d->bgmWidgetWrapper = new QWidget();
-    d->bgmWidgetWrapper->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    d->bgmWidget = new BGMWidget(d->bgmWidgetWrapper);
-    d->bgmWidgetWrapper->resize(400,400);
+    d->htmlWidgetWrapper = new QWidget();
+    d->htmlWidgetWrapper->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    d->htmlWidget = new HTMLWidget(d->htmlWidgetWrapper);
+    d->htmlWidgetWrapper->resize(400,400);
 
-    connect(d->bgmWidget, SIGNAL(completed()),
+    connect(d->htmlWidget, SIGNAL(completed()),
             this, SLOT(slotHTMLInitialized()));
 
-    connect(d->bgmWidget, SIGNAL(signalHTMLEvents(const QStringList&)),
+    connect(d->htmlWidget, SIGNAL(signalHTMLEvents(const QStringList&)),
             this, SLOT(slotHTMLEvents(const QStringList&)));
 
-    d->bgmWidget->loadInitialHTML();
+    loadInitialHTML();
+}
+
+void BackendGoogleMaps::loadInitialHTML()
+{
+        QString mapHTMLCode =
+"<html>\n"
+"<head>\n"
+"<script type=\"text/javascript\" src=\"http://maps.google.com/maps/api/js?sensor=false\"></script>\n"
+"<script type=\"text/javascript\">\n"
+"   var mapDiv;\n"
+"   var map;\n"
+"   var eventBuffer = new Array();\n"
+"   var markerList = new Object();\n"
+"   var clusterList = new Object();\n"
+// ProjectionHelp: http://taapps-javalibs.blogspot.com/2009/10/google-map-v3how-to-use-overlayviews.html
+"   function ProjectionHelper(overlayMap) {\n"
+"       google.maps.OverlayView.call(this);\n"
+"       this.setMap(overlayMap);\n"
+"   }\n"
+"   ProjectionHelper.prototype = new google.maps.OverlayView();\n"
+"   ProjectionHelper.prototype.draw = function() {\n"
+"       \n"
+"   }\n"
+"   var projectionHelper = null;\n"
+"   function wmwPostEventString(eventString) {\n"
+"       eventBuffer.push(eventString);\n"
+"       window.status = '(event)';\n"
+"   }\n"
+"   function wmwReadEventStrings() {\n"
+"       var eventBufferString = eventBuffer.join('|');\n"
+"       eventBuffer = new Array();\n"
+// let the application know that there are no more events waiting:
+"       window.status = '()';\n"
+"       return eventBufferString;\n"
+"   }\n"
+"   function wmwDebugOut(someString) {\n"
+"       wmwPostEventString('do'+someString);\n"
+"   }\n"
+"   function wmwSetZoom(zoomvalue) {\n"
+"       map.setZoom(zoomvalue);\n"
+"   }\n"
+"   function wmwGetZoom() {\n"
+"       return map.getZoom();\n"
+"   }\n"
+"   function wmwZoomIn() {\n"
+"       map.setZoom(map.getZoom()+1);\n"
+"   }\n"
+"   function wmwZoomOut() {\n"
+"       map.setZoom(map.getZoom()-1);\n"
+"   }\n"
+"   function wmwSetCenter(lat, lon) {\n"
+"       var latlng = new google.maps.LatLng(lat, lon);\n"
+"       map.setCenter(latlng);\n"
+"   }\n"
+"   function wmwGetCenter() {\n"
+"       var latlngString = map.getCenter().toUrlValue(12);\n"
+"       return latlngString;\n"
+"   }\n"
+"   function wmwLatLngToPixel(lat, lon) {\n"
+//      There is an offset in fromLatLngToDivPixel once the map has been panned
+"       var latlng = new google.maps.LatLng(lat, lon);\n"
+"       var myPoint = projectionHelper.getProjection().fromLatLngToDivPixel(latlng);\n"
+"       var centerPoint = projectionHelper.getProjection().fromLatLngToDivPixel(map.getCenter());\n"
+"       var centerOffsetX = Math.floor(mapDiv.offsetWidth / 2);\n"
+"       var centerOffsetY = Math.floor(mapDiv.offsetHeight / 2);\n"
+"       var pointX = myPoint.x-centerPoint.x+centerOffsetX;\n"
+"       var pointY = myPoint.y-centerPoint.y+centerOffsetY;\n"
+"       return new google.maps.Point(pointX, pointY).toString();\n"
+// "       return projectionHelper.getProjection().fromLatLngToDivPixel(latlng).toString();\n"
+"   }\n"
+"   function wmwPixelToLatLng(x, y) {\n"
+//      There is an offset in fromDivPixelToLatLng once the map has been panned
+"       var centerPoint = projectionHelper.getProjection().fromLatLngToDivPixel(map.getCenter());\n"
+"       var centerOffsetX = mapDiv.offsetWidth / 2;\n"
+"       var centerOffsetY = mapDiv.offsetHeight / 2;\n"
+"       var pointX = x+centerPoint.x-centerOffsetX;\n"
+"       var pointY = y+centerPoint.y-centerOffsetY;\n"
+"       var point = new google.maps.Point(pointX, pointY); \n"
+"       return projectionHelper.getProjection().fromDivPixelToLatLng(point).toUrlValue(12);\n"
+"   }\n"
+    // parameter: "SATELLITE"/"ROADMAP"/"HYBRID"/"TERRAIN"
+"   function wmwSetMapType(newMapType) {\n"
+"       if (newMapType == \"SATELLITE\") { map.setMapTypeId(google.maps.MapTypeId.SATELLITE); }\n"
+"       if (newMapType == \"ROADMAP\")   { map.setMapTypeId(google.maps.MapTypeId.ROADMAP); }\n"
+"       if (newMapType == \"HYBRID\")    { map.setMapTypeId(google.maps.MapTypeId.HYBRID); }\n"
+"       if (newMapType == \"TERRAIN\")   { map.setMapTypeId(google.maps.MapTypeId.TERRAIN); }\n"
+"   }\n"
+"   function wmwGetMapType() {\n"
+"       var myMapType = map.getMapTypeId();\n"
+"       if (myMapType == google.maps.MapTypeId.SATELLITE) { return \"SATELLITE\"; }\n"
+"       if (myMapType == google.maps.MapTypeId.ROADMAP )  { return \"ROADMAP\"; }\n"
+"       if (myMapType == google.maps.MapTypeId.HYBRID )   { return \"HYBRID\"; }\n"
+"       if (myMapType == google.maps.MapTypeId.TERRAIN )  { return \"TERRAIN\"; }\n"
+"       return "";\n" // unexpected result
+"   }\n"
+"   function wmwSetShowMapTypeControl(state) {\n"
+"       var myOptions = {\n"
+"           mapTypeControl: state\n"
+"       }\n"
+"       map.setOptions(myOptions);\n"
+"   }\n"
+"   function wmwSetShowNavigationControl(state) {\n"
+"       var myOptions = {\n"
+"           navigationControl: state\n"
+"       }\n"
+"       map.setOptions(myOptions);\n"
+"   }\n"
+"   function wmwSetShowScaleControl(state) {\n"
+"       var myOptions = {\n"
+"           scaleControl: state\n"
+"       }\n"
+"       map.setOptions(myOptions);\n"
+"   }\n"
+"   function wmwClearMarkers() {\n"
+"       for (var i in markerList) {\n"
+"           markerList[i].setMap(null);\n"
+"       }\n"
+"       markerList = new Object();\n"
+"   }\n"
+"   function wmwAddMarker(id, lat, lon, setDraggable) {\n"
+"       var latlng = new google.maps.LatLng(lat, lon);\n"
+"       var marker = new google.maps.Marker({\n"
+"           position: latlng,\n"
+"           map: map,\n"
+"           draggable: setDraggable\n"
+"       });\n"
+"       google.maps.event.addListener(marker, 'dragend', function() {\n"
+"           wmwPostEventString('mm'+id.toString());\n"
+"       });\n"
+"       markerList[id] = marker;\n"
+"   }\n"
+"   function wmwGetMarkerPosition(id) {\n"
+"       var latlngString;\n"
+"       if (markerList[id.toString()]) {\n"
+"           latlngString = markerList[id.toString()].getPosition().toUrlValue(12);\n"
+"       }\n"
+"       return latlngString;\n"
+"   }\n"
+"   function wmwClearClusters() {\n"
+"       for (var i in clusterList) {\n"
+"           clusterList[i].setMap(null);\n"
+"       }\n"
+"       clusterList = new Object();\n"
+"   }\n"
+"   function wmwAddCluster(id, lat, lon, setDraggable) {\n"
+"       var latlng = new google.maps.LatLng(lat, lon);\n"
+"       var marker = new google.maps.Marker({\n"
+"           position: latlng,\n"
+"           map: map,\n"
+"           draggable: setDraggable\n"
+"       });\n"
+"       google.maps.event.addListener(marker, 'dragend', function() {\n"
+"           wmwPostEventString('cm'+id.toString());\n"
+"       });\n"
+"       clusterList[id] = marker;\n"
+"   }\n"
+"   function wmwGetClusterPosition(id) {\n"
+"       var latlngString;\n"
+"       if (clusterList[id.toString()]) {\n"
+"           latlngString = clusterList[id.toString()].getPosition().toUrlValue(12);\n"
+"       }\n"
+"       return latlngString;\n"
+"   }\n"
+"   function wmwWidgetResized(newWidth, newHeight) {\n"
+"       document.getElementById('map_canvas').style.height=newHeight.toString()+'px';\n"
+"   }\n"
+"   function initialize() {\n"
+"       var latlng = new google.maps.LatLng(%1, %2);\n"
+"       var myOptions = {\n"
+"           zoom: 8,\n"
+"           center: latlng,\n"
+"           mapTypeId: google.maps.MapTypeId.%3\n"
+"       };\n"
+"       mapDiv = document.getElementById(\"map_canvas\");\n"
+// "       mapDiv.style.height=\"100%\"\n";
+"       map = new google.maps.Map(mapDiv, myOptions);\n"
+"       google.maps.event.addListener(map, 'maptypeid_changed', function() {\n"
+"           wmwPostEventString('MT'+wmwGetMapType());\n"
+"       });\n"
+//  these are too heavy on the performance. monitor 'idle' event only for now:
+// "       google.maps.event.addListener(map, 'bounds_changed', function() {\n"
+// "           wmwPostEventString('MB');\n"
+// "       });\n"
+// "       google.maps.event.addListener(map, 'zoom_changed', function() {\n"
+// "           wmwPostEventString('ZC');\n"
+// "       });\n"
+"       google.maps.event.addListener(map, 'idle', function() {\n"
+"           wmwPostEventString('id');\n"
+"       });\n"
+// source: http://taapps-javalibs.blogspot.com/2009/10/google-map-v3how-to-use-overlayviews.html
+"       projectionHelper = new ProjectionHelper(map);\n"
+"   }\n"
+"</script>\n"
+"</head>\n"
+"<body onload=\"initialize()\" style=\"padding: 0px; margin: 0px;\">\n"
+// "   <div id=\"map_canvas\" style=\"width:400px; height:400px; border: 1px solid black;\"></div>\n"
+"   <div id=\"map_canvas\" style=\"width:100%; height:400px;\"></div>\n"
+// "<div style=\"display: block;\" id=\"mydiv\">aoeu</div>\n"
+"</body>\n"
+"</html>\n";
+
+    const WMWGeoCoordinate initialCenter = WMWGeoCoordinate(52.0, 6.0);
+    const QString initialMapType = "ROADMAP";
+    mapHTMLCode = mapHTMLCode.arg(initialCenter.latString())
+                             .arg(initialCenter.lonString())
+                             .arg(initialMapType);
+
+    d->htmlWidget->loadInitialHTML(mapHTMLCode);
 }
 
 BackendGoogleMaps::~BackendGoogleMaps()
 {
-    if (d->bgmWidgetWrapper)
-        delete d->bgmWidgetWrapper;
+    if (d->htmlWidgetWrapper)
+        delete d->htmlWidgetWrapper;
     
     delete d;
 }
@@ -115,7 +323,7 @@ QString BackendGoogleMaps::backendHumanName() const
 
 QWidget* BackendGoogleMaps::mapWidget() const
 {
-    return d->bgmWidgetWrapper.data();
+    return d->htmlWidgetWrapper.data();
 }
 
 bool BackendGoogleMaps::googleVariantToCoordinates(const QVariant& googleVariant, WMWGeoCoordinate* const coordinates) const
@@ -198,7 +406,7 @@ void BackendGoogleMaps::setCenter(const WMWGeoCoordinate& coordinate)
 
     if (isReady())
     {
-        d->bgmWidget->runScript(QString("wmwSetCenter(%1, %2);").arg(d->cacheCenter.latString()).arg(d->cacheCenter.lonString()));
+        d->htmlWidget->runScript(QString("wmwSetCenter(%1, %2);").arg(d->cacheCenter.latString()).arg(d->cacheCenter.lonString()));
     }
 }
 
@@ -211,7 +419,7 @@ void BackendGoogleMaps::slotHTMLInitialized()
 {
     kDebug()<<1;
     d->isReady = true;
-    d->bgmWidget->runScript(QString("document.getElementById(\"map_canvas\").style.height=\"%1px\"").arg(d->bgmWidgetWrapper->height()));
+    d->htmlWidget->runScript(QString("document.getElementById(\"map_canvas\").style.height=\"%1px\"").arg(d->htmlWidgetWrapper->height()));
 
     // TODO: call javascript directly here and update action availability in one shot
     setMapType(d->cacheMapType);
@@ -219,7 +427,7 @@ void BackendGoogleMaps::slotHTMLInitialized()
     setShowNavigationControl(d->cacheShowNavigationControl);
     setShowScaleControl(d->cacheShowNavigationControl);
     setCenter(d->cacheCenter);
-    d->bgmWidget->runScript(QString("wmwSetZoom(%1);").arg(d->cacheZoom));
+    d->htmlWidget->runScript(QString("wmwSetZoom(%1);").arg(d->cacheZoom));
     emit(signalBackendReady(backendName()));
 }
 
@@ -228,7 +436,7 @@ void BackendGoogleMaps::zoomIn()
     if (!d->isReady)
         return;
     
-    d->bgmWidget->runScript(QString("wmwZoomIn();"));
+    d->htmlWidget->runScript(QString("wmwZoomIn();"));
 }
 
 void BackendGoogleMaps::zoomOut()
@@ -236,7 +444,7 @@ void BackendGoogleMaps::zoomOut()
     if (!d->isReady)
         return;
 
-    d->bgmWidget->runScript(QString("wmwZoomOut();"));
+    d->htmlWidget->runScript(QString("wmwZoomOut();"));
 }
 
 QString BackendGoogleMaps::getMapType() const
@@ -251,7 +459,7 @@ void BackendGoogleMaps::setMapType(const QString& newMapType)
 
     if (isReady())
     {
-        d->bgmWidget->runScript(QString("wmwSetMapType(\"%1\");").arg(newMapType));
+        d->htmlWidget->runScript(QString("wmwSetMapType(\"%1\");").arg(newMapType));
         updateActionsEnabled();
     }
 }
@@ -384,13 +592,13 @@ void BackendGoogleMaps::updateMarkers()
         return;
     
     // re-transfer all markers to the javascript-part:
-    d->bgmWidget->runScript(QString("wmwClearMarkers();"));
+    d->htmlWidget->runScript(QString("wmwClearMarkers();"));
     for (QIntList::const_iterator it = s->visibleMarkers.constBegin(); it!=s->visibleMarkers.constEnd(); ++it)
     {
         const int currentIndex = *it;
         const WMWMarker& currentMarker = s->markerList.at(currentIndex);
 
-        d->bgmWidget->runScript(QString("wmwAddMarker(%1, %2, %3, %4);")
+        d->htmlWidget->runScript(QString("wmwAddMarker(%1, %2, %3, %4);")
                 .arg(currentIndex)
                 .arg(currentMarker.coordinates.latString())
                 .arg(currentMarker.coordinates.lonString())
@@ -456,7 +664,7 @@ void BackendGoogleMaps::slotHTMLEvents(const QStringList& events)
             // re-read the marker position:
             WMWGeoCoordinate clusterCoordinates;
             const bool isValid = googleVariantToCoordinates(
-                d->bgmWidget->runScript(QString("wmwGetClusterPosition(%1);").arg(clusterIndex)),
+                d->htmlWidget->runScript(QString("wmwGetClusterPosition(%1);").arg(clusterIndex)),
                                                             &clusterCoordinates);
 
             if (!isValid)
@@ -482,7 +690,7 @@ void BackendGoogleMaps::slotHTMLEvents(const QStringList& events)
             // re-read the marker position:
             WMWGeoCoordinate markerCoordinates;
             const bool isValid = googleVariantToCoordinates(
-                d->bgmWidget->runScript(QString("wmwGetMarkerPosition(%1);").arg(markerIndex)),
+                d->htmlWidget->runScript(QString("wmwGetMarkerPosition(%1);").arg(markerIndex)),
                                                             &markerCoordinates);
 
             if (!isValid)
@@ -515,13 +723,13 @@ void BackendGoogleMaps::slotHTMLEvents(const QStringList& events)
     // now process the buffered events:
     if (zoomProbablyChanged)
     {
-        d->cacheZoom = d->bgmWidget->runScript(QString("wmwGetZoom();")).toInt();
+        d->cacheZoom = d->htmlWidget->runScript(QString("wmwGetZoom();")).toInt();
         emit(signalZoomChanged(QString("googlemaps:%1").arg(d->cacheZoom)));
     }
     if (centerProbablyChanged)
     {
         // there is nothing we can do if the coordinates are invalid
-        /*const bool isValid = */googleVariantToCoordinates(d->bgmWidget->runScript("wmwGetCenter();"), &(d->cacheCenter));
+        /*const bool isValid = */googleVariantToCoordinates(d->htmlWidget->runScript("wmwGetCenter();"), &(d->cacheCenter));
     }
 
     // update the actions if necessary:
@@ -534,7 +742,7 @@ void BackendGoogleMaps::slotHTMLEvents(const QStringList& events)
     {
         kDebug()<<"getbounds";
         // TODO: parse this better!!!
-        const QString mapBoundsString = d->bgmWidget->runScript("map.getBounds().toString();").toString();
+        const QString mapBoundsString = d->htmlWidget->runScript("map.getBounds().toString();").toString();
 //         kDebug()<<mapBoundsString;
         const QString string1 = mapBoundsString.mid(1, mapBoundsString.length()-2);
         int dumpComma = string1.indexOf(",", 0);
@@ -567,12 +775,12 @@ void BackendGoogleMaps::updateClusters()
     // TODO: only update clusters that have actually changed!
 
     // re-transfer all markers to the javascript-part:
-    d->bgmWidget->runScript(QString("wmwClearClusters();"));
+    d->htmlWidget->runScript(QString("wmwClearClusters();"));
     for (int currentIndex = 0; currentIndex<s->clusterList.size(); ++currentIndex)
     {
         const WMWCluster& currentCluster = s->clusterList.at(currentIndex);
 
-        d->bgmWidget->runScript(QString("wmwAddCluster(%1, %2, %3, %4);")
+        d->htmlWidget->runScript(QString("wmwAddCluster(%1, %2, %3, %4);")
                 .arg(currentIndex)
                 .arg(currentCluster.coordinates.latString())
                 .arg(currentCluster.coordinates.lonString())
@@ -587,7 +795,7 @@ bool BackendGoogleMaps::screenCoordinates(const WMWGeoCoordinate& coordinates, Q
     if (!d->isReady)
         return false;
 
-    const bool isValid = googleVariantToPoint(d->bgmWidget->runScript(
+    const bool isValid = googleVariantToPoint(d->htmlWidget->runScript(
             QString("wmwLatLngToPixel(%1, %2);")
                 .arg(coordinates.latString())
                 .arg(coordinates.lonString())
@@ -604,7 +812,7 @@ bool BackendGoogleMaps::geoCoordinates(const QPoint& point, WMWGeoCoordinate* co
     if (!d->isReady)
         return false;
 
-    const QVariant coordinatesVariant = d->bgmWidget->runScript(
+    const QVariant coordinatesVariant = d->htmlWidget->runScript(
             QString("wmwPixelToLatLng(%1, %2);")
                 .arg(point.x())
                 .arg(point.y()));
@@ -615,9 +823,9 @@ bool BackendGoogleMaps::geoCoordinates(const QPoint& point, WMWGeoCoordinate* co
 
 QSize BackendGoogleMaps::mapSize() const
 {
-    WMW2_ASSERT(d->bgmWidgetWrapper!=0);
+    WMW2_ASSERT(d->htmlWidgetWrapper!=0);
 
-    return d->bgmWidgetWrapper->size();
+    return d->htmlWidgetWrapper->size();
 }
 
 void BackendGoogleMaps::slotFloatSettingsTriggered(QAction* action)
@@ -649,7 +857,7 @@ void BackendGoogleMaps::setShowScaleControl(const bool state)
     if (!isReady())
         return;
 
-    d->bgmWidget->runScript(QString("wmwSetShowScaleControl(%1);").arg(state?"true":"false"));
+    d->htmlWidget->runScript(QString("wmwSetShowScaleControl(%1);").arg(state?"true":"false"));
 }
 
 void BackendGoogleMaps::setShowNavigationControl(const bool state)
@@ -662,7 +870,7 @@ void BackendGoogleMaps::setShowNavigationControl(const bool state)
     if (!isReady())
         return;
 
-    d->bgmWidget->runScript(QString("wmwSetShowNavigationControl(%1);").arg(state?"true":"false"));
+    d->htmlWidget->runScript(QString("wmwSetShowNavigationControl(%1);").arg(state?"true":"false"));
 }
 
 void BackendGoogleMaps::setShowMapTypeControl(const bool state)
@@ -675,7 +883,7 @@ void BackendGoogleMaps::setShowMapTypeControl(const bool state)
     if (!isReady())
         return;
 
-    d->bgmWidget->runScript(QString("wmwSetShowMapTypeControl(%1);").arg(state?"true":"false"));
+    d->htmlWidget->runScript(QString("wmwSetShowMapTypeControl(%1);").arg(state?"true":"false"));
 }
 
 void BackendGoogleMaps::slotClustersNeedUpdating()
@@ -695,7 +903,7 @@ void BackendGoogleMaps::setZoom(const QString& newZoom)
 
     if (isReady())
     {
-        d->bgmWidget->runScript(QString("wmwSetZoom(%1);").arg(d->cacheZoom));
+        d->htmlWidget->runScript(QString("wmwSetZoom(%1);").arg(d->cacheZoom));
     }
 }
 

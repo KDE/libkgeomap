@@ -86,6 +86,7 @@ private:
     BackendGoogleMapsPrivate* const d;
     bool googleVariantToCoordinates(const QVariant& googleVariant, WMWGeoCoordinate* const coordinates) const;
     bool googleVariantToPoint(const QVariant& googleVariant, QPoint* const point) const;
+    void loadInitialHTML();
 };
 
 } /* WMW2 */

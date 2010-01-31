@@ -1,7 +1,7 @@
 /* ============================================================
  *
  * Date        : 2009-12-01
- * Description : Google-Maps-backend for WorldMapWidget2
+ * Description : Widget for displaying HTML in the backends
  *
  * Copyright (C) 2009,2010 by Michael G. Hansen <mike at mghansen dot de>
  *
@@ -17,8 +17,8 @@
  *
  * ============================================================ */
 
-#ifndef BGM_WIDGET_H
-#define BGM_WIDGET_H
+#ifndef HTML_WIDGET_H
+#define HTML_WIDGET_H
 
 // KDE includes
 
@@ -30,17 +30,17 @@
 
 namespace WMW2 {
 
-class BGMWidgetPrivate;
+class HTMLWidgetPrivate;
 
-class BGMWidget : public KHTMLPart
+class HTMLWidget : public KHTMLPart
 {
 Q_OBJECT
 
 public:
-    BGMWidget(QWidget* const parent = 0);
-    ~BGMWidget();
+    HTMLWidget(QWidget* const parent = 0);
+    ~HTMLWidget();
 
-    void loadInitialHTML(const WMWGeoCoordinate& initialCenter = WMWGeoCoordinate(52.0, 6.0), const QString& initialMapType = "ROADMAP");
+    void loadInitialHTML(const QString& initialHTML);
     QVariant runScript(const QString& scriptCode);
 
 protected:
@@ -57,11 +57,11 @@ Q_SIGNALS:
     void signalHTMLEvents(const QStringList& events);
 
 private:
-    BGMWidgetPrivate* const d;
+    HTMLWidgetPrivate* const d;
 };
 
 
 } /* WMW2 */
 
-#endif /* BGM_WIDGET_H */
+#endif /* HTML_WIDGET_H */
 

@@ -45,6 +45,7 @@ INCLUDE_DIRECTORIES(
 SET( widget_sources
     worldmapwidget2/worldmapwidget2.cpp
     worldmapwidget2/map-backend.cpp
+    worldmapwidget2/html_widget.cpp
     worldmapwidget2/markermodel.cpp
 )
 
@@ -55,7 +56,6 @@ SET( backend_marble_sources
 
 SET( backend_googlemaps_sources
     backend-googlemaps/backend-googlemaps.cpp
-    backend-googlemaps/bgm_widget.cpp
 )
 
 KDE4_ADD_LIBRARY( worldmapwidget2library STATIC ${widget_sources} ${backend_marble_sources} ${backend_googlemaps_sources})
