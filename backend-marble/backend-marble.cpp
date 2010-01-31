@@ -20,6 +20,7 @@
 // Qt includes
 
 #include <QMenu>
+#include <QMouseEvent>
 #include <QPointer>
 
 // KDE includes
@@ -59,7 +60,11 @@ public:
       cacheShowCompass(false),
       cacheShowScaleBar(false),
       cacheShowOverviewMap(false),
-      cacheZoom(900)
+      cacheZoom(900),
+      mouseMoveClusterIndex(-1),
+      mouseMoveMarkerIndex(-1),
+      mouseMoveObjectCoordinates(),
+      mouseMoveCenterOffset(0,0)
     {
     }
 
@@ -78,12 +83,18 @@ public:
     bool cacheShowScaleBar;
     bool cacheShowOverviewMap;
     int cacheZoom;
+    int mouseMoveClusterIndex;
+    int mouseMoveMarkerIndex;
+    WMWGeoCoordinate mouseMoveObjectCoordinates;
+    QPoint mouseMoveCenterOffset;
 };
 
 BackendMarble::BackendMarble(WMWSharedData* const sharedData, QObject* const parent)
 : MapBackend(sharedData, parent), d(new BackendMarblePrivate())
 {
     d->marbleWidget = new BMWidget(this);
+
+    d->marbleWidget->installEventFilter(this);
 
     connect(d->marbleWidget, SIGNAL(zoomChanged(int)),
             this, SLOT(slotMarbleZoomChanged(int)));
@@ -367,6 +378,11 @@ bool BackendMarble::geoCoordinates(const QPoint& point, WMWGeoCoordinate* const 
     if (!d->marbleWidget)
         return false;
 
+    // apparently, MarbleWidget::geoCoordinates can return true even if the object is not on the screen
+    // check that the point is in the visible range:
+    if (!d->marbleWidget->rect().contains(point))
+        return false;
+
     qreal lat, lon;
     const bool isVisible = d->marbleWidget->geoCoordinates(point.x(), point.y(), lon, lat, GeoDataCoordinates::Degree);
     if (!isVisible)
@@ -394,8 +410,16 @@ void BackendMarble::marbleCustomPaint(Marble::GeoPainter* painter)
     {
         const int currentIndex = *it;
         const WMWMarker* const currentMarker = &(s->markerList.at(currentIndex));
+
+        WMWGeoCoordinate markerCoordinates = currentMarker->coordinates;
+        // is the marker being moved right now?
+        if (currentIndex == d->mouseMoveMarkerIndex)
+        {
+            markerCoordinates = d->mouseMoveObjectCoordinates;
+        }
+
         QPoint markerPoint;
-        if (!screenCoordinates(currentMarker->coordinates, &markerPoint))
+        if (!screenCoordinates(markerCoordinates, &markerPoint))
             continue;
 
         painter->setPen(circlePen);
@@ -624,6 +648,98 @@ QList<QPair<WMWGeoCoordinate, WMWGeoCoordinate> > BackendMarble::getNormalizedBo
         boundsList << QPair<WMWGeoCoordinate, WMWGeoCoordinate>(WMWGeoCoordinate(bSouth, bWest), WMWGeoCoordinate(bNorth, bEast));
     }
     return boundsList;
+}
+
+bool BackendMarble::eventFilter(QObject *object, QEvent *event)
+{
+    if (object!=d->marbleWidget)
+    {
+        // event not filtered
+        return QObject::eventFilter(object, event);
+    }
+
+    // we only handle mouse events:
+    if (   (event->type() != QEvent::MouseButtonPress)
+        && (event->type() != QEvent::MouseMove)
+        && (event->type() != QEvent::MouseButtonRelease) )
+    {
+        return false;
+    }
+
+    QMouseEvent* const mouseEvent = static_cast<QMouseEvent*>(event);
+    bool doFilterEvent = false;
+
+    if (   ( event->type() == QEvent::MouseButtonPress )
+        && ( mouseEvent->button()==Qt::LeftButton ) )
+    {
+        // check whether the user clicked on one of our items:
+        // scan in reverse order, because the user would expect
+        // the topmost marker to be picked up and not the
+        // one below
+        for (int i=s->markerList.count()-1; i>=0; --i)
+        {
+            const WMWMarker& myMarker = s->markerList.at(i);
+
+            QPoint markerPoint;
+            if (!screenCoordinates(myMarker.coordinates, &markerPoint))
+            {
+                continue;
+            }
+
+            // TODO: use the real size of the cluster here!
+            const QPoint markerDimensions(15, 15);
+            const QRect markerRect(markerPoint-markerDimensions, markerPoint+markerDimensions);
+            if (!markerRect.contains(mouseEvent->pos()))
+            {
+                continue;
+            }
+
+            // the user clicked on a cluster:
+            d->mouseMoveMarkerIndex = i;
+            d->mouseMoveCenterOffset = mouseEvent->pos() - markerPoint;
+            d->mouseMoveObjectCoordinates = myMarker.coordinates;
+            doFilterEvent = true;
+
+            break;
+        }
+    }
+    else if (   (event->type() == QEvent::MouseMove)
+             && (d->mouseMoveMarkerIndex>=0) )
+    {
+        // a marker is being moved. update its position:
+        const QPoint newMarkerPoint = mouseEvent->pos() - d->mouseMoveCenterOffset;
+
+        WMWGeoCoordinate newCoordinates;
+        if (geoCoordinates(newMarkerPoint, &newCoordinates))
+        {
+            d->mouseMoveObjectCoordinates = newCoordinates;
+            d->marbleWidget->update();
+        }
+    }
+    else if (   (event->type() == QEvent::MouseButtonRelease)
+             && (d->mouseMoveMarkerIndex>=0) )
+    {
+        // the marker was dropped, apply the coordinates if it is on screen:
+        const QPoint newMarkerPoint = mouseEvent->pos() - d->mouseMoveCenterOffset;
+
+        WMWGeoCoordinate newCoordinates;
+        if (geoCoordinates(newMarkerPoint, &newCoordinates))
+        {
+            // the marker was dropped to valid coordinates
+            s->markerList[d->mouseMoveMarkerIndex].coordinates = newCoordinates;
+        }
+        QIntList markerIndices;
+        markerIndices << d->mouseMoveMarkerIndex;
+        d->mouseMoveMarkerIndex = -1;
+        d->marbleWidget->update();
+
+        emit(signalMarkersMoved(markerIndices));
+    }
+
+    if (doFilterEvent)
+        return true;
+
+    return QObject::eventFilter(object, event);
 }
 
 } /* WMW2 */

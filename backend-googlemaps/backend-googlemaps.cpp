@@ -408,6 +408,7 @@ void BackendGoogleMaps::slotHTMLEvents(const QStringList& events)
     bool zoomProbablyChanged = false;
     bool mapBoundsProbablyChanged = false;
     QIntList movedClusters;
+    QIntList movedMarkers;
     for (QStringList::const_iterator it = events.constBegin(); it!=events.constEnd(); ++it)
     {
         const QString eventCode = it->left(2);
@@ -466,6 +467,32 @@ void BackendGoogleMaps::slotHTMLEvents(const QStringList& events)
 
             movedClusters << clusterIndex;
         }
+        else if (eventCode=="mm")
+        {
+            // TODO: buffer this event type!
+            // marker moved
+            bool okay = false;
+            const int markerIndex= eventParameter.toInt(&okay);
+            if (!okay)
+                continue;
+
+            if ((markerIndex<0)||(markerIndex>s->markerList.count()))
+                continue;
+
+            // re-read the marker position:
+            WMWGeoCoordinate markerCoordinates;
+            const bool isValid = googleVariantToCoordinates(
+                d->bgmWidget->runScript(QString("wmwGetMarkerPosition(%1);").arg(markerIndex)),
+                                                            &markerCoordinates);
+
+            if (!isValid)
+                continue;
+
+            // TODO: this discards the altitude!
+            s->markerList[markerIndex].coordinates = markerCoordinates;
+
+            movedMarkers << markerIndex;
+        }
         else if (eventCode=="do")
         {
             // debug output:
@@ -477,6 +504,12 @@ void BackendGoogleMaps::slotHTMLEvents(const QStringList& events)
     {
         kDebug()<<movedClusters;
         emit(signalClustersMoved(movedClusters));
+    }
+
+    if (!movedMarkers.isEmpty())
+    {
+        kDebug()<<movedMarkers;
+        emit(signalMarkersMoved(movedMarkers));
     }
 
     // now process the buffered events:

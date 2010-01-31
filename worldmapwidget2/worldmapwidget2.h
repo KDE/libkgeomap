@@ -60,6 +60,7 @@ public:
 
     void addClusterableMarkers(const WMWMarker::List& markerList);
     WMWMarker getClusterableMarker(const int markerIndex);
+    WMWMarker getSingleMarker(const int markerIndex);
     void addSingleMarkers(const WMWMarker::List& markerList);
     void updateMarkers();
     void updateClusters();
@@ -76,6 +77,7 @@ public Q_SLOTS:
     void slotClustersNeedUpdating();
 
 Q_SIGNALS:
+    void signalSingleMarkersMoved(const QList<int>& markerIndices);
     void signalGroupableMarkersMoved(const QList<int>& markerIndices);
 
 protected:
@@ -88,6 +90,7 @@ protected Q_SLOTS:
     void slotChangeBackend(QAction* action);
     void slotBackendZoomChanged(const QString& newZoom);
     void slotClustersMoved(const QIntList& clusterIndices);
+    void slotMarkersMoved(const QIntList& markerIndices);
 
 private:
     WMWSharedData* const s;

@@ -152,6 +152,9 @@ bool WorldMapWidget2::setBackend(const QString& backendName)
 
         disconnect(d->currentBackend, SIGNAL(signalClustersMoved(const QIntList&)),
                 this, SLOT(slotClustersMoved(const QIntList&)));
+
+        disconnect(d->currentBackend, SIGNAL(signalMarkersMoved(const QIntList&)),
+                this, SLOT(slotMarkersMoved(const QIntList&)));
     }
 
     MapBackend* backend;
@@ -172,6 +175,9 @@ bool WorldMapWidget2::setBackend(const QString& backendName)
 
             connect(d->currentBackend, SIGNAL(signalClustersMoved(const QIntList&)),
                     this, SLOT(slotClustersMoved(const QIntList&)));
+
+            connect(d->currentBackend, SIGNAL(signalMarkersMoved(const QIntList&)),
+                    this, SLOT(slotMarkersMoved(const QIntList&)));
 
             // call this slot manually in case the backend was ready right away:
             if (d->currentBackend->isReady())
@@ -969,6 +975,17 @@ WMWMarker WorldMapWidget2::getClusterableMarker(const int markerIndex)
 {
     WMW2_ASSERT(markerIndex<s->markerModel->markerList.count());
     return s->markerModel->markerList.at(markerIndex);
+}
+
+WMWMarker WorldMapWidget2::getSingleMarker(const int markerIndex)
+{
+    WMW2_ASSERT(markerIndex<s->markerList.count());
+    return s->markerList.at(markerIndex);
+}
+
+void WorldMapWidget2::slotMarkersMoved(const QIntList& markerIndices)
+{
+    emit(signalSingleMarkersMoved(markerIndices));
 }
 
 } /* WMW2 */

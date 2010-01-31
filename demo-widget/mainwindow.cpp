@@ -35,6 +35,7 @@
 
 // KDE includes
 
+#include <KCmdLineArgs>
 #include <kconfig.h>
 #include <kconfiggroup.h>
 #include <kiconloader.h>
@@ -76,7 +77,8 @@ public:
         imageLoadingTotalCount(0),
         imageLoadingCurrentCount(0),
         imageLoadingBuncher(),
-        imageLoadingBunchTimer(0)
+        imageLoadingBunchTimer(0),
+        cmdLineArgs(0)
     {
 
     }
@@ -91,15 +93,18 @@ public:
     int imageLoadingCurrentCount;
     QList<MyImageData> imageLoadingBuncher;
     QTimer* imageLoadingBunchTimer;
+    KCmdLineArgs* cmdLineArgs;
 };
 
-MainWindow::MainWindow(QWidget* const parent)
+MainWindow::MainWindow(KCmdLineArgs* const cmdLineArgs, QWidget* const parent)
 : KMainWindow(parent), d(new MainWindowPrivate())
 {
     resize(512, 512);
     setWindowTitle(i18n("WorldMapWidget2 demo"));
     setWindowIcon(SmallIcon("applications-internet"));
     setObjectName("Demo-WorldMapWidget2");
+
+    d->cmdLineArgs = cmdLineArgs;
 
     d->imageLoadingBunchTimer = new QTimer(this);
     d->imageLoadingBunchTimer->setSingleShot(false);
@@ -116,6 +121,10 @@ MainWindow::MainWindow(QWidget* const parent)
 
     connect(d->mapWidget, SIGNAL(signalGroupableMarkersMoved(const QList<int>&)),
             this, SLOT(slotGroupableMarkersMoved(const QList<int>&)));
+
+    connect(d->mapWidget, SIGNAL(signalSingleMarkersMoved(const QList<int>&)),
+            this, SLOT(slotSingleMarkersMoved(const QList<int>&)));
+
 //     d->mapWidget->resize(d->mapWidget->width(), 200);
     d->splitter->addWidget(d->mapWidget);
     d->splitter->setCollapsible(0, false);
@@ -172,7 +181,27 @@ MainWindow::MainWindow(QWidget* const parent)
     // Sagrada Familia in Spain
     markerList<<WMWMarker(WMWGeoCoordinate::fromGeoUrl("geo:41.4036480511,2.1743756533,46"));
 
-//     d->mapWidget->addClusterableMarkers(markerList);
+    for (int i=0; i<markerList.count(); ++i)
+    {
+        markerList[i].setDraggable(true);
+
+        QTreeWidgetItem* const treeItem = new QTreeWidgetItem();
+        treeItem->setText(0, QString("item %1").arg(i));
+        treeItem->setText(1, markerList.at(i).coordinates.geoUrl());
+
+        d->treeWidget->addTopLevelItem(treeItem);
+        markerList[i].data.setValue(treeItem);
+    }
+
+    if (cmdLineArgs->isSet("demopoints_single"))
+    {
+        d->mapWidget->addSingleMarkers(markerList);
+    }
+
+    if (cmdLineArgs->isSet("demopoints_group"))
+    {
+        d->mapWidget->addClusterableMarkers(markerList);
+    }
 }
 
 MainWindow::~MainWindow()
@@ -342,7 +371,16 @@ void MainWindow::slotImageLoadingBunchReady()
 
         WMWMarker myMarker(currentInfo.coordinates);
         myMarker.data.setValue(treeItem);
-        d->mapWidget->addClusterableMarkers(WMWMarker::List()<<myMarker);
+        myMarker.setDraggable(true);
+
+        if (d->cmdLineArgs->isSet("single"))
+        {
+            d->mapWidget->addSingleMarkers(WMWMarker::List()<<myMarker);
+        }
+        else
+        {
+            d->mapWidget->addClusterableMarkers(WMWMarker::List()<<myMarker);
+        }
     }
 
     d->imageLoadingBuncher.clear();
@@ -363,5 +401,21 @@ void MainWindow::slotGroupableMarkersMoved(const QList<int>& markerIndices)
 
         treeItem->setText(1, myMarker.coordinates.geoUrl());
     }
-    
+}
+
+void MainWindow::slotSingleMarkersMoved(const QList<int>& markerIndices)
+{
+    kDebug()<<"markers moved: "<<markerIndices;
+
+    // update the treewidget items:
+    for (int i=0; i<markerIndices.count(); ++i)
+    {
+        const WMWMarker& myMarker = d->mapWidget->getSingleMarker(markerIndices.at(i));
+
+        QTreeWidgetItem* const treeItem = myMarker.data.value<QTreeWidgetItem*>();
+        if (!treeItem)
+            continue;
+
+        treeItem->setText(1, myMarker.coordinates.geoUrl());
+    }
 }

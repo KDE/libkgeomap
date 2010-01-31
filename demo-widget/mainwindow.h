@@ -25,6 +25,8 @@
 #include <kmainwindow.h>
 #include <kurl.h>
 
+class KCmdLineArgs;
+
 class MainWindowPrivate;
 
 class MainWindow : public KMainWindow
@@ -32,7 +34,7 @@ class MainWindow : public KMainWindow
 Q_OBJECT
 
 public:
-    MainWindow(QWidget* const parent = 0);
+    MainWindow(KCmdLineArgs* const cmdLineArgs, QWidget* const parent = 0);
     ~MainWindow();
 
 public Q_SLOTS:
@@ -47,6 +49,7 @@ private Q_SLOTS:
     void slotFutureResultsReadyAt(int startIndex, int endIndex);
     void slotImageLoadingBunchReady();
     void slotGroupableMarkersMoved(const QList<int>& markerIndices);
+    void slotSingleMarkersMoved(const QList<int>& markerIndices);
 
 private:
     MainWindowPrivate* const d;

@@ -87,6 +87,7 @@ public Q_SLOTS:
 protected:
     void updateActionsEnabled();
     void generateClusters();
+    bool eventFilter(QObject *object, QEvent *event);
 
 protected Q_SLOTS:
     void slotMapThemeActionTriggered(QAction* action);

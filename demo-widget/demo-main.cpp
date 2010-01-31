@@ -49,10 +49,13 @@ int main(int argc, char* argv[])
 
     KCmdLineArgs::init(argc, argv, &aboutData);
     KCmdLineOptions options;
+    options.add( "demopoints_single", ki18n("Add built-in demo points as single markers"));
+    options.add( "demopoints_group", ki18n("Add built-in demo points as groupable markers"));
+    options.add( "single", ki18n("Do not group the displayed images"));
     options.add( "+[images]", ki18n("List of images") );
     KCmdLineArgs::addCmdLineOptions( options );
 
-    KCmdLineArgs * const args = KCmdLineArgs::parsedArgs();
+    KCmdLineArgs* const args = KCmdLineArgs::parsedArgs();
     
     // get the list of images to load on startup:
     KUrl::List imagesList;
@@ -65,7 +68,7 @@ int main(int argc, char* argv[])
 
     KApplication app;
 
-    MainWindow* myMainWindow = new MainWindow;
+    MainWindow* myMainWindow = new MainWindow(args);
     myMainWindow->show();
     myMainWindow->slotScheduleImagesForLoading(imagesList);
 
