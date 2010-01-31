@@ -3,6 +3,9 @@ IN PROGRESS
 - create a model for the markers
 
 TODO
+- finish OSM backend
+ - zoom
+ - movable markers
 - synchronize zoom between the backends above Google Maps level 20
 - advance markers
 - check proper handling of marker movement on drop, not on subsequent mouse movement
