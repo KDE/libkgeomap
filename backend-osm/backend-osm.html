@@ -1,0 +1,142 @@
+<html>
+<head>
+<script type="text/javascript" src="http://www.openlayers.org/api/OpenLayers.js"></script>
+<script type="text/javascript" src="http://www.openstreetmap.org/openlayers/OpenStreetMap.js"></script>
+<script type="text/javascript">
+    var mapDiv;
+    var map;
+    var eventBuffer = new Array();
+    var markerList = new Object();
+    var clusterList = new Object();
+    var markerLayer;
+
+    function wmwLonLat2Projection(lonLat) {
+        return lonLat.transform(new OpenLayers.Projection('EPSG:4326'), map.getProjectionObject());
+    }
+    function wmwLonLatFromProjection(lonLat) {
+        return lonLat.transform(map.getProjectionObject(), new OpenLayers.Projection('EPSG:4326'));
+    }
+    function wmwLonLat2String(lonLat) {
+        return lonLat.lat.toString()+','+lonLat.lon.toString();
+    }
+    function wmwPostEventString(eventString) {
+        eventBuffer.push(eventString);
+        window.status = '(event)';
+    }
+    function wmwReadEventStrings() {
+        var eventBufferString = eventBuffer.join('|');
+        eventBuffer = new Array();
+        // let the application know that there are no more events waiting:
+        window.status = '()';
+        return eventBufferString;
+    }
+    function wmwDebugOut(someString) {
+        wmwPostEventString('do'+someString);
+    }
+    function wmwSetZoom(zoomvalue) {
+        map.setZoom(zoomvalue);
+    }
+    function wmwGetZoom() {
+        return map.getZoom();
+    }
+    function wmwZoomIn() {
+        map.zoomIn();
+    }
+    function wmwZoomOut() {
+        map.zoomOut();
+    }
+    function wmwSetCenter(lat, lon) {
+        var lonLat = new OpenLayers.LonLat(lon, lat);
+        map.setCenter(wmwLonLat2Projection(lonLat), 2);
+    }
+    function wmwGetCenter() {
+        var lonLat = wmwLonLatFromProjection(map.getCenter());
+        return wmwLonLat2String(lonLat);
+    }
+    function wmwLatLngToPixel(lat, lon) {
+        // TODO: do we need to transform the lonlat???
+        var myPixel = map.getPixelFromLonLat(wmwLonLat2Projection(new OpenLayers.LonLat(lon, lat)));
+        return '('+myPixel.x.toString()+','+myPixel.y.toString()+')';
+    }
+    function wmwPixelToLatLng(x, y) {
+        // TODO: do we need to transform the lonlat???
+        var myLonLat = wmwLonLatFromProjection(map.getLonLatFromPixel(new OpenLayers.Pixel(x, y)));
+        return wmwLonLat2String(myLonLat);
+    }
+    function wmwClearMarkers() {
+        for (var i in markerList) {
+            markerLayer.removeMarker(markerList[i]);
+            markerList[i].destroy();
+        }
+        markerList = new Object();
+    }
+    function wmwGetMapBounds() {
+    }
+    function wmwAddMarker(id, lat, lon, setDraggable) {
+        var lonLat = wmwLonLat2Projection(new OpenLayers.LonLat(lon, lat));
+        var size = new OpenLayers.Size(21,25);
+        var offset = new OpenLayers.Pixel(-(size.w/2), -size.h);
+        // TODO: use our own icon here!
+        var icon = new OpenLayers.Icon('http://www.openstreetmap.org/openlayers/img/marker.png',size,offset);
+        var myMarker = new OpenLayers.Marker(lonLat, icon);
+        markerLayer.addMarker(myMarker);
+        markerList[id] = myMarker;
+    }
+//   function wmwGetMarkerPosition(id) {
+//       var latlngString;
+//       if (markerList[id.toString()]) {
+//           latlngString = markerList[id.toString()].getPosition().toUrlValue(12);
+//       }
+//       return latlngString;
+//   }
+    function wmwClearClusters() {
+        for (var i in clusterList) {
+            markerLayer.removeMarker(clusterList[i]);
+            clusterList[i].destroy();
+        }
+        clusterList = new Object();
+    }
+    function wmwAddCluster(id, lat, lon, setDraggable) {
+        var lonLat = wmwLonLat2Projection(new OpenLayers.LonLat(lon, lat));
+        var size = new OpenLayers.Size(21,25);
+        var offset = new OpenLayers.Pixel(-(size.w/2), -size.h);
+        var icon = new OpenLayers.Icon('http://www.openstreetmap.org/openlayers/img/marker.png',size,offset);
+        var myMarker = new OpenLayers.Marker(lonLat, icon);
+        markerLayer.addMarker(myMarker);
+        clusterList[id] = myMarker;
+    }
+//   function wmwGetClusterPosition(id) {
+//       var latlngString;
+//       if (clusterList[id.toString()]) {
+//           latlngString = clusterList[id.toString()].getPosition().toUrlValue(12);
+//       }
+//       return latlngString;
+//   }
+    function wmwWidgetResized(newWidth, newHeight) {
+        document.getElementById('map_canvas').style.height=newHeight.toString()+'px';
+    }
+    function initialize() {
+        map = new OpenLayers.Map("map_canvas", {
+            controls:[
+                new OpenLayers.Control.Navigation(),
+                new OpenLayers.Control.PanZoomBar(),
+                new OpenLayers.Control.Attribution()],
+            projection: new OpenLayers.Projection("EPSG:900913"),
+            displayProjection: new OpenLayers.Projection("EPSG:4326")
+        } );
+        layerTilesAtHome = new OpenLayers.Layer.OSM.Osmarender("Osmarender");
+        map.addLayer(layerTilesAtHome);
+        markerLayer = new OpenLayers.Layer.Markers('Markers');
+        wmwSetCenter(52.0, 6.0);
+        wmwDebugOut('hi there from osm');
+
+        map.events.register('moveend', map, function() {
+            wmwPostEventString('id');
+        } );
+    }
+</script>
+</head>
+<body onload="initialize()" style="padding: 0px; margin: 0px;">
+   <div id="map_canvas" style="width:100%; height:400px;"></div>
+</body>
+</html>

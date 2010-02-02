@@ -3,6 +3,7 @@ IN PROGRESS
 - create a model for the markers
 
 TODO
+- set the initial parameters of the html maps directly
 - finish OSM backend
  - zoom
  - movable markers

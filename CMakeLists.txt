@@ -82,6 +82,11 @@ kde4_add_executable( demo_widget  ${demo_widget_sources} )
 target_link_libraries( demo_widget ${worldmapwidget2library_libs} ${KEXIV2_LIBRARIES})
 SET_TARGET_PROPERTIES( demo_widget PROPERTIES COMPILE_FLAGS "${COMPILE_FLAGS} ${MY_COMPILER_WARNINGS}")
 
+INSTALL(FILES
+    backend-osm/backend-osm.html
+    backend-googlemaps/backend-googlemaps.html
+        DESTINATION ${DATA_INSTALL_DIR}/worldmapwidget2/)
+
 IF(KDE4_BUILD_TESTS)
 
     INCLUDE(CTest)
