@@ -6,7 +6,15 @@ var debugTextField;
 var codeTextField;
 var scriptUrls = Array();
 var lastLoadedScript = '';
+var debugInitialized = false;
+var callRunAfterInit = false;
 function runMyScript() {
+    if (!debugInitialized) {
+        callRunAfterInit = true;
+        initializeDebug();
+        return;
+    }
+
     var myCode = codeTextField.value;
 
     eval(myCode);
@@ -21,6 +29,12 @@ function initializeBackend() {
     wmwDebugHook("-- Backend loaded! Calling initialize");
     initialize();
     wmwDebugHook("-- Initialize called!");
+
+    debugInitialized = true;
+
+    if (callRunAfterInit) {
+        runMyScript();
+    }
 }
 function loadNextJavaScriptFile() {
 

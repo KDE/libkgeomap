@@ -99,22 +99,17 @@ function wmwAddMarker(id, lat, lon, setDraggable) {
     vectorLayer.addFeatures(myVectorMarker);
     markerList[id.toString()] = myVectorMarker;
 }
-//     function wmwGetMarkerPosition(id) {
-//         var latlngString;
-//         if (markerList[id.toString()]) {
-//             wmwDebugOut(id.toString());
-//             var markerClone = markerList[id.toString()].clone();
-//             wmwDebugOut(markerClone.geometry.toShortString());
-//             markerClone.geometry.transform(new OpenLayers.Projection("EPSG:4326"), new OpenLayers.Projection("EPSG:900913"));
-//             var x = markerClone.geometry.x;
-//             var y = markerClone.geometry.y;
-//             wmwDebugOut(x.toString()+','+y.toString());
-// //             wmwDebugOut(wmwLatLngToPixel(x,y));
-//             latlngString = wmwLonLat2String(new OpenLayers.LonLat(x, y));
-//             wmwDebugOut('latLngString:'+latLngString);
-//         }
-//         return latlngString;
-//     }
+function wmwGetMarkerPosition(id) {
+    var latlngString;
+    if (markerList[id.toString()]) {
+        var markerClone = markerList[id.toString()].clone();
+        markerClone.geometry.transform(new OpenLayers.Projection("EPSG:900913"), new OpenLayers.Projection("EPSG:4326"));
+        var x = markerClone.geometry.x;
+        var y = markerClone.geometry.y;
+        latlngString = y.toString()+','+x.toString();
+    }
+    return latlngString;
+}
 function wmwClearClusters() {
     for (var i in clusterList) {
         vectorLayer.removeFeatures(clusterList[i]);
@@ -131,13 +126,17 @@ function wmwAddCluster(id, lat, lon, setDraggable) {
     vectorLayer.addFeatures(myVectorMarker);
     clusterList[id.toString()] = myVectorMarker;
 }
-//   function wmwGetClusterPosition(id) {
-//       var latlngString;
-//       if (clusterList[id.toString()]) {
-//           latlngString = clusterList[id.toString()].getPosition().toUrlValue(12);
-//       }
-//       return latlngString;
-//   }
+function wmwGetClusterPosition(id) {
+    var latlngString;
+    if (clusterList[id.toString()]) {
+        var clusterClone = clusterList[id.toString()].clone();
+        clusterClone.geometry.transform(new OpenLayers.Projection("EPSG:900913"), new OpenLayers.Projection("EPSG:4326"));
+        var x = clusterClone.geometry.x;
+        var y = clusterClone.geometry.y;
+        latlngString = y.toString()+','+x.toString();
+    }
+    return latlngString;
+}
 function wmwWidgetResized(newWidth, newHeight) {
     document.getElementById('map_canvas').style.height=newHeight.toString()+'px';
 }
