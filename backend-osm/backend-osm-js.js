@@ -45,7 +45,11 @@ function wmwReadEventStrings() {
     return eventBufferString;
 }
 function wmwDebugOut(someString) {
-    wmwPostEventString('do'+someString);
+    if (typeof wmwDebugHook == 'function') {
+        wmwDebugHook(someString);
+    } else {
+        wmwPostEventString('do'+someString);
+    }
 }
 function wmwSetZoom(zoomvalue) {
     map.setZoom(zoomvalue);
@@ -179,9 +183,10 @@ function initialize() {
     dragFeature.activate();
 
     wmwSetCenter(52.0, 6.0);
-    wmwDebugOut('hi there from osm');
 
     map.events.register('moveend', map, function() {
         wmwPostEventString('id');
     } );
+
+    wmwDebugOut('OSM initialize done');
 }
