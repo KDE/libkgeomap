@@ -83,10 +83,10 @@ target_link_libraries( demo_widget ${worldmapwidget2library_libs} ${KEXIV2_LIBRA
 SET_TARGET_PROPERTIES( demo_widget PROPERTIES COMPILE_FLAGS "${COMPILE_FLAGS} ${MY_COMPILER_WARNINGS}")
 
 INSTALL(FILES
-    backend-osm/backend-osm.html
-    backend-osm/backend-osm-js.js
-    backend-googlemaps/backend-googlemaps.html
-    backend-googlemaps/backend-googlemaps-js.js
+    backend-data/backend-osm.html
+    backend-data/backend-osm-js.js
+    backend-data/backend-googlemaps.html
+    backend-data/backend-googlemaps-js.js
         DESTINATION ${DATA_INSTALL_DIR}/worldmapwidget2/)
 
 IF(KDE4_BUILD_TESTS)
