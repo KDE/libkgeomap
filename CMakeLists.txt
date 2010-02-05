@@ -84,7 +84,9 @@ SET_TARGET_PROPERTIES( demo_widget PROPERTIES COMPILE_FLAGS "${COMPILE_FLAGS} ${
 
 INSTALL(FILES
     backend-osm/backend-osm.html
+    backend-osm/backend-osm-js.js
     backend-googlemaps/backend-googlemaps.html
+    backend-googlemaps/backend-googlemaps-js.js
         DESTINATION ${DATA_INSTALL_DIR}/worldmapwidget2/)
 
 IF(KDE4_BUILD_TESTS)
