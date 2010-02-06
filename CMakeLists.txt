@@ -87,6 +87,12 @@ INSTALL(FILES
     backend-data/backend-osm-js.js
     backend-data/backend-googlemaps.html
     backend-data/backend-googlemaps-js.js
+    backend-data/marker-green.png
+    backend-data/cluster-circle-00ff00.png
+    backend-data/cluster-circle-00ffff.png
+    backend-data/cluster-circle-ff0000.png
+    backend-data/cluster-circle-ff7f00.png
+    backend-data/cluster-circle-ffff00.png
         DESTINATION ${DATA_INSTALL_DIR}/worldmapwidget2/)
 
 IF(KDE4_BUILD_TESTS)

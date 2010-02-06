@@ -28,6 +28,7 @@
 #include <kaction.h>
 #include <kconfiggroup.h>
 #include <klocale.h>
+#include <kstandarddirs.h>
 #include <marble/GeoPainter.h>
 #include <marble/MarbleMap.h>
 #include <marble/ViewParams.h>
@@ -87,11 +88,15 @@ public:
     int mouseMoveMarkerIndex;
     WMWGeoCoordinate mouseMoveObjectCoordinates;
     QPoint mouseMoveCenterOffset;
+    QPixmap markerPixmap;
 };
 
 BackendMarble::BackendMarble(WMWSharedData* const sharedData, QObject* const parent)
 : MapBackend(sharedData, parent), d(new BackendMarblePrivate())
 {
+    const KUrl markerGreenUrl = KStandardDirs::locate("data", "worldmapwidget2/marker-green.png");
+    d->markerPixmap = QPixmap(markerGreenUrl.toLocalFile());
+
     d->marbleWidget = new BMWidget(this);
 
     d->marbleWidget->installEventFilter(this);
@@ -422,9 +427,10 @@ void BackendMarble::marbleCustomPaint(Marble::GeoPainter* painter)
         if (!screenCoordinates(markerCoordinates, &markerPoint))
             continue;
 
-        painter->setPen(circlePen);
-        painter->setBrush(circleBrush);
-        painter->drawEllipse(markerPoint.x()-circleRadius, markerPoint.y()-circleRadius, 2*circleRadius, 2*circleRadius);
+        painter->drawPixmap(markerPoint.x()-d->markerPixmap.height()/2, markerPoint.y()-d->markerPixmap.height(), d->markerPixmap);
+//         painter->setPen(circlePen);
+//         painter->setBrush(circleBrush);
+//         painter->drawEllipse(markerPoint.x()-circleRadius, markerPoint.y()-circleRadius, 2*circleRadius, 2*circleRadius);
     }
 
     // now for the clusters:
@@ -686,9 +692,9 @@ bool BackendMarble::eventFilter(QObject *object, QEvent *event)
                 continue;
             }
 
-            // TODO: use the real size of the cluster here!
-            const QPoint markerDimensions(15, 15);
-            const QRect markerRect(markerPoint-markerDimensions, markerPoint+markerDimensions);
+            const int markerPixmapHeight = d->markerPixmap.height();
+            const int markerPixmapWidth = d->markerPixmap.width();
+            const QRect markerRect(markerPoint.x()-markerPixmapWidth/2, markerPoint.y()-markerPixmapHeight, markerPixmapWidth, markerPixmapHeight);
             if (!markerRect.contains(mouseEvent->pos()))
             {
                 continue;

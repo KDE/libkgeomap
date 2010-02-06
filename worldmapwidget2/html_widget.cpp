@@ -112,6 +112,8 @@ void HTMLWidget::slotHTMLCompleted()
 
     // start monitoring for javascript events using a timer:
     d->javascriptScanTimer->start();
+
+    emit(signalJavaScriptReady());
 }
 
 void HTMLWidget::khtmlMousePressEvent(khtml::MousePressEvent* e)

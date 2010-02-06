@@ -55,6 +55,7 @@ protected Q_SLOTS:
 
 Q_SIGNALS:
     void signalHTMLEvents(const QStringList& events);
+    void signalJavaScriptReady();
 
 private:
     HTMLWidgetPrivate* const d;

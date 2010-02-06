@@ -133,7 +133,8 @@ function wmwAddMarker(id, lat, lon, setDraggable) {
     var marker = new google.maps.Marker({
         position: latlng,
         map: map,
-        draggable: setDraggable
+        draggable: setDraggable,
+        icon: new google.maps.MarkerImage('marker-green.png', new google.maps.Size(20, 32))
     });
     google.maps.event.addListener(marker, 'dragend', function() {
         wmwPostEventString('mm'+id.toString());
@@ -153,12 +154,14 @@ function wmwClearClusters() {
     }
     clusterList = new Object();
 }
-function wmwAddCluster(id, lat, lon, setDraggable) {
+function wmwAddCluster(id, lat, lon, setDraggable, clusterColor, clusterLabel) {
     var latlng = new google.maps.LatLng(lat, lon);
     var marker = new google.maps.Marker({
         position: latlng,
         map: map,
-        draggable: setDraggable
+        draggable: setDraggable,
+        icon: new google.maps.MarkerImage('cluster-circle-'+clusterColor+'.png', new google.maps.Size(30, 30)),
+        title: clusterLabel
     });
     google.maps.event.addListener(marker, 'dragend', function() {
         wmwPostEventString('cm'+id.toString());

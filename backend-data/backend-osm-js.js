@@ -22,16 +22,24 @@ var map;
 var eventBuffer = new Array();
 var markerList = new Object();
 var clusterList = new Object();
-var vectorLayer;
+var vectorLayerMarkers;
+var layerColors = Array('ff0000', 'ff7f00', 'ffff00', '00ff00', '00ffff');
+for (var layerColorIndex in layerColors) {
+    eval('var vectorLayersClusters'+layerColors[layerColorIndex]+';');
+}
 
 function wmwLonLat2Projection(lonLat) {
     return lonLat.transform(new OpenLayers.Projection('EPSG:4326'), map.getProjectionObject());
 }
 function wmwLonLatFromProjection(lonLat) {
-    return lonLat.transform(map.getProjectionObject(), new OpenLayers.Projection('EPSG:4326'));
+    return lonLat.clone().transform(map.getProjectionObject(), new OpenLayers.Projection('EPSG:4326'));
 }
 function wmwLonLat2String(lonLat) {
     return lonLat.lat.toString()+','+lonLat.lon.toString();
+}
+function wmwProjectedLonLat2String(lonLat) {
+    var myLonLat = wmwLonLatFromProjection(lonLat);
+    return wmwLonLat2String(myLonLat);
 }
 function wmwPostEventString(eventString) {
     eventBuffer.push(eventString);
@@ -83,7 +91,7 @@ function wmwPixelToLatLng(x, y) {
 }
 function wmwClearMarkers() {
     for (var i in markerList) {
-        vectorLayer.removeFeatures(markerList[i]);
+        vectorLayerMarkers.removeFeatures(markerList[i]);
         markerList[i].destroy();
     }
     markerList = new Object();
@@ -96,7 +104,7 @@ function wmwAddMarker(id, lat, lon, setDraggable) {
     var myVectorMarker = new OpenLayers.Feature.Vector(
             new OpenLayers.Geometry.Point(projectedLonLat.lon, projectedLonLat.lat)
         );
-    vectorLayer.addFeatures(myVectorMarker);
+    vectorLayerMarkers.addFeatures(myVectorMarker);
     markerList[id.toString()] = myVectorMarker;
 }
 function wmwGetMarkerPosition(id) {
@@ -111,19 +119,27 @@ function wmwGetMarkerPosition(id) {
     return latlngString;
 }
 function wmwClearClusters() {
+    for (var layerColorIndex in layerColors) {
+        eval('vectorLayersClusters'+layerColors[layerColorIndex]+'.removeFeatures(vectorLayersClusters'+layerColors[layerColorIndex]+'.features);');
+    }
     for (var i in clusterList) {
-        vectorLayer.removeFeatures(clusterList[i]);
         clusterList[i].destroy();
     }
     clusterList = new Object();
 }
-function wmwAddCluster(id, lat, lon, setDraggable) {
+function wmwAddCluster(id, lat, lon, setDraggable, clusterColor, labelText) {
     var projectedLonLat = wmwLonLat2Projection(new OpenLayers.LonLat(lon, lat));
 
     var myVectorMarker = new OpenLayers.Feature.Vector(
             new OpenLayers.Geometry.Point(projectedLonLat.lon, projectedLonLat.lat)
+            // setting styles per point does not seem to work in KHTML...
+//             ,null,
+//             new OpenLayers.StyleMap({
+//                 externalGraphic : iconFile,
+//                 pointRadius: 15
+//             })
         );
-    vectorLayer.addFeatures(myVectorMarker);
+    eval('vectorLayersClusters'+clusterColor+'.addFeatures(myVectorMarker);');
     clusterList[id.toString()] = myVectorMarker;
 }
 function wmwGetClusterPosition(id) {
@@ -152,13 +168,26 @@ function initialize() {
     layerTilesAtHome = new OpenLayers.Layer.OSM.Osmarender("Osmarender");
     map.addLayer(layerTilesAtHome);
 
-    // create a vector layer to hold the movable markers:
-    vectorLayer = new OpenLayers.Layer.Vector("Vector layer", {
-            // no options yet
-        });
-    map.addLayer(vectorLayer);
+    for (var layerColorIndex in layerColors) {
+        eval('vectorLayersClusters'+layerColors[layerColorIndex]+' = new OpenLayers.Layer.Vector("Vector layer clusters",'+
+            '{ styleMap: new OpenLayers.StyleMap({ pointRadius: 15,  externalGraphic : "cluster-circle-'+layerColors[layerColorIndex]+'.png" }) });');
+        eval('map.addLayer(vectorLayersClusters'+layerColors[layerColorIndex]+');');
+    }
 
-    var dragFeature = new OpenLayers.Control.DragFeature(vectorLayer);
+    // create a vector layer to hold the movable markers:
+    vectorLayerMarkers = new OpenLayers.Layer.Vector("Vector layer markers",
+        {
+            styleMap: new OpenLayers.StyleMap({
+                externalGraphic : "marker-green.png",
+                graphicWidth : 20,
+                graphicHeight : 32,
+                graphicXOffset : -10,
+                graphicYOffset : 0
+            })
+        });
+    map.addLayer(vectorLayerMarkers);
+
+    var dragFeature = new OpenLayers.Control.DragFeature(vectorLayerMarkers);
     dragFeature.onComplete = function(feature, pixel) {
             // get the id of the feature
             // TODO: is there an easier way? Features seem to be able to have ids,

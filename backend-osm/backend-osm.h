@@ -66,17 +66,13 @@ public:
     virtual int getMarkerModelLevel();
     virtual QList<QPair<WMWGeoCoordinate, WMWGeoCoordinate> > getNormalizedBounds();
 
-    QString getMapType() const;
-
 public Q_SLOTS:
     virtual void slotClustersNeedUpdating();
 
 private Q_SLOTS:
     void slotHTMLInitialized();
     void updateActionsEnabled();
-    void slotMapTypeActionTriggered(QAction* action);
     void slotHTMLEvents(const QStringList& eventStrings);
-    void slotFloatSettingsTriggered(QAction* action);
 
 private:
     BackendOSMPrivate* const d;

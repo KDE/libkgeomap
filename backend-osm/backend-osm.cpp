@@ -46,15 +46,6 @@ public:
     : htmlWidget(0),
       htmlWidgetWrapper(0),
       isReady(false),
-      mapTypeActionGroup(0),
-      floatItemsActionGroup(0),
-      showMapTypeControlAction(0),
-      showNavigationControlAction(0),
-      showScaleControlAction(0),
-      cacheMapType("ROADMAP"),
-      cacheShowMapTypeControl(true),
-      cacheShowNavigationControl(true),
-      cacheShowScaleControl(true),
       cacheZoom(1),
       cacheCenter(0.0,0.0),
       cacheBounds()
@@ -64,16 +55,7 @@ public:
     QPointer<HTMLWidget> htmlWidget;
     QPointer<QWidget> htmlWidgetWrapper;
     bool isReady;
-    QPointer<QActionGroup> mapTypeActionGroup;
-    QPointer<QActionGroup> floatItemsActionGroup;
-    QPointer<KAction> showMapTypeControlAction;
-    QPointer<KAction> showNavigationControlAction;
-    QPointer<KAction> showScaleControlAction;
 
-    QString cacheMapType;
-    bool cacheShowMapTypeControl;
-    bool cacheShowNavigationControl;
-    bool cacheShowScaleControl;
     int cacheZoom;
     WMWGeoCoordinate cacheCenter;
     QPair<WMWGeoCoordinate, WMWGeoCoordinate> cacheBounds;
@@ -87,7 +69,7 @@ BackendOSM::BackendOSM(WMWSharedData* const sharedData, QObject* const parent)
     d->htmlWidget = new HTMLWidget(d->htmlWidgetWrapper);
     d->htmlWidgetWrapper->resize(400,400);
 
-    connect(d->htmlWidget, SIGNAL(completed()),
+    connect(d->htmlWidget, SIGNAL(signalJavaScriptReady()),
             this, SLOT(slotHTMLInitialized()));
 
     connect(d->htmlWidget, SIGNAL(signalHTMLEvents(const QStringList&)),
@@ -244,29 +226,9 @@ void BackendOSM::zoomOut()
     d->htmlWidget->runScript(QString("wmwZoomOut();"));
 }
 
-QString BackendOSM::getMapType() const
-{
-    return d->cacheMapType;
-}
-
 void BackendOSM::updateActionsEnabled()
 {
-    if (d->mapTypeActionGroup&&isReady())
-    {
-        const QString currentMapType = getMapType();
-        const QList<QAction*> mapTypeActions = d->mapTypeActionGroup->actions();
-        for (int i=0; i<mapTypeActions.size(); ++i)
-        {
-            mapTypeActions.at(i)->setChecked(mapTypeActions.at(i)->data().toString()==currentMapType);
-        }
-    }
-
     // TODO: manage state of the zoom buttons
-}
-
-void BackendOSM::slotMapTypeActionTriggered(QAction* action)
-{
-    const QString newMapType = action->data().toString();
 }
 
 void BackendOSM::addActionsToConfigurationMenu(QMenu* const configurationMenu)
@@ -275,73 +237,6 @@ void BackendOSM::addActionsToConfigurationMenu(QMenu* const configurationMenu)
 
     if (!d->isReady)
         return;
-
-    configurationMenu->addSeparator();
-    
-    // actions for selecting the map type:
-    QStringList mapTypes, mapTypesHumanNames;
-    mapTypes           << "ROADMAP"       << "SATELLITE"        << "HYBRID"       << "TERRAIN";
-    mapTypesHumanNames << i18n("Roadmap") << i18n("Satellite")  << i18n("Hybrid") << i18n("Terrain");
-
-    const QString currentMapType = getMapType();
-
-    if (d->mapTypeActionGroup)
-    {
-        delete d->mapTypeActionGroup;
-    }
-    d->mapTypeActionGroup = new QActionGroup(configurationMenu);
-    d->mapTypeActionGroup->setExclusive(true);
-    connect(d->mapTypeActionGroup, SIGNAL(triggered(QAction*)),
-            this, SLOT(slotMapTypeActionTriggered(QAction*)));
-
-    for (int i = 0; i<mapTypes.count(); ++i)
-    {
-        KAction* const mapTypeAction = new KAction(d->mapTypeActionGroup);
-        mapTypeAction->setData(mapTypes.at(i));
-        mapTypeAction->setText(mapTypesHumanNames.at(i));
-        mapTypeAction->setCheckable(true);
-
-        
-        if (currentMapType == mapTypes.at(i))
-        {
-            mapTypeAction->setChecked(true);
-        }
-
-        configurationMenu->addAction(mapTypeAction);
-    }
-
-    configurationMenu->addSeparator();
-
-    if (d->floatItemsActionGroup)
-    {
-        delete d->floatItemsActionGroup;
-    }
-    d->floatItemsActionGroup = new QActionGroup(configurationMenu);
-    d->floatItemsActionGroup->setExclusive(false);
-    connect(d->floatItemsActionGroup, SIGNAL(triggered(QAction*)),
-            this, SLOT(slotFloatSettingsTriggered(QAction*)));
-
-    // TODO: we need a parent for this guy!
-    QMenu* const floatItemsSubMenu = new QMenu(i18n("Float items"), configurationMenu);
-    configurationMenu->addMenu(floatItemsSubMenu);
-
-    d->showMapTypeControlAction = new KAction(i18n("Show Map Type Control"), d->floatItemsActionGroup);
-    d->showMapTypeControlAction->setCheckable(true);
-    d->showMapTypeControlAction->setChecked(d->cacheShowMapTypeControl);
-    d->showMapTypeControlAction->setData("showmaptypecontrol");
-    floatItemsSubMenu->addAction(d->showMapTypeControlAction);
-
-    d->showNavigationControlAction = new KAction(i18n("Show Navigation Control"), d->floatItemsActionGroup);
-    d->showNavigationControlAction->setCheckable(true);
-    d->showNavigationControlAction->setChecked(d->cacheShowNavigationControl);
-    d->showNavigationControlAction->setData("shownavigationcontrol");
-    floatItemsSubMenu->addAction(d->showNavigationControlAction);
-
-    d->showScaleControlAction = new KAction(i18n("Show Scale Control"), d->floatItemsActionGroup);
-    d->showScaleControlAction->setCheckable(true);
-    d->showScaleControlAction->setChecked(d->cacheShowScaleControl);
-    d->showScaleControlAction->setData("showscalecontrol");
-    floatItemsSubMenu->addAction(d->showScaleControlAction);
 }
 
 void BackendOSM::saveSettingsToGroup(KConfigGroup* const group)
@@ -349,11 +244,6 @@ void BackendOSM::saveSettingsToGroup(KConfigGroup* const group)
     WMW2_ASSERT(group != 0);
     if (!group)
         return;
-
-    group->writeEntry("OSM Map Type", getMapType());
-    group->writeEntry("OSM Show Map Type Control", d->cacheShowMapTypeControl);
-    group->writeEntry("OSM Show Navigation Control", d->cacheShowNavigationControl);
-    group->writeEntry("OSM Show Scale Control", d->cacheShowScaleControl);
 }
 
 void BackendOSM::readSettingsFromGroup(const KConfigGroup* const group)
@@ -401,13 +291,7 @@ void BackendOSM::slotHTMLEvents(const QStringList& events)
         const QString eventParameter = it->mid(2);
         const QStringList eventParameters = eventParameter.split('/');
 
-        if (eventCode=="MT")
-        {
-            // map type changed
-            mapTypeChanged = true;
-            d->cacheMapType = eventParameter;
-        }
-        else if (eventCode=="MB")
+        if (eventCode=="MB")
         {   // NOTE: event currently disabled in javascript part
             // map bounds changed
             centerProbablyChanged = true;
@@ -558,11 +442,24 @@ void BackendOSM::updateClusters()
     {
         const WMWCluster& currentCluster = s->clusterList.at(currentIndex);
 
-        d->htmlWidget->runScript(QString("wmwAddCluster(%1, %2, %3, %4);")
+        // determine the colors:
+        QColor       fillColor;
+        QColor       strokeColor;
+        Qt::PenStyle strokeStyle;
+        QColor       labelColor;
+        QString      labelText;
+        s->worldMapWidget->getColorInfos(currentIndex, &fillColor, &strokeColor,
+                              &strokeStyle, &labelText, &labelColor);
+
+        const QString fillColorName = fillColor.name();
+
+        d->htmlWidget->runScript(QString("wmwAddCluster(%1, %2, %3, %4, '%5', '%6');")
                 .arg(currentIndex)
                 .arg(currentCluster.coordinates.latString())
                 .arg(currentCluster.coordinates.lonString())
-                .arg(true?"true":"false") // TODO: just for now, for testing
+                .arg(true?"true":"false")
+                .arg(fillColorName.mid(1))
+                .arg(labelText)
             );
     }
     kDebug()<<"end updateclusters";
@@ -604,12 +501,6 @@ QSize BackendOSM::mapSize() const
     WMW2_ASSERT(d->htmlWidgetWrapper!=0);
 
     return d->htmlWidgetWrapper->size();
-}
-
-void BackendOSM::slotFloatSettingsTriggered(QAction* action)
-{
-    const QString actionIdString = action->data().toString();
-    const bool actionState = action->isChecked();
 }
 
 void BackendOSM::slotClustersNeedUpdating()

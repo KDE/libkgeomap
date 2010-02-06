@@ -87,7 +87,7 @@ BackendGoogleMaps::BackendGoogleMaps(WMWSharedData* const sharedData, QObject* c
     d->htmlWidget = new HTMLWidget(d->htmlWidgetWrapper);
     d->htmlWidgetWrapper->resize(400,400);
 
-    connect(d->htmlWidget, SIGNAL(completed()),
+    connect(d->htmlWidget, SIGNAL(signalJavaScriptReady()),
             this, SLOT(slotHTMLInitialized()));
 
     connect(d->htmlWidget, SIGNAL(signalHTMLEvents(const QStringList&)),
@@ -580,11 +580,24 @@ void BackendGoogleMaps::updateClusters()
     {
         const WMWCluster& currentCluster = s->clusterList.at(currentIndex);
 
-        d->htmlWidget->runScript(QString("wmwAddCluster(%1, %2, %3, %4);")
+        // determine the colors:
+        QColor       fillColor;
+        QColor       strokeColor;
+        Qt::PenStyle strokeStyle;
+        QColor       labelColor;
+        QString      labelText;
+        s->worldMapWidget->getColorInfos(currentIndex, &fillColor, &strokeColor,
+                              &strokeStyle, &labelText, &labelColor);
+
+        const QString fillColorName = fillColor.name();
+
+        d->htmlWidget->runScript(QString("wmwAddCluster(%1, %2, %3, %4, '%5', '%6');")
                 .arg(currentIndex)
                 .arg(currentCluster.coordinates.latString())
                 .arg(currentCluster.coordinates.lonString())
-                .arg(true?"true":"false") // TODO: just for now, for testing
+                .arg(true?"true":"false")
+                .arg(fillColorName.mid(1))
+                .arg(labelText)
             );
     }
     kDebug()<<"end updateclusters";
