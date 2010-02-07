@@ -60,7 +60,7 @@ function wmwDebugOut(someString) {
     }
 }
 function wmwSetZoom(zoomvalue) {
-    map.setZoom(zoomvalue);
+    map.zoomTo(zoomvalue);
 }
 function wmwGetZoom() {
     return map.getZoom();

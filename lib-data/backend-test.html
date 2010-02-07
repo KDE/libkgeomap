@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
 <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
-<title>Debug OSM backend of WorldMapWidget2</title>
+<title>Debug WorldMapWidget2</title>
 <script type="text/javascript">
 var debugTextField;
 var codeTextField;
@@ -19,7 +19,10 @@ function runMyScript() {
 
     var myCode = codeTextField.value;
 
-    eval(myCode);
+    var result = eval(myCode);
+    if (result) {
+        debugTextField.value = 'Result: '+result+'\n'+debugTextField.value;
+    }
 }
 function wmwDebugHook(debugString) {
     debugTextField.value = debugString + '\n' + debugTextField.value;

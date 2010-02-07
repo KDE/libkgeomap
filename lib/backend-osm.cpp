@@ -510,6 +510,7 @@ void BackendOSM::slotClustersNeedUpdating()
 
 void BackendOSM::setZoom(const QString& newZoom)
 {
+    // zoom settings for OSM are basically the same as for Google Maps, so just re-use the prefix
     const QString myZoomString = s->worldMapWidget->convertZoomToBackendZoom(newZoom, "googlemaps");
     WMW2_ASSERT(myZoomString.startsWith("googlemaps:"));
 
@@ -526,6 +527,7 @@ void BackendOSM::setZoom(const QString& newZoom)
 
 QString BackendOSM::getZoom() const
 {
+    // zoom settings for OSM are basically the same as for Google Maps, so just re-use the prefix
     return QString("googlemaps:%1").arg(d->cacheZoom);
 }
 
