@@ -113,4 +113,14 @@ IF(KDE4_BUILD_TESTS)
     target_link_libraries( test_model ${worldmapwidget2_libs} ${QT_QTTEST_LIBRARY} )
     SET_TARGET_PROPERTIES( test_model PROPERTIES COMPILE_FLAGS "${COMPILE_FLAGS} ${MY_COMPILER_WARNINGS}")
     ADD_TEST( test_model ${EXECUTABLE_OUTPUT_PATH}/test_model )
+
+        # test the marker model
+    SET( test_primitives_sources
+        tests/test-primitives.cpp
+    )
+    kde4_add_executable( test_primitives ${test_primitives_sources} )
+    target_link_libraries( test_primitives ${worldmapwidget2_libs} ${QT_QTTEST_LIBRARY} )
+    SET_TARGET_PROPERTIES( test_primitives PROPERTIES COMPILE_FLAGS "${COMPILE_FLAGS} ${MY_COMPILER_WARNINGS}")
+    ADD_TEST( test_primitives ${EXECUTABLE_OUTPUT_PATH}/test_primitives )
+
 ENDIF(KDE4_BUILD_TESTS)

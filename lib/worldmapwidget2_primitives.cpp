@@ -31,7 +31,7 @@ namespace WMW2
 bool WMWHelperParseLatLonString(const QString& latLonString, WMWGeoCoordinate* const coordinates)
 {
     // parse a 'lat,lon' string:
-    const QStringList coordinateStrings = latLonString.split(',');
+    const QStringList coordinateStrings = latLonString.trimmed().split(',');
     bool valid = ( coordinateStrings.size() == 2 );
     if (valid)
     {
@@ -62,11 +62,13 @@ bool WMWHelperParseLatLonString(const QString& latLonString, WMWGeoCoordinate* c
 bool WMWHelperParseXYStringToPoint(const QString& xyString, QPoint* const point)
 {
     // a point is returned as (x, y)
-    bool valid = xyString.startsWith('(') && xyString.endsWith(')');
+
+    const QString myXYString = xyString.trimmed();
+    bool valid = myXYString.startsWith('(') && myXYString.endsWith(')');
     QStringList pointStrings;
     if (valid)
     {
-        pointStrings = xyString.mid(1, xyString.length()-2).split(',');
+        pointStrings = myXYString.mid(1, myXYString.length()-2).split(',');
         valid = ( pointStrings.size() == 2 );
     }
     if (valid)
@@ -99,22 +101,34 @@ bool WMWHelperParseBoundsString(const QString& boundsString, QPair<WMWGeoCoordin
 {
     // bounds are returned as ((lat1, lon1), (lat2, lon2))
 
+    const QString myBoundsString = boundsString.trimmed();
+
     // check for minimum length
-    bool valid = boundsString.size()>=13;
+    bool valid = myBoundsString.size()>=13;
+    valid&= myBoundsString.startsWith('(') && myBoundsString.endsWith(')');
+
     if (valid)
     {
-        const QString string1 = boundsString.mid(1, boundsString.length()-2);
+        // remove outer parentheses:
+        const QString string1 = myBoundsString.mid(1, myBoundsString.length()-2).trimmed();
+
+        // split the string at the middle comma:
         const int dumpComma = string1.indexOf(",", 0);
         const int splitComma = string1.indexOf(",", dumpComma+1);
         valid = (dumpComma>=0) && (splitComma>=0);
 
         if (valid)
         {
-            QString coord1String = string1.mid(0, splitComma);
-            QString coord2String = string1.mid(splitComma+2);
+            const QString coord1String = string1.mid(0, splitComma).trimmed();
+            const QString coord2String = string1.mid(splitComma+1).trimmed();
+            valid&= coord1String.startsWith('(') && coord1String.endsWith(')');
+            valid&= coord2String.startsWith('(') && coord2String.endsWith(')');
 
             WMWGeoCoordinate coord1, coord2;
-            valid = WMWHelperParseLatLonString(coord1String.mid(1, coord1String.length()-2), &coord1);
+            if (valid)
+            {
+                valid = WMWHelperParseLatLonString(coord1String.mid(1, coord1String.length()-2), &coord1);
+            }
             if (valid)
             {
                 valid = WMWHelperParseLatLonString(coord2String.mid(1, coord2String.length()-2), &coord2);
