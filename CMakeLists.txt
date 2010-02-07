@@ -37,63 +37,67 @@ ENDIF(${HAVE_VALGRIND})
 
 INCLUDE_DIRECTORIES(
     ${CMAKE_CURRENT_SOURCE_DIR}/demo
-    ${CMAKE_CURRENT_SOURCE_DIR}/worldmapwidget2
-    ${CMAKE_CURRENT_SOURCE_DIR}/backend-marble
-    ${CMAKE_CURRENT_SOURCE_DIR}/backend-googlemaps
-    ${CMAKE_CURRENT_SOURCE_DIR}/backend-osm
+    ${CMAKE_CURRENT_SOURCE_DIR}/lib
 )
 
 SET( widget_sources
-    worldmapwidget2/worldmapwidget2.cpp
-    worldmapwidget2/map-backend.cpp
-    worldmapwidget2/html_widget.cpp
-    worldmapwidget2/markermodel.cpp
+    lib/worldmapwidget2.cpp
+    lib/map-backend.cpp
+    lib/html_widget.cpp
+    lib/markermodel.cpp
 )
 
 SET( backend_marble_sources
-    backend-marble/backend-marble.cpp
-    backend-marble/bm-widget.cpp
+    lib/backend-marble.cpp
+    lib/bm-widget.cpp
 )
 
 SET( backend_googlemaps_sources
-    backend-googlemaps/backend-googlemaps.cpp
+    lib/backend-googlemaps.cpp
 )
 
 SET( backend_osm_sources
-    backend-osm/backend-osm.cpp
+    lib/backend-osm.cpp
 )
 
-KDE4_ADD_LIBRARY( worldmapwidget2library STATIC ${widget_sources} ${backend_marble_sources} ${backend_googlemaps_sources} ${backend_osm_sources})
-SET( worldmapwidget2library_libs
+# TODO: we want to create a shared library
+KDE4_ADD_LIBRARY( worldmapwidget2 STATIC ${widget_sources} ${backend_marble_sources} ${backend_googlemaps_sources} ${backend_osm_sources})
+SET( worldmapwidget2_libs
     ${KDE4_UI_LIBS} ${KDE4_KPARTS_LIBS} ${LIBMARBLEWIDGET_LIBRARY} ${KDE4_KHTML_LIBS}
 )
-target_link_libraries( worldmapwidget2library ${KDE4_UI_LIBS} ${KDE4_KPARTS_LIBS} ${LIBMARBLEWIDGET_LIBRARY} ${KDE4_KHTML_LIBS} )
-SET_TARGET_PROPERTIES( worldmapwidget2library PROPERTIES COMPILE_FLAGS "${COMPILE_FLAGS} ${MY_COMPILER_WARNINGS}")
-SET( worldmapwidget2library_libs
-    worldmapwidget2library ${worldmapwidget2library_libs}
+target_link_libraries( worldmapwidget2 ${KDE4_UI_LIBS} ${KDE4_KPARTS_LIBS} ${LIBMARBLEWIDGET_LIBRARY} ${KDE4_KHTML_LIBS} )
+SET_TARGET_PROPERTIES( worldmapwidget2 PROPERTIES COMPILE_FLAGS "${COMPILE_FLAGS} ${MY_COMPILER_WARNINGS}")
+SET( worldmapwidget2_libs
+    worldmapwidget2 ${worldmapwidget2_libs}
 )
+
+INSTALL(TARGETS worldmapwidget2 ${INSTALL_TARGETS_DEFAULT_ARGS})
+
+INSTALL(FILES lib-data/backend-osm.html
+              lib-data/backend-osm-js.js
+              lib-data/backend-googlemaps.html
+              lib-data/backend-googlemaps-js.js
+              lib-data/marker-green.png
+              lib-data/cluster-circle-00ff00.png
+              lib-data/cluster-circle-00ffff.png
+              lib-data/cluster-circle-ff0000.png
+              lib-data/cluster-circle-ff7f00.png
+              lib-data/cluster-circle-ffff00.png
+        DESTINATION ${DATA_INSTALL_DIR}/libworldmapwidget2/)
+
+INSTALL(FILES lib/worldmapwidget2.h
+              lib/worldmapwidget2_primitives.h
+        DESTINATION ${INCLUDE_INSTALL_DIR}/libworldmapwidget2 COMPONENT Devel)
 
 # demo widget
-SET( demo_widget_sources
-    demo-widget/demo-main.cpp
-    demo-widget/mainwindow.cpp
+SET( demo_sources
+    demo/demo-main.cpp
+    demo/mainwindow.cpp
 )
-kde4_add_executable( demo_widget  ${demo_widget_sources} )
-target_link_libraries( demo_widget ${worldmapwidget2library_libs} ${KEXIV2_LIBRARIES})
-SET_TARGET_PROPERTIES( demo_widget PROPERTIES COMPILE_FLAGS "${COMPILE_FLAGS} ${MY_COMPILER_WARNINGS}")
-
-INSTALL(FILES
-    backend-data/backend-osm.html
-    backend-data/backend-osm-js.js
-    backend-data/backend-googlemaps.html
-    backend-data/backend-googlemaps-js.js
-    backend-data/marker-green.png
-    backend-data/cluster-circle-00ff00.png
-    backend-data/cluster-circle-00ffff.png
-    backend-data/cluster-circle-ff0000.png
-    backend-data/cluster-circle-ff7f00.png
-    backend-data/cluster-circle-ffff00.png
-        DESTINATION ${DATA_INSTALL_DIR}/worldmapwidget2/)
+kde4_add_executable( worldmapwidget2_demo  ${demo_sources} )
+target_link_libraries( worldmapwidget2_demo ${worldmapwidget2_libs} ${KEXIV2_LIBRARIES})
+SET_TARGET_PROPERTIES( worldmapwidget2_demo PROPERTIES COMPILE_FLAGS "${COMPILE_FLAGS} ${MY_COMPILER_WARNINGS}")
+INSTALL(TARGETS worldmapwidget2_demo ${INSTALL_TARGETS_DEFAULT_ARGS})
 
 IF(KDE4_BUILD_TESTS)
 
@@ -105,7 +109,7 @@ IF(KDE4_BUILD_TESTS)
         tests/test-model.cpp
     )
     kde4_add_executable( test_model ${test_model_sources} )
-    target_link_libraries( test_model ${worldmapwidget2library_libs} ${QT_QTTEST_LIBRARY} )
+    target_link_libraries( test_model ${worldmapwidget2_libs} ${QT_QTTEST_LIBRARY} )
     SET_TARGET_PROPERTIES( test_model PROPERTIES COMPILE_FLAGS "${COMPILE_FLAGS} ${MY_COMPILER_WARNINGS}")
     ADD_TEST( test_model ${EXECUTABLE_OUTPUT_PATH}/test_model )
 ENDIF(KDE4_BUILD_TESTS)
