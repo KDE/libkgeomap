@@ -269,6 +269,17 @@ public:
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(WMW2::WMWMarker::MarkerAttributes)
 
+namespace WMW2
+{
+
+// helper functions:
+
+bool WMWHelperParseLatLonString(const QString& latLonString, WMWGeoCoordinate* const coordinates);
+bool WMWHelperParseXYStringToPoint(const QString& xyString, QPoint* const point);
+bool WMWHelperParseBoundsString(const QString& boundsString, QPair<WMWGeoCoordinate, WMWGeoCoordinate>* const boundsCoordinates);
+
+} /* WMW2 */
+
 inline QDebug operator<<(QDebug debugOut, const WMW2::WMWGeoCoordinate& coordinate)
 {
     debugOut << coordinate.geoUrl();

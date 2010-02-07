@@ -42,6 +42,7 @@ public:
 
     void loadInitialHTML(const QString& initialHTML);
     QVariant runScript(const QString& scriptCode);
+    bool runScript2Coordinates(const QString& scriptCode, WMWGeoCoordinate* const coordinates);
 
 protected:
     bool eventFilter(QObject* object, QEvent* event);

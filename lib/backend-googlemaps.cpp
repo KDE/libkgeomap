@@ -126,74 +126,7 @@ QWidget* BackendGoogleMaps::mapWidget() const
     return d->htmlWidgetWrapper.data();
 }
 
-bool BackendGoogleMaps::googleVariantToCoordinates(const QVariant& googleVariant, WMWGeoCoordinate* const coordinates) const
-{
-    bool valid = ( googleVariant.type()==QVariant::String );
-    if (valid)
-    {
-        QStringList coordinateStrings = googleVariant.toString().split(',');
-        valid = ( coordinateStrings.size() == 2 );
-        if (valid)
-        {
-            double    ptLongitude = 0.0;
-            double    ptLatitude  = 0.0;
 
-            ptLatitude = coordinateStrings.at(0).toDouble(&valid);
-            if (valid)
-                ptLongitude = coordinateStrings.at(1).toDouble(&valid);
-
-            if (valid)
-            {
-                if (coordinates)
-                {
-                    *coordinates = WMWGeoCoordinate(ptLatitude, ptLongitude);
-                }
-                
-                return true;
-            }
-        }
-    }
-
-    return false;
-}
-
-bool BackendGoogleMaps::googleVariantToPoint(const QVariant& googleVariant, QPoint* const point) const
-{
-    // a point is returned as (x, y)
-    bool valid = ( googleVariant.type()==QVariant::String );
-    if (valid)
-    {
-        QString pointString = googleVariant.toString();
-        valid = pointString.startsWith('(')&&pointString.endsWith(')');
-        QStringList pointStrings;
-        if (valid)
-        {
-            pointStrings = pointString.mid(1, pointString.length()-2).split(',');
-            valid = ( pointStrings.size() == 2 );
-        }
-        if (valid)
-        {
-            int ptX = 0;
-            int ptY = 0;
-
-            ptX = pointStrings.at(0).toInt(&valid);
-            if (valid)
-                ptY = pointStrings.at(1).toInt(&valid);
-
-            if (valid)
-            {
-                if (point)
-                {
-                    *point = QPoint(ptX, ptY);
-                }
-
-                return true;
-            }
-        }
-    }
-
-    return false;
-}
 
 WMWGeoCoordinate BackendGoogleMaps::getCenter() const
 {
@@ -463,9 +396,10 @@ void BackendGoogleMaps::slotHTMLEvents(const QStringList& events)
 
             // re-read the marker position:
             WMWGeoCoordinate clusterCoordinates;
-            const bool isValid = googleVariantToCoordinates(
-                d->htmlWidget->runScript(QString("wmwGetClusterPosition(%1);").arg(clusterIndex)),
-                                                            &clusterCoordinates);
+            const bool isValid = d->htmlWidget->runScript2Coordinates(
+                    QString("wmwGetClusterPosition(%1);").arg(clusterIndex),
+                    &clusterCoordinates
+                );
 
             if (!isValid)
                 continue;
@@ -489,9 +423,10 @@ void BackendGoogleMaps::slotHTMLEvents(const QStringList& events)
 
             // re-read the marker position:
             WMWGeoCoordinate markerCoordinates;
-            const bool isValid = googleVariantToCoordinates(
-                d->htmlWidget->runScript(QString("wmwGetMarkerPosition(%1);").arg(markerIndex)),
-                                                            &markerCoordinates);
+            const bool isValid = d->htmlWidget->runScript2Coordinates(
+                    QString("wmwGetMarkerPosition(%1);").arg(markerIndex),
+                    &markerCoordinates
+                );
 
             if (!isValid)
                 continue;
@@ -529,7 +464,7 @@ void BackendGoogleMaps::slotHTMLEvents(const QStringList& events)
     if (centerProbablyChanged)
     {
         // there is nothing we can do if the coordinates are invalid
-        /*const bool isValid = */googleVariantToCoordinates(d->htmlWidget->runScript("wmwGetCenter();"), &(d->cacheCenter));
+        /*const bool isValid = */d->htmlWidget->runScript2Coordinates("wmwGetCenter();", &(d->cacheCenter));
     }
 
     // update the actions if necessary:
@@ -540,22 +475,9 @@ void BackendGoogleMaps::slotHTMLEvents(const QStringList& events)
 
     if (mapBoundsProbablyChanged)
     {
-        kDebug()<<"getbounds";
-        // TODO: parse this better!!!
         const QString mapBoundsString = d->htmlWidget->runScript("map.getBounds().toString();").toString();
-//         kDebug()<<mapBoundsString;
-        const QString string1 = mapBoundsString.mid(1, mapBoundsString.length()-2);
-        int dumpComma = string1.indexOf(",", 0);
-        int splitComma = string1.indexOf(",", dumpComma+1);
-        QString coord1String = string1.mid(0, splitComma);
-        QString coord2String = string1.mid(splitComma+2);
-        WMWGeoCoordinate coord1, coord2;
-        googleVariantToCoordinates(QVariant(coord1String.mid(1, coord1String.length()-2)), &coord1);
-        googleVariantToCoordinates(QVariant(coord2String.mid(1, coord2String.length()-2)), &coord2);
-        d->cacheBounds = QPair<WMWGeoCoordinate, WMWGeoCoordinate>(coord1, coord2);
-//         kDebug()<<coord1String<<coord2String;
-//         QStringList mapBoundsStrings = mapBoundsString.split
-        kDebug()<<"gotbounds";
+        QPair<WMWGeoCoordinate, WMWGeoCoordinate> boundsCoordinates;
+        WMWHelperParseBoundsString(mapBoundsString, &d->cacheBounds);
     }
 
     if (mapBoundsProbablyChanged||!movedClusters.isEmpty())
@@ -608,11 +530,12 @@ bool BackendGoogleMaps::screenCoordinates(const WMWGeoCoordinate& coordinates, Q
     if (!d->isReady)
         return false;
 
-    const bool isValid = googleVariantToPoint(d->htmlWidget->runScript(
-            QString("wmwLatLngToPixel(%1, %2);")
-                .arg(coordinates.latString())
-                .arg(coordinates.lonString())
-                ),
+    const bool isValid = WMWHelperParseXYStringToPoint(
+            d->htmlWidget->runScript(
+                QString("wmwLatLngToPixel(%1, %2);")
+                    .arg(coordinates.latString())
+                    .arg(coordinates.lonString())
+                    ).toString(),
             point);
 
     // TODO: apparently, even points outside the visible area are returned as valid
@@ -625,11 +548,11 @@ bool BackendGoogleMaps::geoCoordinates(const QPoint& point, WMWGeoCoordinate* co
     if (!d->isReady)
         return false;
 
-    const QVariant coordinatesVariant = d->htmlWidget->runScript(
+    const bool isValid = d->htmlWidget->runScript2Coordinates(
             QString("wmwPixelToLatLng(%1, %2);")
                 .arg(point.x())
-                .arg(point.y()));
-    const bool isValid = googleVariantToCoordinates(coordinatesVariant, coordinates);
+                .arg(point.y()),
+            coordinates);
 
     return isValid;
 }

@@ -45,6 +45,7 @@ SET( widget_sources
     lib/map-backend.cpp
     lib/html_widget.cpp
     lib/markermodel.cpp
+    lib/worldmapwidget2_primitives.cpp
 )
 
 SET( backend_marble_sources

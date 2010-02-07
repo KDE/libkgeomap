@@ -165,5 +165,15 @@ QVariant HTMLWidget::runScript(const QString& scriptCode)
     return executeScript(scriptCode);
 }
 
+/**
+ * @brief Execute a script which returns coordinates and parse these
+ */
+bool HTMLWidget::runScript2Coordinates(const QString& scriptCode, WMWGeoCoordinate* const coordinates)
+{
+    const QVariant scriptResult = runScript(scriptCode);
+
+    return WMWHelperParseLatLonString(scriptResult.toString(), coordinates);
+}
+
 } /* WMW2 */
 
