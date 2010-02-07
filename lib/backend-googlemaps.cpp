@@ -475,8 +475,7 @@ void BackendGoogleMaps::slotHTMLEvents(const QStringList& events)
 
     if (mapBoundsProbablyChanged)
     {
-        const QString mapBoundsString = d->htmlWidget->runScript("map.getBounds().toString();").toString();
-        QPair<WMWGeoCoordinate, WMWGeoCoordinate> boundsCoordinates;
+        const QString mapBoundsString = d->htmlWidget->runScript("wmwGetBounds();").toString();
         WMWHelperParseBoundsString(mapBoundsString, &d->cacheBounds);
     }
 

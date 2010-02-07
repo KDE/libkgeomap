@@ -67,6 +67,9 @@ function wmwGetCenter() {
     var latlngString = map.getCenter().toUrlValue(12);
     return latlngString;
 }
+function wmwGetBounds() {
+    return map.getBounds().toString();
+}
 function wmwLatLngToPixel(lat, lon) {
     //      There is an offset in fromLatLngToDivPixel once the map has been panned
     var latlng = new google.maps.LatLng(lat, lon);

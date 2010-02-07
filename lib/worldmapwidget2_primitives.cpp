@@ -97,7 +97,7 @@ bool WMWHelperParseXYStringToPoint(const QString& xyString, QPoint* const point)
  */
 bool WMWHelperParseBoundsString(const QString& boundsString, QPair<WMWGeoCoordinate, WMWGeoCoordinate>* const boundsCoordinates)
 {
-    // ((lat1, lon1), (lat2, lon2))
+    // bounds are returned as ((lat1, lon1), (lat2, lon2))
 
     // check for minimum length
     bool valid = boundsString.size()>=13;

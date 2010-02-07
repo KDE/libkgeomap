@@ -19,6 +19,7 @@
 
 var mapDiv;
 var map;
+var mapLayer;
 var eventBuffer = new Array();
 var markerList = new Object();
 var clusterList = new Object();
@@ -78,6 +79,12 @@ function wmwSetCenter(lat, lon) {
 function wmwGetCenter() {
     var lonLat = wmwLonLatFromProjection(map.getCenter());
     return wmwLonLat2String(lonLat);
+}
+function wmwGetBounds() {
+    var mapBounds = mapLayer.getExtent();
+    mapBounds.transform(map.getProjectionObject(),new OpenLayers.Projection('EPSG:4326'));
+
+    return '(('+mapBounds.bottom+','+mapBounds.left+'),('+mapBounds.top+','+mapBounds.right+'))';
 }
 function wmwLatLngToPixel(lat, lon) {
     // TODO: do we need to transform the lonlat???
@@ -165,8 +172,8 @@ function initialize() {
         projection: new OpenLayers.Projection("EPSG:900913"),
         displayProjection: new OpenLayers.Projection("EPSG:4326")
     } );
-    layerTilesAtHome = new OpenLayers.Layer.OSM.Osmarender("Osmarender");
-    map.addLayer(layerTilesAtHome);
+    mapLayer = new OpenLayers.Layer.OSM.Osmarender("Osmarender");
+    map.addLayer(mapLayer);
 
     for (var layerColorIndex in layerColors) {
         eval('vectorLayersClusters'+layerColors[layerColorIndex]+' = new OpenLayers.Layer.Vector("Vector layer clusters",'+

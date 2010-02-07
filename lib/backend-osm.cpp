@@ -333,8 +333,7 @@ void BackendOSM::slotHTMLEvents(const QStringList& events)
 
     if (mapBoundsProbablyChanged)
     {
-        // TODO: get bounds from OSM
-        const QString mapBoundsString = "((-180,-90),(180,90))";//d->htmlWidget->runScript("map.getBounds().toString();").toString();
+        const QString mapBoundsString = d->htmlWidget->runScript("wmwGetBounds();").toString();
         WMWHelperParseBoundsString(mapBoundsString, &d->cacheBounds);
     }
 
