@@ -146,6 +146,32 @@ bool WMWHelperParseBoundsString(const QString& boundsString, QPair<WMWGeoCoordin
     return false;
 }
 
+/**
+ * @brief Split bounds crossing the dateline into parts which do not cross the dateline
+ */
+WMWGeoCoordinate::PairList WMWHelperNormalizeBounds(const WMWGeoCoordinate::Pair& boundsPair)
+{
+    WMWGeoCoordinate::PairList boundsList;
+
+    const qreal bWest = boundsPair.first.lon;
+    const qreal bEast = boundsPair.second.lon;
+    const qreal bNorth = boundsPair.second.lat;
+    const qreal bSouth = boundsPair.first.lat;
+//     kDebug()<<bWest<<bEast<<bNorth<<bSouth;
+
+    if (bEast<bWest)
+    {
+        boundsList << WMWGeoCoordinate::makePair(bSouth, bEast, bNorth, 0);
+        boundsList << WMWGeoCoordinate::makePair(bSouth, 0, bNorth, bWest);
+    }
+    else
+    {
+        boundsList << WMWGeoCoordinate::makePair(bSouth, bWest, bNorth, bEast);
+    }
+//     kDebug()<<boundsList;
+    return boundsList;
+}
+
 
 
 } /* WMW2 */

@@ -74,7 +74,7 @@ public:
     virtual QString getZoom() const;
 
     virtual int getMarkerModelLevel();
-    virtual QList<QPair<WMWGeoCoordinate, WMWGeoCoordinate> > getNormalizedBounds();
+    virtual WMWGeoCoordinate::PairList getNormalizedBounds();
 
     void marbleCustomPaint(Marble::GeoPainter* painter);
     void setShowCompass(const bool state);

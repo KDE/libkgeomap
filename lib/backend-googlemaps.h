@@ -64,7 +64,7 @@ public:
     virtual QString getZoom() const;
 
     virtual int getMarkerModelLevel();
-    virtual QList<QPair<WMWGeoCoordinate, WMWGeoCoordinate> > getNormalizedBounds();
+    virtual WMWGeoCoordinate::PairList getNormalizedBounds();
 
     QString getMapType() const;
     void setMapType(const QString& newMapType);

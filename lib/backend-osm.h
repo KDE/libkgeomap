@@ -64,7 +64,7 @@ public:
     virtual QString getZoom() const;
 
     virtual int getMarkerModelLevel();
-    virtual QList<QPair<WMWGeoCoordinate, WMWGeoCoordinate> > getNormalizedBounds();
+    virtual WMWGeoCoordinate::PairList getNormalizedBounds();
 
 public Q_SLOTS:
     virtual void slotClustersNeedUpdating();

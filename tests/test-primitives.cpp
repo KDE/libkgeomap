@@ -129,6 +129,56 @@ void TestPrimitives::testParseBoundsString()
     QVERIFY(!WMWHelperParseBoundsString("((-52.5,),(52.5,6.5))", 0));
 }
 
+void TestPrimitives::testNormalizeBounds_data()
+{
+    QTest::addColumn<WMWGeoCoordinate::Pair>("bounds");
+    QTest::addColumn<QList<WMWGeoCoordinate::Pair> >("nbounds");
+
+    // these ones should not be split:
+    QTest::newRow("top-left")
+        << WMWGeoCoordinate::makePair(10, 20, 12, 22)
+        << ( WMWGeoCoordinate::PairList() << WMWGeoCoordinate::makePair(10, 20, 12, 22) );
+
+    QTest::newRow("bottom-left")
+        << WMWGeoCoordinate::makePair(-12, 20, -10, 22)
+        << ( WMWGeoCoordinate::PairList() << WMWGeoCoordinate::makePair(-12, 20, -10, 22) );
+
+    QTest::newRow("top-right")
+        << WMWGeoCoordinate::makePair(10, -22, 12, -20)
+        << ( WMWGeoCoordinate::PairList() << WMWGeoCoordinate::makePair(10, -22, 12, -20) );
+
+    QTest::newRow("bottom-right")
+        << WMWGeoCoordinate::makePair(-12, -22, -10, -20)
+        << ( WMWGeoCoordinate::PairList() << WMWGeoCoordinate::makePair(-12, -22, -10, -20) );
+
+    QTest::newRow("cross_origin")
+        << WMWGeoCoordinate::makePair(-12, -22, 10, 20)
+        << ( WMWGeoCoordinate::PairList() << WMWGeoCoordinate::makePair(-12, -22, 10, 20) );
+
+    // these ones should be split:
+    QTest::newRow("cross_date")
+        << WMWGeoCoordinate::makePair(10, 20, 15, -170)
+        << ( WMWGeoCoordinate::PairList()
+                << WMWGeoCoordinate::makePair(10, -170, 15, 0)
+                << WMWGeoCoordinate::makePair(10, 0, 15, 20)
+            );
+
+    QTest::newRow("cross_date")
+        << WMWGeoCoordinate::makePair(-10, 20, 15, -170)
+        << ( WMWGeoCoordinate::PairList()
+                << WMWGeoCoordinate::makePair(-10, -170, 15, 0)
+                << WMWGeoCoordinate::makePair(-10, 0, 15, 20)
+            );
+
+}
+
+void TestPrimitives::testNormalizeBounds()
+{
+    QFETCH(WMWGeoCoordinate::Pair, bounds);
+
+    QTEST(WMWHelperNormalizeBounds(bounds), "nbounds");
+}
+
 QTEST_MAIN(TestPrimitives)
 
 

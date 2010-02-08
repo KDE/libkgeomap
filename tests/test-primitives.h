@@ -39,6 +39,8 @@ private Q_SLOTS:
     void testParseLatLonString();
     void testParseXYStringToPoint();
     void testParseBoundsString();
+    void testNormalizeBounds_data();
+    void testNormalizeBounds();
 };
 
 #endif /* TEST_MODEL_H */

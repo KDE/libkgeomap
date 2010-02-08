@@ -631,29 +631,19 @@ int BackendMarble::getMarkerModelLevel()
     return s->markerModel->maxLevel()-1;
 }
 
-QList<QPair<WMWGeoCoordinate, WMWGeoCoordinate> > BackendMarble::getNormalizedBounds()
+WMWGeoCoordinate::PairList BackendMarble::getNormalizedBounds()
 {
-    QList<QPair<WMWGeoCoordinate, WMWGeoCoordinate> > boundsList;
-
     const GeoDataLatLonAltBox marbleBounds = d->marbleWidget->map()->viewParams()->viewport()->viewLatLonAltBox();
     kDebug()<<marbleBounds.toString(GeoDataCoordinates::Degree);
 
-    const qreal bWest = marbleBounds.west(GeoDataCoordinates::Degree);
-    const qreal bEast = marbleBounds.east(GeoDataCoordinates::Degree);
-    const qreal bNorth = marbleBounds.north(GeoDataCoordinates::Degree);
-    const qreal bSouth = marbleBounds.south(GeoDataCoordinates::Degree);
+    const WMWGeoCoordinate::Pair boundsPair = WMWGeoCoordinate::makePair(
+            marbleBounds.south(GeoDataCoordinates::Degree),
+            marbleBounds.west(GeoDataCoordinates::Degree),
+            marbleBounds.north(GeoDataCoordinates::Degree),
+            marbleBounds.east(GeoDataCoordinates::Degree)
+        );
 
-    // TODO: does this cover all cases?
-    if (bEast<bWest)
-    {
-        boundsList << QPair<WMWGeoCoordinate, WMWGeoCoordinate>(WMWGeoCoordinate(bSouth, bWest), WMWGeoCoordinate(bNorth, 180.0));
-        boundsList << QPair<WMWGeoCoordinate, WMWGeoCoordinate>(WMWGeoCoordinate(bSouth, -180.0), WMWGeoCoordinate(bNorth, bEast));
-    }
-    else
-    {
-        boundsList << QPair<WMWGeoCoordinate, WMWGeoCoordinate>(WMWGeoCoordinate(bSouth, bWest), WMWGeoCoordinate(bNorth, bEast));
-    }
-    return boundsList;
+    return WMWHelperNormalizeBounds(boundsPair);
 }
 
 bool BackendMarble::eventFilter(QObject *object, QEvent *event)

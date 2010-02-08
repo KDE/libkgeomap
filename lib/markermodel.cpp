@@ -435,7 +435,7 @@ MarkerModel::NonEmptyIterator::NonEmptyIterator(MarkerModel* const model, const 
     initializeNextBounds();
 }
 
-MarkerModel::NonEmptyIterator::NonEmptyIterator(MarkerModel* const model, const int level, const QList<QPair<WMWGeoCoordinate, WMWGeoCoordinate> >& normalizedMapBounds)
+MarkerModel::NonEmptyIterator::NonEmptyIterator(MarkerModel* const model, const int level, const WMWGeoCoordinate::PairList& normalizedMapBounds)
 : d(new MarkerModelNonEmptyIteratorPrivate())
 {
     d->model = model;
@@ -445,7 +445,7 @@ MarkerModel::NonEmptyIterator::NonEmptyIterator(MarkerModel* const model, const 
     // store the coordinates of the bounds as indices:
     for (int i=0; i<normalizedMapBounds.count(); ++i)
     {
-        QPair<WMWGeoCoordinate, WMWGeoCoordinate> currentBounds = normalizedMapBounds.at(i);
+        WMWGeoCoordinate::Pair currentBounds = normalizedMapBounds.at(i);
         WMW2_ASSERT(currentBounds.first.lat<currentBounds.second.lat);
         WMW2_ASSERT(currentBounds.first.lon<currentBounds.second.lon);
 

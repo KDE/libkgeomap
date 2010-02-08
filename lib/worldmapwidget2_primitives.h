@@ -64,7 +64,8 @@ class WMWGeoCoordinate
 public:
 
     typedef QPair<WMWGeoCoordinate, WMWGeoCoordinate> Pair;
-    static Pair pair(const qreal lat1, const qreal lon1, const qreal lat2, const qreal lon2)
+    typedef QList<WMWGeoCoordinate::Pair> PairList;
+    static Pair makePair(const qreal lat1, const qreal lon1, const qreal lat2, const qreal lon2)
     {
         return Pair(WMWGeoCoordinate(lat1, lon1), WMWGeoCoordinate(lat2, lon2));
     }
@@ -277,6 +278,7 @@ namespace WMW2
 bool WMWHelperParseLatLonString(const QString& latLonString, WMWGeoCoordinate* const coordinates);
 bool WMWHelperParseXYStringToPoint(const QString& xyString, QPoint* const point);
 bool WMWHelperParseBoundsString(const QString& boundsString, QPair<WMWGeoCoordinate, WMWGeoCoordinate>* const boundsCoordinates);
+WMWGeoCoordinate::PairList WMWHelperNormalizeBounds(const WMWGeoCoordinate::Pair& boundsPair);
 
 } /* WMW2 */
 
@@ -286,6 +288,16 @@ inline QDebug operator<<(QDebug debugOut, const WMW2::WMWGeoCoordinate& coordina
     return debugOut;
 }
 
-// Q_DECLARE_METATYPE(WMW2::WMWGeoCoordinate)
+inline bool operator==(const WMW2::WMWGeoCoordinate& a, const WMW2::WMWGeoCoordinate& b)
+{
+    return
+        ( a.lat == b.lat ) &&
+        ( a.lon == b.lon ) &&
+        ( a.hasAlt == b.hasAlt ) &&
+        ( a.hasAlt ? ( a.alt == b.alt ) : true );
+}
+
+Q_DECLARE_METATYPE(WMW2::WMWGeoCoordinate::Pair)
+Q_DECLARE_METATYPE(WMW2::WMWGeoCoordinate::PairList)
 
 #endif /* WORLDMAPWIDGET2_PRIMITIVES_H */

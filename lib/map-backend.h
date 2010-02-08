@@ -73,7 +73,7 @@ public:
     virtual QString getZoom() const = 0;
 
     virtual int getMarkerModelLevel() = 0;
-    virtual QList<QPair<WMWGeoCoordinate, WMWGeoCoordinate> > getNormalizedBounds() = 0;
+    virtual WMWGeoCoordinate::PairList getNormalizedBounds() = 0;
 
     WMWSharedData* const s;
 

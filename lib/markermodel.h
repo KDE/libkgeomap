@@ -132,7 +132,7 @@ public:
     public:
         NonEmptyIterator(MarkerModel* const model, const int level);
         NonEmptyIterator(MarkerModel* const model, const int level, const QIntList& startIndex, const QIntList& endIndex);
-        NonEmptyIterator(MarkerModel* const model, const int level, const QList<QPair<WMWGeoCoordinate, WMWGeoCoordinate> >& normalizedMapBounds);
+        NonEmptyIterator(MarkerModel* const model, const int level, const WMWGeoCoordinate::PairList& normalizedMapBounds);
 
         bool atEnd() const;
         QIntList nextIndex();

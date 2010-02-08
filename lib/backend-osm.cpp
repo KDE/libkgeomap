@@ -491,27 +491,9 @@ int BackendOSM::getMarkerModelLevel()
     return tileLevel;
 }
 
-QList<QPair<WMWGeoCoordinate, WMWGeoCoordinate> > BackendOSM::getNormalizedBounds()
+WMWGeoCoordinate::PairList BackendOSM::getNormalizedBounds()
 {
-    QList<QPair<WMWGeoCoordinate, WMWGeoCoordinate> > boundsList;
-
-    const qreal bWest = d->cacheBounds.first.lon;
-    const qreal bEast = d->cacheBounds.second.lon;
-    const qreal bNorth = d->cacheBounds.second.lat;
-    const qreal bSouth = d->cacheBounds.first.lat;
-    kDebug()<<bWest<<bEast<<bNorth<<bSouth;
-
-    if (bEast<bWest)
-    {
-        boundsList << QPair<WMWGeoCoordinate, WMWGeoCoordinate>(WMWGeoCoordinate(bSouth, bEast), WMWGeoCoordinate(bNorth, 0));
-        boundsList << QPair<WMWGeoCoordinate, WMWGeoCoordinate>(WMWGeoCoordinate(bSouth, 0), WMWGeoCoordinate(bNorth, bWest));
-    }
-    else
-    {
-        boundsList << QPair<WMWGeoCoordinate, WMWGeoCoordinate>(WMWGeoCoordinate(bSouth, bWest), WMWGeoCoordinate(bNorth, bEast));
-    }
-    kDebug()<<boundsList;
-    return boundsList;
+    return WMWHelperNormalizeBounds(d->cacheBounds);
 }
 
 } /* WMW2 */

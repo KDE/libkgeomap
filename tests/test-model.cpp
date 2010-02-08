@@ -216,44 +216,44 @@ void TestModel::testIteratorPartial1()
     {
         {
             // iterate over a part which should be empty:
-            QList<WMWGeoCoordinate::Pair> boundsList;
-            boundsList << WMWGeoCoordinate::pair(-10.0, -10.0, -5.0, -5.0);
+            WMWGeoCoordinate::PairList boundsList;
+            boundsList << WMWGeoCoordinate::makePair(-10.0, -10.0, -5.0, -5.0);
             MarkerModel::NonEmptyIterator it(&mm, l, boundsList);
             QVERIFY( CountMarkersInIterator(&it) == 0 );
         }
 
         {
             // iterate over a part which should contain one marker:
-            QList<WMWGeoCoordinate::Pair> boundsList;
-            boundsList << WMWGeoCoordinate::pair(-10.0, -10.0, 5.0, 5.0);
+            WMWGeoCoordinate::PairList boundsList;
+            boundsList << WMWGeoCoordinate::makePair(-10.0, -10.0, 5.0, 5.0);
             MarkerModel::NonEmptyIterator it(&mm, l, boundsList);
             QVERIFY( CountMarkersInIterator(&it) == 1 );
 
             // iterate over a part which should contain one marker:
-            QList<WMWGeoCoordinate::Pair> boundsList1;
-            boundsList1 << WMWGeoCoordinate::pair(1.0, 2.0, 5.0, 5.0);
+            WMWGeoCoordinate::PairList boundsList1;
+            boundsList1 << WMWGeoCoordinate::makePair(1.0, 2.0, 5.0, 5.0);
             MarkerModel::NonEmptyIterator it1(&mm, l, boundsList1);
             QVERIFY( CountMarkersInIterator(&it1) == 1 );
 
-            QList<WMWGeoCoordinate::Pair> boundsList2;
-            boundsList2 << WMWGeoCoordinate::pair(-1.0, -2.0, 1.0, 2.0);
+            WMWGeoCoordinate::PairList boundsList2;
+            boundsList2 << WMWGeoCoordinate::makePair(-1.0, -2.0, 1.0, 2.0);
             MarkerModel::NonEmptyIterator it2(&mm, l, boundsList2);
             QVERIFY( CountMarkersInIterator(&it2) == 1 );
         }
 
         {
             // iterate over a part which should contain two markers:
-            QList<WMWGeoCoordinate::Pair> boundsList;
-            boundsList << WMWGeoCoordinate::pair(0.0, 0.0, 60.0, 60.0);
+            WMWGeoCoordinate::PairList boundsList;
+            boundsList << WMWGeoCoordinate::makePair(0.0, 0.0, 60.0, 60.0);
             MarkerModel::NonEmptyIterator it(&mm, l, boundsList);
             QVERIFY( CountMarkersInIterator(&it) == 2 );
         }
 
         {
             // iterate over two parts which should contain two markers:
-            QList<WMWGeoCoordinate::Pair> boundsList;
-            boundsList << WMWGeoCoordinate::pair(0.0, 0.0, 5.0, 5.0);
-            boundsList << WMWGeoCoordinate::pair(49.0, 59.0, 51.0, 61.0);
+            WMWGeoCoordinate::PairList boundsList;
+            boundsList << WMWGeoCoordinate::makePair(0.0, 0.0, 5.0, 5.0);
+            boundsList << WMWGeoCoordinate::makePair(49.0, 59.0, 51.0, 61.0);
             MarkerModel::NonEmptyIterator it(&mm, l, boundsList);
             QVERIFY( CountMarkersInIterator(&it) == 2 );
         }
@@ -263,8 +263,8 @@ void TestModel::testIteratorPartial1()
     mm.addMarker(WMWMarker(coord_2_2));
     {
         // at level 1, the iterator should find only one marker:
-        QList<WMWGeoCoordinate::Pair> boundsList;
-        boundsList << WMWGeoCoordinate::pair(0.0, 0.0, 1.0, 2.0);
+        WMWGeoCoordinate::PairList boundsList;
+        boundsList << WMWGeoCoordinate::makePair(0.0, 0.0, 1.0, 2.0);
         MarkerModel::NonEmptyIterator it(&mm, 1, boundsList);
         QVERIFY( CountMarkersInIterator(&it) == 1 );
     }
@@ -275,8 +275,8 @@ void TestModel::testIteratorPartial2()
     MarkerModel mm;
     const int maxLevel = mm.maxLevel();
 
-    QList<WMWGeoCoordinate::Pair> boundsList;
-    boundsList << WMWGeoCoordinate::pair(0.55, 1.55, 0.56, 1.56);
+    WMWGeoCoordinate::PairList boundsList;
+    boundsList << WMWGeoCoordinate::makePair(0.55, 1.55, 0.56, 1.56);
 
     const WMWGeoCoordinate coordInBounds1 = WMWGeoCoordinate(0.556, 1.556);
     const WMWGeoCoordinate coordOutOfBounds1 = WMWGeoCoordinate(0.5, 1.5);
