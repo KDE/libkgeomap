@@ -17,14 +17,12 @@
  *
  * ============================================================ */
 
+#include "backend-altitude-geonames.moc"
+
 // KDE includes
 
 #include <kio/job.h>
 #include <klocale.h>
-
-// local includes
-
-#include "backend-altitude-geonames.h"
 
 namespace WMW2
 {

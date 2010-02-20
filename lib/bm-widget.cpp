@@ -17,9 +17,10 @@
  *
  * ============================================================ */
 
+#include "bm-widget.moc"
+
 // local includes
 
-#include "bm-widget.h"
 #include "backend-marble.h"
 
 namespace WMW2 {

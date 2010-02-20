@@ -17,8 +17,6 @@
  *
  * ============================================================ */
 
-// local includes
-
 #include "worldmapwidget2_primitives.h"
 
 namespace WMW2

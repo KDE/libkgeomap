@@ -17,6 +17,8 @@
  *
  * ============================================================ */
 
+#include "worldmapwidget2.moc"
+
 // C++ includes
 
 #include <math.h>
@@ -33,13 +35,11 @@
 #include <kaction.h>
 #include <kconfig.h>
 #include <kconfiggroup.h>
-#include <kdebug.h>
 #include <khbox.h>
 #include <klocale.h>
 
 // local includes
 
-#include "worldmapwidget2.h"
 #include "map-backend.h"
 #include "backend-marble.h"
 #include "backend-googlemaps.h"

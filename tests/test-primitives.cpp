@@ -17,9 +17,7 @@
  *
  * ============================================================ */
 
-// local includes
-
-#include "test-primitives.h"
+#include "test-primitives.moc"
 
 using namespace WMW2;
 

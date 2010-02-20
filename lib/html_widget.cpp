@@ -17,6 +17,8 @@
  *
  * ============================================================ */
 
+#include "html_widget.moc"
+
 // Qt includes
 
 #include <QTimer>
@@ -24,11 +26,6 @@
 // KDE includes
 
 #include <khtmlview.h>
-
-// local includes
-
-#include "html_widget.h"
-
 
 namespace WMW2 {
 

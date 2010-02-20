@@ -17,9 +17,7 @@
  *
  * ============================================================ */
 
-// local includes
-
-#include "test-model.h"
+#include "test-model.moc"
 
 using namespace WMW2;
 

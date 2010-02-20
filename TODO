@@ -18,7 +18,6 @@ TODO
 - make UI not block while images are being loaded
 
 LATER
-- include .moc - this is somehow not working now ...
 - re-implement clustering for the markers
 - don't crash on JavaScript errors ...
 - find out how to trigger signals from inside JavaScript ...
@@ -44,4 +43,4 @@ DONE
 - calls to wmwLatLngToPixel are not correct when panning in Google Maps until a zoom is performed
 - only search for markers in the visible part of the map
 - make markers moveable in Marble
-
+- include .moc

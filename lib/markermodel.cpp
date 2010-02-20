@@ -17,17 +17,12 @@
  *
  * ============================================================ */
 
-// KDE includes
-
-#include <kdebug.h>
-
-// local includes
-
 #include "markermodel.h"
 
 namespace WMW2 {
 
 typedef QPair<int, int> QIntPair;
+
 class MarkerModelPrivate
 {
 public:

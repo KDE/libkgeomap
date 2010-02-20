@@ -17,9 +17,7 @@
  *
  * ============================================================ */
 
-// local includes
-
-#include "map-backend.h"
+#include "map-backend.moc"
 
 namespace WMW2 {
 

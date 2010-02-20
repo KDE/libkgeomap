@@ -17,7 +17,7 @@
  *
  * ============================================================ */
 
-#include "altitude-backend.h"
+#include "altitude-backend.moc"
 
 namespace WMW2
 {

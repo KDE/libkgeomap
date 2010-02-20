@@ -17,6 +17,8 @@
  *
  * ============================================================ */
 
+#include "backend-marble.moc"
+
 // Qt includes
 
 #include <QMenu>
@@ -36,7 +38,6 @@
 
 // local includes
 
-#include "backend-marble.h"
 #include "bm-widget.h"
 #include "markermodel.h"
 #include "worldmapwidget2.h"

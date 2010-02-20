@@ -17,6 +17,8 @@
  *
  * ============================================================ */
 
+#include "backend-osm.moc"
+
 // Qt includes
 
 #include <QActionGroup>
@@ -32,7 +34,6 @@
 
 // local includes
 
-#include "backend-osm.h"
 #include "html_widget.h"
 #include "worldmapwidget2.h"
 #include "markermodel.h"

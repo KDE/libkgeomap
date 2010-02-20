@@ -17,6 +17,8 @@
  *
  * ============================================================ */
 
+#include "mainwindow.moc"
+
 // Qt includes
 
 #include <QCloseEvent>
@@ -50,7 +52,6 @@
 
 // local includes
 
-#include "mainwindow.h"
 #include "worldmapwidget2.h"
 
 Q_DECLARE_METATYPE(QTreeWidgetItem*)
