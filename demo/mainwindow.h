@@ -25,6 +25,10 @@
 #include <kmainwindow.h>
 #include <kurl.h>
 
+// local includes
+
+#include <worldmapwidget2_primitives.h>
+
 class KCmdLineArgs;
 
 class MainWindowPrivate;
@@ -50,6 +54,7 @@ private Q_SLOTS:
     void slotImageLoadingBunchReady();
     void slotGroupableMarkersMoved(const QList<int>& markerIndices);
     void slotSingleMarkersMoved(const QList<int>& markerIndices);
+    void slotAltitudeLookupReady(const WMW2::WMWAltitudeLookup::List& altitudes);
 
 private:
     MainWindowPrivate* const d;

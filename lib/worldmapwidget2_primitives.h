@@ -104,7 +104,12 @@ public:
         hasAlt = true;
         alt = inAlt;
     }
-    
+
+    void clearAlt()
+    {
+        hasAlt = false;
+    }
+
     QString altString() const { return QString::number(alt, 'g', 12); }
     QString latString() const { return QString::number(lat, 'g', 12); }
     QString lonString() const { return QString::number(lon, 'g', 12); }
@@ -119,6 +124,11 @@ public:
         {
             return QString::fromLatin1("geo:%1,%2").arg(latString()).arg(lonString());
         }
+    }
+
+    bool sameLonLatAs(const WMWGeoCoordinate& other) const
+    {
+        return (lat==other.lat)&&(lon==other.lon);
     }
 
     static WMWGeoCoordinate fromGeoUrl(const QString& url, bool* const parsedOkay = 0)
@@ -280,6 +290,17 @@ bool WMWHelperParseXYStringToPoint(const QString& xyString, QPoint* const point)
 bool WMWHelperParseBoundsString(const QString& boundsString, QPair<WMWGeoCoordinate, WMWGeoCoordinate>* const boundsCoordinates);
 WMWGeoCoordinate::PairList WMWHelperNormalizeBounds(const WMWGeoCoordinate::Pair& boundsPair);
 
+// primitives for altitude lookup:
+class WMWAltitudeLookup
+{
+public:
+    WMWGeoCoordinate coordinates;
+    QVariant data;
+
+    typedef QList<WMWAltitudeLookup> List;
+};
+
+
 } /* WMW2 */
 
 inline QDebug operator<<(QDebug debugOut, const WMW2::WMWGeoCoordinate& coordinate)
@@ -299,5 +320,6 @@ inline bool operator==(const WMW2::WMWGeoCoordinate& a, const WMW2::WMWGeoCoordi
 
 Q_DECLARE_METATYPE(WMW2::WMWGeoCoordinate::Pair)
 Q_DECLARE_METATYPE(WMW2::WMWGeoCoordinate::PairList)
+Q_DECLARE_METATYPE(WMW2::WMWAltitudeLookup)
 
 #endif /* WORLDMAPWIDGET2_PRIMITIVES_H */

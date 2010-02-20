@@ -125,6 +125,9 @@ MainWindow::MainWindow(KCmdLineArgs* const cmdLineArgs, QWidget* const parent)
     connect(d->mapWidget, SIGNAL(signalSingleMarkersMoved(const QList<int>&)),
             this, SLOT(slotSingleMarkersMoved(const QList<int>&)));
 
+    connect(d->mapWidget, SIGNAL(signalAltitudeLookupReady(const WMW2::WMWAltitudeLookup::List&)),
+            this, SLOT(slotAltitudeLookupReady(const WMW2::WMWAltitudeLookup::List&)));
+
 //     d->mapWidget->resize(d->mapWidget->width(), 200);
     d->splitter->addWidget(d->mapWidget);
     d->splitter->setCollapsible(0, false);
@@ -410,7 +413,8 @@ void MainWindow::slotSingleMarkersMoved(const QList<int>& markerIndices)
 {
     kDebug()<<"markers moved: "<<markerIndices;
 
-    // update the treewidget items:
+    // update the treewidget items and prepare altitude lookups
+    WMWAltitudeLookup::List altitudeQueries;
     for (int i=0; i<markerIndices.count(); ++i)
     {
         const WMWMarker& myMarker = d->mapWidget->getSingleMarker(markerIndices.at(i));
@@ -420,5 +424,37 @@ void MainWindow::slotSingleMarkersMoved(const QList<int>& markerIndices)
             continue;
 
         treeItem->setText(1, myMarker.coordinates.geoUrl());
+
+        WMWAltitudeLookup myLookup;
+        myLookup.coordinates = myMarker.coordinates;
+        myLookup.data = QVariant(markerIndices.at(i));
+        altitudeQueries << myLookup;
+    }
+
+    if (!altitudeQueries.isEmpty())
+    {
+        d->mapWidget->queryAltitudes(altitudeQueries, "geonames");
+    }
+}
+
+void MainWindow::slotAltitudeLookupReady(const WMWAltitudeLookup::List& altitudes)
+{
+    for (int i=0; i<altitudes.count(); ++i)
+    {
+        const WMWAltitudeLookup& myLookup = altitudes.at(i);
+
+        const int markerIndex = myLookup.data.toInt();
+        kDebug()<<markerIndex;
+
+        // TODO: this is problematic if a marker was removed in between
+        WMWMarker& myMarker = d->mapWidget->getSingleMarker(markerIndex);
+        myMarker.coordinates = myLookup.coordinates;
+
+        QTreeWidgetItem* const treeItem = myMarker.data.value<QTreeWidgetItem*>();
+        if (!treeItem)
+            continue;
+
+        treeItem->setText(1, myMarker.coordinates.geoUrl());
+
     }
 }

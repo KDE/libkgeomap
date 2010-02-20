@@ -60,7 +60,7 @@ public:
 
     void addClusterableMarkers(const WMWMarker::List& markerList);
     WMWMarker getClusterableMarker(const int markerIndex);
-    WMWMarker getSingleMarker(const int markerIndex);
+    WMWMarker& getSingleMarker(const int markerIndex);
     void addSingleMarkers(const WMWMarker::List& markerList);
     void updateMarkers();
     void updateClusters();
@@ -69,6 +69,7 @@ public:
                        Qt::PenStyle *strokeStyle, QString *labelText, QColor *labelColor) const;
 
     QString convertZoomToBackendZoom(const QString& someZoom, const QString& targetBackend) const;
+    bool queryAltitudes(const WMWAltitudeLookup::List& queryItems, const QString& backendName = "");
 
 public Q_SLOTS:
     void slotZoomIn();
@@ -79,6 +80,7 @@ public Q_SLOTS:
 Q_SIGNALS:
     void signalSingleMarkersMoved(const QList<int>& markerIndices);
     void signalGroupableMarkersMoved(const QList<int>& markerIndices);
+    void signalAltitudeLookupReady(const WMW2::WMWAltitudeLookup::List& altitudes);
 
 protected:
     void applyCacheToBackend();

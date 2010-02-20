@@ -45,6 +45,7 @@
 #include "backend-googlemaps.h"
 #include "backend-osm.h"
 #include "markermodel.h"
+#include "backend-altitude-geonames.h"
 
 namespace WMW2 {
 
@@ -64,7 +65,8 @@ class WorldMapWidget2Private
 {
 public:
     WorldMapWidget2Private()
-    : loadedBackends(),
+    : loadedAltitudeBackends(),
+      loadedBackends(),
       currentBackend(0),
       currentBackendReady(false),
       currentBackendName(),
@@ -77,7 +79,8 @@ public:
       controlWidget(0)
     {
     }
-    
+
+    QList<AltitudeBackend*> loadedAltitudeBackends;
     QList<MapBackend*> loadedBackends;
     MapBackend* currentBackend;
     bool currentBackendReady;
@@ -107,6 +110,11 @@ WorldMapWidget2::WorldMapWidget2(QWidget* const parent)
     d->loadedBackends.append(new BackendGoogleMaps(s, this));
     d->loadedBackends.append(new BackendMarble(s, this));
     d->loadedBackends.append(new BackendOSM(s, this));
+
+    AltitudeBackend* const geonamesBackend = new BackendAltitudeGeonames(s, this);
+    d->loadedAltitudeBackends.append(geonamesBackend);
+    connect(geonamesBackend, SIGNAL(signalAltitudes(const WMW2::WMWAltitudeLookup::List)),
+            this, SIGNAL(signalAltitudeLookupReady(const WMW2::WMWAltitudeLookup::List)));
 }
 
 WorldMapWidget2::~WorldMapWidget2()
@@ -979,15 +987,29 @@ WMWMarker WorldMapWidget2::getClusterableMarker(const int markerIndex)
     return s->markerModel->markerList.at(markerIndex);
 }
 
-WMWMarker WorldMapWidget2::getSingleMarker(const int markerIndex)
+WMWMarker& WorldMapWidget2::getSingleMarker(const int markerIndex)
 {
     WMW2_ASSERT(markerIndex<s->markerList.count());
-    return s->markerList.at(markerIndex);
+    return s->markerList[markerIndex];
 }
 
 void WorldMapWidget2::slotMarkersMoved(const QIntList& markerIndices)
 {
     emit(signalSingleMarkersMoved(markerIndices));
+}
+
+bool WorldMapWidget2::queryAltitudes(const WMWAltitudeLookup::List& queryItems, const QString& backendName)
+{
+    for (int i=0; i<d->loadedAltitudeBackends.count(); ++i)
+    {
+        AltitudeBackend* const altitudeBackend = d->loadedAltitudeBackends.at(i);
+
+        if (altitudeBackend->backendName() == backendName)
+        {
+            return altitudeBackend->queryAltitudes(queryItems);
+        }
+    }
+    return false;
 }
 
 } /* WMW2 */

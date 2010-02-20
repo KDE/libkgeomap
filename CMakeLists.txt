@@ -46,6 +46,9 @@ SET( widget_sources
     lib/html_widget.cpp
     lib/markermodel.cpp
     lib/worldmapwidget2_primitives.cpp
+    lib/altitude-backend.cpp
+
+    lib/backend-altitude-geonames.cpp
 )
 
 SET( backend_marble_sources
