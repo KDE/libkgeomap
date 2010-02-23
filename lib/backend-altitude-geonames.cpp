@@ -54,7 +54,7 @@ public:
     
 };
 
-BackendAltitudeGeonames::BackendAltitudeGeonames(WMWSharedData* const sharedData, QObject* const parent)
+BackendAltitudeGeonames::BackendAltitudeGeonames(const QExplicitlySharedDataPointer<WMWSharedData>& sharedData, QObject* const parent)
 : AltitudeBackend(sharedData, parent), d(new BackendAltitudeGeonamesPrivate)
 {
 }

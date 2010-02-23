@@ -92,7 +92,7 @@ public:
     QPixmap markerPixmap;
 };
 
-BackendMarble::BackendMarble(WMWSharedData* const sharedData, QObject* const parent)
+BackendMarble::BackendMarble(const QExplicitlySharedDataPointer<WMWSharedData>& sharedData, QObject* const parent)
 : MapBackend(sharedData, parent), d(new BackendMarblePrivate())
 {
     const KUrl markerGreenUrl = KStandardDirs::locate("data", "libworldmapwidget2/marker-green.png");

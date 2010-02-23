@@ -24,6 +24,7 @@
 
 #include <QAbstractItemModel>
 #include <QPoint>
+#include <QSharedData>
 #include <QString>
 #include <QStringList>
 #include <QVariant>
@@ -259,11 +260,12 @@ public:
 class MarkerModel;
 class WorldMapWidget2;
 
-class WMWSharedData
+class WMWSharedData : public QSharedData
 {
 public:
     WMWSharedData()
-    : worldMapWidget(0),
+    : QSharedData(),
+      worldMapWidget(0),
       visibleMarkers(),
       markerModel(0),
       clusterList(),

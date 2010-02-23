@@ -29,7 +29,7 @@ public:
     }
 };
 
-MapBackend::MapBackend(WMWSharedData* const sharedData, QObject* const parent)
+MapBackend::MapBackend(const QExplicitlySharedDataPointer<WMWSharedData>& sharedData, QObject* const parent)
 : QObject(parent), s(sharedData), d(new MapBackendPrivate())
 {
 

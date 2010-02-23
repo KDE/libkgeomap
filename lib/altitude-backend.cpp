@@ -22,7 +22,7 @@
 namespace WMW2
 {
 
-AltitudeBackend::AltitudeBackend(WMWSharedData* const sharedData, QObject* const parent)
+AltitudeBackend::AltitudeBackend(const QExplicitlySharedDataPointer<WMWSharedData>& sharedData, QObject* const parent)
 : QObject(parent), s(sharedData)
 {
 

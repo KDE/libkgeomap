@@ -95,7 +95,7 @@ protected Q_SLOTS:
     void slotClustersMoved(const QIntList& clusterIndices);
 
 private:
-    WMWSharedData* const s;
+    const QExplicitlySharedDataPointer<WMWSharedData> s;
     WorldMapWidget2Private* const d;
 };
 

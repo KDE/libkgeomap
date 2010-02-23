@@ -30,7 +30,7 @@ class AltitudeBackend : public QObject
 Q_OBJECT
 
 public:
-    AltitudeBackend(WMWSharedData* const sharedData, QObject* const parent);
+    AltitudeBackend(const QExplicitlySharedDataPointer<WMWSharedData>& sharedData, QObject* const parent);
     virtual ~AltitudeBackend();
 
     virtual QString backendName() const = 0;
@@ -38,7 +38,7 @@ public:
 
     virtual bool queryAltitudes(const WMWAltitudeLookup::List& queryItems) = 0;
 
-    WMWSharedData* const s;
+    const QExplicitlySharedDataPointer<WMWSharedData> s;
 
 Q_SIGNALS:
     void signalAltitudes(const WMW2::WMWAltitudeLookup::List results);

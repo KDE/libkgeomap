@@ -42,7 +42,7 @@ Q_OBJECT
 
 public:
 
-    MapBackend(WMWSharedData* const sharedData, QObject* const parent);
+    MapBackend(const QExplicitlySharedDataPointer<WMWSharedData>& sharedData, QObject* const parent);
     virtual ~MapBackend();
 
     virtual QString backendName() const = 0;
@@ -75,7 +75,7 @@ public:
     virtual int getMarkerModelLevel() = 0;
     virtual WMWGeoCoordinate::PairList getNormalizedBounds() = 0;
 
-    WMWSharedData* const s;
+    const QExplicitlySharedDataPointer<WMWSharedData> s;
 
 public Q_SLOTS:
     virtual void slotClustersNeedUpdating() = 0;

@@ -101,6 +101,7 @@ public:
 WorldMapWidget2::WorldMapWidget2(QWidget* const parent)
 : QWidget(parent), s(new WMWSharedData), d(new WorldMapWidget2Private)
 {
+    // TODO: someone has to delete this model later!
     s->markerModel = new MarkerModel();
     s->worldMapWidget = this;
 

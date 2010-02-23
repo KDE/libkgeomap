@@ -62,7 +62,7 @@ public:
     QPair<WMWGeoCoordinate, WMWGeoCoordinate> cacheBounds;
 };
 
-BackendOSM::BackendOSM(WMWSharedData* const sharedData, QObject* const parent)
+BackendOSM::BackendOSM(const QExplicitlySharedDataPointer<WMWSharedData>& sharedData, QObject* const parent)
 : MapBackend(sharedData, parent), d(new BackendOSMPrivate())
 {
     d->htmlWidgetWrapper = new QWidget();

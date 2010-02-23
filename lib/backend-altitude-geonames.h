@@ -35,7 +35,7 @@ class BackendAltitudeGeonames : public AltitudeBackend
 Q_OBJECT
 
 public:
-    BackendAltitudeGeonames(WMWSharedData* const sharedData, QObject* const parent);
+    BackendAltitudeGeonames(const QExplicitlySharedDataPointer<WMWSharedData>& sharedData, QObject* const parent);
     virtual ~BackendAltitudeGeonames();
 
     virtual QString backendName() const;

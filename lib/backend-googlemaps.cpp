@@ -80,7 +80,7 @@ public:
     QPair<WMWGeoCoordinate, WMWGeoCoordinate> cacheBounds;
 };
 
-BackendGoogleMaps::BackendGoogleMaps(WMWSharedData* const sharedData, QObject* const parent)
+BackendGoogleMaps::BackendGoogleMaps(const QExplicitlySharedDataPointer<WMWSharedData>& sharedData, QObject* const parent)
 : MapBackend(sharedData, parent), d(new BackendGoogleMapsPrivate())
 {
     d->htmlWidgetWrapper = new QWidget();
