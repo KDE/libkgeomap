@@ -43,6 +43,8 @@ private Q_SLOTS:
     void testIteratorWholeWorld();
     void testIteratorPartial1();
     void testIteratorPartial2();
+    void testRemoveMarkers();
+    void testPreExistingMarkers();
 };
 
 #endif /* TEST_MODEL_H */

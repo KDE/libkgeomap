@@ -23,6 +23,7 @@
 // Qt includes
 
 #include <QBitArray>
+#include <QObject>
 
 // local includes
 
@@ -33,8 +34,10 @@ namespace WMW2 {
 class MarkerModelPrivate;
 class MarkerModelNonEmptyIteratorPrivate;
 
-class MarkerModel
+class MarkerModel : public QObject/* : public QAbstractItemModel*/
 {
+Q_OBJECT
+
 public:
 
     class Tile
@@ -97,11 +100,20 @@ public:
 
         QVector<Tile*> children;
         QBitArray childrenMask;
-        QIntList markerIndices;
+        QList<QPersistentModelIndex> markerIndices;
     };
 
     MarkerModel();
     ~MarkerModel();
+
+    void setMarkerModel(QAbstractItemModel* const markerModel, const int coordinatesRole);
+
+//     Qt::ItemFlags flags(const QModelIndex& index) const;
+//     QVariant data(const QModelIndex& index, int role=Qt::DisplayRole) const;
+//     QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
+//     int rowCount(const QModelIndex& parent = QModelIndex()) const;
+//     int columnCount(const QModelIndex& parent = QModelIndex()) const;
+//     bool hasChildren(const QModelIndex& parent = QModelIndex()) const;
 
     WMWGeoCoordinate tileIndexToCoordinate(const QIntList& tileIndex);
     QIntList coordinateToTileIndex(const WMWGeoCoordinate& coordinate, const int level);
@@ -112,12 +124,7 @@ public:
     QList<QIntPair> linearIndexToLatLonIndex(const QIntList& linearIndex) const;
     QIntList latLonIndexToLinearIndex(const QList<QIntPair>& latLonIndex) const;
 
-    int addMarker(const WMWMarker& newMarker);
-    void removeMarkerIndexFromGrid(const int markerIndex);
-    void addMarkers(const WMWMarker::List& newMarkers);
-    void addMarkerIndexToGrid(const int markerIndex);
-    void moveMarker(const int markerIndex, const WMWGeoCoordinate& newPosition);
-    void clear();
+    void moveMarker(const QPersistentModelIndex& markerIndex, const WMWGeoCoordinate& newPosition);
     int getTileMarkerCount(const QIntList& tileIndex);
     Tile* getTile(const QIntList& tileIndex, const bool stopIfEmpty = false);
     int maxLevel() const;
@@ -125,7 +132,11 @@ public:
     Tile* rootTile() const;
     QPair<int, int> getTesselationSizes(const int level) const;
 
-    WMWMarker::List markerList;
+private:
+    void removeMarkerIndexFromGrid(const QPersistentModelIndex& markerIndex);
+    void addMarkerIndexToGrid(const QPersistentModelIndex& markerIndex);
+
+public:
 
     class NonEmptyIterator
     {
@@ -133,6 +144,7 @@ public:
         NonEmptyIterator(MarkerModel* const model, const int level);
         NonEmptyIterator(MarkerModel* const model, const int level, const QIntList& startIndex, const QIntList& endIndex);
         NonEmptyIterator(MarkerModel* const model, const int level, const WMWGeoCoordinate::PairList& normalizedMapBounds);
+        ~NonEmptyIterator();
 
         bool atEnd() const;
         QIntList nextIndex();
@@ -143,6 +155,10 @@ public:
         bool initializeNextBounds();
         MarkerModelNonEmptyIteratorPrivate* const d;
     };
+
+private Q_SLOTS:
+    void slotSourceModelRowsInserted(const QModelIndex& parentIndex, int start, int end);
+    void slotSourceModelRowsAboutToBeRemoved(const QModelIndex& parentIndex, int start, int end);
 
 private:
     MarkerModelPrivate* const d;

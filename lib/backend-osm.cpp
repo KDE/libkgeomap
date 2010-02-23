@@ -193,16 +193,17 @@ void BackendOSM::updateMarkers()
     
     // re-transfer all markers to the javascript-part:
     d->htmlWidget->runScript(QString("wmwClearMarkers();"));
-    for (QIntList::const_iterator it = s->visibleMarkers.constBegin(); it!=s->visibleMarkers.constEnd(); ++it)
+    for (int row = 0; row<s->specialMarkersModel->rowCount(); ++row)
     {
-        const int currentIndex = *it;
-        const WMWMarker& currentMarker = s->markerList.at(currentIndex);
+        const QModelIndex currentIndex = s->specialMarkersModel->index(row, 0);
+
+        const WMWGeoCoordinate currentCoordinates = s->specialMarkersModel->data(currentIndex, s->specialMarkersCoordinatesRole).value<WMWGeoCoordinate>();
 
         d->htmlWidget->runScript(QString("wmwAddMarker(%1, %2, %3, %4);")
-                .arg(currentIndex)
-                .arg(currentMarker.coordinates.latString())
-                .arg(currentMarker.coordinates.lonString())
-                .arg(currentMarker.isDraggable()?"true":"false")
+                .arg(row)
+                .arg(currentCoordinates.latString())
+                .arg(currentCoordinates.lonString())
+                .arg(/*currentMarker.isDraggable()?*/"true"/*:"false"*/)
             );
     }
     
@@ -216,7 +217,7 @@ void BackendOSM::slotHTMLEvents(const QStringList& events)
     bool zoomProbablyChanged = false;
     bool mapBoundsProbablyChanged = false;
     QIntList movedClusters;
-    QIntList movedMarkers;
+    QList<QPersistentModelIndex> movedMarkers;
     for (QStringList::const_iterator it = events.constBegin(); it!=events.constEnd(); ++it)
     {
         const QString eventCode = it->left(2);
@@ -274,26 +275,28 @@ void BackendOSM::slotHTMLEvents(const QStringList& events)
             // TODO: buffer this event type!
             // marker moved
             bool okay = false;
-            const int markerIndex= eventParameter.toInt(&okay);
+            const int markerRow= eventParameter.toInt(&okay);
             if (!okay)
                 continue;
 
-            if ((markerIndex<0)||(markerIndex>s->markerList.count()))
+            if ((markerRow<0)||(markerRow>s->specialMarkersModel->rowCount()))
                 continue;
 
             // re-read the marker position:
             WMWGeoCoordinate markerCoordinates;
             const bool isValid = d->htmlWidget->runScript2Coordinates(
-                    QString("wmwGetMarkerPosition(%1);").arg(markerIndex),
-                    &markerCoordinates);
+                    QString("wmwGetMarkerPosition(%1);").arg(markerRow),
+                    &markerCoordinates
+                );
 
             if (!isValid)
                 continue;
 
             // TODO: this discards the altitude!
-            s->markerList[markerIndex].coordinates = markerCoordinates;
+            const QModelIndex markerIndex = s->specialMarkersModel->index(markerRow, 0);
+            s->specialMarkersModel->setData(markerIndex, QVariant::fromValue(markerCoordinates), s->specialMarkersCoordinatesRole);
 
-            movedMarkers << markerIndex;
+            movedMarkers << QPersistentModelIndex(markerIndex);
         }
         else if (eventCode=="do")
         {
@@ -311,7 +314,7 @@ void BackendOSM::slotHTMLEvents(const QStringList& events)
     if (!movedMarkers.isEmpty())
     {
         kDebug()<<movedMarkers;
-        emit(signalMarkersMoved(movedMarkers));
+        emit(signalSpecialMarkersMoved(movedMarkers));
     }
 
     // now process the buffered events:

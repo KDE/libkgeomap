@@ -19,7 +19,21 @@
 
 #include "test-model.moc"
 
+// Qt includes
+
+#include <QStandardItemModel>
+
 using namespace WMW2;
+
+const int CoordinatesRole = Qt::UserRole + 0;
+
+QStandardItem* MakeItemAt(const WMWGeoCoordinate& coordinates)
+{
+    QStandardItem* const newItem = new QStandardItem(coordinates.geoUrl());
+    newItem->setData(QVariant::fromValue(coordinates), CoordinatesRole);
+
+    return newItem;
+}
 
 /**
  * @brief Helper function: count the number of markers found by an iterator
@@ -58,7 +72,9 @@ void TestModel::testIndices()
 
 void TestModel::testBasicModel()
 {
+    const QSharedPointer<QStandardItemModel> itemModel(new QStandardItemModel());
     MarkerModel mm;
+    mm.setMarkerModel(itemModel.data(), CoordinatesRole);
 
     const int maxLevel = mm.maxLevel();
 
@@ -70,7 +86,7 @@ void TestModel::testBasicModel()
         QVERIFY(mm.getTile(mm.coordinateToTileIndex(coord_1_2, l), true) == 0);
     }
 
-    mm.addMarker(WMWMarker(coord_1_2));
+    itemModel->appendRow(MakeItemAt(coord_1_2));
 
     // now there should be tiles with one marker:
     for (int l = 0; l<=maxLevel; ++l)
@@ -85,14 +101,19 @@ void TestModel::testBasicModel()
 
 void TestModel::testMoveMarkers1()
 {
+    const QSharedPointer<QStandardItemModel> itemModel(new QStandardItemModel());
     MarkerModel mm;
+    mm.setMarkerModel(itemModel.data(), CoordinatesRole);
     const int maxLevel = mm.maxLevel();
 
     const int fillLevel = maxLevel - 2;
 
     // add a marker to the model and create tiles up to a certain level:
     const WMWGeoCoordinate coord_1_2 = WMWGeoCoordinate(1.0, 2.0);
-    const int markerIndex1 = mm.addMarker(WMWMarker(coord_1_2));
+    QStandardItem* const item1 = MakeItemAt(coord_1_2);
+    itemModel->appendRow(item1);
+    const QModelIndex markerIndex1 = itemModel->indexFromItem(item1);
+    WMW2_ASSERT(markerIndex1.isValid());
     for (int l = 1; l<=fillLevel; ++l)
     {
         const QIntList tileIndex = mm.coordinateToTileIndex(coord_1_2, l);
@@ -122,12 +143,14 @@ void TestModel::testMoveMarkers1()
         QVERIFY(mm.getTileMarkerCount(tileIndex) == 1);
     }
 
-    mm.clear();
+//     mm.clear();
 }
 
 void TestModel::testMoveMarkers2()
 {
+    const QSharedPointer<QStandardItemModel> itemModel(new QStandardItemModel());
     MarkerModel mm;
+    mm.setMarkerModel(itemModel.data(), CoordinatesRole);
     const int maxLevel = mm.maxLevel();
 
     const int fillLevel = maxLevel - 2;
@@ -135,8 +158,12 @@ void TestModel::testMoveMarkers2()
     const WMWGeoCoordinate coord_50_60 = WMWGeoCoordinate(50.0, 60.0);
 
     // add markers to the model and create tiles up to a certain level:
-    const int markerIndex1 = mm.addMarker(WMWMarker(coord_1_2));
-    const int markerIndex2 = mm.addMarker(WMWMarker(coord_1_2));
+    QStandardItem* const item1 = MakeItemAt(coord_1_2);
+    itemModel->appendRow(item1);
+    const QModelIndex markerIndex1 = itemModel->indexFromItem(item1);
+    QStandardItem* const item2 = MakeItemAt(coord_1_2);
+    itemModel->appendRow(item2);
+    const QModelIndex markerIndex2 = itemModel->indexFromItem(item2);
     for (int l = 1; l<=fillLevel; ++l)
     {
         const QIntList tileIndex = mm.coordinateToTileIndex(coord_1_2, l);
@@ -145,7 +172,9 @@ void TestModel::testMoveMarkers2()
         QVERIFY(myTile->children.count()==0);
         QVERIFY(mm.getTileMarkerCount(tileIndex) == 2);
     }
-    const int markerIndex3 = mm.addMarker(WMWMarker(coord_50_60));
+    QStandardItem* const item3 = MakeItemAt(coord_50_60);
+    itemModel->appendRow(item3);
+    const QModelIndex markerIndex3 = itemModel->indexFromItem(item3);
     for (int l = 1; l<=fillLevel; ++l)
     {
         const QIntList tileIndex = mm.coordinateToTileIndex(coord_50_60, l);
@@ -157,6 +186,9 @@ void TestModel::testMoveMarkers2()
 
     // now move marker 1:
     mm.moveMarker(markerIndex1, coord_50_60);
+
+    // make sure the item model was also updated:
+    QVERIFY(item1->data(CoordinatesRole).value<WMWGeoCoordinate>() == coord_50_60);
 
     for (int l = 0; l<=fillLevel; ++l)
     {
@@ -175,12 +207,14 @@ void TestModel::testMoveMarkers2()
         QVERIFY(mm.getTileMarkerCount(tileIndex) == 2);
     }
 
-    mm.clear();
+//     mm.clear();
 }
 
 void TestModel::testIteratorWholeWorld()
 {
+    const QSharedPointer<QStandardItemModel> itemModel(new QStandardItemModel());
     MarkerModel mm;
+    mm.setMarkerModel(itemModel.data(), CoordinatesRole);
     const int maxLevel = mm.maxLevel();
 
     for (int l = 0; l<=maxLevel; ++l)
@@ -191,8 +225,8 @@ void TestModel::testIteratorWholeWorld()
 
     const WMWGeoCoordinate coord_1_2 = WMWGeoCoordinate(1.0, 2.0);
     const WMWGeoCoordinate coord_50_60 = WMWGeoCoordinate(50.0, 60.0);
-    mm.addMarker(WMWMarker(coord_1_2));
-    mm.addMarker(WMWMarker(coord_50_60));
+    itemModel->appendRow(MakeItemAt(coord_1_2));
+    itemModel->appendRow(MakeItemAt(coord_50_60));
     for (int l = 0; l<=maxLevel; ++l)
     {
         // iterate over the whole world:
@@ -203,13 +237,15 @@ void TestModel::testIteratorWholeWorld()
 
 void TestModel::testIteratorPartial1()
 {
+    const QSharedPointer<QStandardItemModel> itemModel(new QStandardItemModel());
     MarkerModel mm;
+    mm.setMarkerModel(itemModel.data(), CoordinatesRole);
     const int maxLevel = mm.maxLevel();
 
     const WMWGeoCoordinate coord_1_2 = WMWGeoCoordinate(1.0, 2.0);
     const WMWGeoCoordinate coord_50_60 = WMWGeoCoordinate(50.0, 60.0);
-    mm.addMarker(WMWMarker(coord_1_2));
-    mm.addMarker(WMWMarker(coord_50_60));
+    itemModel->appendRow(MakeItemAt(coord_1_2));
+    itemModel->appendRow(MakeItemAt(coord_50_60));
     for (int l = 0; l<=maxLevel; ++l)
     {
         {
@@ -258,7 +294,7 @@ void TestModel::testIteratorPartial1()
     }
 
     const WMWGeoCoordinate coord_2_2 = WMWGeoCoordinate(2.0, 2.0);
-    mm.addMarker(WMWMarker(coord_2_2));
+    itemModel->appendRow(MakeItemAt(coord_2_2));
     {
         // at level 1, the iterator should find only one marker:
         WMWGeoCoordinate::PairList boundsList;
@@ -270,7 +306,9 @@ void TestModel::testIteratorPartial1()
 
 void TestModel::testIteratorPartial2()
 {
+    const QSharedPointer<QStandardItemModel> itemModel(new QStandardItemModel());
     MarkerModel mm;
+    mm.setMarkerModel(itemModel.data(), CoordinatesRole);
     const int maxLevel = mm.maxLevel();
 
     WMWGeoCoordinate::PairList boundsList;
@@ -281,15 +319,72 @@ void TestModel::testIteratorPartial2()
     const WMWGeoCoordinate coordOutOfBounds2 = WMWGeoCoordinate(0.5, 1.6);
     const WMWGeoCoordinate coordOutOfBounds3 = WMWGeoCoordinate(0.6, 1.5);
     const WMWGeoCoordinate coordOutOfBounds4 = WMWGeoCoordinate(0.6, 1.6);
-    mm.addMarker(WMWMarker(coordInBounds1));
-    mm.addMarker(WMWMarker(coordOutOfBounds1));
-    mm.addMarker(WMWMarker(coordOutOfBounds2));
-    mm.addMarker(WMWMarker(coordOutOfBounds3));
-    mm.addMarker(WMWMarker(coordOutOfBounds4));
+    itemModel->appendRow(MakeItemAt(coordInBounds1));
+    itemModel->appendRow(MakeItemAt(coordOutOfBounds1));
+    itemModel->appendRow(MakeItemAt(coordOutOfBounds2));
+    itemModel->appendRow(MakeItemAt(coordOutOfBounds3));
+    itemModel->appendRow(MakeItemAt(coordOutOfBounds4));
 
     for (int l = 3; l<=maxLevel; ++l)
     {
         MarkerModel::NonEmptyIterator it(&mm, l, boundsList);
+        QVERIFY( CountMarkersInIterator(&it) == 1 );
+    }
+}
+
+void TestModel::testRemoveMarkers()
+{
+    const QSharedPointer<QStandardItemModel> itemModel(new QStandardItemModel());
+    MarkerModel mm;
+    mm.setMarkerModel(itemModel.data(), CoordinatesRole);
+    const int maxLevel = mm.maxLevel();
+
+    for (int l = 0; l<=maxLevel; ++l)
+    {
+        MarkerModel::NonEmptyIterator it(&mm, l);
+        QVERIFY( CountMarkersInIterator(&it) == 0 );
+    }
+
+    const WMWGeoCoordinate coord_1_2 = WMWGeoCoordinate(1.0, 2.0);
+    const WMWGeoCoordinate coord_50_60 = WMWGeoCoordinate(50.0, 60.0);
+    QStandardItem* const item1 = MakeItemAt(coord_1_2);
+    itemModel->appendRow(item1);
+    itemModel->appendRow(MakeItemAt(coord_50_60));
+    for (int l = 0; l<=maxLevel; ++l)
+    {
+        // iterate over the whole world:
+        MarkerModel::NonEmptyIterator it(&mm, l);
+        QVERIFY( CountMarkersInIterator(&it) == 2 );
+    }
+
+    // now remove items:
+    itemModel->takeRow(itemModel->indexFromItem(item1).row());
+    delete item1;
+    for (int l = 0; l<=maxLevel; ++l)
+    {
+        // iterate over the whole world:
+        MarkerModel::NonEmptyIterator it(&mm, l);
+        QVERIFY( CountMarkersInIterator(&it) == 1 );
+    }
+}
+
+/**
+ * @brief Make sure that items which are in the model before it is given to the tiled model are found by the tile model
+ */
+void TestModel::testPreExistingMarkers()
+{
+    const QSharedPointer<QStandardItemModel> itemModel(new QStandardItemModel());
+    const WMWGeoCoordinate coord_50_60 = WMWGeoCoordinate(50.0, 60.0);
+    itemModel->appendRow(MakeItemAt(coord_50_60));
+    
+    MarkerModel mm;
+    mm.setMarkerModel(itemModel.data(), CoordinatesRole);
+    const int maxLevel = mm.maxLevel();
+
+    for (int l = 0; l<=maxLevel; ++l)
+    {
+        // iterate over the whole world:
+        MarkerModel::NonEmptyIterator it(&mm, l);
         QVERIFY( CountMarkersInIterator(&it) == 1 );
     }
 }

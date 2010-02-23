@@ -19,8 +19,10 @@
 
 #ifndef WORLDMAPWIDGET2_H
 #define WORLDMAPWIDGET2_H
+
 // Qt includes
 
+#include <QAbstractItemModel>
 #include <QWidget>
 #include <QStringList>
 
@@ -58,10 +60,6 @@ public:
     KAction* getControlAction(const QString& actionName);
     QWidget* getControlWidget();
 
-    void addClusterableMarkers(const WMWMarker::List& markerList);
-    WMWMarker getClusterableMarker(const int markerIndex);
-    WMWMarker& getSingleMarker(const int markerIndex);
-    void addSingleMarkers(const WMWMarker::List& markerList);
     void updateMarkers();
     void updateClusters();
 
@@ -71,6 +69,9 @@ public:
     QString convertZoomToBackendZoom(const QString& someZoom, const QString& targetBackend) const;
     bool queryAltitudes(const WMWAltitudeLookup::List& queryItems, const QString& backendName = "");
 
+    void setSpecialMarkersModel(QAbstractItemModel* const specialMarkersModel, const int coordinatesRole);
+    void setDisplayMarkersModel(QAbstractItemModel* const displayMarkersModel, const int coordinatesRole);
+
 public Q_SLOTS:
     void slotZoomIn();
     void slotZoomOut();
@@ -78,9 +79,9 @@ public Q_SLOTS:
     void slotClustersNeedUpdating();
 
 Q_SIGNALS:
-    void signalSingleMarkersMoved(const QList<int>& markerIndices);
-    void signalGroupableMarkersMoved(const QList<int>& markerIndices);
     void signalAltitudeLookupReady(const WMW2::WMWAltitudeLookup::List& altitudes);
+    void signalDisplayMarkersMoved(const QList<QPersistentModelIndex>& indices);
+    void signalSpecialMarkersMoved(const QList<QPersistentModelIndex>& indices);
 
 protected:
     void applyCacheToBackend();
@@ -92,7 +93,6 @@ protected Q_SLOTS:
     void slotChangeBackend(QAction* action);
     void slotBackendZoomChanged(const QString& newZoom);
     void slotClustersMoved(const QIntList& clusterIndices);
-    void slotMarkersMoved(const QIntList& markerIndices);
 
 private:
     WMWSharedData* const s;

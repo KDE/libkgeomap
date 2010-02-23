@@ -17,7 +17,7 @@
  *
  * ============================================================ */
 
-#include "markermodel.h"
+#include "markermodel.moc"
 
 namespace WMW2 {
 
@@ -28,7 +28,9 @@ class MarkerModelPrivate
 public:
     MarkerModelPrivate()
     : tesselationSizes(),
-      rootTile(new MarkerModel::Tile())
+      rootTile(new MarkerModel::Tile()),
+      markerModel(0),
+      coordinatesRole(0)
     {
         const QIntPair level0Sizes(18, 36);
         tesselationSizes << level0Sizes;
@@ -41,12 +43,41 @@ public:
     }
 
     QList<QIntPair> tesselationSizes;
-    MarkerModel::Tile* const rootTile;
+    MarkerModel::Tile* rootTile;
+    QAbstractItemModel* markerModel;
+    int coordinatesRole;
 };
 
 MarkerModel::MarkerModel()
 : d(new MarkerModelPrivate())
 {
+}
+
+void MarkerModel::setMarkerModel(QAbstractItemModel* const markerModel, const int coordinatesRole)
+{
+    delete d->rootTile;
+    d->rootTile = new Tile();
+    d->rootTile->prepareForChildren(d->tesselationSizes.first());
+
+    d->markerModel = markerModel;
+    d->coordinatesRole = coordinatesRole;
+
+    if (d->markerModel!=0)
+    {
+        connect(d->markerModel, SIGNAL(rowsInserted(const QModelIndex&, int, int)),
+                this, SLOT(slotSourceModelRowsInserted(const QModelIndex&, int, int)));
+
+        connect(d->markerModel, SIGNAL(rowsAboutToBeRemoved(const QModelIndex&, int, int)),
+                this, SLOT(slotSourceModelRowsAboutToBeRemoved(const QModelIndex&, int, int)));
+
+        // read out all existing markers into tiles:
+        for (int row=0; row<d->markerModel->rowCount(); ++row)
+        {
+            const QModelIndex modelIndex = d->markerModel->index(row, 0);
+
+            addMarkerIndexToGrid(QPersistentModelIndex(modelIndex));
+        }
+    }
 }
 
 MarkerModel::~MarkerModel()
@@ -189,27 +220,11 @@ void MarkerModel::linearIndexToLatLonIndex(const int linearIndex, const int leve
     WMW2_ASSERT(*lonIndex<tesselationSizes.second);
 }
 
-void MarkerModel::addMarkers(const WMWMarker::List& newMarkers)
+void MarkerModel::addMarkerIndexToGrid(const QPersistentModelIndex& markerIndex)
 {
-    Q_FOREACH(const WMWMarker& newMarker, newMarkers)
-    {
-        addMarker(newMarker);
-    }
-}
-
-int MarkerModel::addMarker(const WMWMarker& newMarker)
-{
-    const int markerIndex = markerList.count();
-    markerList<<newMarker;
-
-    addMarkerIndexToGrid(markerIndex);
-
-    return markerIndex;
-}
-
-void MarkerModel::addMarkerIndexToGrid(const int markerIndex)
-{
-    const QIntList tileIndex = coordinateToTileIndex(markerList.at(markerIndex).coordinates, maxLevel());
+    const WMWGeoCoordinate markerCoordinates = markerIndex.data(d->coordinatesRole).value<WMWGeoCoordinate>();
+    
+    const QIntList tileIndex = coordinateToTileIndex(markerCoordinates, maxLevel());
     WMW2_ASSERT(tileIndex.count()==maxIndexCount());
 
     // add the marker to all existing tiles:
@@ -270,11 +285,11 @@ MarkerModel::Tile* MarkerModel::getTile(const QIntList& tileIndex, const bool st
             {
                 for (int i=0; i<tile->markerIndices.count(); ++i)
                 {
-                    const int currentMarkerIndex = tile->markerIndices.at(i);
-                    WMW2_ASSERT(currentMarkerIndex<markerList.count());
+                    const QPersistentModelIndex currentMarkerIndex = tile->markerIndices.at(i);
+                    WMW2_ASSERT(currentMarkerIndex.isValid());
                     
                     // get the tile index for this marker:
-                    const QIntList markerTileIndex = coordinateToTileIndex(markerList.at(currentMarkerIndex).coordinates, level);
+                    const QIntList markerTileIndex = coordinateToTileIndex(currentMarkerIndex.data(d->coordinatesRole).value<WMWGeoCoordinate>(), level);
                     const int newTileIndex = markerTileIndex.last();
 
                     Tile* newTile = tile->children.at(newTileIndex);
@@ -393,6 +408,11 @@ public:
     bool atEnd;
     bool atStartOfLevel;
 };
+
+MarkerModel::NonEmptyIterator::~NonEmptyIterator()
+{
+    delete d;
+}
 
 MarkerModel::NonEmptyIterator::NonEmptyIterator(MarkerModel* const model, const int level)
 : d(new MarkerModelNonEmptyIteratorPrivate())
@@ -684,13 +704,12 @@ MarkerModel* MarkerModel::NonEmptyIterator::model() const
     return d->model;
 }
 
-void MarkerModel::removeMarkerIndexFromGrid(const int markerIndex)
+void MarkerModel::removeMarkerIndexFromGrid(const QPersistentModelIndex& markerIndex)
 {
-    WMW2_ASSERT(markerIndex<markerList.count());
-    WMW2_ASSERT(markerIndex>=0);
+    WMW2_ASSERT(markerIndex.isValid());
 
     // remove the marker from the grid:
-    const WMWGeoCoordinate markerCoordinates = markerList.at(markerIndex).coordinates;
+    const WMWGeoCoordinate markerCoordinates = markerIndex.data(d->coordinatesRole).value<WMWGeoCoordinate>();
     const QIntList tileIndex = coordinateToTileIndex(markerCoordinates, maxLevel());
     QList<Tile*> tiles;
     for (int l=0; l<=maxLevel(); ++l)
@@ -718,19 +737,32 @@ void MarkerModel::removeMarkerIndexFromGrid(const int markerIndex)
 
 }
 
-void MarkerModel::moveMarker(const int markerIndex, const WMWGeoCoordinate& newPosition)
+void MarkerModel::moveMarker(const QPersistentModelIndex& markerIndex, const WMWGeoCoordinate& newPosition)
 {
     removeMarkerIndexFromGrid(markerIndex);
 
-    markerList[markerIndex].coordinates = newPosition;
+    d->markerModel->setData(markerIndex, QVariant::fromValue(newPosition), d->coordinatesRole);
 
     addMarkerIndexToGrid(markerIndex);
 }
 
-void MarkerModel::clear()
+void MarkerModel::slotSourceModelRowsInserted(const QModelIndex& parentIndex, int start, int end)
 {
-    markerList.clear();
-    d->rootTile->deleteChildren();
+    // sort the new items into our tiles:
+    for (int i=start; i<=end; ++i)
+    {
+        addMarkerIndexToGrid(QPersistentModelIndex(d->markerModel->index(start, 0, parentIndex)));
+    }
+}
+
+void MarkerModel::slotSourceModelRowsAboutToBeRemoved(const QModelIndex& parentIndex, int start, int end)
+{
+    // remove the items from their tiles:
+    for (int i=start; i<=end; ++i)
+    {
+        const QPersistentModelIndex itemIndex = QPersistentModelIndex(d->markerModel->index(start, 0, parentIndex));
+        removeMarkerIndexFromGrid(itemIndex);
+    }
 }
 
 } /* WMW2 */

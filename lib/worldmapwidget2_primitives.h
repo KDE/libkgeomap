@@ -22,6 +22,7 @@
 
 // Qt includes
 
+#include <QAbstractItemModel>
 #include <QPoint>
 #include <QString>
 #include <QStringList>
@@ -63,6 +64,7 @@ class WMWGeoCoordinate
 {
 public:
 
+    typedef QList<WMWGeoCoordinate> List;
     typedef QPair<WMWGeoCoordinate, WMWGeoCoordinate> Pair;
     typedef QList<WMWGeoCoordinate::Pair> PairList;
     static Pair makePair(const qreal lat1, const qreal lon1, const qreal lat2, const qreal lon2)
@@ -262,18 +264,24 @@ class WMWSharedData
 public:
     WMWSharedData()
     : worldMapWidget(0),
-      markerList(),
       visibleMarkers(),
       markerModel(0),
-      clusterList()
+      clusterList(),
+      specialMarkersModel(0),
+      specialMarkersCoordinatesRole(0),
+      displayMarkersModel(0),
+      displayMarkersCoordinatesRole(0)
     {
     }
 
     WorldMapWidget2* worldMapWidget;
-    WMWMarker::List markerList;
     QIntList visibleMarkers;
     MarkerModel* markerModel;
     WMWCluster::List clusterList;
+    QAbstractItemModel* specialMarkersModel;
+    int specialMarkersCoordinatesRole;
+    QAbstractItemModel* displayMarkersModel;
+    int displayMarkersCoordinatesRole;
 };
 
 } /* WMW2 */
@@ -318,6 +326,7 @@ inline bool operator==(const WMW2::WMWGeoCoordinate& a, const WMW2::WMWGeoCoordi
         ( a.hasAlt ? ( a.alt == b.alt ) : true );
 }
 
+Q_DECLARE_METATYPE(WMW2::WMWGeoCoordinate)
 Q_DECLARE_METATYPE(WMW2::WMWGeoCoordinate::Pair)
 Q_DECLARE_METATYPE(WMW2::WMWGeoCoordinate::PairList)
 Q_DECLARE_METATYPE(WMW2::WMWAltitudeLookup)

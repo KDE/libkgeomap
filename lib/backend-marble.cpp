@@ -64,7 +64,7 @@ public:
       cacheShowOverviewMap(false),
       cacheZoom(900),
       mouseMoveClusterIndex(-1),
-      mouseMoveMarkerIndex(-1),
+      mouseMoveMarkerIndex(),
       mouseMoveObjectCoordinates(),
       mouseMoveCenterOffset(0,0)
     {
@@ -86,7 +86,7 @@ public:
     bool cacheShowOverviewMap;
     int cacheZoom;
     int mouseMoveClusterIndex;
-    int mouseMoveMarkerIndex;
+    QPersistentModelIndex mouseMoveMarkerIndex;
     WMWGeoCoordinate mouseMoveObjectCoordinates;
     QPoint mouseMoveCenterOffset;
     QPixmap markerPixmap;
@@ -412,12 +412,11 @@ void BackendMarble::marbleCustomPaint(Marble::GeoPainter* painter)
     const int circleRadius = 15;
 
     // render all visible markers:
-    for (QIntList::const_iterator it = s->visibleMarkers.constBegin(); it!=s->visibleMarkers.constEnd(); ++it)
+    for (int row = 0; row<s->specialMarkersModel->rowCount(); ++row)
     {
-        const int currentIndex = *it;
-        const WMWMarker* const currentMarker = &(s->markerList.at(currentIndex));
-
-        WMWGeoCoordinate markerCoordinates = currentMarker->coordinates;
+        const QModelIndex currentIndex = s->specialMarkersModel->index(row, 0);
+        
+        WMWGeoCoordinate markerCoordinates = s->specialMarkersModel->data(currentIndex, s->specialMarkersCoordinatesRole).value<WMWGeoCoordinate>();
         // is the marker being moved right now?
         if (currentIndex == d->mouseMoveMarkerIndex)
         {
@@ -673,12 +672,13 @@ bool BackendMarble::eventFilter(QObject *object, QEvent *event)
         // scan in reverse order, because the user would expect
         // the topmost marker to be picked up and not the
         // one below
-        for (int i=s->markerList.count()-1; i>=0; --i)
+        for (int row = s->specialMarkersModel->rowCount()-1; row>=0; --row)
         {
-            const WMWMarker& myMarker = s->markerList.at(i);
+            const QModelIndex currentIndex = s->specialMarkersModel->index(row, 0);
+            const WMWGeoCoordinate currentCoordinates = s->specialMarkersModel->data(currentIndex, s->specialMarkersCoordinatesRole).value<WMWGeoCoordinate>();
 
             QPoint markerPoint;
-            if (!screenCoordinates(myMarker.coordinates, &markerPoint))
+            if (!screenCoordinates(currentCoordinates, &markerPoint))
             {
                 continue;
             }
@@ -692,16 +692,16 @@ bool BackendMarble::eventFilter(QObject *object, QEvent *event)
             }
 
             // the user clicked on a cluster:
-            d->mouseMoveMarkerIndex = i;
+            d->mouseMoveMarkerIndex = QPersistentModelIndex(currentIndex);
             d->mouseMoveCenterOffset = mouseEvent->pos() - markerPoint;
-            d->mouseMoveObjectCoordinates = myMarker.coordinates;
+            d->mouseMoveObjectCoordinates = currentCoordinates;
             doFilterEvent = true;
 
             break;
         }
     }
     else if (   (event->type() == QEvent::MouseMove)
-             && (d->mouseMoveMarkerIndex>=0) )
+             && (d->mouseMoveMarkerIndex.isValid()) )
     {
         // a marker is being moved. update its position:
         const QPoint newMarkerPoint = mouseEvent->pos() - d->mouseMoveCenterOffset;
@@ -714,7 +714,7 @@ bool BackendMarble::eventFilter(QObject *object, QEvent *event)
         }
     }
     else if (   (event->type() == QEvent::MouseButtonRelease)
-             && (d->mouseMoveMarkerIndex>=0) )
+             && (d->mouseMoveMarkerIndex.isValid()) )
     {
         // the marker was dropped, apply the coordinates if it is on screen:
         const QPoint newMarkerPoint = mouseEvent->pos() - d->mouseMoveCenterOffset;
@@ -723,14 +723,17 @@ bool BackendMarble::eventFilter(QObject *object, QEvent *event)
         if (geoCoordinates(newMarkerPoint, &newCoordinates))
         {
             // the marker was dropped to valid coordinates
-            s->markerList[d->mouseMoveMarkerIndex].coordinates = newCoordinates;
-        }
-        QIntList markerIndices;
-        markerIndices << d->mouseMoveMarkerIndex;
-        d->mouseMoveMarkerIndex = -1;
-        d->marbleWidget->update();
+            s->specialMarkersModel->setData(d->mouseMoveMarkerIndex, QVariant::fromValue(newCoordinates), s->specialMarkersCoordinatesRole);
 
-        emit(signalMarkersMoved(markerIndices));
+            QList<QPersistentModelIndex> markerIndices;
+            markerIndices << d->mouseMoveMarkerIndex;
+
+            d->mouseMoveMarkerIndex = QPersistentModelIndex();
+            d->marbleWidget->update();
+
+            // also emit a signal that the marker was moved:
+            emit(signalSpecialMarkersMoved(markerIndices));
+        }
     }
 
     if (doFilterEvent)

@@ -101,7 +101,7 @@ public:
 WorldMapWidget2::WorldMapWidget2(QWidget* const parent)
 : QWidget(parent), s(new WMWSharedData), d(new WorldMapWidget2Private)
 {
-    s->markerModel = new MarkerModel;
+    s->markerModel = new MarkerModel();
     s->worldMapWidget = this;
 
     d->stackedLayout = new QStackedLayout(this);
@@ -165,6 +165,9 @@ bool WorldMapWidget2::setBackend(const QString& backendName)
 
         disconnect(d->currentBackend, SIGNAL(signalMarkersMoved(const QIntList&)),
                 this, SLOT(slotMarkersMoved(const QIntList&)));
+
+        disconnect(d->currentBackend, SIGNAL(signalSpecialMarkersMoved(const QList<QPersistentModelIndex>&)),
+                    this, SIGNAL(signalSpecialMarkersMoved(const QList<QPersistentModelIndex>&)));
     }
 
     MapBackend* backend;
@@ -186,8 +189,8 @@ bool WorldMapWidget2::setBackend(const QString& backendName)
             connect(d->currentBackend, SIGNAL(signalClustersMoved(const QIntList&)),
                     this, SLOT(slotClustersMoved(const QIntList&)));
 
-            connect(d->currentBackend, SIGNAL(signalMarkersMoved(const QIntList&)),
-                    this, SLOT(slotMarkersMoved(const QIntList&)));
+            connect(d->currentBackend, SIGNAL(signalSpecialMarkersMoved(const QList<QPersistentModelIndex>&)),
+                    this, SIGNAL(signalSpecialMarkersMoved(const QList<QPersistentModelIndex>&)));
 
             // call this slot manually in case the backend was ready right away:
             if (d->currentBackend->isReady())
@@ -463,27 +466,6 @@ void WorldMapWidget2::slotChangeBackend(QAction* action)
 
     const QString newBackendName = action->data().toString();
     setBackend(newBackendName);
-}
-
-void WorldMapWidget2::addClusterableMarkers(const WMWMarker::List& markerList)
-{
-    s->markerModel->addMarkers(markerList);
-
-    slotClustersNeedUpdating();
-}
-
-void WorldMapWidget2::addSingleMarkers(const WMWMarker::List& markerList)
-{
-    const int oldMarkerCount = s->markerList.count();
-    s->markerList << markerList;
-
-    // TODO: clustering
-    for (int i=0; i<markerList.count(); ++i)
-    {
-        s->visibleMarkers << oldMarkerCount + i;
-    }
-
-    updateMarkers();
 }
 
 void WorldMapWidget2::updateMarkers()
@@ -941,7 +923,7 @@ void WorldMapWidget2::slotClustersMoved(const QIntList& clusterIndices)
 {
     kDebug()<<clusterIndices;
 
-    QIntList markerIndices;
+    QList<QPersistentModelIndex> markerIndices;
     // update the positions of the markers held by the clusters:
     for (int cii=0; cii<clusterIndices.count(); ++cii)
     {
@@ -950,7 +932,7 @@ void WorldMapWidget2::slotClustersMoved(const QIntList& clusterIndices)
         const WMWCluster& cluster = s->clusterList.at(clusterIndex);
 
         // remove all the markers in the cluster from the model and then add them again:
-        QIntList movedMarkers;
+        QList<QPersistentModelIndex> movedMarkers;
         for (int i=0; i<cluster.tileIndicesList.count(); ++i)
         {
             const QIntList tileIndex = cluster.tileIndicesList.at(i);
@@ -972,30 +954,13 @@ void WorldMapWidget2::slotClustersMoved(const QIntList& clusterIndices)
         markerIndices << movedMarkers;
     }
 
-    kDebug()<<markerIndices;
+//     kDebug()<<markerIndices;
     if (!markerIndices.isEmpty())
     {
-        emit(signalGroupableMarkersMoved(markerIndices));
+        emit(signalDisplayMarkersMoved(markerIndices));
     }
 
     // TODO: who calls updateClusters? Right now, the google maps backend does that
-}
-
-WMWMarker WorldMapWidget2::getClusterableMarker(const int markerIndex)
-{
-    WMW2_ASSERT(markerIndex<s->markerModel->markerList.count());
-    return s->markerModel->markerList.at(markerIndex);
-}
-
-WMWMarker& WorldMapWidget2::getSingleMarker(const int markerIndex)
-{
-    WMW2_ASSERT(markerIndex<s->markerList.count());
-    return s->markerList[markerIndex];
-}
-
-void WorldMapWidget2::slotMarkersMoved(const QIntList& markerIndices)
-{
-    emit(signalSingleMarkersMoved(markerIndices));
 }
 
 bool WorldMapWidget2::queryAltitudes(const WMWAltitudeLookup::List& queryItems, const QString& backendName)
@@ -1010,6 +975,22 @@ bool WorldMapWidget2::queryAltitudes(const WMWAltitudeLookup::List& queryItems, 
         }
     }
     return false;
+}
+
+void WorldMapWidget2::setSpecialMarkersModel(QAbstractItemModel* const specialMarkersModel, const int coordinatesRole)
+{
+    s->specialMarkersModel = specialMarkersModel;
+    s->specialMarkersCoordinatesRole = coordinatesRole;
+
+    // TODO: update everything!
+}
+
+void WorldMapWidget2::setDisplayMarkersModel(QAbstractItemModel* const displayMarkersModel, const int coordinatesRole)
+{
+    s->displayMarkersModel= displayMarkersModel;
+    s->displayMarkersCoordinatesRole = coordinatesRole;
+    s->markerModel->setMarkerModel(displayMarkersModel, coordinatesRole);
+    // TODO: update everything!
 }
 
 } /* WMW2 */

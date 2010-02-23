@@ -85,6 +85,7 @@ Q_SIGNALS:
     void signalClustersMoved(const QIntList& clusterIndices);
     void signalMarkersMoved(const QIntList& markerIndices);
     void signalZoomChanged(const QString& newZoom);
+    void signalSpecialMarkersMoved(const QList<QPersistentModelIndex>& indices);
 
 private:
     MapBackendPrivate* const d;
