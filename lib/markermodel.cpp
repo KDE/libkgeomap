@@ -30,7 +30,8 @@ public:
     : tesselationSizes(),
       rootTile(new MarkerModel::Tile()),
       markerModel(0),
-      coordinatesRole(0)
+      coordinatesRole(0),
+      selectionModel(0)
     {
         const QIntPair level0Sizes(18, 36);
         tesselationSizes << level0Sizes;
@@ -46,6 +47,7 @@ public:
     MarkerModel::Tile* rootTile;
     QAbstractItemModel* markerModel;
     int coordinatesRole;
+    QItemSelectionModel* selectionModel;
 };
 
 MarkerModel::MarkerModel()
@@ -299,6 +301,13 @@ MarkerModel::Tile* MarkerModel::getTile(const QIntList& tileIndex, const bool st
                         tile->addChild(newTileIndex, newTile);
                     }
                     newTile->markerIndices<<currentMarkerIndex;
+                    if (d->selectionModel)
+                    {
+                        if (d->selectionModel->isSelected(currentMarkerIndex))
+                        {
+                            newTile->selectedCount++;
+                        }
+                    }
                 }
             }
         }
@@ -762,6 +771,65 @@ void MarkerModel::slotSourceModelRowsAboutToBeRemoved(const QModelIndex& parentI
     {
         const QPersistentModelIndex itemIndex = QPersistentModelIndex(d->markerModel->index(start, 0, parentIndex));
         removeMarkerIndexFromGrid(itemIndex);
+    }
+}
+
+void MarkerModel::setSelectionModel(QItemSelectionModel* const selectionModel)
+{
+    d->selectionModel = selectionModel;
+
+    connect(d->selectionModel, SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)),
+            this, SLOT(slotSelectionChanged(const QItemSelection&, const QItemSelection&)));
+}
+
+void MarkerModel::slotSelectionChanged(const QItemSelection& selected, const QItemSelection& deselected)
+{
+    for (int i=0; i<selected.count(); ++i)
+    {
+        const QItemSelectionRange selectionRange = selected.at(i);
+        for (int row = selectionRange.top(); row<=selectionRange.bottom(); ++row)
+        {
+            // get the coordinates of the item
+            const WMWGeoCoordinate coordinates = d->markerModel->data(d->markerModel->index(row, 0, selectionRange.parent()), d->coordinatesRole).value<WMWGeoCoordinate>();
+
+            for (int l=0; l<=maxLevel(); ++l)
+            {
+                const QIntList tileIndex = coordinateToTileIndex(coordinates, l);
+                MarkerModel::Tile* const myTile = getTile(tileIndex, true);
+                if (!myTile)
+                    break;
+
+                myTile->selectedCount++;
+                WMW2_ASSERT(myTile->selectedCount <= myTile->markerIndices.count());
+
+                if (myTile->children.isEmpty())
+                    break;
+            }
+        }
+    }
+
+    for (int i=0; i<deselected.count(); ++i)
+    {
+        const QItemSelectionRange selectionRange = deselected.at(i);
+        for (int row = selectionRange.top(); row<=selectionRange.bottom(); ++row)
+        {
+            // get the coordinates of the item
+            const WMWGeoCoordinate coordinates = d->markerModel->data(d->markerModel->index(row, 0, selectionRange.parent()), d->coordinatesRole).value<WMWGeoCoordinate>();
+
+            for (int l=0; l<maxLevel(); ++l)
+            {
+                const QIntList tileIndex = coordinateToTileIndex(coordinates, l);
+                MarkerModel::Tile* const myTile = getTile(tileIndex, true);
+                if (!myTile)
+                    break;
+
+                myTile->selectedCount--;
+                WMW2_ASSERT(myTile->selectedCount >= 0);
+
+                if (myTile->children.isEmpty())
+                    break;
+            }
+        }
     }
 }
 

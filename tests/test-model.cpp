@@ -389,5 +389,52 @@ void TestModel::testPreExistingMarkers()
     }
 }
 
+void TestModel::testSelectionState1()
+{
+    const QSharedPointer<QStandardItemModel> itemModel(new QStandardItemModel());
+    MarkerModel mm;
+    mm.setMarkerModel(itemModel.data(), CoordinatesRole);
+
+    const int maxLevel = mm.maxLevel();
+
+    const WMWGeoCoordinate coord_1_2 = WMWGeoCoordinate(1.0, 2.0);
+    QStandardItem* const item1 = MakeItemAt(coord_1_2);
+    item1->setSelectable(true);
+    itemModel->appendRow(item1);
+    QModelIndex item1Index = itemModel->indexFromItem(item1);
+
+    // verify the selection state of the tiles:
+    // make sure we do not create tiles all the way down,
+    // because we want to test whether the state is okay in newly created tiles
+    const int preMaxLevel = maxLevel -2;
+    for (int l = 0; l<=preMaxLevel; ++l)
+    {
+        const QIntList tileIndex = mm.coordinateToTileIndex(coord_1_2, l);
+        MarkerModel::Tile* const myTile = mm.getTile(tileIndex, true);
+        QVERIFY(myTile != 0);
+        QVERIFY(mm.getTileMarkerCount(tileIndex) == 1);
+        QVERIFY(myTile->getSelectionState()==MarkerModel::Tile::SelectedNone);
+    }
+
+    QItemSelectionModel* const selectionModel = new QItemSelectionModel(itemModel.data());
+    mm.setSelectionModel(selectionModel);
+    selectionModel->select(item1Index, QItemSelectionModel::Select);
+
+    // verify the selection state of the tiles:
+    for (int l = 0; l<=maxLevel; ++l)
+    {
+        const QIntList tileIndex = mm.coordinateToTileIndex(coord_1_2, l);
+        MarkerModel::Tile* const myTile = mm.getTile(tileIndex, true);
+        QVERIFY(myTile != 0);
+        QVERIFY(mm.getTileMarkerCount(tileIndex) == 1);
+        QVERIFY(myTile->getSelectionState()==MarkerModel::Tile::SelectedAll);
+    }
+
+    // TODO: verify that the selection state is kept for new tiles
+    // TODO: set a model with selected items, make sure the selections are read out
+    // TODO: test removing of selected markers
+    // TODO: test moving of selected markers
+}
+
 QTEST_MAIN(TestModel)
 

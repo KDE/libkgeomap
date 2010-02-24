@@ -45,6 +45,7 @@ private Q_SLOTS:
     void testIteratorPartial2();
     void testRemoveMarkers();
     void testPreExistingMarkers();
+    void testSelectionState1();
 };
 
 #endif /* TEST_MODEL_H */

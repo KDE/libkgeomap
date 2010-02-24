@@ -23,6 +23,7 @@
 // Qt includes
 
 #include <QBitArray>
+#include <QItemSelectionModel>
 #include <QObject>
 
 // local includes
@@ -43,10 +44,18 @@ public:
     class Tile
     {
     public:
+
+        enum SelectionState {
+            SelectedNone = 0,
+            SelectedSome = 1,
+            SelectedAll = 2
+        };
+        
         Tile()
         : children(),
           childrenMask(),
-          markerIndices()
+          markerIndices(),
+          selectedCount(0)
         {
         }
 
@@ -98,9 +107,24 @@ public:
             delete childTile;
         }
 
+        SelectionState getSelectionState() const
+        {
+            if (selectedCount==0)
+            {
+                return SelectedNone;
+            }
+            else if (selectedCount==markerIndices.count())
+            {
+                return SelectedAll;
+            }
+
+            return SelectedSome;
+        }
+
         QVector<Tile*> children;
         QBitArray childrenMask;
         QList<QPersistentModelIndex> markerIndices;
+        int selectedCount;
     };
 
     MarkerModel();
@@ -132,6 +156,8 @@ public:
     Tile* rootTile() const;
     QPair<int, int> getTesselationSizes(const int level) const;
 
+    void setSelectionModel(QItemSelectionModel* const selectionModel);
+
 private:
     void removeMarkerIndexFromGrid(const QPersistentModelIndex& markerIndex);
     void addMarkerIndexToGrid(const QPersistentModelIndex& markerIndex);
@@ -159,6 +185,7 @@ public:
 private Q_SLOTS:
     void slotSourceModelRowsInserted(const QModelIndex& parentIndex, int start, int end);
     void slotSourceModelRowsAboutToBeRemoved(const QModelIndex& parentIndex, int start, int end);
+    void slotSelectionChanged(const QItemSelection& selected, const QItemSelection& deselected);
 
 private:
     MarkerModelPrivate* const d;
