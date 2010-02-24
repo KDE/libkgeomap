@@ -93,6 +93,7 @@ protected Q_SLOTS:
     void slotChangeBackend(QAction* action);
     void slotBackendZoomChanged(const QString& newZoom);
     void slotClustersMoved(const QIntList& clusterIndices);
+    void slotGroupModeChanged(QAction* triggeredAction);
 
 private:
     const QExplicitlySharedDataPointer<WMWSharedData> s;

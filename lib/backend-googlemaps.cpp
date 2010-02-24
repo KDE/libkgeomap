@@ -498,6 +498,7 @@ void BackendGoogleMaps::updateClusters()
 
     // re-transfer all markers to the javascript-part:
     d->htmlWidget->runScript(QString("wmwClearClusters();"));
+    d->htmlWidget->runScript(QString("wmwSetIsInEditMode(%1);").arg(s->inEditMode?"true":"false"));
     for (int currentIndex = 0; currentIndex<s->clusterList.size(); ++currentIndex)
     {
         const WMWCluster& currentCluster = s->clusterList.at(currentIndex);

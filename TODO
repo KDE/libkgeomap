@@ -16,6 +16,7 @@ TODO
 - panning in Google Maps is quite slow with many clusters, find out whether the bottleneck is adding the clusters to the html-part or finding the positions of the markers (probably both :-( ) -> monitor 'idle' event for now
 - clean up ways to re-create the clusters (generateClusters, updateClusters, clustersNeedUpdating...)
 - make UI not block while images are being loaded
+- verify that the pixmaps/icons on the map have the correct offset
 
 LATER
 - re-implement clustering for the markers

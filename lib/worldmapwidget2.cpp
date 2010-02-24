@@ -76,7 +76,10 @@ public:
       actionConfigurationMenu(0),
       actionZoomIn(0),
       actionZoomOut(0),
-      controlWidget(0)
+      controlWidget(0),
+      actionBrowseMode(0),
+      actionEditMode(0),
+      actionGroupMode(0)
     {
     }
 
@@ -96,6 +99,10 @@ public:
     QPointer<KAction> actionZoomIn;
     QPointer<KAction> actionZoomOut;
     QPointer<QWidget> controlWidget;
+
+    KAction* actionBrowseMode;
+    KAction* actionEditMode;
+    QActionGroup* actionGroupMode;
 };
 
 WorldMapWidget2::WorldMapWidget2(QWidget* const parent)
@@ -116,6 +123,25 @@ WorldMapWidget2::WorldMapWidget2(QWidget* const parent)
     d->loadedAltitudeBackends.append(geonamesBackend);
     connect(geonamesBackend, SIGNAL(signalAltitudes(const WMW2::WMWAltitudeLookup::List)),
             this, SIGNAL(signalAltitudeLookupReady(const WMW2::WMWAltitudeLookup::List)));
+
+    d->actionGroupMode = new QActionGroup(this);
+    d->actionGroupMode->setExclusive(true);
+
+    d->actionEditMode = new KAction(d->actionGroupMode);
+    // TODO: icon
+    d->actionEditMode->setText("E");
+    d->actionEditMode->setToolTip(i18n("Switch to edit mode"));
+    d->actionEditMode->setCheckable(true);
+
+    d->actionBrowseMode = new KAction(d->actionGroupMode);
+    // TODO: icon
+    d->actionBrowseMode->setText("B");
+    d->actionBrowseMode->setToolTip(i18n("Switch to browse mode"));
+    d->actionBrowseMode->setCheckable(true);
+    d->actionBrowseMode->setChecked(true);
+
+    connect(d->actionGroupMode, SIGNAL(triggered(QAction*)),
+            this, SLOT(slotGroupModeChanged(QAction*)));
 }
 
 WorldMapWidget2::~WorldMapWidget2()
@@ -427,6 +453,16 @@ QWidget* WorldMapWidget2::getControlWidget()
         QToolButton* const zoomOutButton = new QToolButton(d->controlWidget);
         zoomOutButton->setDefaultAction(getControlAction("zoomout"));
 
+        QFrame* const hLine1 = new QFrame(d->controlWidget);
+        hLine1->setFrameShape(QFrame::VLine);
+        hLine1->setFrameShadow(QFrame::Sunken);
+
+        QToolButton* const browseModeButton = new QToolButton(d->controlWidget);
+        browseModeButton->setDefaultAction(d->actionBrowseMode);
+
+        QToolButton* const editModeButton = new QToolButton(d->controlWidget);
+        editModeButton->setDefaultAction(d->actionEditMode);
+
         QHBoxLayout* const hBoxLayout = reinterpret_cast<QHBoxLayout*>(d->controlWidget->layout());
         if (hBoxLayout)
         {
@@ -478,14 +514,20 @@ void WorldMapWidget2::updateMarkers()
     d->currentBackend->updateMarkers();
 }
 
-// constants for clusters
-const int ClusterRadius          = 15;
-const QSize ClusterDefaultSize   = QSize(2*ClusterRadius, 2*ClusterRadius);
-const int ClusterGridSizeScreen  = 60;
-const QSize ClusterMaxPixmapSize = QSize(60, 60);
-
 void WorldMapWidget2::updateClusters()
 {
+    if (s->haveMovingCluster)
+    {
+        // do not re-cluster while a cluster is being moved
+        return;
+    }
+
+    // constants for clusters
+    const int ClusterRadius          = s->inEditMode ? 7 : 15;
+    const QSize ClusterDefaultSize   = QSize(2*ClusterRadius, 2*ClusterRadius);
+    const int ClusterGridSizeScreen  = 4*ClusterRadius;
+    const QSize ClusterMaxPixmapSize = QSize(ClusterGridSizeScreen, ClusterGridSizeScreen);
+
 //     kDebug()<<"updateClusters starting...";
 
     s->clusterList.clear();
@@ -992,6 +1034,13 @@ void WorldMapWidget2::setDisplayMarkersModel(QAbstractItemModel* const displayMa
     s->displayMarkersCoordinatesRole = coordinatesRole;
     s->markerModel->setMarkerModel(displayMarkersModel, coordinatesRole);
     // TODO: update everything!
+}
+
+void WorldMapWidget2::slotGroupModeChanged(QAction* triggeredAction)
+{
+    Q_UNUSED(triggeredAction);
+    s->inEditMode = d->actionEditMode->isChecked();
+    slotClustersNeedUpdating();
 }
 
 } /* WMW2 */

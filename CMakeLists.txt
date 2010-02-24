@@ -17,7 +17,8 @@
 project(worldmapwidget2)
 
 SET( MY_COMPILER_WARNINGS
-    "-Wall -Wold-style-cast -Wextra -pedantic"
+    "-Wall -Wextra -pedantic"
+    # -Wold-style-cast
 )
 
 find_package( KDE4 REQUIRED )

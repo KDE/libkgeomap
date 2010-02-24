@@ -272,7 +272,9 @@ public:
       specialMarkersModel(0),
       specialMarkersCoordinatesRole(0),
       displayMarkersModel(0),
-      displayMarkersCoordinatesRole(0)
+      displayMarkersCoordinatesRole(0),
+      inEditMode(false),
+      haveMovingCluster(false)
     {
     }
 
@@ -284,6 +286,8 @@ public:
     int specialMarkersCoordinatesRole;
     QAbstractItemModel* displayMarkersModel;
     int displayMarkersCoordinatesRole;
+    bool inEditMode;
+    bool haveMovingCluster;
 };
 
 } /* WMW2 */

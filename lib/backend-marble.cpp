@@ -63,6 +63,7 @@ public:
       cacheShowScaleBar(false),
       cacheShowOverviewMap(false),
       cacheZoom(900),
+      haveMouseMovingObject(false),
       mouseMoveClusterIndex(-1),
       mouseMoveMarkerIndex(),
       mouseMoveObjectCoordinates(),
@@ -85,6 +86,7 @@ public:
     bool cacheShowScaleBar;
     bool cacheShowOverviewMap;
     int cacheZoom;
+    bool haveMouseMovingObject;
     int mouseMoveClusterIndex;
     QPersistentModelIndex mouseMoveMarkerIndex;
     WMWGeoCoordinate mouseMoveObjectCoordinates;
@@ -439,36 +441,48 @@ void BackendMarble::marbleCustomPaint(Marble::GeoPainter* painter)
     for (int i = 0; i<s->clusterList.size(); ++i)
     {
         const WMWCluster& cluster = s->clusterList.at(i);
+        WMWGeoCoordinate clusterCoordinates = cluster.coordinates;
+        if (d->mouseMoveClusterIndex == i)
+        {
+            clusterCoordinates = d->mouseMoveObjectCoordinates;
+        }
         QPoint clusterPoint;
-        if (!screenCoordinates(cluster.coordinates, &clusterPoint))
+        if (!screenCoordinates(clusterCoordinates, &clusterPoint))
             continue;
 
-        // determine the colors:
-        QColor       fillColor;
-        QColor       strokeColor;
-        Qt::PenStyle strokeStyle;
-        QColor       labelColor;
-        QString      labelText;
-        s->worldMapWidget->getColorInfos(i, &fillColor, &strokeColor,
-                              &strokeStyle, &labelText, &labelColor);
+        if (s->inEditMode)
+        {
+            painter->drawPixmap(clusterPoint.x()-d->markerPixmap.height()/2, clusterPoint.y()-d->markerPixmap.height(), d->markerPixmap);
+        }
+        else
+        {
+            // determine the colors:
+            QColor       fillColor;
+            QColor       strokeColor;
+            Qt::PenStyle strokeStyle;
+            QColor       labelColor;
+            QString      labelText;
+            s->worldMapWidget->getColorInfos(i, &fillColor, &strokeColor,
+                                &strokeStyle, &labelText, &labelColor);
 
-        QPen circlePen;
-        circlePen.setColor(strokeColor);
-        circlePen.setStyle(strokeStyle);
-        circlePen.setWidth(2);
-        QBrush circleBrush(fillColor);
-        QPen labelPen;
-        labelPen.setColor(labelColor);
-                              
-        const QRect circleRect(clusterPoint.x()-circleRadius, clusterPoint.y()-circleRadius, 2*circleRadius, 2*circleRadius);
+            QPen circlePen;
+            circlePen.setColor(strokeColor);
+            circlePen.setStyle(strokeStyle);
+            circlePen.setWidth(2);
+            QBrush circleBrush(fillColor);
+            QPen labelPen;
+            labelPen.setColor(labelColor);
 
-        painter->setPen(circlePen);
-        painter->setBrush(circleBrush);
-        painter->drawEllipse(circleRect);
+            const QRect circleRect(clusterPoint.x()-circleRadius, clusterPoint.y()-circleRadius, 2*circleRadius, 2*circleRadius);
 
-        painter->setPen(labelPen);
-        painter->setBrush(Qt::NoBrush);
-        painter->drawText(circleRect, Qt::AlignHCenter|Qt::AlignVCenter, labelText);
+            painter->setPen(circlePen);
+            painter->setBrush(circleBrush);
+            painter->drawEllipse(circleRect);
+
+            painter->setPen(labelPen);
+            painter->setBrush(Qt::NoBrush);
+            painter->drawText(circleRect, Qt::AlignHCenter|Qt::AlignVCenter, labelText);
+        }
     }
 
     painter->restore();
@@ -691,19 +705,52 @@ bool BackendMarble::eventFilter(QObject *object, QEvent *event)
                 continue;
             }
 
-            // the user clicked on a cluster:
+            // the user clicked on a marker:
             d->mouseMoveMarkerIndex = QPersistentModelIndex(currentIndex);
             d->mouseMoveCenterOffset = mouseEvent->pos() - markerPoint;
             d->mouseMoveObjectCoordinates = currentCoordinates;
             doFilterEvent = true;
+            d->haveMouseMovingObject = true;
 
             break;
         }
+
+        if (s->inEditMode&&!doFilterEvent)
+        {
+            for (int clusterIndex = 0; clusterIndex<s->clusterList.count(); ++clusterIndex)
+            {
+                const WMWGeoCoordinate currentCoordinates = s->clusterList.at(clusterIndex).coordinates;
+
+                QPoint clusterPoint;
+                if (!screenCoordinates(currentCoordinates, &clusterPoint))
+                {
+                    continue;
+                }
+
+                const int markerPixmapHeight = d->markerPixmap.height();
+                const int markerPixmapWidth = d->markerPixmap.width();
+                const QRect markerRect(clusterPoint.x()-markerPixmapWidth/2, clusterPoint.y()-markerPixmapHeight, markerPixmapWidth, markerPixmapHeight);
+                if (!markerRect.contains(mouseEvent->pos()))
+                {
+                    continue;
+                }
+
+                // the user clicked on a cluster:
+                d->mouseMoveClusterIndex = clusterIndex;
+                d->mouseMoveCenterOffset = mouseEvent->pos() - clusterPoint;
+                d->mouseMoveObjectCoordinates = currentCoordinates;
+                doFilterEvent = true;
+                d->haveMouseMovingObject = true;
+                s->haveMovingCluster = true;
+
+                break;
+            }
+        }
     }
     else if (   (event->type() == QEvent::MouseMove)
-             && (d->mouseMoveMarkerIndex.isValid()) )
+             && d->haveMouseMovingObject )
     {
-        // a marker is being moved. update its position:
+        // a cluster or marker is being moved. update its position:
         const QPoint newMarkerPoint = mouseEvent->pos() - d->mouseMoveCenterOffset;
 
         WMWGeoCoordinate newCoordinates;
@@ -714,26 +761,38 @@ bool BackendMarble::eventFilter(QObject *object, QEvent *event)
         }
     }
     else if (   (event->type() == QEvent::MouseButtonRelease)
-             && (d->mouseMoveMarkerIndex.isValid()) )
+             && (d->haveMouseMovingObject) )
     {
-        // the marker was dropped, apply the coordinates if it is on screen:
+        // the object was dropped, apply the coordinates if it is on screen:
         const QPoint newMarkerPoint = mouseEvent->pos() - d->mouseMoveCenterOffset;
 
         WMWGeoCoordinate newCoordinates;
         if (geoCoordinates(newMarkerPoint, &newCoordinates))
         {
-            // the marker was dropped to valid coordinates
-            s->specialMarkersModel->setData(d->mouseMoveMarkerIndex, QVariant::fromValue(newCoordinates), s->specialMarkersCoordinatesRole);
+            if (d->mouseMoveMarkerIndex.isValid())
+            {
+                // the marker was dropped to valid coordinates
+                s->specialMarkersModel->setData(d->mouseMoveMarkerIndex, QVariant::fromValue(newCoordinates), s->specialMarkersCoordinatesRole);
 
-            QList<QPersistentModelIndex> markerIndices;
-            markerIndices << d->mouseMoveMarkerIndex;
+                QList<QPersistentModelIndex> markerIndices;
+                markerIndices << d->mouseMoveMarkerIndex;
 
-            d->mouseMoveMarkerIndex = QPersistentModelIndex();
-            d->marbleWidget->update();
-
-            // also emit a signal that the marker was moved:
-            emit(signalSpecialMarkersMoved(markerIndices));
+                // also emit a signal that the marker was moved:
+                emit(signalSpecialMarkersMoved(markerIndices));
+            }
+            else
+            {
+                // a cluster is being moved
+                s->clusterList[d->mouseMoveClusterIndex].coordinates = newCoordinates;
+                emit(signalClustersMoved(QIntList()<<d->mouseMoveClusterIndex));
+            }
         }
+
+        d->haveMouseMovingObject = false;
+        d->mouseMoveClusterIndex = -1;
+        d->mouseMoveMarkerIndex = QPersistentModelIndex();
+        d->marbleWidget->update();
+        s->haveMovingCluster = false;
     }
 
     if (doFilterEvent)

@@ -22,6 +22,7 @@ var map;
 var eventBuffer = new Array();
 var markerList = new Object();
 var clusterList = new Object();
+var isInEditMode = false;
 
 // ProjectionHelp: http://taapps-javalibs.blogspot.com/2009/10/google-map-v3how-to-use-overlayviews.html
 function ProjectionHelper(overlayMap) {
@@ -69,6 +70,9 @@ function wmwGetCenter() {
 }
 function wmwGetBounds() {
     return map.getBounds().toString();
+}
+function wmwSetIsInEditMode(state) {
+    isInEditMode = state;
 }
 function wmwLatLngToPixel(lat, lon) {
     //      There is an offset in fromLatLngToDivPixel once the map has been panned
@@ -159,11 +163,17 @@ function wmwClearClusters() {
 }
 function wmwAddCluster(id, lat, lon, setDraggable, clusterColor, clusterLabel) {
     var latlng = new google.maps.LatLng(lat, lon);
+    var clusterIcon;
+    if (isInEditMode) {
+        clusterIcon = new google.maps.MarkerImage('marker-green.png', new google.maps.Size(20, 32));
+    } else {
+        clusterIcon = new google.maps.MarkerImage('cluster-circle-'+clusterColor+'.png', new google.maps.Size(30, 30));
+    }
     var marker = new google.maps.Marker({
         position: latlng,
         map: map,
-        draggable: setDraggable,
-        icon: new google.maps.MarkerImage('cluster-circle-'+clusterColor+'.png', new google.maps.Size(30, 30)),
+        draggable: isInEditMode,
+        icon: clusterIcon,
         title: clusterLabel
     });
     google.maps.event.addListener(marker, 'dragend', function() {
