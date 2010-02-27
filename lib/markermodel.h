@@ -41,15 +41,15 @@ Q_OBJECT
 
 public:
 
+    enum SelectionState {
+        SelectedNone = 0,
+        SelectedSome = 1,
+        SelectedAll = 2
+    };
+        
     class Tile
     {
     public:
-
-        enum SelectionState {
-            SelectedNone = 0,
-            SelectedSome = 1,
-            SelectedAll = 2
-        };
         
         Tile()
         : children(),
@@ -107,18 +107,31 @@ public:
             delete childTile;
         }
 
-        SelectionState getSelectionState() const
+        void removeMarkerIndexOrInvalidIndex(const QModelIndex& indexToRemove)
         {
-            if (selectedCount==0)
+            int i=0;
+            while (i<markerIndices.count())
             {
-                return SelectedNone;
-            }
-            else if (selectedCount==markerIndices.count())
-            {
-                return SelectedAll;
-            }
+                const QPersistentModelIndex& currentIndex = markerIndices.at(i);
 
-            return SelectedSome;
+                // NOTE: this function is usually called after the model has sent
+                //       an aboutToRemove-signal. It is possible that the persistent
+                //       marker index became invalid before the caller received the signal.
+                //       we remove any invalid indices as we find them.
+                if ( !currentIndex.isValid() )
+                {
+                    markerIndices.takeAt(i);
+                    continue;
+                }
+
+                if ( currentIndex == indexToRemove )
+                {
+                    markerIndices.takeAt(i);
+                    return;
+                }
+
+                ++i;
+            }
         }
 
         QVector<Tile*> children;
@@ -131,36 +144,32 @@ public:
     ~MarkerModel();
 
     void setMarkerModel(QAbstractItemModel* const markerModel, const int coordinatesRole);
-
-//     Qt::ItemFlags flags(const QModelIndex& index) const;
-//     QVariant data(const QModelIndex& index, int role=Qt::DisplayRole) const;
-//     QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
-//     int rowCount(const QModelIndex& parent = QModelIndex()) const;
-//     int columnCount(const QModelIndex& parent = QModelIndex()) const;
-//     bool hasChildren(const QModelIndex& parent = QModelIndex()) const;
+    void setSelectionModel(QItemSelectionModel* const selectionModel);
 
     WMWGeoCoordinate tileIndexToCoordinate(const QIntList& tileIndex);
     QIntList coordinateToTileIndex(const WMWGeoCoordinate& coordinate, const int level);
 
+    void moveMarker(const QPersistentModelIndex& markerIndex, const WMWGeoCoordinate& newPosition);
+    int getTileMarkerCount(const QIntList& tileIndex);
+    int getTileSelectedCount(const QIntList& tileIndex);
+    QList<QPersistentModelIndex> getTileMarkerIndices(const QIntList& tileIndex);
+    SelectionState getTileSelectedState(const QIntList& tileIndex);
+    int maxLevel() const;
+    int maxIndexCount() const;
+    QPair<int, int> getTesselationSizes(const int level) const;
+
+    // to be made protected:
+// protected:
+    void removeMarkerIndexFromGrid(const QModelIndex& markerIndex, const bool ignoreSelection = false);
+    void addMarkerIndexToGrid(const QPersistentModelIndex& markerIndex);
+    void regenerateTiles();
+    Tile* getTile(const QIntList& tileIndex, const bool stopIfEmpty = false);
+    Tile* rootTile();
+    QList<QIntPair> linearIndexToLatLonIndex(const QIntList& linearIndex) const;
+    QIntList latLonIndexToLinearIndex(const QList<QIntPair>& latLonIndex) const;
     int latLonIndexToLinearIndex(const int latIndex, const int lonIndex, const int level) const;
     void linearIndexToLatLonIndex(const int linearIndex, const int level, int* const latIndex, int* const lonIndex) const;
     bool indicesEqual(const QIntList& a, const QIntList& b, const int upToLevel) const;
-    QList<QIntPair> linearIndexToLatLonIndex(const QIntList& linearIndex) const;
-    QIntList latLonIndexToLinearIndex(const QList<QIntPair>& latLonIndex) const;
-
-    void moveMarker(const QPersistentModelIndex& markerIndex, const WMWGeoCoordinate& newPosition);
-    int getTileMarkerCount(const QIntList& tileIndex);
-    Tile* getTile(const QIntList& tileIndex, const bool stopIfEmpty = false);
-    int maxLevel() const;
-    int maxIndexCount() const;
-    Tile* rootTile() const;
-    QPair<int, int> getTesselationSizes(const int level) const;
-
-    void setSelectionModel(QItemSelectionModel* const selectionModel);
-
-private:
-    void removeMarkerIndexFromGrid(const QPersistentModelIndex& markerIndex);
-    void addMarkerIndexToGrid(const QPersistentModelIndex& markerIndex);
 
 public:
 
@@ -185,6 +194,7 @@ public:
 private Q_SLOTS:
     void slotSourceModelRowsInserted(const QModelIndex& parentIndex, int start, int end);
     void slotSourceModelRowsAboutToBeRemoved(const QModelIndex& parentIndex, int start, int end);
+    void slotSourceModelDataChanged(const QModelIndex& topLeft, const QModelIndex& bottomRight);
     void slotSelectionChanged(const QItemSelection& selected, const QItemSelection& deselected);
 
 private:

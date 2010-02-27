@@ -27,6 +27,10 @@ using namespace WMW2;
 
 const int CoordinatesRole = Qt::UserRole + 0;
 
+const WMWGeoCoordinate coord_1_2 = WMWGeoCoordinate::fromGeoUrl("geo:1,2");
+const WMWGeoCoordinate coord_50_60 = WMWGeoCoordinate::fromGeoUrl("geo:50,60");
+const WMWGeoCoordinate coord_m50_m60 = WMWGeoCoordinate::fromGeoUrl("geo:-50,-60");
+
 QStandardItem* MakeItemAt(const WMWGeoCoordinate& coordinates)
 {
     QStandardItem* const newItem = new QStandardItem(coordinates.geoUrl());
@@ -61,8 +65,6 @@ void TestModel::testIndices()
     MarkerModel mm;
     const int maxLevel = mm.maxLevel();
 
-    const WMWGeoCoordinate coord_1_2 = WMWGeoCoordinate(1.0, 2.0);
-
     for (int l = 0; l<=maxLevel; ++l)
     {
         const QIntList tileIndex = mm.coordinateToTileIndex(coord_1_2, l);
@@ -70,7 +72,7 @@ void TestModel::testIndices()
     }
 }
 
-void TestModel::testBasicModel()
+void TestModel::testAddMarkers1()
 {
     const QSharedPointer<QStandardItemModel> itemModel(new QStandardItemModel());
     MarkerModel mm;
@@ -78,24 +80,65 @@ void TestModel::testBasicModel()
 
     const int maxLevel = mm.maxLevel();
 
-    const WMWGeoCoordinate coord_1_2 = WMWGeoCoordinate(1.0, 2.0);
-
     // there should be no tiles in the model yet:
     for (int l = 0; l<=maxLevel; ++l)
     {
-        QVERIFY(mm.getTile(mm.coordinateToTileIndex(coord_1_2, l), true) == 0);
+        QVERIFY(mm.getTile(mm.coordinateToTileIndex(coord_50_60, l), true) == 0);
     }
 
-    itemModel->appendRow(MakeItemAt(coord_1_2));
+    itemModel->appendRow(MakeItemAt(coord_50_60));
 
     // now there should be tiles with one marker:
     for (int l = 0; l<=maxLevel; ++l)
     {
-        const QIntList tileIndex = mm.coordinateToTileIndex(coord_1_2, l);
+        const QIntList tileIndex = mm.coordinateToTileIndex(coord_50_60, l);
         MarkerModel::Tile* const myTile = mm.getTile(tileIndex, true);
         QVERIFY(myTile != 0);
         QVERIFY(myTile->children.count()==0);
         QVERIFY(mm.getTileMarkerCount(tileIndex) == 1);
+    }
+
+    itemModel->appendRow(MakeItemAt(coord_50_60));
+
+    // now there should be tiles with two markers:
+    for (int l = 0; l<=maxLevel; ++l)
+    {
+        const QIntList tileIndex = mm.coordinateToTileIndex(coord_50_60, l);
+        MarkerModel::Tile* const myTile = mm.getTile(tileIndex, true);
+        QVERIFY(myTile != 0);
+        QCOMPARE(mm.getTileMarkerCount(tileIndex), 2);
+    }
+}
+
+void TestModel::testRemoveMarkers2()
+{
+    const QSharedPointer<QStandardItemModel> itemModel(new QStandardItemModel());
+    MarkerModel mm;
+    mm.setMarkerModel(itemModel.data(), CoordinatesRole);
+
+    const int maxLevel = mm.maxLevel();
+
+    itemModel->appendRow(MakeItemAt(coord_50_60));
+    QStandardItem* const item2 = MakeItemAt(coord_50_60);
+    itemModel->appendRow(item2);
+
+    // now there should be tiles with two markers:
+    for (int l = 0; l<=maxLevel; ++l)
+    {
+        const QIntList tileIndex = mm.coordinateToTileIndex(coord_50_60, l);
+        MarkerModel::Tile* const myTile = mm.getTile(tileIndex, true);
+        QVERIFY(myTile != 0);
+        QCOMPARE(mm.getTileMarkerCount(tileIndex), 2);
+    }
+
+    // remove one item:
+    qDeleteAll(itemModel->takeRow(itemModel->indexFromItem(item2).row()));
+    for (int l = 0; l<=maxLevel; ++l)
+    {
+        const QIntList tileIndex = mm.coordinateToTileIndex(coord_50_60, l);
+        MarkerModel::Tile* const myTile = mm.getTile(tileIndex, true);
+        QVERIFY(myTile != 0);
+        QCOMPARE(mm.getTileMarkerCount(tileIndex), 1);
     }
 }
 
@@ -109,22 +152,21 @@ void TestModel::testMoveMarkers1()
     const int fillLevel = maxLevel - 2;
 
     // add a marker to the model and create tiles up to a certain level:
-    const WMWGeoCoordinate coord_1_2 = WMWGeoCoordinate(1.0, 2.0);
     QStandardItem* const item1 = MakeItemAt(coord_1_2);
     itemModel->appendRow(item1);
     const QModelIndex markerIndex1 = itemModel->indexFromItem(item1);
+    
     WMW2_ASSERT(markerIndex1.isValid());
     for (int l = 1; l<=fillLevel; ++l)
     {
         const QIntList tileIndex = mm.coordinateToTileIndex(coord_1_2, l);
         MarkerModel::Tile* const myTile = mm.getTile(tileIndex, true);
         QVERIFY(myTile != 0);
-        QVERIFY(myTile->children.count()==0);
-        QVERIFY(mm.getTileMarkerCount(tileIndex) == 1);
+        QCOMPARE(myTile->children.count(), 0);
+        QCOMPARE(mm.getTileMarkerCount(tileIndex), 1);
     }
 
     // now move marker 1:
-    const WMWGeoCoordinate coord_50_60 = WMWGeoCoordinate(50.0, 60.0);
     mm.moveMarker(markerIndex1, coord_50_60);
 
     for (int l = 0; l<=fillLevel; ++l)
@@ -132,7 +174,7 @@ void TestModel::testMoveMarkers1()
         // make sure the marker can not be found at the old position any more
         QIntList tileIndex = mm.coordinateToTileIndex(coord_1_2, l);
         QVERIFY(mm.getTile(tileIndex, true) == 0);
-        QVERIFY(mm.getTileMarkerCount(tileIndex) == 0);
+        QCOMPARE(mm.getTileMarkerCount(tileIndex), 0);
         QVERIFY(mm.getTile(tileIndex, true) == 0);
 
         // find it at the new position:
@@ -154,8 +196,6 @@ void TestModel::testMoveMarkers2()
     const int maxLevel = mm.maxLevel();
 
     const int fillLevel = maxLevel - 2;
-    const WMWGeoCoordinate coord_1_2 = WMWGeoCoordinate(1.0, 2.0);
-    const WMWGeoCoordinate coord_50_60 = WMWGeoCoordinate(50.0, 60.0);
 
     // add markers to the model and create tiles up to a certain level:
     QStandardItem* const item1 = MakeItemAt(coord_1_2);
@@ -223,8 +263,6 @@ void TestModel::testIteratorWholeWorld()
         QVERIFY( CountMarkersInIterator(&it) == 0 );
     }
 
-    const WMWGeoCoordinate coord_1_2 = WMWGeoCoordinate(1.0, 2.0);
-    const WMWGeoCoordinate coord_50_60 = WMWGeoCoordinate(50.0, 60.0);
     itemModel->appendRow(MakeItemAt(coord_1_2));
     itemModel->appendRow(MakeItemAt(coord_50_60));
     for (int l = 0; l<=maxLevel; ++l)
@@ -242,8 +280,6 @@ void TestModel::testIteratorPartial1()
     mm.setMarkerModel(itemModel.data(), CoordinatesRole);
     const int maxLevel = mm.maxLevel();
 
-    const WMWGeoCoordinate coord_1_2 = WMWGeoCoordinate(1.0, 2.0);
-    const WMWGeoCoordinate coord_50_60 = WMWGeoCoordinate(50.0, 60.0);
     itemModel->appendRow(MakeItemAt(coord_1_2));
     itemModel->appendRow(MakeItemAt(coord_50_60));
     for (int l = 0; l<=maxLevel; ++l)
@@ -332,7 +368,7 @@ void TestModel::testIteratorPartial2()
     }
 }
 
-void TestModel::testRemoveMarkers()
+void TestModel::testRemoveMarkers1()
 {
     const QSharedPointer<QStandardItemModel> itemModel(new QStandardItemModel());
     MarkerModel mm;
@@ -345,8 +381,6 @@ void TestModel::testRemoveMarkers()
         QVERIFY( CountMarkersInIterator(&it) == 0 );
     }
 
-    const WMWGeoCoordinate coord_1_2 = WMWGeoCoordinate(1.0, 2.0);
-    const WMWGeoCoordinate coord_50_60 = WMWGeoCoordinate(50.0, 60.0);
     QStandardItem* const item1 = MakeItemAt(coord_1_2);
     itemModel->appendRow(item1);
     itemModel->appendRow(MakeItemAt(coord_50_60));
@@ -354,17 +388,17 @@ void TestModel::testRemoveMarkers()
     {
         // iterate over the whole world:
         MarkerModel::NonEmptyIterator it(&mm, l);
-        QVERIFY( CountMarkersInIterator(&it) == 2 );
+        QCOMPARE(CountMarkersInIterator(&it), 2);
     }
 
     // now remove items:
-    itemModel->takeRow(itemModel->indexFromItem(item1).row());
+    QCOMPARE(itemModel->takeRow(itemModel->indexFromItem(item1).row()).count(), 1);
     delete item1;
     for (int l = 0; l<=maxLevel; ++l)
     {
         // iterate over the whole world:
         MarkerModel::NonEmptyIterator it(&mm, l);
-        QVERIFY( CountMarkersInIterator(&it) == 1 );
+        QCOMPARE(CountMarkersInIterator(&it), 1);
     }
 }
 
@@ -374,7 +408,6 @@ void TestModel::testRemoveMarkers()
 void TestModel::testPreExistingMarkers()
 {
     const QSharedPointer<QStandardItemModel> itemModel(new QStandardItemModel());
-    const WMWGeoCoordinate coord_50_60 = WMWGeoCoordinate(50.0, 60.0);
     itemModel->appendRow(MakeItemAt(coord_50_60));
     
     MarkerModel mm;
@@ -397,8 +430,7 @@ void TestModel::testSelectionState1()
 
     const int maxLevel = mm.maxLevel();
 
-    const WMWGeoCoordinate coord_1_2 = WMWGeoCoordinate(1.0, 2.0);
-    QStandardItem* const item1 = MakeItemAt(coord_1_2);
+    QStandardItem* const item1 = MakeItemAt(coord_50_60);
     item1->setSelectable(true);
     itemModel->appendRow(item1);
     QModelIndex item1Index = itemModel->indexFromItem(item1);
@@ -409,11 +441,11 @@ void TestModel::testSelectionState1()
     const int preMaxLevel = maxLevel -2;
     for (int l = 0; l<=preMaxLevel; ++l)
     {
-        const QIntList tileIndex = mm.coordinateToTileIndex(coord_1_2, l);
+        const QIntList tileIndex = mm.coordinateToTileIndex(coord_50_60, l);
         MarkerModel::Tile* const myTile = mm.getTile(tileIndex, true);
         QVERIFY(myTile != 0);
         QVERIFY(mm.getTileMarkerCount(tileIndex) == 1);
-        QVERIFY(myTile->getSelectionState()==MarkerModel::Tile::SelectedNone);
+        QVERIFY(mm.getTileSelectedState(tileIndex)==MarkerModel::SelectedNone);
     }
 
     QItemSelectionModel* const selectionModel = new QItemSelectionModel(itemModel.data());
@@ -423,17 +455,110 @@ void TestModel::testSelectionState1()
     // verify the selection state of the tiles:
     for (int l = 0; l<=maxLevel; ++l)
     {
+        const QIntList tileIndex = mm.coordinateToTileIndex(coord_50_60, l);
+        MarkerModel::Tile* const myTile = mm.getTile(tileIndex, true);
+        QVERIFY(myTile != 0);
+        QCOMPARE(mm.getTileMarkerCount(tileIndex), 1);
+        QVERIFY(mm.getTileSelectedState(tileIndex)==MarkerModel::SelectedAll);
+        QVERIFY(mm.getTileSelectedCount(tileIndex)==1);
+    }
+
+    // add an unselected item and make sure the tilecount is still correct
+    QStandardItem* const item2 = MakeItemAt(coord_50_60);
+    item2->setSelectable(true);
+    itemModel->appendRow(item2);
+    const QPersistentModelIndex item2Index = itemModel->indexFromItem(item2);
+    for (int l = 0; l<=maxLevel; ++l)
+    {
+        const QIntList tileIndex = mm.coordinateToTileIndex(coord_50_60, l);
+        MarkerModel::Tile* const myTile = mm.getTile(tileIndex, true);
+        QVERIFY(myTile != 0);
+        QCOMPARE(mm.getTileMarkerCount(tileIndex), 2);
+        QVERIFY(mm.getTileSelectedState(tileIndex)==MarkerModel::SelectedSome);
+        QCOMPARE(mm.getTileSelectedCount(tileIndex), 1);
+    }
+
+    selectionModel->select(item2Index, QItemSelectionModel::Select);
+    for (int l = 0; l<=maxLevel; ++l)
+    {
+        const QIntList tileIndex = mm.coordinateToTileIndex(coord_50_60, l);
+        MarkerModel::Tile* const myTile = mm.getTile(tileIndex, true);
+        QVERIFY(myTile != 0);
+        QCOMPARE(mm.getTileMarkerCount(tileIndex), 2);
+        QCOMPARE(mm.getTileSelectedCount(tileIndex), 2);
+        QVERIFY(mm.getTileSelectedState(tileIndex)==MarkerModel::SelectedAll);
+    }
+
+    // now remove the selected item:
+    QCOMPARE(itemModel->takeRow(item2Index.row()).count(), 1);
+    delete item2;
+    // verify the selection state of the tiles:
+    for (int l = 0; l<=maxLevel; ++l)
+    {
+        const QIntList tileIndex = mm.coordinateToTileIndex(coord_50_60, l);
+        MarkerModel::Tile* const myTile = mm.getTile(tileIndex, true);
+        QVERIFY(myTile != 0);
+        QCOMPARE(mm.getTileMarkerCount(tileIndex), 1);
+        QCOMPARE(mm.getTileSelectedCount(tileIndex), 1);
+        QVERIFY(mm.getTileSelectedState(tileIndex)==MarkerModel::SelectedAll);
+    }
+
+    // add a selected item and then move it:
+    QStandardItem* const item3 = MakeItemAt(coord_1_2);
+    item3->setSelectable(true);
+    itemModel->appendRow(item3);
+    const QPersistentModelIndex item3Index = itemModel->indexFromItem(item3);
+    selectionModel->select(item3Index, QItemSelectionModel::Select);
+    for (int l = 0; l<=maxLevel; ++l)
+    {
         const QIntList tileIndex = mm.coordinateToTileIndex(coord_1_2, l);
         MarkerModel::Tile* const myTile = mm.getTile(tileIndex, true);
         QVERIFY(myTile != 0);
-        QVERIFY(mm.getTileMarkerCount(tileIndex) == 1);
-        QVERIFY(myTile->getSelectionState()==MarkerModel::Tile::SelectedAll);
+        QCOMPARE(mm.getTileMarkerCount(tileIndex), 1);
+        QCOMPARE(mm.getTileSelectedCount(tileIndex), 1);
+        QVERIFY(mm.getTileSelectedState(tileIndex)==MarkerModel::SelectedAll);
+    }
+    for (int l = 0; l<=maxLevel; ++l)
+    {
+        const QIntList tileIndex = mm.coordinateToTileIndex(coord_50_60, l);
+        MarkerModel::Tile* const myTile = mm.getTile(tileIndex, true);
+        QVERIFY(myTile != 0);
+        QCOMPARE(mm.getTileMarkerCount(tileIndex), 1);
+        QCOMPARE(mm.getTileSelectedCount(tileIndex), 1);
+        QVERIFY(mm.getTileSelectedState(tileIndex)==MarkerModel::SelectedAll);
+    }
+    mm.moveMarker(item3Index, coord_50_60);
+    for (int l = 0; l<=maxLevel; ++l)
+    {
+        const QIntList tileIndex = mm.coordinateToTileIndex(coord_50_60, l);
+        MarkerModel::Tile* const myTile = mm.getTile(tileIndex, true);
+        QVERIFY(myTile != 0);
+        QCOMPARE(mm.getTileMarkerCount(tileIndex), 2);
+        QCOMPARE(mm.getTileSelectedCount(tileIndex), 2);
+        QVERIFY(mm.getTileSelectedState(tileIndex)==MarkerModel::SelectedAll);
+    }
+    mm.moveMarker(item3Index, coord_m50_m60);
+    for (int l = 0; l<=maxLevel; ++l)
+    {
+        const QIntList tileIndex = mm.coordinateToTileIndex(coord_50_60, l);
+        MarkerModel::Tile* const myTile = mm.getTile(tileIndex, true);
+        QVERIFY(myTile != 0);
+        QCOMPARE(mm.getTileMarkerCount(tileIndex), 1);
+        QCOMPARE(mm.getTileSelectedCount(tileIndex), 1);
+        QVERIFY(mm.getTileSelectedState(tileIndex)==MarkerModel::SelectedAll);
+    }
+    for (int l = 0; l<=maxLevel; ++l)
+    {
+        const QIntList tileIndex = mm.coordinateToTileIndex(coord_m50_m60, l);
+        MarkerModel::Tile* const myTile = mm.getTile(tileIndex, true);
+        QVERIFY(myTile != 0);
+        QCOMPARE(mm.getTileMarkerCount(tileIndex), 1);
+        QCOMPARE(mm.getTileSelectedCount(tileIndex), 1);
+        QVERIFY(mm.getTileSelectedState(tileIndex)==MarkerModel::SelectedAll);
     }
 
-    // TODO: verify that the selection state is kept for new tiles
     // TODO: set a model with selected items, make sure the selections are read out
-    // TODO: test removing of selected markers
-    // TODO: test moving of selected markers
+    //       this is currently implemented by simply setting the tiles as dirty
 }
 
 QTEST_MAIN(TestModel)

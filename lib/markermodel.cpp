@@ -29,6 +29,7 @@ public:
     MarkerModelPrivate()
     : tesselationSizes(),
       rootTile(new MarkerModel::Tile()),
+      isDirty(true),
       markerModel(0),
       coordinatesRole(0),
       selectionModel(0)
@@ -45,6 +46,7 @@ public:
 
     QList<QIntPair> tesselationSizes;
     MarkerModel::Tile* rootTile;
+    bool isDirty;
     QAbstractItemModel* markerModel;
     int coordinatesRole;
     QItemSelectionModel* selectionModel;
@@ -57,28 +59,21 @@ MarkerModel::MarkerModel()
 
 void MarkerModel::setMarkerModel(QAbstractItemModel* const markerModel, const int coordinatesRole)
 {
-    delete d->rootTile;
-    d->rootTile = new Tile();
-    d->rootTile->prepareForChildren(d->tesselationSizes.first());
-
+    d->isDirty = true;
     d->markerModel = markerModel;
     d->coordinatesRole = coordinatesRole;
 
     if (d->markerModel!=0)
     {
+        // TODO: disconnect the old model if there was one
         connect(d->markerModel, SIGNAL(rowsInserted(const QModelIndex&, int, int)),
                 this, SLOT(slotSourceModelRowsInserted(const QModelIndex&, int, int)));
 
         connect(d->markerModel, SIGNAL(rowsAboutToBeRemoved(const QModelIndex&, int, int)),
                 this, SLOT(slotSourceModelRowsAboutToBeRemoved(const QModelIndex&, int, int)));
 
-        // read out all existing markers into tiles:
-        for (int row=0; row<d->markerModel->rowCount(); ++row)
-        {
-            const QModelIndex modelIndex = d->markerModel->index(row, 0);
-
-            addMarkerIndexToGrid(QPersistentModelIndex(modelIndex));
-        }
+        connect(d->markerModel, SIGNAL(dataChanged(const QModelIndex&, const QModelIndex&)),
+                this, SLOT(slotSourceModelDataChanged(const QModelIndex&, const QModelIndex&)));
     }
 }
 
@@ -224,16 +219,31 @@ void MarkerModel::linearIndexToLatLonIndex(const int linearIndex, const int leve
 
 void MarkerModel::addMarkerIndexToGrid(const QPersistentModelIndex& markerIndex)
 {
+    if (d->isDirty)
+    {
+        regenerateTiles();
+    }
+
     const WMWGeoCoordinate markerCoordinates = markerIndex.data(d->coordinatesRole).value<WMWGeoCoordinate>();
     
     const QIntList tileIndex = coordinateToTileIndex(markerCoordinates, maxLevel());
     WMW2_ASSERT(tileIndex.count()==maxIndexCount());
+
+    bool markerIsSelected = false;
+    if (d->selectionModel)
+    {
+        markerIsSelected = d->selectionModel->isSelected(markerIndex);
+    }
 
     // add the marker to all existing tiles:
     Tile* currentTile = d->rootTile;
     for (int l = 0; l<=maxLevel(); ++l)
     {
         currentTile->markerIndices<<markerIndex;
+        if (markerIsSelected)
+        {
+            currentTile->selectedCount++;
+        }
 
         // does the tile have any children?
         if (currentTile->children.isEmpty())
@@ -248,12 +258,28 @@ void MarkerModel::addMarkerIndexToGrid(const QPersistentModelIndex& markerIndex)
             nextTile = new Tile();
             currentTile->addChild(nextIndex, nextTile);
         }
+
+        // if this is the last loop iteration, populate the next tile now:
+        if (l==maxLevel())
+        {
+            nextTile->markerIndices<<markerIndex;
+            if (markerIsSelected)
+            {
+                nextTile->selectedCount++;
+            }
+        }
+
         currentTile = nextTile;
     }   
 }
 
 int MarkerModel::getTileMarkerCount(const QIntList& tileIndex)
 {
+    if (d->isDirty)
+    {
+        regenerateTiles();
+    }
+
     WMW2_ASSERT(tileIndex.count()<=maxIndexCount());
 
     Tile* const myTile = getTile(tileIndex, true);
@@ -266,8 +292,81 @@ int MarkerModel::getTileMarkerCount(const QIntList& tileIndex)
     return myTile->markerIndices.count();
 }
 
+int MarkerModel::getTileSelectedCount(const QIntList& tileIndex)
+{
+    if (d->isDirty)
+    {
+        regenerateTiles();
+    }
+
+    WMW2_ASSERT(tileIndex.count()<=maxIndexCount());
+
+    Tile* const myTile = getTile(tileIndex, true);
+
+    if (!myTile)
+    {
+        return 0;
+    }
+
+    return myTile->selectedCount;
+}
+
+QList<QPersistentModelIndex> MarkerModel::getTileMarkerIndices(const QIntList& tileIndex)
+{
+        if (d->isDirty)
+    {
+        regenerateTiles();
+    }
+
+    WMW2_ASSERT(tileIndex.count()<=maxIndexCount());
+
+    Tile* const myTile = getTile(tileIndex, true);
+
+    if (!myTile)
+    {
+        return QList<QPersistentModelIndex>();
+    }
+
+    return myTile->markerIndices;
+}
+
+MarkerModel::SelectionState MarkerModel::getTileSelectedState(const QIntList& tileIndex)
+{
+    if (d->isDirty)
+    {
+        regenerateTiles();
+    }
+
+    WMW2_ASSERT(tileIndex.count()<=maxIndexCount());
+
+    Tile* const myTile = getTile(tileIndex, true);
+
+    if (!myTile)
+    {
+        return SelectedNone;
+    }
+
+    const int selectedCount = myTile->selectedCount;
+    if (selectedCount==0)
+    {
+        return SelectedNone;
+    }
+    else if (selectedCount==myTile->markerIndices.count())
+    {
+        return SelectedAll;
+    }
+
+    return SelectedSome;
+}
+
+
 MarkerModel::Tile* MarkerModel::getTile(const QIntList& tileIndex, const bool stopIfEmpty)
 {
+    if (d->isDirty)
+    {
+        regenerateTiles();
+    }
+
     WMW2_ASSERT(tileIndex.count()<=maxIndexCount());
 
     Tile* tile = d->rootTile;
@@ -340,8 +439,13 @@ int MarkerModel::maxIndexCount() const
     return d->tesselationSizes.count();
 }
 
-MarkerModel::Tile* MarkerModel::rootTile() const
+MarkerModel::Tile* MarkerModel::rootTile()
 {
+    if (d->isDirty)
+    {
+        regenerateTiles();
+    }
+
     return d->rootTile;
 }
 
@@ -713,23 +817,50 @@ MarkerModel* MarkerModel::NonEmptyIterator::model() const
     return d->model;
 }
 
-void MarkerModel::removeMarkerIndexFromGrid(const QPersistentModelIndex& markerIndex)
+/**
+ * @brief Remove a marker from the grid
+ * @param ignoreSelection Do not remove the marker from the count of selected items.
+ *                        This is only used by slotSourceModelRowsAboutToBeRemoved internally,
+ *                        because the selection model sends us an extra signal about the deselection.
+ */
+void MarkerModel::removeMarkerIndexFromGrid(const QModelIndex& markerIndex, const bool ignoreSelection)
 {
+    if (d->isDirty)
+    {
+        // if the model is dirty, there is no need to remove the marker
+        // because the tiles will be regenerated on the next call
+        // that requests data
+        return;
+    }
+
     WMW2_ASSERT(markerIndex.isValid());
 
+    bool markerIsSelected = false;
+    if (d->selectionModel)
+    {
+        markerIsSelected = d->selectionModel->isSelected(markerIndex);
+    }
+    
     // remove the marker from the grid:
     const WMWGeoCoordinate markerCoordinates = markerIndex.data(d->coordinatesRole).value<WMWGeoCoordinate>();
     const QIntList tileIndex = coordinateToTileIndex(markerCoordinates, maxLevel());
     QList<Tile*> tiles;
-    for (int l=0; l<=maxLevel(); ++l)
+    // here l functions as the number of indices that we actually use, therefore we have to go one more up
+    // in this case, l==0 returns the root tile
+    for (int l=0; l<=maxLevel()+1; ++l)
     {
         Tile* const currentTile = getTile(tileIndex.mid(0, l), true);
         if (!currentTile)
             break;
 
         tiles << currentTile;
+        currentTile->removeMarkerIndexOrInvalidIndex(markerIndex);
 
-        currentTile->markerIndices.removeOne(markerIndex);
+        if (markerIsSelected&&!ignoreSelection)
+        {
+            currentTile->selectedCount--;
+            WMW2_ASSERT(currentTile->selectedCount>=0);
+        }
     }
 
     // delete the tiles which are now empty!
@@ -748,15 +879,26 @@ void MarkerModel::removeMarkerIndexFromGrid(const QPersistentModelIndex& markerI
 
 void MarkerModel::moveMarker(const QPersistentModelIndex& markerIndex, const WMWGeoCoordinate& newPosition)
 {
-    removeMarkerIndexFromGrid(markerIndex);
-
+    WMW2_ASSERT(markerIndex.isValid());
+    // TODO: is there a way to move the marker without resetting the tiles?
     d->markerModel->setData(markerIndex, QVariant::fromValue(newPosition), d->coordinatesRole);
+}
 
-    addMarkerIndexToGrid(markerIndex);
+void MarkerModel::slotSourceModelDataChanged(const QModelIndex& topLeft, const QModelIndex& bottomRight)
+{
+    d->isDirty = true;
+
+    // TODO: if only a few items were changed, try to see whether they are still in the right tiles
 }
 
 void MarkerModel::slotSourceModelRowsInserted(const QModelIndex& parentIndex, int start, int end)
 {
+    if (d->isDirty)
+    {
+        // rows will be added once the tiles are regenerated
+        return;
+    }
+
     // sort the new items into our tiles:
     for (int i=start; i<=end; ++i)
     {
@@ -766,12 +908,27 @@ void MarkerModel::slotSourceModelRowsInserted(const QModelIndex& parentIndex, in
 
 void MarkerModel::slotSourceModelRowsAboutToBeRemoved(const QModelIndex& parentIndex, int start, int end)
 {
+#if QT_VERSION < 0x040600
+    // removeMarkerIndexFromGrid does not work in Qt 4.5 because the model has already deleted all
+    // the data of the item, but we need the items coordinates to work efficiently
+    d->isDirty = true;
+    return;
+#else
+    if (d->isDirty)
+    {
+        return;
+    }
+    
     // remove the items from their tiles:
     for (int i=start; i<=end; ++i)
     {
-        const QPersistentModelIndex itemIndex = QPersistentModelIndex(d->markerModel->index(start, 0, parentIndex));
-        removeMarkerIndexFromGrid(itemIndex);
+        const QModelIndex itemIndex = d->markerModel->index(start, 0, parentIndex);
+
+        // remove the marker from the grid, but leave the selection count alone because the
+        // selection model will send a signal about the deselection of the marker
+        removeMarkerIndexFromGrid(itemIndex, true);
     }
+#endif
 }
 
 void MarkerModel::setSelectionModel(QItemSelectionModel* const selectionModel)
@@ -780,10 +937,18 @@ void MarkerModel::setSelectionModel(QItemSelectionModel* const selectionModel)
 
     connect(d->selectionModel, SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)),
             this, SLOT(slotSelectionChanged(const QItemSelection&, const QItemSelection&)));
+
+    // TODO: read out the selection state of existing items!!!
+    d->isDirty = true;
 }
 
 void MarkerModel::slotSelectionChanged(const QItemSelection& selected, const QItemSelection& deselected)
 {
+    if (d->isDirty)
+    {
+        return;
+    }
+
     for (int i=0; i<selected.count(); ++i)
     {
         const QItemSelectionRange selectionRange = selected.at(i);
@@ -800,6 +965,7 @@ void MarkerModel::slotSelectionChanged(const QItemSelection& selected, const QIt
                     break;
 
                 myTile->selectedCount++;
+//                 kDebug()<<l<<tileIndex<<myTile->selectedCount;
                 WMW2_ASSERT(myTile->selectedCount <= myTile->markerIndices.count());
 
                 if (myTile->children.isEmpty())
@@ -816,7 +982,7 @@ void MarkerModel::slotSelectionChanged(const QItemSelection& selected, const QIt
             // get the coordinates of the item
             const WMWGeoCoordinate coordinates = d->markerModel->data(d->markerModel->index(row, 0, selectionRange.parent()), d->coordinatesRole).value<WMWGeoCoordinate>();
 
-            for (int l=0; l<maxLevel(); ++l)
+            for (int l=0; l<=maxLevel(); ++l)
             {
                 const QIntList tileIndex = coordinateToTileIndex(coordinates, l);
                 MarkerModel::Tile* const myTile = getTile(tileIndex, true);
@@ -830,6 +996,26 @@ void MarkerModel::slotSelectionChanged(const QItemSelection& selected, const QIt
                     break;
             }
         }
+    }
+}
+
+void MarkerModel::regenerateTiles()
+{
+    delete d->rootTile;
+    d->rootTile = 0;
+
+    if (!d->markerModel)
+        return;
+
+    d->isDirty = false;
+    d->rootTile = new Tile();
+    d->rootTile->prepareForChildren(d->tesselationSizes.first());
+
+    // read out all existing markers into tiles:
+    for (int row=0; row<d->markerModel->rowCount(); ++row)
+    {
+        const QModelIndex modelIndex = d->markerModel->index(row, 0);
+        addMarkerIndexToGrid(QPersistentModelIndex(modelIndex));
     }
 }
 

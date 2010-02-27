@@ -979,13 +979,7 @@ void WorldMapWidget2::slotClustersMoved(const QIntList& clusterIndices)
         for (int i=0; i<cluster.tileIndicesList.count(); ++i)
         {
             const QIntList tileIndex = cluster.tileIndicesList.at(i);
-            MarkerModel::Tile* const sourceTile = s->markerModel->getTile(tileIndex, true);
-            if (!sourceTile)
-            {
-                continue;
-            }
-
-            movedMarkers << sourceTile->markerIndices;
+            movedMarkers << s->markerModel->getTileMarkerIndices(tileIndex);
         }
 
         // update the positions of the markers:

@@ -37,13 +37,14 @@ class TestModel : public QObject
 private Q_SLOTS:
     void testNoOp();
     void testIndices();
-    void testBasicModel();
+    void testAddMarkers1();
+    void testRemoveMarkers1();
+    void testRemoveMarkers2();
     void testMoveMarkers1();
     void testMoveMarkers2();
     void testIteratorWholeWorld();
     void testIteratorPartial1();
     void testIteratorPartial2();
-    void testRemoveMarkers();
     void testPreExistingMarkers();
     void testSelectionState1();
 };
