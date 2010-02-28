@@ -185,7 +185,7 @@ function initialize() {
     vectorLayerMarkers = new OpenLayers.Layer.Vector("Vector layer markers",
         {
             styleMap: new OpenLayers.StyleMap({
-                externalGraphic : "marker-green.png",
+                externalGraphic : "marker-00ff00.png",
                 graphicWidth : 20,
                 graphicHeight : 32,
                 graphicXOffset : -10,

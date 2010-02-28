@@ -82,7 +82,6 @@ INSTALL(FILES lib-data/backend-osm.html
               lib-data/backend-osm-js.js
               lib-data/backend-googlemaps.html
               lib-data/backend-googlemaps-js.js
-              lib-data/marker-green.png
               lib-data/cluster-circle-00ff00.png
               lib-data/cluster-circle-00ffff.png
               lib-data/cluster-circle-ff0000.png
