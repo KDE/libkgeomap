@@ -528,7 +528,7 @@ void WorldMapWidget2::updateClusters()
     }
 
     // constants for clusters
-    const int ClusterRadius          = s->inEditMode ? 7 : 15;
+    const int ClusterRadius          = s->inEditMode ? 3 : 15;
     const QSize ClusterDefaultSize   = QSize(2*ClusterRadius, 2*ClusterRadius);
     const int ClusterGridSizeScreen  = 4*ClusterRadius;
     const QSize ClusterMaxPixmapSize = QSize(ClusterGridSizeScreen, ClusterGridSizeScreen);
@@ -745,23 +745,26 @@ void WorldMapWidget2::updateClusters()
     {
         WMWCluster& cluster = s->clusterList[i];
 
-        WMWSelectionState clusterSelectionState = s->markerModel->getTileSelectedState(cluster.tileIndicesList.first());
-        if (clusterSelectionState!=WMWSelectedSome)
+        int clusterSelectedCount = 0;
+        for (int iTile=0;
+                (iTile<cluster.tileIndicesList.count());
+                ++iTile)
         {
-            for (int iTile=1;
-                    (iTile<cluster.tileIndicesList.count());
-                    ++iTile)
-            {
-                const WMWSelectionState nextSelectionState = s->markerModel->getTileSelectedState(cluster.tileIndicesList.at(iTile));
-
-                if (nextSelectionState==clusterSelectionState)
-                    continue;
-
-                clusterSelectionState = WMWSelectedSome;
-                break;
-            }
+            clusterSelectedCount+= s->markerModel->getTileSelectedCount(cluster.tileIndicesList.at(iTile));
         }
-        cluster.selectedState = clusterSelectionState;
+        cluster.markerSelectedCount = clusterSelectedCount;
+        if (cluster.markerSelectedCount==0)
+        {
+            cluster.selectedState = WMWSelectedNone;
+        }
+        else if (cluster.markerSelectedCount==cluster.markerCount)
+        {
+            cluster.selectedState = WMWSelectedAll;
+        }
+        else
+        {
+            cluster.selectedState = WMWSelectedSome;
+        }
     }
 
 //     kDebug()<<s->clusterList.size();
@@ -786,14 +789,18 @@ void WorldMapWidget2::slotClustersNeedUpdating()
  * @param strokeStyle Style used to draw the stroke around the crircle
  * @param labelText Text for the label
  * @param labelColor Color for the label text
+ * @param overrideSelection Get the colors for a different selection state
+ * @param overrideCount Get the colors for a different amount of markers
  */
 void WorldMapWidget2::getColorInfos(const int clusterIndex, QColor *fillColor, QColor *strokeColor,
-                                    Qt::PenStyle *strokeStyle, QString *labelText, QColor *labelColor) const
+                                    Qt::PenStyle *strokeStyle, QString *labelText, QColor *labelColor,
+                                    const WMWSelectionState* const overrideSelection,
+                                    const int* const overrideCount) const
 {
     const WMWCluster& cluster = s->clusterList.at(clusterIndex);
 
     // TODO: check that this number is already valid!
-    const int nMarkers = cluster.markerCount;
+    const int nMarkers = overrideCount ? *overrideCount : cluster.markerCount;
 
     if (nMarkers<1000)
     {
@@ -826,7 +833,7 @@ void WorldMapWidget2::getColorInfos(const int clusterIndex, QColor *fillColor, Q
     // TODO: 'solo' and 'selected' properties have not yet been defined,
     //       therefore use the default colors
     *strokeStyle = Qt::NoPen;
-    switch (cluster.selectedState)
+    switch (overrideSelection?*overrideSelection:cluster.selectedState)
     {
         case WMWSelectedNone:
             *strokeStyle = Qt::NoPen;
@@ -995,38 +1002,50 @@ void WorldMapWidget2::slotClustersMoved(const QIntList& clusterIndices)
 {
     kDebug()<<clusterIndices;
 
-    QList<QPersistentModelIndex> markerIndices;
-    // update the positions of the markers held by the clusters:
-    for (int cii=0; cii<clusterIndices.count(); ++cii)
+    // TODO: we actually expect only one clusterindex
+    int clusterIndex = clusterIndices.first();
+    WMWGeoCoordinate targetCoordinates = s->clusterList.at(clusterIndex).coordinates;
+
+    QList<QPersistentModelIndex> movedMarkers;
+    if (s->clusterList.at(clusterIndex).selectedState==WMWSelectedNone)
     {
-        const int clusterIndex = clusterIndices.at(cii);
-
+        // a not-selected marker was moved. update all of its items:
         const WMWCluster& cluster = s->clusterList.at(clusterIndex);
-
-        // remove all the markers in the cluster from the model and then add them again:
-        QList<QPersistentModelIndex> movedMarkers;
         for (int i=0; i<cluster.tileIndicesList.count(); ++i)
         {
             const QIntList tileIndex = cluster.tileIndicesList.at(i);
             movedMarkers << s->markerModel->getTileMarkerIndices(tileIndex);
         }
+    }
+    else
+    {
+        // selected items were moved. Get their indices from the selection model:
+        QItemSelectionModel* const selectionModel = s->markerModel->getSelectionModel();
+        WMW2_ASSERT(selectionModel!=0);
+        if (!selectionModel)
+            return;
 
-        // update the positions of the markers:
-        for (int i=0; i<movedMarkers.count(); ++i)
+        QModelIndexList selectedIndices = selectionModel->selectedIndexes();
+        for (int i=0; i<selectedIndices.count(); ++i)
         {
-            s->markerModel->moveMarker(movedMarkers.at(i), cluster.coordinates);
+            movedMarkers << selectedIndices.at(i);
         }
+    }
 
-        markerIndices << movedMarkers;
+    // update the positions of the markers:
+    for (int i=0; i<movedMarkers.count(); ++i)
+    {
+        s->markerModel->moveMarker(movedMarkers.at(i), targetCoordinates);
     }
 
 //     kDebug()<<markerIndices;
-    if (!markerIndices.isEmpty())
+    if (!movedMarkers.isEmpty())
     {
-        emit(signalDisplayMarkersMoved(markerIndices));
+        emit(signalDisplayMarkersMoved(movedMarkers));
     }
 
-    // TODO: who calls updateClusters? Right now, the google maps backend does that
+    // TODO: clusters are marked as dirty by slotClustersNeedUpdating which is called
+    // while we update the model
 }
 
 bool WorldMapWidget2::queryAltitudes(const WMWAltitudeLookup::List& queryItems, const QString& backendName)

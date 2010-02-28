@@ -139,6 +139,7 @@ public:
 
     void setMarkerModel(QAbstractItemModel* const markerModel, const int coordinatesRole);
     void setSelectionModel(QItemSelectionModel* const selectionModel);
+    QItemSelectionModel* getSelectionModel() const;
 
     WMWGeoCoordinate tileIndexToCoordinate(const QIntList& tileIndex);
     QIntList coordinateToTileIndex(const WMWGeoCoordinate& coordinate, const int level);

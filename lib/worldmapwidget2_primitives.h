@@ -252,6 +252,7 @@ public:
     WMWCluster()
     : tileIndicesList(),
       markerCount(0),
+      markerSelectedCount(0),
       coordinates(),
       pixelPos(),
       selectedState(WMWSelectedNone)
@@ -260,6 +261,7 @@ public:
 
     QList<QIntList> tileIndicesList;
     int markerCount;
+    int markerSelectedCount;
     WMWGeoCoordinate coordinates;
     QPoint pixelPos;
     WMWSelectionState selectedState;

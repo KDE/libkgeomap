@@ -65,7 +65,9 @@ public:
     void updateClusters();
 
     void getColorInfos(const int clusterIndex, QColor *fillColor, QColor *strokeColor,
-                       Qt::PenStyle *strokeStyle, QString *labelText, QColor *labelColor) const;
+                       Qt::PenStyle *strokeStyle, QString *labelText, QColor *labelColor,
+                                    const WMWSelectionState* const overrideSelection = 0,
+                                    const int* const overrideCount = 0) const;
 
     QString convertZoomToBackendZoom(const QString& someZoom, const QString& targetBackend) const;
     bool queryAltitudes(const WMWAltitudeLookup::List& queryItems, const QString& backendName = "");

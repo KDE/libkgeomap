@@ -451,14 +451,30 @@ void BackendMarble::marbleCustomPaint(Marble::GeoPainter* painter)
     // now for the clusters:
     generateClusters();
 
+    int markersInMovingCluster = 0;
     for (int i = 0; i<s->clusterList.size(); ++i)
     {
         const WMWCluster& cluster = s->clusterList.at(i);
         WMWGeoCoordinate clusterCoordinates = cluster.coordinates;
-        if (d->mouseMoveClusterIndex == i)
+        int markerCountOverride = cluster.markerCount;
+        WMWSelectionState selectionStateOverride = cluster.selectedState;
+        if (d->mouseMoveClusterIndex>=0)
         {
-            clusterCoordinates = d->mouseMoveObjectCoordinates;
+            bool movingSelectedMarkers = s->clusterList.at(d->mouseMoveClusterIndex).selectedState!=WMWSelectedNone;
+            if (movingSelectedMarkers)
+            {
+                markersInMovingCluster+=cluster.markerSelectedCount;
+                markerCountOverride-=cluster.markerSelectedCount;
+                selectionStateOverride = WMWSelectedNone;
+            }
+            else if (d->mouseMoveClusterIndex == i)
+            {
+                markerCountOverride = 0;
+            }
+            if (markerCountOverride==0)
+                continue;
         }
+
         QPoint clusterPoint;
         if (!screenCoordinates(clusterCoordinates, &clusterPoint))
             continue;
@@ -470,16 +486,18 @@ void BackendMarble::marbleCustomPaint(Marble::GeoPainter* painter)
         QColor       labelColor;
         QString      labelText;
         s->worldMapWidget->getColorInfos(i, &fillColor, &strokeColor,
-                            &strokeStyle, &labelText, &labelColor);
+                            &strokeStyle, &labelText, &labelColor,
+                            &selectionStateOverride,
+                            &markerCountOverride);
 
         if (s->inEditMode)
         {
             QString pixmapName = fillColor.name().mid(1);
-            if (cluster.selectedState==WMWSelectedAll)
+            if (selectionStateOverride==WMWSelectedAll)
             {
                 pixmapName+="-selected";
             }
-            if (cluster.selectedState==WMWSelectedSome)
+            if (selectionStateOverride==WMWSelectedSome)
             {
                 pixmapName+="-someselected";
             }
@@ -506,6 +524,42 @@ void BackendMarble::marbleCustomPaint(Marble::GeoPainter* painter)
             painter->setPen(labelPen);
             painter->setBrush(Qt::NoBrush);
             painter->drawText(circleRect, Qt::AlignHCenter|Qt::AlignVCenter, labelText);
+        }
+    }
+
+    // now render the mouse-moving cluster, if there is one:
+    if (d->mouseMoveClusterIndex>=0)
+    {
+        const WMWCluster& cluster = s->clusterList.at(d->mouseMoveClusterIndex);
+        WMWGeoCoordinate clusterCoordinates = d->mouseMoveObjectCoordinates;
+        int markerCountOverride = (markersInMovingCluster>0)?markersInMovingCluster:cluster.markerCount;
+        WMWSelectionState selectionStateOverride = cluster.selectedState;
+
+        QPoint clusterPoint;
+        if (screenCoordinates(clusterCoordinates, &clusterPoint))
+        {
+            // determine the colors:
+            QColor       fillColor;
+            QColor       strokeColor;
+            Qt::PenStyle strokeStyle;
+            QColor       labelColor;
+            QString      labelText;
+            s->worldMapWidget->getColorInfos(d->mouseMoveClusterIndex, &fillColor, &strokeColor,
+                                &strokeStyle, &labelText, &labelColor,
+                                &selectionStateOverride,
+                                &markerCountOverride);
+
+            QString pixmapName = fillColor.name().mid(1);
+            if (cluster.selectedState==WMWSelectedAll)
+            {
+                pixmapName+="-selected";
+            }
+            if (cluster.selectedState==WMWSelectedSome)
+            {
+                pixmapName+="-someselected";
+            }
+            const QPixmap& markerPixmap = d->markerPixmaps[pixmapName];
+            painter->drawPixmap(clusterPoint.x()-markerPixmap.height()/2, clusterPoint.y()-markerPixmap.height(), markerPixmap);
         }
     }
 
@@ -741,7 +795,8 @@ bool BackendMarble::eventFilter(QObject *object, QEvent *event)
 
         if (s->inEditMode&&!doFilterEvent)
         {
-            for (int clusterIndex = 0; clusterIndex<s->clusterList.count(); ++clusterIndex)
+            // scan in reverse order of painting!
+            for (int clusterIndex = s->clusterList.count()-1; clusterIndex>=0; --clusterIndex)
             {
                 const WMWGeoCoordinate currentCoordinates = s->clusterList.at(clusterIndex).coordinates;
 

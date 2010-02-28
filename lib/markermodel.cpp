@@ -1027,5 +1027,10 @@ void MarkerModel::regenerateTiles()
     }
 }
 
+QItemSelectionModel* MarkerModel::getSelectionModel() const
+{
+    return d->selectionModel;
+}
+
 } /* WMW2 */
 
