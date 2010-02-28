@@ -330,7 +330,7 @@ QList<QPersistentModelIndex> MarkerModel::getTileMarkerIndices(const QIntList& t
     return myTile->markerIndices;
 }
 
-MarkerModel::SelectionState MarkerModel::getTileSelectedState(const QIntList& tileIndex)
+WMWSelectionState MarkerModel::getTileSelectedState(const QIntList& tileIndex)
 {
     if (d->isDirty)
     {
@@ -343,20 +343,20 @@ MarkerModel::SelectionState MarkerModel::getTileSelectedState(const QIntList& ti
 
     if (!myTile)
     {
-        return SelectedNone;
+        return WMWSelectedNone;
     }
 
     const int selectedCount = myTile->selectedCount;
     if (selectedCount==0)
     {
-        return SelectedNone;
+        return WMWSelectedNone;
     }
     else if (selectedCount==myTile->markerIndices.count())
     {
-        return SelectedAll;
+        return WMWSelectedAll;
     }
 
-    return SelectedSome;
+    return WMWSelectedSome;
 }
 
 
@@ -887,6 +887,7 @@ void MarkerModel::moveMarker(const QPersistentModelIndex& markerIndex, const WMW
 void MarkerModel::slotSourceModelDataChanged(const QModelIndex& topLeft, const QModelIndex& bottomRight)
 {
     d->isDirty = true;
+    emit(signalTilesOrSelectionChanged());
 
     // TODO: if only a few items were changed, try to see whether they are still in the right tiles
 }
@@ -904,10 +905,13 @@ void MarkerModel::slotSourceModelRowsInserted(const QModelIndex& parentIndex, in
     {
         addMarkerIndexToGrid(QPersistentModelIndex(d->markerModel->index(start, 0, parentIndex)));
     }
+
+    emit(signalTilesOrSelectionChanged());
 }
 
 void MarkerModel::slotSourceModelRowsAboutToBeRemoved(const QModelIndex& parentIndex, int start, int end)
 {
+    // TODO: emit(signalTilesOrSelectionChanged()); in rowsWereRemoved
 #if QT_VERSION < 0x040600
     // removeMarkerIndexFromGrid does not work in Qt 4.5 because the model has already deleted all
     // the data of the item, but we need the items coordinates to work efficiently
@@ -940,6 +944,8 @@ void MarkerModel::setSelectionModel(QItemSelectionModel* const selectionModel)
 
     // TODO: read out the selection state of existing items!!!
     d->isDirty = true;
+
+    emit(signalTilesOrSelectionChanged());
 }
 
 void MarkerModel::slotSelectionChanged(const QItemSelection& selected, const QItemSelection& deselected)
@@ -997,6 +1003,8 @@ void MarkerModel::slotSelectionChanged(const QItemSelection& selected, const QIt
             }
         }
     }
+
+    emit(signalTilesOrSelectionChanged());
 }
 
 void MarkerModel::regenerateTiles()

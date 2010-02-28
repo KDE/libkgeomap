@@ -92,14 +92,27 @@ public:
     WMWGeoCoordinate mouseMoveObjectCoordinates;
     QPoint mouseMoveCenterOffset;
     QPixmap markerPixmap;
+    QMap<QString, QPixmap> markerPixmaps;
 };
 
 BackendMarble::BackendMarble(const QExplicitlySharedDataPointer<WMWSharedData>& sharedData, QObject* const parent)
 : MapBackend(sharedData, parent), d(new BackendMarblePrivate())
 {
-    const KUrl markerGreenUrl = KStandardDirs::locate("data", "libworldmapwidget2/marker-green.png");
-    d->markerPixmap = QPixmap(markerGreenUrl.toLocalFile());
-
+    QStringList markerColors;
+    markerColors << "00ff00" << "00ffff" << "ff0000" << "ff7f00" << "ffff00";
+    QStringList stateNames;
+    stateNames << "" << "-selected" << "-someselected";
+    for (QStringList::const_iterator it = markerColors.constBegin(); it!=markerColors.constEnd(); ++it)
+    {
+        for (QStringList::const_iterator sit = stateNames.constBegin(); sit!=stateNames.constEnd(); ++sit)
+        {
+            const QString pixmapName = *it + *sit;
+            const KUrl markerUrl = KStandardDirs::locate("data", QString("libworldmapwidget2/marker-%1.png").arg(pixmapName));
+            d->markerPixmaps[pixmapName] = QPixmap(markerUrl.toLocalFile());
+        }
+    }
+    d->markerPixmap = d->markerPixmaps["00ff00"];
+    
     d->marbleWidget = new BMWidget(this);
 
     d->marbleWidget->installEventFilter(this);
@@ -450,20 +463,31 @@ void BackendMarble::marbleCustomPaint(Marble::GeoPainter* painter)
         if (!screenCoordinates(clusterCoordinates, &clusterPoint))
             continue;
 
+        // determine the colors:
+        QColor       fillColor;
+        QColor       strokeColor;
+        Qt::PenStyle strokeStyle;
+        QColor       labelColor;
+        QString      labelText;
+        s->worldMapWidget->getColorInfos(i, &fillColor, &strokeColor,
+                            &strokeStyle, &labelText, &labelColor);
+
         if (s->inEditMode)
         {
-            painter->drawPixmap(clusterPoint.x()-d->markerPixmap.height()/2, clusterPoint.y()-d->markerPixmap.height(), d->markerPixmap);
+            QString pixmapName = fillColor.name().mid(1);
+            if (cluster.selectedState==WMWSelectedAll)
+            {
+                pixmapName+="-selected";
+            }
+            if (cluster.selectedState==WMWSelectedSome)
+            {
+                pixmapName+="-someselected";
+            }
+            const QPixmap& markerPixmap = d->markerPixmaps[pixmapName];
+            painter->drawPixmap(clusterPoint.x()-markerPixmap.height()/2, clusterPoint.y()-markerPixmap.height(), markerPixmap);
         }
         else
         {
-            // determine the colors:
-            QColor       fillColor;
-            QColor       strokeColor;
-            Qt::PenStyle strokeStyle;
-            QColor       labelColor;
-            QString      labelText;
-            s->worldMapWidget->getColorInfos(i, &fillColor, &strokeColor,
-                                &strokeStyle, &labelText, &labelColor);
 
             QPen circlePen;
             circlePen.setColor(strokeColor);

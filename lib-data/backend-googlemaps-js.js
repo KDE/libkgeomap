@@ -165,7 +165,7 @@ function wmwAddCluster(id, lat, lon, setDraggable, clusterColor, clusterLabel) {
     var latlng = new google.maps.LatLng(lat, lon);
     var clusterIcon;
     if (isInEditMode) {
-        clusterIcon = new google.maps.MarkerImage('marker-green.png', new google.maps.Size(20, 32));
+        clusterIcon = new google.maps.MarkerImage('marker-'+clusterColor+'.png', new google.maps.Size(20, 32));
     } else {
         clusterIcon = new google.maps.MarkerImage('cluster-circle-'+clusterColor+'.png', new google.maps.Size(30, 30));
     }

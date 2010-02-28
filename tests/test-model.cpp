@@ -445,7 +445,7 @@ void TestModel::testSelectionState1()
         MarkerModel::Tile* const myTile = mm.getTile(tileIndex, true);
         QVERIFY(myTile != 0);
         QVERIFY(mm.getTileMarkerCount(tileIndex) == 1);
-        QVERIFY(mm.getTileSelectedState(tileIndex)==MarkerModel::SelectedNone);
+        QVERIFY(mm.getTileSelectedState(tileIndex)==WMWSelectedNone);
     }
 
     QItemSelectionModel* const selectionModel = new QItemSelectionModel(itemModel.data());
@@ -459,7 +459,7 @@ void TestModel::testSelectionState1()
         MarkerModel::Tile* const myTile = mm.getTile(tileIndex, true);
         QVERIFY(myTile != 0);
         QCOMPARE(mm.getTileMarkerCount(tileIndex), 1);
-        QVERIFY(mm.getTileSelectedState(tileIndex)==MarkerModel::SelectedAll);
+        QVERIFY(mm.getTileSelectedState(tileIndex)==WMWSelectedAll);
         QVERIFY(mm.getTileSelectedCount(tileIndex)==1);
     }
 
@@ -474,7 +474,7 @@ void TestModel::testSelectionState1()
         MarkerModel::Tile* const myTile = mm.getTile(tileIndex, true);
         QVERIFY(myTile != 0);
         QCOMPARE(mm.getTileMarkerCount(tileIndex), 2);
-        QVERIFY(mm.getTileSelectedState(tileIndex)==MarkerModel::SelectedSome);
+        QVERIFY(mm.getTileSelectedState(tileIndex)==WMWSelectedSome);
         QCOMPARE(mm.getTileSelectedCount(tileIndex), 1);
     }
 
@@ -486,7 +486,7 @@ void TestModel::testSelectionState1()
         QVERIFY(myTile != 0);
         QCOMPARE(mm.getTileMarkerCount(tileIndex), 2);
         QCOMPARE(mm.getTileSelectedCount(tileIndex), 2);
-        QVERIFY(mm.getTileSelectedState(tileIndex)==MarkerModel::SelectedAll);
+        QVERIFY(mm.getTileSelectedState(tileIndex)==WMWSelectedAll);
     }
 
     // now remove the selected item:
@@ -500,7 +500,7 @@ void TestModel::testSelectionState1()
         QVERIFY(myTile != 0);
         QCOMPARE(mm.getTileMarkerCount(tileIndex), 1);
         QCOMPARE(mm.getTileSelectedCount(tileIndex), 1);
-        QVERIFY(mm.getTileSelectedState(tileIndex)==MarkerModel::SelectedAll);
+        QVERIFY(mm.getTileSelectedState(tileIndex)==WMWSelectedAll);
     }
 
     // add a selected item and then move it:
@@ -516,7 +516,7 @@ void TestModel::testSelectionState1()
         QVERIFY(myTile != 0);
         QCOMPARE(mm.getTileMarkerCount(tileIndex), 1);
         QCOMPARE(mm.getTileSelectedCount(tileIndex), 1);
-        QVERIFY(mm.getTileSelectedState(tileIndex)==MarkerModel::SelectedAll);
+        QVERIFY(mm.getTileSelectedState(tileIndex)==WMWSelectedAll);
     }
     for (int l = 0; l<=maxLevel; ++l)
     {
@@ -525,7 +525,7 @@ void TestModel::testSelectionState1()
         QVERIFY(myTile != 0);
         QCOMPARE(mm.getTileMarkerCount(tileIndex), 1);
         QCOMPARE(mm.getTileSelectedCount(tileIndex), 1);
-        QVERIFY(mm.getTileSelectedState(tileIndex)==MarkerModel::SelectedAll);
+        QVERIFY(mm.getTileSelectedState(tileIndex)==WMWSelectedAll);
     }
     mm.moveMarker(item3Index, coord_50_60);
     for (int l = 0; l<=maxLevel; ++l)
@@ -535,7 +535,7 @@ void TestModel::testSelectionState1()
         QVERIFY(myTile != 0);
         QCOMPARE(mm.getTileMarkerCount(tileIndex), 2);
         QCOMPARE(mm.getTileSelectedCount(tileIndex), 2);
-        QVERIFY(mm.getTileSelectedState(tileIndex)==MarkerModel::SelectedAll);
+        QVERIFY(mm.getTileSelectedState(tileIndex)==WMWSelectedAll);
     }
     mm.moveMarker(item3Index, coord_m50_m60);
     for (int l = 0; l<=maxLevel; ++l)
@@ -545,7 +545,7 @@ void TestModel::testSelectionState1()
         QVERIFY(myTile != 0);
         QCOMPARE(mm.getTileMarkerCount(tileIndex), 1);
         QCOMPARE(mm.getTileSelectedCount(tileIndex), 1);
-        QVERIFY(mm.getTileSelectedState(tileIndex)==MarkerModel::SelectedAll);
+        QVERIFY(mm.getTileSelectedState(tileIndex)==WMWSelectedAll);
     }
     for (int l = 0; l<=maxLevel; ++l)
     {
@@ -554,7 +554,7 @@ void TestModel::testSelectionState1()
         QVERIFY(myTile != 0);
         QCOMPARE(mm.getTileMarkerCount(tileIndex), 1);
         QCOMPARE(mm.getTileSelectedCount(tileIndex), 1);
-        QVERIFY(mm.getTileSelectedState(tileIndex)==MarkerModel::SelectedAll);
+        QVERIFY(mm.getTileSelectedState(tileIndex)==WMWSelectedAll);
     }
 
     // TODO: set a model with selected items, make sure the selections are read out

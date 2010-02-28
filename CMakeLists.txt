@@ -88,6 +88,31 @@ INSTALL(FILES lib-data/backend-osm.html
               lib-data/cluster-circle-ff0000.png
               lib-data/cluster-circle-ff7f00.png
               lib-data/cluster-circle-ffff00.png
+              lib-data/cluster-circle-00ff00-someselected.png
+              lib-data/cluster-circle-00ffff-someselected.png
+              lib-data/cluster-circle-ff0000-someselected.png
+              lib-data/cluster-circle-ff7f00-someselected.png
+              lib-data/cluster-circle-ffff00-someselected.png
+              lib-data/cluster-circle-00ff00-selected.png
+              lib-data/cluster-circle-00ffff-selected.png
+              lib-data/cluster-circle-ff0000-selected.png
+              lib-data/cluster-circle-ff7f00-selected.png
+              lib-data/cluster-circle-ffff00-selected.png
+              lib-data/marker-00ff00.png
+              lib-data/marker-00ffff.png
+              lib-data/marker-ff0000.png
+              lib-data/marker-ff7f00.png
+              lib-data/marker-ffff00.png
+              lib-data/marker-00ff00-someselected.png
+              lib-data/marker-00ffff-someselected.png
+              lib-data/marker-ff0000-someselected.png
+              lib-data/marker-ff7f00-someselected.png
+              lib-data/marker-ffff00-someselected.png
+              lib-data/marker-00ff00-selected.png
+              lib-data/marker-00ffff-selected.png
+              lib-data/marker-ff0000-selected.png
+              lib-data/marker-ff7f00-selected.png
+              lib-data/marker-ffff00-selected.png
         DESTINATION ${DATA_INSTALL_DIR}/libworldmapwidget2/)
 
 INSTALL(FILES lib/worldmapwidget2.h

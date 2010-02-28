@@ -56,6 +56,7 @@ private Q_SLOTS:
     void slotDisplayMarkersDataChanged(const QModelIndex& topLeft, const QModelIndex& bottomRight);
     void slotMarkersMoved(const QList<QPersistentModelIndex>& markerIndices);
     void slotAltitudeLookupReady(const WMW2::WMWAltitudeLookup::List& altitudes);
+    void slotTreeWidgetSelectionChanged();
 
 private:
     MainWindowPrivate* const d;

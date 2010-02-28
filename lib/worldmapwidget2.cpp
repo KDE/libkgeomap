@@ -25,6 +25,7 @@
 
 // Qt includes
 
+#include <QItemSelectionModel>
 #include <QMenu>
 #include <QPointer>
 #include <QStackedLayout>
@@ -111,6 +112,10 @@ WorldMapWidget2::WorldMapWidget2(QWidget* const parent)
     // TODO: someone has to delete this model later!
     s->markerModel = new MarkerModel();
     s->worldMapWidget = this;
+
+    // TODO: this needs some buffering for the google maps backend
+    connect(s->markerModel, SIGNAL(signalTilesOrSelectionChanged()),
+            this, SLOT(slotClustersNeedUpdating()));
 
     d->stackedLayout = new QStackedLayout(this);
     setLayout(d->stackedLayout);
@@ -678,8 +683,6 @@ void WorldMapWidget2::updateClusters()
         cluster.tileIndicesList = pixelNonEmptyTileIndexGrid.at(markerX+markerY*gridWidth);
         cluster.markerCount = pixelCountGrid.at(markerX+markerY*gridWidth);
 
-//         kDebug()<<QString("created cluster %1: %2 markers").arg(s->clusterList.size()).arg(cluster.markerCount);
-
         // mark the pixel as done:
         pixelCountGrid[markerX+markerY*gridWidth] = 0;
         pixelNonEmptyTileIndexGrid[markerX+markerY*gridWidth].clear();
@@ -705,6 +708,8 @@ void WorldMapWidget2::updateClusters()
                 pixelCountGrid[index] = 0;
             }
         }
+
+        kDebug()<<QString("created cluster %1: %2 tiles").arg(s->clusterList.size()).arg(cluster.tileIndicesList.count());
 
         s->clusterList << cluster;
     }
@@ -733,6 +738,30 @@ void WorldMapWidget2::updateClusters()
             s->clusterList[closestIndex].markerCount+= it->second.first;
             s->clusterList[closestIndex].tileIndicesList << it->second.second;
         }
+    }
+
+    // determine the selected states of the clusters:
+    for (int i=0; i<s->clusterList.count(); ++i)
+    {
+        WMWCluster& cluster = s->clusterList[i];
+
+        WMWSelectionState clusterSelectionState = s->markerModel->getTileSelectedState(cluster.tileIndicesList.first());
+        if (clusterSelectionState!=WMWSelectedSome)
+        {
+            for (int iTile=1;
+                    (iTile<cluster.tileIndicesList.count());
+                    ++iTile)
+            {
+                const WMWSelectionState nextSelectionState = s->markerModel->getTileSelectedState(cluster.tileIndicesList.at(iTile));
+
+                if (nextSelectionState==clusterSelectionState)
+                    continue;
+
+                clusterSelectionState = WMWSelectedSome;
+                break;
+            }
+        }
+        cluster.selectedState = clusterSelectionState;
     }
 
 //     kDebug()<<s->clusterList.size();
@@ -797,18 +826,18 @@ void WorldMapWidget2::getColorInfos(const int clusterIndex, QColor *fillColor, Q
     // TODO: 'solo' and 'selected' properties have not yet been defined,
     //       therefore use the default colors
     *strokeStyle = Qt::NoPen;
-//     switch (selected)
-//     {
-//         case PartialNone:
-//             *strokeStyle = Qt::NoPen;
-//             break;
-//         case PartialSome:
-//             *strokeStyle = Qt::DotLine;
-//             break;
-//         case PartialAll:
-//             *strokeStyle = Qt::SolidLine;
-//             break;
-//     }
+    switch (cluster.selectedState)
+    {
+        case WMWSelectedNone:
+            *strokeStyle = Qt::NoPen;
+            break;
+        case WMWSelectedSome:
+            *strokeStyle = Qt::DotLine;
+            break;
+        case WMWSelectedAll:
+            *strokeStyle = Qt::SolidLine;
+            break;
+    }
     *strokeColor = QColor(Qt::blue);
 
     QColor fillAll, fillSome, fillNone;
@@ -1022,18 +1051,21 @@ void WorldMapWidget2::setSpecialMarkersModel(QAbstractItemModel* const specialMa
     // TODO: update everything!
 }
 
-void WorldMapWidget2::setDisplayMarkersModel(QAbstractItemModel* const displayMarkersModel, const int coordinatesRole)
+void WorldMapWidget2::setDisplayMarkersModel(QAbstractItemModel* const displayMarkersModel, const int coordinatesRole, QItemSelectionModel* const selectionModel)
 {
     s->displayMarkersModel= displayMarkersModel;
     s->displayMarkersCoordinatesRole = coordinatesRole;
     s->markerModel->setMarkerModel(displayMarkersModel, coordinatesRole);
-    // TODO: update everything!
+    s->markerModel->setSelectionModel(selectionModel);
+
+    slotClustersNeedUpdating();
 }
 
 void WorldMapWidget2::slotGroupModeChanged(QAction* triggeredAction)
 {
     Q_UNUSED(triggeredAction);
     s->inEditMode = d->actionEditMode->isChecked();
+
     slotClustersNeedUpdating();
 }
 

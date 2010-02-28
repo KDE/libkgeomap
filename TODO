@@ -17,6 +17,10 @@ TODO
 - clean up ways to re-create the clusters (generateClusters, updateClusters, clustersNeedUpdating...)
 - make UI not block while images are being loaded
 - verify that the pixmaps/icons on the map have the correct offset
+- update the cluster state when the selection has been changed
+- allow selection of items in the widget
+- handle selected items when moving items
+- handle selections in the google maps backend
 
 LATER
 - re-implement clustering for the markers

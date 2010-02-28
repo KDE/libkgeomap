@@ -104,6 +104,7 @@ public:
 
     QStandardItemModel* specialMarkersModel;
     QStandardItemModel* displayMarkersModel;
+    QItemSelectionModel* selectionModel;
 };
 
 MainWindow::MainWindow(KCmdLineArgs* const cmdLineArgs, QWidget* const parent)
@@ -111,6 +112,7 @@ MainWindow::MainWindow(KCmdLineArgs* const cmdLineArgs, QWidget* const parent)
 {
     d->specialMarkersModel = new QStandardItemModel(this);
     d->displayMarkersModel = new QStandardItemModel(this);
+    d->selectionModel = new QItemSelectionModel(d->displayMarkersModel);
 
     connect(d->displayMarkersModel, SIGNAL(dataChanged(const QModelIndex&, const QModelIndex&)),
             this, SLOT(slotDisplayMarkersDataChanged(const QModelIndex&, const QModelIndex&)));
@@ -137,7 +139,7 @@ MainWindow::MainWindow(KCmdLineArgs* const cmdLineArgs, QWidget* const parent)
 
     d->mapWidget = new WorldMapWidget2(d->splitter);
     d->mapWidget->setSpecialMarkersModel(d->specialMarkersModel, RoleCoordinates);
-    d->mapWidget->setDisplayMarkersModel(d->displayMarkersModel, RoleCoordinates);
+    d->mapWidget->setDisplayMarkersModel(d->displayMarkersModel, RoleCoordinates, d->selectionModel);
 
     connect(d->mapWidget, SIGNAL(signalAltitudeLookupReady(const WMW2::WMWAltitudeLookup::List&)),
             this, SLOT(slotAltitudeLookupReady(const WMW2::WMWAltitudeLookup::List&)));
@@ -162,7 +164,11 @@ MainWindow::MainWindow(KCmdLineArgs* const cmdLineArgs, QWidget* const parent)
     d->treeWidget = new QTreeWidget(this);
     d->treeWidget->setColumnCount(2);
     d->treeWidget->setHeaderLabels(QStringList()<<i18n("Filename")<<i18n("Coordinates"));
+    d->treeWidget->setSelectionMode(QAbstractItemView::ExtendedSelection);
     vbox->addWidget(d->treeWidget);
+
+    connect(d->treeWidget, SIGNAL(itemSelectionChanged()),
+            this, SLOT(slotTreeWidgetSelectionChanged()));
 
     d->progressBar = new QProgressBar();
     d->progressBar->setFormat(i18n("Loading images - %p%"));
@@ -398,6 +404,8 @@ void MainWindow::slotImageLoadingBunchReady()
         else
         {
             d->displayMarkersModel->appendRow(standardItem);
+            QPersistentModelIndex itemIndex = d->displayMarkersModel->indexFromItem(standardItem);
+            treeItem->setData(0, RoleMyData, QVariant::fromValue(itemIndex));
         }
     }
 
@@ -478,3 +486,21 @@ void MainWindow::slotAltitudeLookupReady(const WMWAltitudeLookup::List& altitude
         const_cast<QAbstractItemModel*>(itemModel)->setData(markerIndex, QVariant::fromValue(myLookup.coordinates), RoleCoordinates);
     }
 }
+
+void MainWindow::slotTreeWidgetSelectionChanged()
+{
+    const QList<QTreeWidgetItem*> selectedItems = d->treeWidget->selectedItems();
+
+    d->selectionModel->clearSelection();
+    for (int i=0; i<selectedItems.count(); ++i)
+    {
+        QTreeWidgetItem* const treeItem = selectedItems.at(i);
+        const QPersistentModelIndex itemIndex = treeItem->data(0, RoleMyData).value<QPersistentModelIndex>();
+        if (!itemIndex.isValid())
+            continue;
+
+        kDebug()<<itemIndex<<treeItem->isSelected();
+        d->selectionModel->select(itemIndex, treeItem->isSelected() ? QItemSelectionModel::Select : QItemSelectionModel::Deselect);
+    }
+}
+

@@ -237,6 +237,12 @@ public:
 typedef QList<int> QIntList;
 typedef QPair<int, int> QIntPair;
 
+enum WMWSelectionState {
+    WMWSelectedNone = 0,
+    WMWSelectedSome = 1,
+    WMWSelectedAll = 2
+};
+
 class WMWCluster
 {
 public:
@@ -247,7 +253,8 @@ public:
     : tileIndicesList(),
       markerCount(0),
       coordinates(),
-      pixelPos()
+      pixelPos(),
+      selectedState(WMWSelectedNone)
     {
     }
 
@@ -255,6 +262,7 @@ public:
     int markerCount;
     WMWGeoCoordinate coordinates;
     QPoint pixelPos;
+    WMWSelectionState selectedState;
 };
 
 class MarkerModel;

@@ -41,12 +41,6 @@ Q_OBJECT
 
 public:
 
-    enum SelectionState {
-        SelectedNone = 0,
-        SelectedSome = 1,
-        SelectedAll = 2
-    };
-        
     class Tile
     {
     public:
@@ -153,7 +147,7 @@ public:
     int getTileMarkerCount(const QIntList& tileIndex);
     int getTileSelectedCount(const QIntList& tileIndex);
     QList<QPersistentModelIndex> getTileMarkerIndices(const QIntList& tileIndex);
-    SelectionState getTileSelectedState(const QIntList& tileIndex);
+    WMWSelectionState getTileSelectedState(const QIntList& tileIndex);
     int maxLevel() const;
     int maxIndexCount() const;
     QPair<int, int> getTesselationSizes(const int level) const;
@@ -196,6 +190,9 @@ private Q_SLOTS:
     void slotSourceModelRowsAboutToBeRemoved(const QModelIndex& parentIndex, int start, int end);
     void slotSourceModelDataChanged(const QModelIndex& topLeft, const QModelIndex& bottomRight);
     void slotSelectionChanged(const QItemSelection& selected, const QItemSelection& deselected);
+
+Q_SIGNALS:
+    void signalTilesOrSelectionChanged();
 
 private:
     MarkerModelPrivate* const d;

@@ -32,6 +32,7 @@
 
 class KAction;
 class KConfigGroup;
+class QItemSelectionModel;
 
 namespace WMW2 {
 
@@ -70,7 +71,7 @@ public:
     bool queryAltitudes(const WMWAltitudeLookup::List& queryItems, const QString& backendName = "");
 
     void setSpecialMarkersModel(QAbstractItemModel* const specialMarkersModel, const int coordinatesRole);
-    void setDisplayMarkersModel(QAbstractItemModel* const displayMarkersModel, const int coordinatesRole);
+    void setDisplayMarkersModel(QAbstractItemModel* const displayMarkersModel, const int coordinatesRole, QItemSelectionModel* const selectionModel = 0);
 
 public Q_SLOTS:
     void slotZoomIn();

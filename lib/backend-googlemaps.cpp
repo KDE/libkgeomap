@@ -512,14 +512,23 @@ void BackendGoogleMaps::updateClusters()
         s->worldMapWidget->getColorInfos(currentIndex, &fillColor, &strokeColor,
                               &strokeStyle, &labelText, &labelColor);
 
-        const QString fillColorName = fillColor.name();
+        const QString fillColorName = fillColor.name().mid(1);
+        QString selectedName;
+        if (currentCluster.selectedState == WMWSelectedAll)
+        {
+            selectedName="-selected";
+        }
+        if (currentCluster.selectedState == WMWSelectedSome)
+        {
+            selectedName="-someselected";
+        }
 
         d->htmlWidget->runScript(QString("wmwAddCluster(%1, %2, %3, %4, '%5', '%6');")
                 .arg(currentIndex)
                 .arg(currentCluster.coordinates.latString())
                 .arg(currentCluster.coordinates.lonString())
                 .arg(true?"true":"false")
-                .arg(fillColorName.mid(1))
+                .arg(fillColorName+selectedName)
                 .arg(labelText)
             );
     }
