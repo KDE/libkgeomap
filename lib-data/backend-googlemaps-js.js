@@ -22,6 +22,7 @@ var map;
 var eventBuffer = new Array();
 var markerList = new Object();
 var clusterList = new Object();
+var clusterDataList = new Object();
 var isInEditMode = false;
 
 // ProjectionHelp: http://taapps-javalibs.blogspot.com/2009/10/google-map-v3how-to-use-overlayviews.html
@@ -160,26 +161,105 @@ function wmwClearClusters() {
         clusterList[i].setMap(null);
     }
     clusterList = new Object();
+    clusterDataList = new Object();
 }
-function wmwAddCluster(id, lat, lon, setDraggable, clusterColor, clusterLabel) {
+function wmwGetPixmapName(markerCount, markerSelectedCount)
+{
+    var colorCode;
+    if (markerCount>=100)
+    {
+        colorCode="ff0000";
+    }
+    else if (markerCount>=50)
+    {
+        colorCode="ff7f00";
+    }
+    else if (markerCount>=10)
+    {
+        colorCode="ffff00";
+    }
+    else if (markerCount>=2)
+    {
+        colorCode="00ff00";
+    }
+    else
+    {
+        colorCode="00ffff";
+    }
+    if (markerSelectedCount==markerCount)
+    {
+        colorCode+="-selected";
+    }
+    else if (markerSelectedCount>0)
+    {
+        colorCode+="-someselected";
+    }
+    return colorCode;
+}
+function wmwAddCluster(id, lat, lon, setDraggable, markerCount, markerSelectedCount) {
     var latlng = new google.maps.LatLng(lat, lon);
     var clusterIcon;
+    var colorCode = wmwGetPixmapName(markerCount, markerSelectedCount);
     if (isInEditMode) {
-        clusterIcon = new google.maps.MarkerImage('marker-'+clusterColor+'.png', new google.maps.Size(20, 32));
+        clusterIcon = new google.maps.MarkerImage('marker-'+colorCode+'.png', new google.maps.Size(20, 32));
     } else {
-        clusterIcon = new google.maps.MarkerImage('cluster-circle-'+clusterColor+'.png', new google.maps.Size(30, 30));
+        clusterIcon = new google.maps.MarkerImage('cluster-circle-'+colorCode+'.png', new google.maps.Size(30, 30));
     }
     var marker = new google.maps.Marker({
         position: latlng,
         map: map,
         draggable: isInEditMode,
-        icon: clusterIcon,
-        title: clusterLabel
+        icon: clusterIcon
+    });
+    google.maps.event.addListener(marker, 'dragstart', function() {
+        var movingClusterData = clusterDataList[id];
+        if (movingClusterData.MarkerSelectedCount==0) {
+            // no need to change the cluster in any way
+            return;
+        }
+        // at least some items in the cluster are selected. we have to scan all clusters and
+        // take their selected markers:
+        var newSelectedCount = 0;
+        for (var i in clusterList) {
+            var clusterData = clusterDataList[i];
+            if (clusterData.MarkerSelectedCount>0) {
+                newSelectedCount+=clusterData.MarkerSelectedCount;
+                var newMarkerCount = clusterData.MarkerCount-clusterData.MarkerSelectedCount;
+
+                if (i!=id) {
+                    var colorCode = wmwGetPixmapName(newMarkerCount, 0);
+                    var clusterIcon = new google.maps.MarkerImage('marker-'+colorCode+'.png', new google.maps.Size(20, 32));
+                    clusterList[i].setOptions({ icon: clusterIcon, title: newMarkerCount.toString() });
+                }
+            }
+        }
+        // adjust the moving marker
+        var colorCode = wmwGetPixmapName(newSelectedCount, newSelectedCount);
+        var clusterIcon = new google.maps.MarkerImage('marker-'+colorCode+'.png', new google.maps.Size(20, 32));
+        clusterList[id].setOptions({ icon: clusterIcon, title: newSelectedCount.toString()});
+
+        // create a leftover-marker:
+        var leftOverMarkerCount=movingClusterData.MarkerCount-movingClusterData.MarkerSelectedCount;
+        if (leftOverMarkerCount>0) {
+            var colorCode = wmwGetPixmapName(leftOverMarkerCount, 0);
+            var clusterIcon = new google.maps.MarkerImage('marker-'+colorCode+'.png', new google.maps.Size(20, 32));
+            var leftOverMarker = new google.maps.Marker({
+                position: latlng,
+                map: map,
+                icon: clusterIcon,
+                title: leftOverMarkerCount.toString()
+            });
+            clusterList[-1]=leftOverMarker;
+        }
     });
     google.maps.event.addListener(marker, 'dragend', function() {
         wmwPostEventString('cm'+id.toString());
     });
     clusterList[id] = marker;
+    var clusterData = new Object();
+    clusterData["MarkerCount"]=markerCount;
+    clusterData["MarkerSelectedCount"]=markerSelectedCount;
+    clusterDataList[id]=clusterData;
 }
 function wmwGetClusterPosition(id) {
     var latlngString;

@@ -503,33 +503,13 @@ void BackendGoogleMaps::updateClusters()
     {
         const WMWCluster& currentCluster = s->clusterList.at(currentIndex);
 
-        // determine the colors:
-        QColor       fillColor;
-        QColor       strokeColor;
-        Qt::PenStyle strokeStyle;
-        QColor       labelColor;
-        QString      labelText;
-        s->worldMapWidget->getColorInfos(currentIndex, &fillColor, &strokeColor,
-                              &strokeStyle, &labelText, &labelColor);
-
-        const QString fillColorName = fillColor.name().mid(1);
-        QString selectedName;
-        if (currentCluster.selectedState == WMWSelectedAll)
-        {
-            selectedName="-selected";
-        }
-        if (currentCluster.selectedState == WMWSelectedSome)
-        {
-            selectedName="-someselected";
-        }
-
-        d->htmlWidget->runScript(QString("wmwAddCluster(%1, %2, %3, %4, '%5', '%6');")
+        d->htmlWidget->runScript(QString("wmwAddCluster(%1, %2, %3, %4, %5, %6);")
                 .arg(currentIndex)
                 .arg(currentCluster.coordinates.latString())
                 .arg(currentCluster.coordinates.lonString())
                 .arg(true?"true":"false")
-                .arg(fillColorName+selectedName)
-                .arg(labelText)
+                .arg(currentCluster.markerCount)
+                .arg(currentCluster.markerSelectedCount)
             );
     }
     kDebug()<<"end updateclusters";
