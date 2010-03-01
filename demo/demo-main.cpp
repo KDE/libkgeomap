@@ -27,6 +27,7 @@
 #include <KCmdLineArgs>
 #include <KCmdLineOptions>
 #include <KDebug>
+#include <kicon.h>
 
 // local includes
 
@@ -34,7 +35,7 @@
 
 int main(int argc, char* argv[])
 {
-    const KAboutData aboutData(
+    KAboutData aboutData(
         "demo-worldmapwidget2",
         0,
         ki18n("WorldMapWidget2 demo application"),
@@ -46,6 +47,11 @@ int main(int argc, char* argv[])
         "", // URI of homepage
         "" // bugs e-mail address
     );
+
+    aboutData.addAuthor(ki18n("Michael G. Hansen"),
+                         ki18n("WorldMapWidget2 library"),
+                         "mike@mghansen.de",
+                         "http://www.mghansen.de/");
 
     KCmdLineArgs::init(argc, argv, &aboutData);
     KCmdLineOptions options;

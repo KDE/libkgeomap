@@ -48,6 +48,7 @@ protected:
     void readSettings();
     void saveSettings();
     void closeEvent(QCloseEvent* e);
+    void createMenus();
 
 private Q_SLOTS:
     void slotFutureResultsReadyAt(int startIndex, int endIndex);
@@ -57,6 +58,7 @@ private Q_SLOTS:
     void slotMarkersMoved(const QList<QPersistentModelIndex>& markerIndices);
     void slotAltitudeLookupReady(const WMW2::WMWAltitudeLookup::List& altitudes);
     void slotTreeWidgetSelectionChanged();
+    void slotAddImages();
 
 private:
     MainWindowPrivate* const d;

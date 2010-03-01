@@ -38,12 +38,16 @@
 
 // KDE includes
 
+#include <kaction.h>
 #include <KCmdLineArgs>
 #include <kconfig.h>
 #include <kconfiggroup.h>
+#include <kfiledialog.h>
 #include <kiconloader.h>
 #include <klineedit.h>
 #include <klocale.h>
+#include <kmenu.h>
+#include <kmenubar.h>
 #include <kstatusbar.h>
 
 // LibKExiv2 includes
@@ -85,7 +89,8 @@ public:
         imageLoadingCurrentCount(0),
         imageLoadingBuncher(),
         imageLoadingBunchTimer(0),
-        cmdLineArgs(0)
+        cmdLineArgs(0),
+        lastImageOpenDir()
     {
 
     }
@@ -101,6 +106,7 @@ public:
     QList<MyImageData> imageLoadingBuncher;
     QTimer* imageLoadingBunchTimer;
     KCmdLineArgs* cmdLineArgs;
+    KUrl lastImageOpenDir;
 
     QStandardItemModel* specialMarkersModel;
     QStandardItemModel* displayMarkersModel;
@@ -133,6 +139,7 @@ MainWindow::MainWindow(KCmdLineArgs* const cmdLineArgs, QWidget* const parent)
 
     // create a status bar:
     statusBar();
+    createMenus();
 
     d->splitter = new QSplitter(Qt::Vertical, this);
     setCentralWidget(d->splitter);
@@ -246,6 +253,7 @@ void MainWindow::readSettings()
     d->mapWidget->readSettingsFromGroup(&groupWidgetConfig);
 
     KConfigGroup groupMainWindowConfig = config.group(QString("MainWindowConfig"));
+    d->lastImageOpenDir = groupMainWindowConfig.readEntry("Last Image Open Directory", KUrl());
     if (groupMainWindowConfig.hasKey("SplitterState"))
     {
         const QByteArray splitterState = QByteArray::fromBase64(groupMainWindowConfig.readEntry(QString("SplitterState"), QByteArray()));
@@ -264,6 +272,7 @@ void MainWindow::saveSettings()
     d->mapWidget->saveSettingsToGroup(&groupWidgetConfig);
 
     KConfigGroup groupMainWindowConfig = config.group(QString("MainWindowConfig"));
+    groupMainWindowConfig.writeEntry("Last Image Open Directory", d->lastImageOpenDir);
     groupMainWindowConfig.writeEntry(QString("SplitterState"), d->splitter->saveState().toBase64());
 }
 
@@ -504,3 +513,26 @@ void MainWindow::slotTreeWidgetSelectionChanged()
     }
 }
 
+void MainWindow::slotAddImages()
+{
+    const KUrl::List fileNames = KFileDialog::getOpenUrls(d->lastImageOpenDir, QString("*.jpg|*.jpeg|*.png"), this, i18n("Add image files"));
+
+    if (fileNames.isEmpty())
+        return;
+
+    d->lastImageOpenDir = fileNames.first().upUrl();
+
+    slotScheduleImagesForLoading(fileNames);
+}
+
+void MainWindow::createMenus()
+{
+    QMenu* const fileMenu = menuBar()->addMenu(i18n("File"));
+
+    KAction* const addFilesAction = new KAction(i18n("Add images..."), fileMenu);
+    fileMenu->addAction(addFilesAction);
+    connect(addFilesAction, SIGNAL(triggered()),
+            this, SLOT(slotAddImages()));
+
+    menuBar()->addMenu(helpMenu());
+}
