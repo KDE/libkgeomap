@@ -29,6 +29,7 @@
 #include <QMenu>
 #include <QPointer>
 #include <QStackedLayout>
+#include <QTimer>
 #include <QToolButton>
 
 // KDE includes
@@ -80,7 +81,8 @@ public:
       controlWidget(0),
       actionBrowseMode(0),
       actionEditMode(0),
-      actionGroupMode(0)
+      actionGroupMode(0),
+      lazyReclusteringRequested(false)
     {
     }
 
@@ -104,6 +106,8 @@ public:
     KAction* actionBrowseMode;
     KAction* actionEditMode;
     QActionGroup* actionGroupMode;
+
+    bool lazyReclusteringRequested;
 };
 
 WorldMapWidget2::WorldMapWidget2(QWidget* const parent)
@@ -115,7 +119,7 @@ WorldMapWidget2::WorldMapWidget2(QWidget* const parent)
 
     // TODO: this needs some buffering for the google maps backend
     connect(s->markerModel, SIGNAL(signalTilesOrSelectionChanged()),
-            this, SLOT(slotClustersNeedUpdating()));
+            this, SLOT(slotRequestLazyReclustering()));
 
     d->stackedLayout = new QStackedLayout(this);
     setLayout(d->stackedLayout);
@@ -1084,6 +1088,29 @@ void WorldMapWidget2::slotGroupModeChanged(QAction* triggeredAction)
 {
     Q_UNUSED(triggeredAction);
     s->inEditMode = d->actionEditMode->isChecked();
+
+    slotClustersNeedUpdating();
+}
+
+/**
+ * @brief Request reclustering, repeated calls should generate only one actual update of the clusters
+ */
+void WorldMapWidget2::slotRequestLazyReclustering()
+{
+    if (d->lazyReclusteringRequested)
+        return;
+
+    d->lazyReclusteringRequested = true;
+    QTimer::singleShot(0, this, SLOT(slotLazyReclusteringRequested()));
+}
+
+/**
+ * @brief Helper function to buffer reclustering
+ */
+void WorldMapWidget2::slotLazyReclusteringRequested()
+{
+    if (!d->lazyReclusteringRequested)
+        return;
 
     slotClustersNeedUpdating();
 }
