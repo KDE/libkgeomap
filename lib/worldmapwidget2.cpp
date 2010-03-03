@@ -199,6 +199,9 @@ bool WorldMapWidget2::setBackend(const QString& backendName)
         disconnect(d->currentBackend, SIGNAL(signalClustersMoved(const QIntList&)),
                 this, SLOT(slotClustersMoved(const QIntList&)));
 
+        disconnect(d->currentBackend, SIGNAL(signalClustersClicked(const QIntList&)),
+                    this, SLOT(slotClustersClicked(const QIntList&)));
+
         disconnect(d->currentBackend, SIGNAL(signalMarkersMoved(const QIntList&)),
                 this, SLOT(slotMarkersMoved(const QIntList&)));
 
@@ -224,6 +227,9 @@ bool WorldMapWidget2::setBackend(const QString& backendName)
 
             connect(d->currentBackend, SIGNAL(signalClustersMoved(const QIntList&)),
                     this, SLOT(slotClustersMoved(const QIntList&)));
+
+            connect(d->currentBackend, SIGNAL(signalClustersClicked(const QIntList&)),
+                    this, SLOT(slotClustersClicked(const QIntList&)));
 
             connect(d->currentBackend, SIGNAL(signalSpecialMarkersMoved(const QList<QPersistentModelIndex>&)),
                     this, SIGNAL(signalSpecialMarkersMoved(const QList<QPersistentModelIndex>&)));
@@ -525,6 +531,7 @@ void WorldMapWidget2::updateMarkers()
 
 void WorldMapWidget2::updateClusters()
 {
+    kDebug()<<s->haveMovingCluster;
     if (s->haveMovingCluster)
     {
         // do not re-cluster while a cluster is being moved
@@ -1112,7 +1119,42 @@ void WorldMapWidget2::slotLazyReclusteringRequested()
     if (!d->lazyReclusteringRequested)
         return;
 
+    d->lazyReclusteringRequested = false;
     slotClustersNeedUpdating();
+}
+
+void WorldMapWidget2::slotClustersClicked(const QIntList& clusterIndices)
+{
+    kDebug()<<clusterIndices;
+    QItemSelectionModel* const selectionModel = s->markerModel->getSelectionModel();
+    if (!selectionModel)
+        return;
+
+    // update the selection state of the clusters
+    for (int i=0; i<clusterIndices.count(); ++i)
+    {
+        const int clusterIndex = clusterIndices.at(i);
+        kDebug()<<clusterIndex;
+        const WMWCluster currentCluster = s->clusterList.at(clusterIndex);
+
+        const bool doSelect = (currentCluster.selectedState!=WMWSelectedAll);
+        kDebug()<<doSelect;
+        for (int j=0; j<currentCluster.tileIndicesList.count(); ++j)
+        {
+            const QIntList& currentTileIndex = currentCluster.tileIndicesList.at(j);
+            
+            const QList<QPersistentModelIndex> currentMarkers = s->markerModel->getTileMarkerIndices(currentTileIndex);
+            kDebug()<<currentTileIndex<<currentMarkers;
+            for (int k=0; k<currentMarkers.count(); ++k)
+            {
+                kDebug()<<k<<currentMarkers.at(k)<<doSelect;
+                if (selectionModel->isSelected(currentMarkers.at(k))!=doSelect)
+                {
+                    selectionModel->select(currentMarkers.at(k), doSelect ? QItemSelectionModel::Select : QItemSelectionModel::Deselect);
+                }
+            }
+        }
+    }
 }
 
 } /* WMW2 */

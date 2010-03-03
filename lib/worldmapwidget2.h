@@ -96,6 +96,7 @@ protected Q_SLOTS:
     void slotChangeBackend(QAction* action);
     void slotBackendZoomChanged(const QString& newZoom);
     void slotClustersMoved(const QIntList& clusterIndices);
+    void slotClustersClicked(const QIntList& clusterIndices);
     void slotGroupModeChanged(QAction* triggeredAction);
     void slotRequestLazyReclustering();
     void slotLazyReclusteringRequested();

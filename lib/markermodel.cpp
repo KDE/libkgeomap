@@ -950,10 +950,14 @@ void MarkerModel::setSelectionModel(QItemSelectionModel* const selectionModel)
 
 void MarkerModel::slotSelectionChanged(const QItemSelection& selected, const QItemSelection& deselected)
 {
+    kDebug()<<selected<<deselected;
     if (d->isDirty)
     {
         return;
     }
+//     d->isDirty=true;
+//     emit(signalTilesOrSelectionChanged());
+//     return;
 
     for (int i=0; i<selected.count(); ++i)
     {

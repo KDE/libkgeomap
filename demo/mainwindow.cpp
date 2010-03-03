@@ -124,6 +124,8 @@ MainWindow::MainWindow(KCmdLineArgs* const cmdLineArgs, QWidget* const parent)
             this, SLOT(slotDisplayMarkersDataChanged(const QModelIndex&, const QModelIndex&)));
     connect(d->specialMarkersModel, SIGNAL(dataChanged(const QModelIndex&, const QModelIndex&)),
             this, SLOT(slotSpecialMarkersDataChanged(const QModelIndex&, const QModelIndex&)));
+    connect(d->selectionModel, SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)),
+            this, SLOT(slotSelectionChanged(const QItemSelection&, const QItemSelection&)));
 
     resize(512, 512);
     setWindowTitle(i18n("WorldMapWidget2 demo"));
@@ -498,17 +500,13 @@ void MainWindow::slotAltitudeLookupReady(const WMWAltitudeLookup::List& altitude
 
 void MainWindow::slotTreeWidgetSelectionChanged()
 {
-    const QList<QTreeWidgetItem*> selectedItems = d->treeWidget->selectedItems();
-
-    d->selectionModel->clearSelection();
-    for (int i=0; i<selectedItems.count(); ++i)
+    for (int i=0; i<d->treeWidget->topLevelItemCount(); ++i)
     {
-        QTreeWidgetItem* const treeItem = selectedItems.at(i);
+        QTreeWidgetItem* const treeItem = d->treeWidget->topLevelItem(i);
         const QPersistentModelIndex itemIndex = treeItem->data(0, RoleMyData).value<QPersistentModelIndex>();
         if (!itemIndex.isValid())
             continue;
 
-        kDebug()<<itemIndex<<treeItem->isSelected();
         d->selectionModel->select(itemIndex, treeItem->isSelected() ? QItemSelectionModel::Select : QItemSelectionModel::Deselect);
     }
 }
@@ -535,4 +533,47 @@ void MainWindow::createMenus()
             this, SLOT(slotAddImages()));
 
     menuBar()->addMenu(helpMenu());
+}
+
+void MainWindow::slotSelectionChanged(const QItemSelection& selected, const QItemSelection& deselected)
+{
+    kDebug()<<selected<<deselected;
+
+    for (int i=0; i<selected.count(); ++i)
+    {
+        const QItemSelectionRange selectionRange = selected.at(i);
+        for (int row = selectionRange.top(); row<=selectionRange.bottom(); ++row)
+        {
+            const QModelIndex currentIndex = d->displayMarkersModel->index(row, 0, selectionRange.parent());
+
+            QTreeWidgetItem* const treeItem = d->displayMarkersModel->data(currentIndex, RoleMyData).value<QTreeWidgetItem*>();
+            WMW2_ASSERT(treeItem!=0);
+            if (!treeItem)
+                continue;
+
+            if (!treeItem->isSelected())
+            {
+                treeItem->setSelected(true);
+            }
+        }
+    }
+
+    for (int i=0; i<deselected.count(); ++i)
+    {
+        const QItemSelectionRange selectionRange = deselected.at(i);
+        for (int row = selectionRange.top(); row<=selectionRange.bottom(); ++row)
+        {
+            const QModelIndex currentIndex = d->displayMarkersModel->index(row, 0, selectionRange.parent());
+
+            QTreeWidgetItem* const treeItem = d->displayMarkersModel->data(currentIndex, RoleMyData).value<QTreeWidgetItem*>();
+            WMW2_ASSERT(treeItem!=0);
+            if (!treeItem)
+                continue;
+
+            if (treeItem->isSelected())
+            {
+                treeItem->setSelected(false);
+            }
+        }
+    }
 }

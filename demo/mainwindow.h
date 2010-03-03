@@ -20,6 +20,10 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
+// Qt includes
+
+#include <QItemSelection>
+
 // KDE includes
 
 #include <kmainwindow.h>
@@ -59,6 +63,7 @@ private Q_SLOTS:
     void slotAltitudeLookupReady(const WMW2::WMWAltitudeLookup::List& altitudes);
     void slotTreeWidgetSelectionChanged();
     void slotAddImages();
+    void slotSelectionChanged(const QItemSelection& selected, const QItemSelection& deselected);
 
 private:
     MainWindowPrivate* const d;

@@ -350,6 +350,9 @@ void BackendGoogleMaps::slotHTMLEvents(const QStringList& events)
     bool mapBoundsProbablyChanged = false;
     QIntList movedClusters;
     QList<QPersistentModelIndex> movedMarkers;
+    QIntList clickedClusters;
+    // TODO: verify that the order of the events is still okay
+    //       or that the order does not matter
     for (QStringList::const_iterator it = events.constBegin(); it!=events.constEnd(); ++it)
     {
         const QString eventCode = it->left(2);
@@ -388,9 +391,12 @@ void BackendGoogleMaps::slotHTMLEvents(const QStringList& events)
             // cluster moved
             bool okay = false;
             const int clusterIndex = eventParameter.toInt(&okay);
+            WMW2_ASSERT(okay);
             if (!okay)
                 continue;
 
+            WMW2_ASSERT(clusterIndex>=0);
+            WMW2_ASSERT(clusterIndex<s->clusterList.size());
             if ((clusterIndex<0)||(clusterIndex>s->clusterList.size()))
                 continue;
 
@@ -401,6 +407,7 @@ void BackendGoogleMaps::slotHTMLEvents(const QStringList& events)
                     &clusterCoordinates
                 );
 
+            WMW2_ASSERT(isValid);
             if (!isValid)
                 continue;
 
@@ -409,16 +416,36 @@ void BackendGoogleMaps::slotHTMLEvents(const QStringList& events)
 
             movedClusters << clusterIndex;
         }
+        else if (eventCode=="cc")
+        {
+            // TODO: buffer this event type!
+            // cluster clicked
+            bool okay = false;
+            const int clusterIndex = eventParameter.toInt(&okay);
+            WMW2_ASSERT(okay);
+            if (!okay)
+                continue;
+
+            WMW2_ASSERT(clusterIndex>=0);
+            WMW2_ASSERT(clusterIndex<s->clusterList.size());
+            if ((clusterIndex<0)||(clusterIndex>s->clusterList.size()))
+                continue;
+
+            clickedClusters << clusterIndex;
+        }
         else if (eventCode=="mm")
         {
             // TODO: buffer this event type!
             // marker moved
             bool okay = false;
             const int markerRow= eventParameter.toInt(&okay);
+            WMW2_ASSERT(okay);
             if (!okay)
                 continue;
 
-            if ((markerRow<0)||(markerRow>s->specialMarkersModel->rowCount()))
+            WMW2_ASSERT(markerRow>=0);
+            WMW2_ASSERT(markerRow<s->specialMarkersModel->rowCount());
+            if ((markerRow<0)||(markerRow>=s->specialMarkersModel->rowCount()))
                 continue;
 
             // re-read the marker position:
@@ -428,6 +455,7 @@ void BackendGoogleMaps::slotHTMLEvents(const QStringList& events)
                     &markerCoordinates
                 );
 
+            WMW2_ASSERT(isValid);
             if (!isValid)
                 continue;
 
@@ -454,6 +482,12 @@ void BackendGoogleMaps::slotHTMLEvents(const QStringList& events)
     {
         kDebug()<<movedMarkers;
         emit(signalSpecialMarkersMoved(movedMarkers));
+    }
+
+    if (!clickedClusters.isEmpty())
+    {
+        kDebug()<<clickedClusters;
+        emit(signalClustersClicked(clickedClusters));
     }
 
     // now process the buffered events:
