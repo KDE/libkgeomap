@@ -20,6 +20,7 @@ TODO
 - allow selection of items in the widget
 - handle selected items when moving items
 - handle selections in the google maps backend
+- use labeledmarker: http://gmaps-utility-library.googlecode.com/svn/trunk/labeledmarker/release/src/labeledmarker.js
 
 LATER
 - re-implement clustering for the markers
