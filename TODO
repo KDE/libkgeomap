@@ -21,7 +21,7 @@ TODO
 - handle selected items when moving items
 - handle selections in the google maps backend
 - use labeledmarker: http://gmaps-utility-library.googlecode.com/svn/trunk/labeledmarker/release/src/labeledmarker.js
-- make it possible to select markers in the marble backend
+- find a way to handle selection-clicks for clusters in browse mode and still allow panning with the mouse at the same time
 
 LATER
 - re-implement clustering for the markers
@@ -51,3 +51,4 @@ DONE
 - make markers moveable in Marble
 - include .moc
 - update the cluster state when the selection has been changed
+- make it possible to select markers in the marble backend

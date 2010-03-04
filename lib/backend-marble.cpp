@@ -63,6 +63,7 @@ public:
       cacheShowScaleBar(false),
       cacheShowOverviewMap(false),
       cacheZoom(900),
+      havePotentiallyMouseMovingObject(false),
       haveMouseMovingObject(false),
       mouseMoveClusterIndex(-1),
       mouseMoveMarkerIndex(),
@@ -86,6 +87,7 @@ public:
     bool cacheShowScaleBar;
     bool cacheShowOverviewMap;
     int cacheZoom;
+    bool havePotentiallyMouseMovingObject;
     bool haveMouseMovingObject;
     int mouseMoveClusterIndex;
     QPersistentModelIndex mouseMoveMarkerIndex;
@@ -458,7 +460,7 @@ void BackendMarble::marbleCustomPaint(Marble::GeoPainter* painter)
         WMWGeoCoordinate clusterCoordinates = cluster.coordinates;
         int markerCountOverride = cluster.markerCount;
         WMWSelectionState selectionStateOverride = cluster.selectedState;
-        if (d->mouseMoveClusterIndex>=0)
+        if (d->haveMouseMovingObject&&(d->mouseMoveClusterIndex>=0))
         {
             bool movingSelectedMarkers = s->clusterList.at(d->mouseMoveClusterIndex).selectedState!=WMWSelectedNone;
             if (movingSelectedMarkers)
@@ -528,7 +530,7 @@ void BackendMarble::marbleCustomPaint(Marble::GeoPainter* painter)
     }
 
     // now render the mouse-moving cluster, if there is one:
-    if (d->mouseMoveClusterIndex>=0)
+    if (d->haveMouseMovingObject&&(d->mouseMoveClusterIndex>=0))
     {
         const WMWCluster& cluster = s->clusterList.at(d->mouseMoveClusterIndex);
         WMWGeoCoordinate clusterCoordinates = d->mouseMoveObjectCoordinates;
@@ -788,12 +790,12 @@ bool BackendMarble::eventFilter(QObject *object, QEvent *event)
             d->mouseMoveCenterOffset = mouseEvent->pos() - markerPoint;
             d->mouseMoveObjectCoordinates = currentCoordinates;
             doFilterEvent = true;
-            d->haveMouseMovingObject = true;
+            d->havePotentiallyMouseMovingObject = true;
 
             break;
         }
 
-        if (s->inEditMode&&!doFilterEvent)
+        if (/*s->inEditMode&&*/!doFilterEvent)
         {
             // scan in reverse order of painting!
             for (int clusterIndex = s->clusterList.count()-1; clusterIndex>=0; --clusterIndex)
@@ -806,9 +808,19 @@ bool BackendMarble::eventFilter(QObject *object, QEvent *event)
                     continue;
                 }
 
-                const int markerPixmapHeight = d->markerPixmap.height();
-                const int markerPixmapWidth = d->markerPixmap.width();
-                const QRect markerRect(clusterPoint.x()-markerPixmapWidth/2, clusterPoint.y()-markerPixmapHeight, markerPixmapWidth, markerPixmapHeight);
+                QRect markerRect;
+                if (s->inEditMode)
+                {
+                    const int markerPixmapHeight = d->markerPixmap.height();
+                    const int markerPixmapWidth = d->markerPixmap.width();
+                    markerRect = QRect(clusterPoint.x()-markerPixmapWidth/2, clusterPoint.y()-markerPixmapHeight, markerPixmapWidth, markerPixmapHeight);
+                }
+                else
+                {
+                    const int markerPixmapHeight = 30;
+                    const int markerPixmapWidth = 30;
+                    markerRect = QRect(clusterPoint.x()-markerPixmapWidth/2, clusterPoint.y()-markerPixmapHeight/2, markerPixmapWidth, markerPixmapHeight);
+                }
                 if (!markerRect.contains(mouseEvent->pos()))
                 {
                     continue;
@@ -819,7 +831,7 @@ bool BackendMarble::eventFilter(QObject *object, QEvent *event)
                 d->mouseMoveCenterOffset = mouseEvent->pos() - clusterPoint;
                 d->mouseMoveObjectCoordinates = currentCoordinates;
                 doFilterEvent = true;
-                d->haveMouseMovingObject = true;
+                d->havePotentiallyMouseMovingObject = true;
                 s->haveMovingCluster = true;
 
                 break;
@@ -827,16 +839,59 @@ bool BackendMarble::eventFilter(QObject *object, QEvent *event)
         }
     }
     else if (   (event->type() == QEvent::MouseMove)
-             && d->haveMouseMovingObject )
+             && (d->havePotentiallyMouseMovingObject || d->haveMouseMovingObject) )
     {
-        // a cluster or marker is being moved. update its position:
-        const QPoint newMarkerPoint = mouseEvent->pos() - d->mouseMoveCenterOffset;
-
-        WMWGeoCoordinate newCoordinates;
-        if (geoCoordinates(newMarkerPoint, &newCoordinates))
+        if ((d->mouseMoveClusterIndex>=0)&&!s->inEditMode)
         {
-            d->mouseMoveObjectCoordinates = newCoordinates;
-            d->marbleWidget->update();
+            // clusters only move in edit mode
+            // TODO: this blocks moving of the map in non-edit mode
+            d->havePotentiallyMouseMovingObject = false;
+            d->mouseMoveClusterIndex = -1;
+            d->mouseMoveMarkerIndex = QPersistentModelIndex();
+            s->haveMovingCluster = false;
+        }
+        else
+        {
+
+            // mark the object as really moving:
+            d->havePotentiallyMouseMovingObject = false;
+            d->haveMouseMovingObject = true;
+
+            // a cluster or marker is being moved. update its position:
+            const QPoint newMarkerPoint = mouseEvent->pos() - d->mouseMoveCenterOffset;
+
+            WMWGeoCoordinate newCoordinates;
+            if (geoCoordinates(newMarkerPoint, &newCoordinates))
+            {
+                d->mouseMoveObjectCoordinates = newCoordinates;
+                d->marbleWidget->update();
+            }
+        }
+    }
+    else if (   (event->type() == QEvent::MouseButtonRelease)
+             && (d->havePotentiallyMouseMovingObject) )
+    {
+        // the object was not moved, but just clicked once
+        if (d->mouseMoveClusterIndex>=0)
+        {
+            const int mouseMoveClusterIndex = d->mouseMoveClusterIndex;
+
+            // we are done with the clicked object
+            // reset these before sending the signal
+            d->havePotentiallyMouseMovingObject = false;
+            d->mouseMoveClusterIndex = -1;
+            d->mouseMoveMarkerIndex = QPersistentModelIndex();
+            s->haveMovingCluster = false;
+
+            emit(signalClustersClicked(QIntList()<<mouseMoveClusterIndex));
+        }
+        else
+        {
+            // we are done with the clicked object:
+            d->havePotentiallyMouseMovingObject = false;
+            d->mouseMoveClusterIndex = -1;
+            d->mouseMoveMarkerIndex = QPersistentModelIndex();
+            s->haveMovingCluster = false;
         }
     }
     else if (   (event->type() == QEvent::MouseButtonRelease)
