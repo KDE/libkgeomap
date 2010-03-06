@@ -59,12 +59,7 @@
 
 #include "worldmapwidget2.h"
 #include "markermodel.h"
-
-Q_DECLARE_METATYPE(QTreeWidgetItem*)
-Q_DECLARE_METATYPE(QPersistentModelIndex)
-
-const int RoleMyData = Qt::UserRole+0;
-const int RoleCoordinates = Qt::UserRole+1;
+#include "mytreewidget.h"
 
 using namespace WMW2;
 
@@ -97,7 +92,7 @@ public:
 
     QSplitter* splitter;
     WorldMapWidget2* mapWidget;
-    QTreeWidget* treeWidget;
+    MyTreeWidget* treeWidget;
     QPointer<QProgressBar> progressBar;
     QList<QFuture<MyImageData> > imageLoadingRunningFutures;
     QList<QFutureWatcher<MyImageData>*> imageLoadingFutureWatchers;
@@ -170,7 +165,7 @@ MainWindow::MainWindow(KCmdLineArgs* const cmdLineArgs, QWidget* const parent)
 
     vbox->addWidget(d->mapWidget->getControlWidget());
 
-    d->treeWidget = new QTreeWidget(this);
+    d->treeWidget = new MyTreeWidget(this);
     d->treeWidget->setColumnCount(2);
     d->treeWidget->setHeaderLabels(QStringList()<<i18n("Filename")<<i18n("Coordinates"));
     d->treeWidget->setSelectionMode(QAbstractItemView::ExtendedSelection);

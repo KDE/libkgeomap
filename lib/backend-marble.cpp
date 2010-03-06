@@ -68,7 +68,9 @@ public:
       mouseMoveClusterIndex(-1),
       mouseMoveMarkerIndex(),
       mouseMoveObjectCoordinates(),
-      mouseMoveCenterOffset(0,0)
+      mouseMoveCenterOffset(0,0),
+      dragDropMarkerCount(0),
+      dragDropMarkerPos()
     {
     }
 
@@ -93,28 +95,13 @@ public:
     QPersistentModelIndex mouseMoveMarkerIndex;
     WMWGeoCoordinate mouseMoveObjectCoordinates;
     QPoint mouseMoveCenterOffset;
-    QPixmap markerPixmap;
-    QMap<QString, QPixmap> markerPixmaps;
+    int dragDropMarkerCount;
+    QPoint dragDropMarkerPos;
 };
 
 BackendMarble::BackendMarble(const QExplicitlySharedDataPointer<WMWSharedData>& sharedData, QObject* const parent)
 : MapBackend(sharedData, parent), d(new BackendMarblePrivate())
 {
-    QStringList markerColors;
-    markerColors << "00ff00" << "00ffff" << "ff0000" << "ff7f00" << "ffff00";
-    QStringList stateNames;
-    stateNames << "" << "-selected" << "-someselected";
-    for (QStringList::const_iterator it = markerColors.constBegin(); it!=markerColors.constEnd(); ++it)
-    {
-        for (QStringList::const_iterator sit = stateNames.constBegin(); sit!=stateNames.constEnd(); ++sit)
-        {
-            const QString pixmapName = *it + *sit;
-            const KUrl markerUrl = KStandardDirs::locate("data", QString("libworldmapwidget2/marker-%1.png").arg(pixmapName));
-            d->markerPixmaps[pixmapName] = QPixmap(markerUrl.toLocalFile());
-        }
-    }
-    d->markerPixmap = d->markerPixmaps["00ff00"];
-    
     d->marbleWidget = new BMWidget(this);
 
     d->marbleWidget->installEventFilter(this);
@@ -444,7 +431,7 @@ void BackendMarble::marbleCustomPaint(Marble::GeoPainter* painter)
         if (!screenCoordinates(markerCoordinates, &markerPoint))
             continue;
 
-        painter->drawPixmap(markerPoint.x()-d->markerPixmap.height()/2, markerPoint.y()-d->markerPixmap.height(), d->markerPixmap);
+        painter->drawPixmap(markerPoint.x()-s->markerPixmap.width()/2, markerPoint.y()-s->markerPixmap.height(), s->markerPixmap);
 //         painter->setPen(circlePen);
 //         painter->setBrush(circleBrush);
 //         painter->drawEllipse(markerPoint.x()-circleRadius, markerPoint.y()-circleRadius, 2*circleRadius, 2*circleRadius);
@@ -503,8 +490,8 @@ void BackendMarble::marbleCustomPaint(Marble::GeoPainter* painter)
             {
                 pixmapName+="-someselected";
             }
-            const QPixmap& markerPixmap = d->markerPixmaps[pixmapName];
-            painter->drawPixmap(clusterPoint.x()-markerPixmap.height()/2, clusterPoint.y()-markerPixmap.height(), markerPixmap);
+            const QPixmap& markerPixmap = s->markerPixmaps[pixmapName];
+            painter->drawPixmap(clusterPoint.x()-markerPixmap.width()/2, clusterPoint.y()-markerPixmap.height(), markerPixmap);
         }
         else
         {
@@ -560,9 +547,29 @@ void BackendMarble::marbleCustomPaint(Marble::GeoPainter* painter)
             {
                 pixmapName+="-someselected";
             }
-            const QPixmap& markerPixmap = d->markerPixmaps[pixmapName];
-            painter->drawPixmap(clusterPoint.x()-markerPixmap.height()/2, clusterPoint.y()-markerPixmap.height(), markerPixmap);
+            const QPixmap& markerPixmap = s->markerPixmaps[pixmapName];
+            painter->drawPixmap(clusterPoint.x()-markerPixmap.width()/2, clusterPoint.y()-markerPixmap.height(), markerPixmap);
         }
+    }
+
+    // now render the drag-and-drop marker, if there is one:
+    if (d->dragDropMarkerCount>0)
+    {
+        // determine the colors:
+        QColor       fillColor;
+        QColor       strokeColor;
+        Qt::PenStyle strokeStyle;
+        QColor       labelColor;
+        QString      labelText;
+        s->worldMapWidget->getColorInfos(WMWSelectedAll, d->dragDropMarkerCount,
+                            &fillColor, &strokeColor,
+                            &strokeStyle, &labelText, &labelColor);
+
+        QString pixmapName = fillColor.name().mid(1);
+        pixmapName+="-selected";
+
+        const QPixmap& markerPixmap = s->markerPixmaps[pixmapName];
+        painter->drawPixmap(d->dragDropMarkerPos.x()-markerPixmap.width()/2, d->dragDropMarkerPos.y()-markerPixmap.height(), markerPixmap);
     }
 
     painter->restore();
@@ -777,8 +784,8 @@ bool BackendMarble::eventFilter(QObject *object, QEvent *event)
                 continue;
             }
 
-            const int markerPixmapHeight = d->markerPixmap.height();
-            const int markerPixmapWidth = d->markerPixmap.width();
+            const int markerPixmapHeight = s->markerPixmap.height();
+            const int markerPixmapWidth = s->markerPixmap.width();
             const QRect markerRect(markerPoint.x()-markerPixmapWidth/2, markerPoint.y()-markerPixmapHeight, markerPixmapWidth, markerPixmapHeight);
             if (!markerRect.contains(mouseEvent->pos()))
             {
@@ -811,8 +818,8 @@ bool BackendMarble::eventFilter(QObject *object, QEvent *event)
                 QRect markerRect;
                 if (s->inEditMode)
                 {
-                    const int markerPixmapHeight = d->markerPixmap.height();
-                    const int markerPixmapWidth = d->markerPixmap.width();
+                    const int markerPixmapHeight = s->markerPixmap.height();
+                    const int markerPixmapWidth = s->markerPixmap.width();
                     markerRect = QRect(clusterPoint.x()-markerPixmapWidth/2, clusterPoint.y()-markerPixmapHeight, markerPixmapWidth, markerPixmapHeight);
                 }
                 else
@@ -933,6 +940,22 @@ bool BackendMarble::eventFilter(QObject *object, QEvent *event)
         return true;
 
     return QObject::eventFilter(object, event);
+}
+
+void BackendMarble::updateDragDropMarker(const QPoint& pos, const WMWDragData* const dragData)
+{
+    if (!dragData)
+    {
+        d->dragDropMarkerCount = 0;
+    }
+    else
+    {
+        d->dragDropMarkerPos = pos;
+        d->dragDropMarkerCount = dragData->itemCount;
+    }
+    d->marbleWidget->update();
+
+    // TODO: hide dragged markers on the map
 }
 
 } /* WMW2 */

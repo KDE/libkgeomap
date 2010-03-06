@@ -25,6 +25,8 @@
 
 // Qt includes
 
+#include <QDragEnterEvent>
+#include <QDropEvent>
 #include <QItemSelectionModel>
 #include <QMenu>
 #include <QPointer>
@@ -151,6 +153,8 @@ WorldMapWidget2::WorldMapWidget2(QWidget* const parent)
 
     connect(d->actionGroupMode, SIGNAL(triggered(QAction*)),
             this, SLOT(slotGroupModeChanged(QAction*)));
+
+    setAcceptDrops(true);
 }
 
 WorldMapWidget2::~WorldMapWidget2()
@@ -808,11 +812,22 @@ void WorldMapWidget2::getColorInfos(const int clusterIndex, QColor *fillColor, Q
                                     const WMWSelectionState* const overrideSelection,
                                     const int* const overrideCount) const
 {
+    // TODO: call the new getColorInfos function!
     const WMWCluster& cluster = s->clusterList.at(clusterIndex);
 
     // TODO: check that this number is already valid!
     const int nMarkers = overrideCount ? *overrideCount : cluster.markerCount;
 
+    getColorInfos(overrideSelection?*overrideSelection:cluster.selectedState,
+                  nMarkers,
+                  fillColor, strokeColor, strokeStyle, labelText, labelColor);
+}
+
+void WorldMapWidget2::getColorInfos(const WMWSelectionState selectionState,
+                       const int nMarkers,
+                       QColor *fillColor, QColor *strokeColor,
+                       Qt::PenStyle *strokeStyle, QString *labelText, QColor *labelColor) const
+{
     if (nMarkers<1000)
     {
         *labelText = QString::number(nMarkers);
@@ -844,7 +859,7 @@ void WorldMapWidget2::getColorInfos(const int clusterIndex, QColor *fillColor, Q
     // TODO: 'solo' and 'selected' properties have not yet been defined,
     //       therefore use the default colors
     *strokeStyle = Qt::NoPen;
-    switch (overrideSelection?*overrideSelection:cluster.selectedState)
+    switch (selectionState)
     {
         case WMWSelectedNone:
             *strokeStyle = Qt::NoPen;
@@ -911,6 +926,7 @@ void WorldMapWidget2::getColorInfos(const int clusterIndex, QColor *fillColor, Q
 //             break;
 //     }
 }
+
 
 QString WorldMapWidget2::convertZoomToBackendZoom(const QString& someZoom, const QString& targetBackend) const
 {
@@ -1155,6 +1171,56 @@ void WorldMapWidget2::slotClustersClicked(const QIntList& clusterIndices)
             }
         }
     }
+}
+
+void WorldMapWidget2::dragEnterEvent(QDragEnterEvent* event)
+{
+    const WMWDragData* const dragData = qobject_cast<const WMWDragData*>(event->mimeData());
+    if (!dragData)
+        return;
+
+    if (!dragData->haveDragPixmap)
+        d->currentBackend->updateDragDropMarker(event->pos(), dragData);
+
+    event->accept();
+}
+
+void WorldMapWidget2::dragMoveEvent(QDragMoveEvent* event)
+{
+    const WMWDragData* const dragData = qobject_cast<const WMWDragData*>(event->mimeData());
+    if (!dragData)
+        return;
+
+    if (!dragData->haveDragPixmap)
+        d->currentBackend->updateDragDropMarker(event->pos(), dragData);
+}
+
+void WorldMapWidget2::dropEvent(QDropEvent* event)
+{
+    const WMWDragData* const dragData = qobject_cast<const WMWDragData*>(event->mimeData());
+    if (!dragData)
+        return;
+
+    event->acceptProposedAction();
+
+    // remove the marker:
+    d->currentBackend->updateDragDropMarker(QPoint(), 0);
+
+    WMWGeoCoordinate dropCoordinates;
+    if (!d->currentBackend->geoCoordinates(event->pos(), &dropCoordinates))
+        return;
+
+    for (int i=0; i<dragData->itemIndices.count(); ++i)
+    {
+        s->markerModel->moveMarker(dragData->itemIndices.at(i), dropCoordinates);
+    }
+    emit(signalDisplayMarkersMoved(dragData->itemIndices));
+}
+
+void WorldMapWidget2::dragLeaveEvent(QDragLeaveEvent* event)
+{
+    // remove the marker:
+    d->currentBackend->updateDragDropMarker(QPoint(), 0);
 }
 
 } /* WMW2 */

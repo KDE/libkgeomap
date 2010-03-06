@@ -75,6 +75,9 @@ public:
     virtual int getMarkerModelLevel() = 0;
     virtual WMWGeoCoordinate::PairList getNormalizedBounds() = 0;
 
+    // TODO: = 0
+    virtual void updateDragDropMarker(const QPoint& pos, const WMWDragData* const dragData) {};
+
     const QExplicitlySharedDataPointer<WMWSharedData> s;
 
 public Q_SLOTS:

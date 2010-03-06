@@ -23,6 +23,8 @@
 // Qt includes
 
 #include <QAbstractItemModel>
+#include <QMimeData>
+#include <QPixmap>
 #include <QPoint>
 #include <QSharedData>
 #include <QString>
@@ -32,6 +34,8 @@
 // Kde includes
 
 #include <kdebug.h>
+#include <kstandarddirs.h>
+#include <kurl.h>
 
 #ifdef WMW2_HAVE_VALGRIND
 #include <valgrind/valgrind.h>
@@ -284,8 +288,24 @@ public:
       displayMarkersModel(0),
       displayMarkersCoordinatesRole(0),
       inEditMode(false),
-      haveMovingCluster(false)
+      haveMovingCluster(false),
+      markerPixmap(),
+      markerPixmaps()
     {
+        QStringList markerColors;
+        markerColors << "00ff00" << "00ffff" << "ff0000" << "ff7f00" << "ffff00";
+        QStringList stateNames;
+        stateNames << "" << "-selected" << "-someselected";
+        for (QStringList::const_iterator it = markerColors.constBegin(); it!=markerColors.constEnd(); ++it)
+        {
+            for (QStringList::const_iterator sit = stateNames.constBegin(); sit!=stateNames.constEnd(); ++sit)
+            {
+                const QString pixmapName = *it + *sit;
+                const KUrl markerUrl = KStandardDirs::locate("data", QString("libworldmapwidget2/marker-%1.png").arg(pixmapName));
+                markerPixmaps[pixmapName] = QPixmap(markerUrl.toLocalFile());
+            }
+        }
+        markerPixmap = markerPixmaps["00ff00"];
     }
 
     WorldMapWidget2* worldMapWidget;
@@ -298,6 +318,8 @@ public:
     int displayMarkersCoordinatesRole;
     bool inEditMode;
     bool haveMovingCluster;
+    QPixmap markerPixmap;
+    QMap<QString, QPixmap> markerPixmaps;
 };
 
 } /* WMW2 */
@@ -324,6 +346,20 @@ public:
     typedef QList<WMWAltitudeLookup> List;
 };
 
+class WMWDragData : public QMimeData
+{
+Q_OBJECT
+
+public:
+    WMWDragData();
+
+    //! Total number of items in the drag, in case there are items which are not yet in the model
+    int itemCount;
+    QList<QPersistentModelIndex> itemIndices;
+    bool haveDragPixmap;
+
+    // TODO: find a way to retrieve the items which are not yet in the model
+};
 
 } /* WMW2 */
 

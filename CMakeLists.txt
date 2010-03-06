@@ -122,6 +122,7 @@ INSTALL(FILES lib/worldmapwidget2.h
 SET( demo_sources
     demo/demo-main.cpp
     demo/mainwindow.cpp
+    demo/mytreewidget.cpp
 )
 kde4_add_executable( worldmapwidget2_demo  ${demo_sources} )
 target_link_libraries( worldmapwidget2_demo ${worldmapwidget2_libs} ${KEXIV2_LIBRARIES})
@@ -142,7 +143,7 @@ IF(KDE4_BUILD_TESTS)
     SET_TARGET_PROPERTIES( test_model PROPERTIES COMPILE_FLAGS "${COMPILE_FLAGS} ${MY_COMPILER_WARNINGS}")
     ADD_TEST( test_model ${EXECUTABLE_OUTPUT_PATH}/test_model )
 
-        # test the marker model
+    # test the marker model
     SET( test_primitives_sources
         tests/test-primitives.cpp
     )

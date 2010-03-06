@@ -33,6 +33,8 @@
 class KAction;
 class KConfigGroup;
 class QItemSelectionModel;
+class QDragEnterEvent;
+class QDropEvent;
 
 namespace WMW2 {
 
@@ -69,6 +71,11 @@ public:
                                     const WMWSelectionState* const overrideSelection = 0,
                                     const int* const overrideCount = 0) const;
 
+    void getColorInfos(const WMWSelectionState selectionState,
+                       const int nMarkers,
+                       QColor *fillColor, QColor *strokeColor,
+                       Qt::PenStyle *strokeStyle, QString *labelText, QColor *labelColor) const;
+
     QString convertZoomToBackendZoom(const QString& someZoom, const QString& targetBackend) const;
     bool queryAltitudes(const WMWAltitudeLookup::List& queryItems, const QString& backendName = "");
 
@@ -90,6 +97,10 @@ protected:
     void applyCacheToBackend();
     void saveBackendToCache();
     void rebuildConfigurationMenu();
+    void dropEvent(QDropEvent* event);
+    void dragMoveEvent(QDragMoveEvent* event);
+    void dragEnterEvent(QDragEnterEvent* event);
+    void dragLeaveEvent(QDragLeaveEvent* event);
 
 protected Q_SLOTS:
     void slotBackendReady(const QString& backendName);

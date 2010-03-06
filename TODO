@@ -1,27 +1,21 @@
 
-IN PROGRESS
-- create a model for the markers
-
 TODO
 - set the initial parameters of the html maps directly
-- finish OSM backend
- - zoom
- - movable markers
 - synchronize zoom between the backends above Google Maps level 20
-- advance markers
 - check proper handling of marker movement on drop, not on subsequent mouse movement
-- make clusters moveable in Marble
 - check for memory leaks when handling menus and actions
 - use appropriate levels in the marker model when scanning for visible markers
 - panning in Google Maps is quite slow with many clusters, find out whether the bottleneck is adding the clusters to the html-part or finding the positions of the markers (probably both :-( ) -> monitor 'idle' event for now
 - clean up ways to re-create the clusters (generateClusters, updateClusters, clustersNeedUpdating...)
 - make UI not block while images are being loaded
 - verify that the pixmaps/icons on the map have the correct offset
-- allow selection of items in the widget
-- handle selected items when moving items
-- handle selections in the google maps backend
 - use labeledmarker: http://gmaps-utility-library.googlecode.com/svn/trunk/labeledmarker/release/src/labeledmarker.js
-- find a way to handle selection-clicks for clusters in browse mode and still allow panning with the mouse at the same time
+- Marble: find a way to handle selection-clicks for clusters in browse mode and still allow panning with the mouse at the same time
+- Google Maps: show drag-and-drop marker over google maps backend
+- Drag and Drop: make it possible to drag items onto the map which have not been in the model yet
+- Drag and Drop: remove dragged marker from the clusters while dragging is active
+- Marble: there seem to be problems with some regions of the globe, where markers in clusters are not shown. Example: Mercator projection, move a marker to the dateline. Move the dateline to the right until a new dateline appears on the left and the one on the right vanishes->marker is not shown any more.
+- re-arrange clusters only if the map bounds have changed
 
 LATER
 - re-implement clustering for the markers
@@ -30,6 +24,7 @@ LATER
 - move from WMW2_ASSERT to some kde-thing
 - make sure altitude values are properly handled
 - find out what causes the Marble dbus errors
+- finish OSM backend, delayed because there are problems with OSM in KHTML
 
 DONE
 - create directory structure
@@ -52,3 +47,9 @@ DONE
 - include .moc
 - update the cluster state when the selection has been changed
 - make it possible to select markers in the marble backend
+- make clusters moveable in Marble
+- advance markers
+- allow selection of items in the widget
+- handle selected items when moving items
+- handle selections in the google maps backend
+- create a model for the markers
