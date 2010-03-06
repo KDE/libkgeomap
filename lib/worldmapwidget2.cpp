@@ -1219,6 +1219,8 @@ void WorldMapWidget2::dropEvent(QDropEvent* event)
 
 void WorldMapWidget2::dragLeaveEvent(QDragLeaveEvent* event)
 {
+    Q_UNUSED(event);
+
     // remove the marker:
     d->currentBackend->updateDragDropMarker(QPoint(), 0);
 }
