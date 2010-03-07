@@ -65,11 +65,11 @@ public:
     QPointer<HTMLWidget> htmlWidget;
     QPointer<QWidget> htmlWidgetWrapper;
     bool isReady;
-    QPointer<QActionGroup> mapTypeActionGroup;
-    QPointer<QActionGroup> floatItemsActionGroup;
-    QPointer<KAction> showMapTypeControlAction;
-    QPointer<KAction> showNavigationControlAction;
-    QPointer<KAction> showScaleControlAction;
+    QActionGroup* mapTypeActionGroup;
+    QActionGroup* floatItemsActionGroup;
+    KAction* showMapTypeControlAction;
+    KAction* showNavigationControlAction;
+    KAction* showScaleControlAction;
 
     QString cacheMapType;
     bool cacheShowMapTypeControl;
@@ -83,6 +83,8 @@ public:
 BackendGoogleMaps::BackendGoogleMaps(const QExplicitlySharedDataPointer<WMWSharedData>& sharedData, QObject* const parent)
 : MapBackend(sharedData, parent), d(new BackendGoogleMapsPrivate())
 {
+    createActions();
+
     d->htmlWidgetWrapper = new QWidget();
     d->htmlWidgetWrapper->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     d->htmlWidget = new HTMLWidget(d->htmlWidgetWrapper);
@@ -95,6 +97,50 @@ BackendGoogleMaps::BackendGoogleMaps(const QExplicitlySharedDataPointer<WMWShare
             this, SLOT(slotHTMLEvents(const QStringList&)));
 
     loadInitialHTML();
+}
+
+void BackendGoogleMaps::createActions()
+{
+    // actions for selecting the map type:
+    d->mapTypeActionGroup = new QActionGroup(this);
+    d->mapTypeActionGroup->setExclusive(true);
+
+    connect(d->mapTypeActionGroup, SIGNAL(triggered(QAction*)),
+            this, SLOT(slotMapTypeActionTriggered(QAction*)));
+    
+    QStringList mapTypes, mapTypesHumanNames;
+    mapTypes           << "ROADMAP"       << "SATELLITE"        << "HYBRID"       << "TERRAIN";
+    mapTypesHumanNames << i18n("Roadmap") << i18n("Satellite")  << i18n("Hybrid") << i18n("Terrain");
+
+    for (int i = 0; i<mapTypes.count(); ++i)
+    {
+        KAction* const mapTypeAction = new KAction(d->mapTypeActionGroup);
+        mapTypeAction->setData(mapTypes.at(i));
+        mapTypeAction->setText(mapTypesHumanNames.at(i));
+        mapTypeAction->setCheckable(true);
+    }
+
+    // float items:
+    d->floatItemsActionGroup = new QActionGroup(this);
+    d->floatItemsActionGroup->setExclusive(false);
+
+    connect(d->floatItemsActionGroup, SIGNAL(triggered(QAction*)),
+            this, SLOT(slotFloatSettingsTriggered(QAction*)));
+
+    d->showMapTypeControlAction = new KAction(i18n("Show Map Type Control"), d->floatItemsActionGroup);
+    d->showMapTypeControlAction->setCheckable(true);
+    d->showMapTypeControlAction->setChecked(d->cacheShowMapTypeControl);
+    d->showMapTypeControlAction->setData("showmaptypecontrol");
+
+    d->showNavigationControlAction = new KAction(i18n("Show Navigation Control"), d->floatItemsActionGroup);
+    d->showNavigationControlAction->setCheckable(true);
+    d->showNavigationControlAction->setChecked(d->cacheShowNavigationControl);
+    d->showNavigationControlAction->setData("shownavigationcontrol");
+
+    d->showScaleControlAction = new KAction(i18n("Show Scale Control"), d->floatItemsActionGroup);
+    d->showScaleControlAction->setCheckable(true);
+    d->showScaleControlAction->setChecked(d->cacheShowScaleControl);
+    d->showScaleControlAction->setData("showscalecontrol");
 }
 
 void BackendGoogleMaps::loadInitialHTML()
@@ -198,14 +244,14 @@ void BackendGoogleMaps::setMapType(const QString& newMapType)
 
 void BackendGoogleMaps::updateActionsEnabled()
 {
-    if (d->mapTypeActionGroup&&isReady())
+    if (!isReady())
+        return;
+
+    const QString currentMapType = getMapType();
+    const QList<QAction*> mapTypeActions = d->mapTypeActionGroup->actions();
+    for (int i=0; i<mapTypeActions.size(); ++i)
     {
-        const QString currentMapType = getMapType();
-        const QList<QAction*> mapTypeActions = d->mapTypeActionGroup->actions();
-        for (int i=0; i<mapTypeActions.size(); ++i)
-        {
-            mapTypeActions.at(i)->setChecked(mapTypeActions.at(i)->data().toString()==currentMapType);
-        }
+        mapTypeActions.at(i)->setChecked(mapTypeActions.at(i)->data().toString()==currentMapType);
     }
 
     // TODO: manage state of the zoom buttons
@@ -225,70 +271,23 @@ void BackendGoogleMaps::addActionsToConfigurationMenu(QMenu* const configuration
         return;
 
     configurationMenu->addSeparator();
-    
-    // actions for selecting the map type:
-    QStringList mapTypes, mapTypesHumanNames;
-    mapTypes           << "ROADMAP"       << "SATELLITE"        << "HYBRID"       << "TERRAIN";
-    mapTypesHumanNames << i18n("Roadmap") << i18n("Satellite")  << i18n("Hybrid") << i18n("Terrain");
 
-    const QString currentMapType = getMapType();
-
-    if (d->mapTypeActionGroup)
+    // map type actions:
+    const QList<QAction*> mapTypeActions = d->mapTypeActionGroup->actions();
+    for (int i = 0; i<mapTypeActions.count(); ++i)
     {
-        delete d->mapTypeActionGroup;
-    }
-    d->mapTypeActionGroup = new QActionGroup(configurationMenu);
-    d->mapTypeActionGroup->setExclusive(true);
-    connect(d->mapTypeActionGroup, SIGNAL(triggered(QAction*)),
-            this, SLOT(slotMapTypeActionTriggered(QAction*)));
-
-    for (int i = 0; i<mapTypes.count(); ++i)
-    {
-        KAction* const mapTypeAction = new KAction(d->mapTypeActionGroup);
-        mapTypeAction->setData(mapTypes.at(i));
-        mapTypeAction->setText(mapTypesHumanNames.at(i));
-        mapTypeAction->setCheckable(true);
-
-        
-        if (currentMapType == mapTypes.at(i))
-        {
-            mapTypeAction->setChecked(true);
-        }
-
+        QAction* const mapTypeAction = mapTypeActions.at(i);
         configurationMenu->addAction(mapTypeAction);
     }
 
     configurationMenu->addSeparator();
 
-    if (d->floatItemsActionGroup)
-    {
-        delete d->floatItemsActionGroup;
-    }
-    d->floatItemsActionGroup = new QActionGroup(configurationMenu);
-    d->floatItemsActionGroup->setExclusive(false);
-    connect(d->floatItemsActionGroup, SIGNAL(triggered(QAction*)),
-            this, SLOT(slotFloatSettingsTriggered(QAction*)));
-
-    // TODO: we need a parent for this guy!
+    // float items visibility:
     QMenu* const floatItemsSubMenu = new QMenu(i18n("Float items"), configurationMenu);
     configurationMenu->addMenu(floatItemsSubMenu);
 
-    d->showMapTypeControlAction = new KAction(i18n("Show Map Type Control"), d->floatItemsActionGroup);
-    d->showMapTypeControlAction->setCheckable(true);
-    d->showMapTypeControlAction->setChecked(d->cacheShowMapTypeControl);
-    d->showMapTypeControlAction->setData("showmaptypecontrol");
     floatItemsSubMenu->addAction(d->showMapTypeControlAction);
-
-    d->showNavigationControlAction = new KAction(i18n("Show Navigation Control"), d->floatItemsActionGroup);
-    d->showNavigationControlAction->setCheckable(true);
-    d->showNavigationControlAction->setChecked(d->cacheShowNavigationControl);
-    d->showNavigationControlAction->setData("shownavigationcontrol");
     floatItemsSubMenu->addAction(d->showNavigationControlAction);
-
-    d->showScaleControlAction = new KAction(i18n("Show Scale Control"), d->floatItemsActionGroup);
-    d->showScaleControlAction->setCheckable(true);
-    d->showScaleControlAction->setChecked(d->cacheShowScaleControl);
-    d->showScaleControlAction->setData("showscalecontrol");
     floatItemsSubMenu->addAction(d->showScaleControlAction);
 }
 

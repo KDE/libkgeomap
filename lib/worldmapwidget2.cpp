@@ -77,13 +77,14 @@ public:
       stackedLayout(0),
       cacheCenterCoordinate(52.0,6.0),
       cacheZoom("marble:900"),
-      actionConfigurationMenu(0),
+      configurationMenu(0),
+      actionGroupBackendSelection(0),
       actionZoomIn(0),
       actionZoomOut(0),
-      controlWidget(0),
       actionBrowseMode(0),
       actionEditMode(0),
       actionGroupMode(0),
+      controlWidget(0),
       lazyReclusteringRequested(false)
     {
     }
@@ -100,14 +101,14 @@ public:
     QString cacheZoom;
 
     // actions for controlling the widget
-    QPointer<KAction> actionConfigurationMenu;
-    QPointer<KAction> actionZoomIn;
-    QPointer<KAction> actionZoomOut;
-    QPointer<QWidget> controlWidget;
-
+    QMenu* configurationMenu;
+    QActionGroup* actionGroupBackendSelection;
+    KAction* actionZoomIn;
+    KAction* actionZoomOut;
     KAction* actionBrowseMode;
     KAction* actionEditMode;
     QActionGroup* actionGroupMode;
+    QPointer<QWidget> controlWidget;
 
     bool lazyReclusteringRequested;
 };
@@ -115,6 +116,8 @@ public:
 WorldMapWidget2::WorldMapWidget2(QWidget* const parent)
 : QWidget(parent), s(new WMWSharedData), d(new WorldMapWidget2Private)
 {
+    createActions();
+
     // TODO: someone has to delete this model later!
     s->markerModel = new MarkerModel();
     s->worldMapWidget = this;
@@ -129,12 +132,31 @@ WorldMapWidget2::WorldMapWidget2(QWidget* const parent)
     d->loadedBackends.append(new BackendGoogleMaps(s, this));
     d->loadedBackends.append(new BackendMarble(s, this));
 //     d->loadedBackends.append(new BackendOSM(s, this));
+    createActionsForBackendSelection();
 
     AltitudeBackend* const geonamesBackend = new BackendAltitudeGeonames(s, this);
     d->loadedAltitudeBackends.append(geonamesBackend);
     connect(geonamesBackend, SIGNAL(signalAltitudes(const WMW2::WMWAltitudeLookup::List)),
             this, SIGNAL(signalAltitudeLookupReady(const WMW2::WMWAltitudeLookup::List)));
 
+    setAcceptDrops(true);
+}
+
+void WorldMapWidget2::createActions()
+{
+    d->actionZoomIn = new KAction(this);
+    d->actionZoomIn->setIcon(SmallIcon("zoom-in"));
+    d->actionZoomIn->setToolTip(i18n("Zoom in"));
+    connect(d->actionZoomIn, SIGNAL(triggered()),
+            this, SLOT(slotZoomIn()));
+
+    d->actionZoomOut = new KAction(this);
+    d->actionZoomOut->setIcon(SmallIcon("zoom-out"));
+    d->actionZoomOut->setToolTip(i18n("Zoom out"));
+    connect(d->actionZoomOut, SIGNAL(triggered()),
+            this, SLOT(slotZoomOut()));
+
+    // actions to switch between edit mode and browse mode
     d->actionGroupMode = new QActionGroup(this);
     d->actionGroupMode->setExclusive(true);
 
@@ -154,7 +176,31 @@ WorldMapWidget2::WorldMapWidget2(QWidget* const parent)
     connect(d->actionGroupMode, SIGNAL(triggered(QAction*)),
             this, SLOT(slotGroupModeChanged(QAction*)));
 
-    setAcceptDrops(true);
+    // create backend selection entries:
+    d->actionGroupBackendSelection = new QActionGroup(this);
+    d->actionGroupBackendSelection->setExclusive(true);
+    connect(d->actionGroupBackendSelection, SIGNAL(triggered(QAction*)),
+            this, SLOT(slotChangeBackend(QAction*)));
+
+    createActionsForBackendSelection();
+    
+    d->configurationMenu = new QMenu(this);
+}
+
+void WorldMapWidget2::createActionsForBackendSelection()
+{
+    // delete the existing actions:
+    qDeleteAll(d->actionGroupBackendSelection->actions());
+
+    // create actions for all backends:
+    for (int i = 0; i<d->loadedBackends.size(); ++i)
+    {
+        const QString backendName = d->loadedBackends.at(i)->backendName();
+        KAction* backendAction = new KAction(d->actionGroupBackendSelection);
+        backendAction->setData(backendName);
+        backendAction->setText(d->loadedBackends.at(i)->backendHumanName());
+        backendAction->setCheckable(true);
+    }
 }
 
 WorldMapWidget2::~WorldMapWidget2()
@@ -366,88 +412,36 @@ void WorldMapWidget2::readSettingsFromGroup(const KConfigGroup* const group)
 
 void WorldMapWidget2::rebuildConfigurationMenu()
 {
-    if (!d->actionConfigurationMenu)
-    {
-        d->actionConfigurationMenu = new KAction(this);
-    }
+    d->configurationMenu->clear();
 
-    QMenu* configurationMenu = d->actionConfigurationMenu->menu();
-    if (!configurationMenu)
+    const QList<QAction*> backendSelectionActions = d->actionGroupBackendSelection->actions();
+    for (int i=0; i<backendSelectionActions.count(); ++i)
     {
-        // TODO: will the menu be deleted when the action is deleted?
-        configurationMenu = new QMenu(this);
-        d->actionConfigurationMenu->setMenu(configurationMenu);
-    }
-    else
-    {
-        configurationMenu->clear();
-    }
+        QAction* const backendAction = backendSelectionActions.at(i);
 
-    // create backend selection entries:
-    QActionGroup* const backendActionGroup = new QActionGroup(configurationMenu);
-    backendActionGroup->setExclusive(true);
-    for (int i = 0; i<d->loadedBackends.size(); ++i)
-    {
-        const QString backendName = d->loadedBackends.at(i)->backendName();
-        KAction* backendAction = new KAction(backendActionGroup);
-        backendAction->setData(backendName);
-        backendAction->setText(d->loadedBackends.at(i)->backendHumanName());
-        backendAction->setCheckable(true);
-        
-        if (backendName==d->currentBackendName)
+        if (backendAction->data().toString()==d->currentBackendName)
         {
             backendAction->setChecked(true);
         }
 
-        configurationMenu->addAction(backendAction);
+        d->configurationMenu->addAction(backendAction);
     }
 
     if (d->currentBackendReady)
     {
-        d->currentBackend->addActionsToConfigurationMenu(configurationMenu);
+        d->currentBackend->addActionsToConfigurationMenu(d->configurationMenu);
     }
-
-    connect(backendActionGroup, SIGNAL(triggered(QAction*)),
-            this, SLOT(slotChangeBackend(QAction*)));
 }
 
 KAction* WorldMapWidget2::getControlAction(const QString& actionName)
 {
-    if (actionName=="configuration")
+    kDebug()<<actionName;
+    if (actionName=="zoomin")
     {
-        bool needToRebuildMenu = !d->actionConfigurationMenu;
-        if (!needToRebuildMenu)
-        {
-            needToRebuildMenu = !d->actionConfigurationMenu->menu();
-        }
-        if (needToRebuildMenu)
-        {
-            rebuildConfigurationMenu();
-        }
-        return d->actionConfigurationMenu;
-    }
-    else if (actionName=="zoomin")
-    {
-        if (!d->actionZoomIn)
-        {
-            d->actionZoomIn = new KAction(this);
-            d->actionZoomIn->setIcon(SmallIcon("zoom-in"));
-            d->actionZoomIn->setToolTip(i18n("Zoom in"));
-            connect(d->actionZoomIn, SIGNAL(triggered()),
-                    this, SLOT(slotZoomIn()));
-        }
         return d->actionZoomIn;
     }
     else if (actionName=="zoomout")
     {
-        if (!d->actionZoomOut)
-        {
-            d->actionZoomOut = new KAction(this);
-            d->actionZoomOut->setIcon(SmallIcon("zoom-out"));
-            d->actionZoomOut->setToolTip(i18n("Zoom out"));
-            connect(d->actionZoomOut, SIGNAL(triggered()),
-                    this, SLOT(slotZoomOut()));
-        }
         return d->actionZoomOut;
     }
 
@@ -463,14 +457,14 @@ QWidget* WorldMapWidget2::getControlWidget()
         QToolButton* const configurationButton = new QToolButton(d->controlWidget);
         configurationButton->setToolTip(i18n("Map settings"));
         configurationButton->setIcon(SmallIcon("applications-internet"));
-        configurationButton->setMenu(getControlAction("configuration")->menu());
+        configurationButton->setMenu(d->configurationMenu);
         configurationButton->setPopupMode(QToolButton::InstantPopup);
 
         QToolButton* const zoomInButton = new QToolButton(d->controlWidget);
-        zoomInButton->setDefaultAction(getControlAction("zoomin"));
+        zoomInButton->setDefaultAction(d->actionZoomIn);
 
         QToolButton* const zoomOutButton = new QToolButton(d->controlWidget);
-        zoomOutButton->setDefaultAction(getControlAction("zoomout"));
+        zoomOutButton->setDefaultAction(d->actionZoomOut);
 
         QFrame* const hLine1 = new QFrame(d->controlWidget);
         hLine1->setFrameShape(QFrame::VLine);

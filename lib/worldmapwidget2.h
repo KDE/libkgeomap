@@ -101,6 +101,8 @@ protected:
     void dragMoveEvent(QDragMoveEvent* event);
     void dragEnterEvent(QDragEnterEvent* event);
     void dragLeaveEvent(QDragLeaveEvent* event);
+    void createActions();
+    void createActionsForBackendSelection();
 
 protected Q_SLOTS:
     void slotBackendReady(const QString& backendName);

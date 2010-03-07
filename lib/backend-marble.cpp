@@ -76,12 +76,12 @@ public:
 
     QPointer<BMWidget> marbleWidget;
 
-    QPointer<QActionGroup> actionGroupMapTheme;
-    QPointer<QActionGroup> actionGroupProjection;
-    QPointer<QActionGroup> actionGroupFloatItems;
-    QPointer<KAction> actionShowCompass;
-    QPointer<KAction> actionShowOverviewMap;
-    QPointer<KAction> actionShowScaleBar;
+    QActionGroup* actionGroupMapTheme;
+    QActionGroup* actionGroupProjection;
+    QActionGroup* actionGroupFloatItems;
+    KAction* actionShowCompass;
+    KAction* actionShowOverviewMap;
+    KAction* actionShowScaleBar;
 
     QString cacheMapTheme;
     QString cacheProjection;
@@ -102,6 +102,8 @@ public:
 BackendMarble::BackendMarble(const QExplicitlySharedDataPointer<WMWSharedData>& sharedData, QObject* const parent)
 : MapBackend(sharedData, parent), d(new BackendMarblePrivate())
 {
+    createActions();
+
     d->marbleWidget = new BMWidget(this);
 
     d->marbleWidget->installEventFilter(this);
@@ -166,98 +168,100 @@ void BackendMarble::zoomOut()
     d->marbleWidget->repaint();
 }
 
+void BackendMarble::createActions()
+{
+    // map theme:
+    d->actionGroupMapTheme = new QActionGroup(this);
+    d->actionGroupMapTheme->setExclusive(true);
+
+    connect(d->actionGroupMapTheme, SIGNAL(triggered(QAction*)),
+            this, SLOT(slotMapThemeActionTriggered(QAction*)));
+
+    KAction* const actionAtlas = new KAction(d->actionGroupMapTheme);
+    actionAtlas->setCheckable(true);
+    actionAtlas->setText(i18n("Atlas map"));
+    actionAtlas->setData("atlas");
+
+    KAction* const actionOpenStreetmap = new KAction(d->actionGroupMapTheme);
+    actionOpenStreetmap->setCheckable(true);
+    actionOpenStreetmap->setText(i18n("OpenStreetMap"));
+    actionOpenStreetmap->setData("openstreetmap");
+
+    // projection:
+    d->actionGroupProjection = new QActionGroup(this);
+    d->actionGroupProjection->setExclusive(true);
+
+    connect(d->actionGroupProjection, SIGNAL(triggered(QAction*)),
+            this, SLOT(slotProjectionActionTriggered(QAction*)));
+
+    KAction* const actionSpherical = new KAction(d->actionGroupProjection);
+    actionSpherical->setCheckable(true);
+    actionSpherical->setText(i18n("Spherical"));
+    actionSpherical->setData("spherical");
+
+    KAction* const actionMercator = new KAction(d->actionGroupProjection);
+    actionMercator->setCheckable(true);
+    actionMercator->setText(i18n("Mercator"));
+    actionMercator->setData("mercator");
+
+    KAction* const actionEquirectangular = new KAction(d->actionGroupProjection);
+    actionEquirectangular->setCheckable(true);
+    actionEquirectangular->setText(i18n("Equirectangular"));
+    actionEquirectangular->setData("equirectangular");
+
+    // float items:
+    d->actionGroupFloatItems = new QActionGroup(this);
+    d->actionGroupFloatItems->setExclusive(false);
+    
+    connect(d->actionGroupFloatItems, SIGNAL(triggered(QAction*)),
+            this, SLOT(slotFloatSettingsTriggered(QAction*)));
+
+    d->actionShowCompass = new KAction(i18n("Show compass"), d->actionGroupFloatItems);
+    d->actionShowCompass->setData("showcompass");
+    d->actionShowCompass->setCheckable(true);
+    d->actionGroupFloatItems->addAction(d->actionShowCompass);
+
+    d->actionShowOverviewMap = new KAction(i18n("Show overview map"), d->actionGroupFloatItems);
+    d->actionShowOverviewMap->setData("showoverviewmap");
+    d->actionShowOverviewMap->setCheckable(true);
+    d->actionGroupFloatItems->addAction(d->actionShowOverviewMap);
+
+    d->actionShowScaleBar = new KAction(i18n("Show scale bar"), d->actionGroupFloatItems);
+    d->actionShowScaleBar->setData("showscalebar");
+    d->actionShowScaleBar->setCheckable(true);
+    d->actionGroupFloatItems->addAction(d->actionShowScaleBar);
+}
+
 void BackendMarble::addActionsToConfigurationMenu(QMenu* const configurationMenu)
 {
     WMW2_ASSERT(configurationMenu!=0);
 
     configurationMenu->addSeparator();
 
-    if (d->actionGroupMapTheme)
+    const QList<QAction*> mapThemeActions = d->actionGroupMapTheme->actions();
+    for (int i=0; i<mapThemeActions.count(); ++i)
     {
-        delete d->actionGroupMapTheme;
+        configurationMenu->addAction(mapThemeActions.at(i));
     }
-    d->actionGroupMapTheme = new QActionGroup(configurationMenu);
-    d->actionGroupMapTheme->setExclusive(true);
-
-    KAction* const actionAtlas = new KAction(d->actionGroupMapTheme);
-    actionAtlas->setCheckable(true);
-    actionAtlas->setText(i18n("Atlas map"));
-    actionAtlas->setData("atlas");
-//     actionAtlas->setChecked(getMapTheme()=="atlas");
-    configurationMenu->addAction(actionAtlas);
-
-    KAction* const actionOpenStreetmap = new KAction(d->actionGroupMapTheme);
-    actionOpenStreetmap->setCheckable(true);
-    actionOpenStreetmap->setText(i18n("OpenStreetMap"));
-    actionOpenStreetmap->setData("openstreetmap");
-//     actionOpenStreetmap->setChecked(getMapTheme()=="openstreetmap");
-    configurationMenu->addAction(actionOpenStreetmap);
-
-    connect(d->actionGroupMapTheme, SIGNAL(triggered(QAction*)),
-            this, SLOT(slotMapThemeActionTriggered(QAction*)));
 
     configurationMenu->addSeparator();
-
-    if (d->actionGroupProjection)
-    {
-        delete d->actionGroupProjection;
-    }
-    d->actionGroupProjection = new QActionGroup(configurationMenu);
-    d->actionGroupProjection->setExclusive(true);
 
     // TODO: we need a parent for this guy!
     QMenu* const projectionSubMenu = new QMenu(i18n("Projection"), configurationMenu);
     configurationMenu->addMenu(projectionSubMenu);
-
-    KAction* const actionSpherical = new KAction(d->actionGroupProjection);
-    actionSpherical->setCheckable(true);
-    actionSpherical->setText(i18n("Spherical"));
-    actionSpherical->setData("spherical");
-    projectionSubMenu->addAction(actionSpherical);
-
-    KAction* const actionMercator = new KAction(d->actionGroupProjection);
-    actionMercator->setCheckable(true);
-    actionMercator->setText(i18n("Mercator"));
-    actionMercator->setData("mercator");
-    projectionSubMenu->addAction(actionMercator);
-
-    KAction* const actionEquirectangular = new KAction(d->actionGroupProjection);
-    actionEquirectangular->setCheckable(true);
-    actionEquirectangular->setText(i18n("Equirectangular"));
-    actionEquirectangular->setData("equirectangular");
-    projectionSubMenu->addAction(actionEquirectangular);
-
-    connect(d->actionGroupProjection, SIGNAL(triggered(QAction*)),
-            this, SLOT(slotProjectionActionTriggered(QAction*)));
-
-    if (!d->actionGroupFloatItems)
+    const QList<QAction*> projectionActions = d->actionGroupProjection->actions();
+    for (int i=0; i<projectionActions.count(); ++i)
     {
-        d->actionGroupFloatItems = new QActionGroup(this);
-        d->actionGroupFloatItems->setExclusive(false);
-        connect(d->actionGroupFloatItems, SIGNAL(triggered(QAction*)),
-                this, SLOT(slotFloatSettingsTriggered(QAction*)));
+        projectionSubMenu->addAction(projectionActions.at(i));
     }
 
     QMenu* const floatItemsSubMenu = new QMenu(i18n("Float items"), configurationMenu);
     configurationMenu->addMenu(floatItemsSubMenu);
-
-    d->actionShowCompass = new KAction(i18n("Show compass"), floatItemsSubMenu);
-    d->actionShowCompass->setData("showcompass");
-    d->actionShowCompass->setCheckable(true);
-    d->actionGroupFloatItems->addAction(d->actionShowCompass);
-    floatItemsSubMenu->addAction(d->actionShowCompass);
-
-    d->actionShowOverviewMap = new KAction(i18n("Show overview map"), floatItemsSubMenu);
-    d->actionShowOverviewMap->setData("showoverviewmap");
-    d->actionShowOverviewMap->setCheckable(true);
-    d->actionGroupFloatItems->addAction(d->actionShowOverviewMap);
-    floatItemsSubMenu->addAction(d->actionShowOverviewMap);
-
-    d->actionShowScaleBar = new KAction(i18n("Show scale bar"), floatItemsSubMenu);
-    d->actionShowScaleBar->setData("showscalebar");
-    d->actionShowScaleBar->setCheckable(true);
-    d->actionGroupFloatItems->addAction(d->actionShowScaleBar);
-    floatItemsSubMenu->addAction(d->actionShowScaleBar);
+    const QList<QAction*> floatActions = d->actionGroupFloatItems->actions();
+    for (int i=0; i<floatActions.count(); ++i)
+    {
+        floatItemsSubMenu->addAction(floatActions.at(i));
+    }
 
     updateActionsEnabled();
 }
@@ -299,38 +303,22 @@ void BackendMarble::setMapTheme(const QString& newMapTheme)
 
 void BackendMarble::updateActionsEnabled()
 {
-    if (d->actionGroupMapTheme)
+
+    const QList<QAction*> mapThemeActions = d->actionGroupMapTheme->actions();
+    for (int i=0; i<mapThemeActions.size(); ++i)
     {
-        const QList<QAction*> mapThemeActions = d->actionGroupMapTheme->actions();
-        for (int i=0; i<mapThemeActions.size(); ++i)
-        {
-            mapThemeActions.at(i)->setChecked(mapThemeActions.at(i)->data().toString()==getMapTheme());
-        }
+        mapThemeActions.at(i)->setChecked(mapThemeActions.at(i)->data().toString()==getMapTheme());
     }
 
-    if (d->actionGroupProjection)
+    const QList<QAction*> projectionActions = d->actionGroupProjection->actions();
+    for (int i=0; i<projectionActions.size(); ++i)
     {
-        const QList<QAction*> projectionActions = d->actionGroupProjection->actions();
-        for (int i=0; i<projectionActions.size(); ++i)
-        {
-            projectionActions.at(i)->setChecked(projectionActions.at(i)->data().toString()==getProjection());
-        }
+        projectionActions.at(i)->setChecked(projectionActions.at(i)->data().toString()==getProjection());
     }
 
-    if (d->actionShowCompass)
-    {
-        d->actionShowCompass->setChecked(d->cacheShowCompass);
-    }
-
-    if (d->actionShowScaleBar)
-    {
-        d->actionShowScaleBar->setChecked(d->cacheShowScaleBar);
-    }
-
-    if (d->actionShowOverviewMap)
-    {
-        d->actionShowOverviewMap->setChecked(d->cacheShowOverviewMap);
-    }
+    d->actionShowCompass->setChecked(d->cacheShowCompass);
+    d->actionShowScaleBar->setChecked(d->cacheShowScaleBar);
+    d->actionShowOverviewMap->setChecked(d->cacheShowOverviewMap);
 }
 
 void BackendMarble::saveSettingsToGroup(KConfigGroup* const group)

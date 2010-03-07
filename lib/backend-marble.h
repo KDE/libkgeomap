@@ -91,6 +91,7 @@ protected:
     void updateActionsEnabled();
     void generateClusters();
     bool eventFilter(QObject *object, QEvent *event);
+    void createActions();
 
 protected Q_SLOTS:
     void slotMapThemeActionTriggered(QAction* action);

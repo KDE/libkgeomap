@@ -79,6 +79,9 @@ public:
 public Q_SLOTS:
     virtual void slotClustersNeedUpdating();
 
+protected:
+    void createActions();
+
 private Q_SLOTS:
     void slotHTMLInitialized();
     void updateActionsEnabled();
