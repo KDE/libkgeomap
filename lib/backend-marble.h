@@ -77,6 +77,7 @@ public:
     virtual WMWGeoCoordinate::PairList getNormalizedBounds();
 
     virtual void updateDragDropMarker(const QPoint& pos, const WMWDragData* const dragData);
+    virtual void updateDragDropMarkerPosition(const QPoint& pos);
 
     void marbleCustomPaint(Marble::GeoPainter* painter);
     void setShowCompass(const bool state);

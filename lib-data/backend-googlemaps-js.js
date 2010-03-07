@@ -24,6 +24,7 @@ var markerList = new Object();
 var clusterList = new Object();
 var clusterDataList = new Object();
 var isInEditMode = false;
+var dragMarker;
 
 // ProjectionHelp: http://taapps-javalibs.blogspot.com/2009/10/google-map-v3how-to-use-overlayviews.html
 function ProjectionHelper(overlayMap) {
@@ -87,7 +88,7 @@ function wmwLatLngToPixel(lat, lon) {
     return new google.maps.Point(pointX, pointY).toString();
 //         return projectionHelper.getProjection().fromLatLngToDivPixel(latlng).toString();
 }
-function wmwPixelToLatLng(x, y) {
+function wmwPixelToLatLngObject(x, y) {
     //      There is an offset in fromDivPixelToLatLng once the map has been panned
     var centerPoint = projectionHelper.getProjection().fromLatLngToDivPixel(map.getCenter());
     var centerOffsetX = mapDiv.offsetWidth / 2;
@@ -95,7 +96,10 @@ function wmwPixelToLatLng(x, y) {
     var pointX = x+centerPoint.x-centerOffsetX;
     var pointY = y+centerPoint.y-centerOffsetY;
     var point = new google.maps.Point(pointX, pointY);
-    return projectionHelper.getProjection().fromDivPixelToLatLng(point).toUrlValue(12);
+    return projectionHelper.getProjection().fromDivPixelToLatLng(point);
+}
+function wmwPixelToLatLng(x, y) {
+    return wmwPixelToLatLngObject(x, y).toUrlValue(12);
 }
 // parameter: "SATELLITE"/"ROADMAP"/"HYBRID"/"TERRAIN"
 function wmwSetMapType(newMapType) {
@@ -273,6 +277,28 @@ function wmwGetClusterPosition(id) {
 }
 function wmwWidgetResized(newWidth, newHeight) {
     document.getElementById('map_canvas').style.height=newHeight.toString()+'px';
+}
+function wmwRemoveDragMarker() {
+    if (dragMarker) {
+        dragMarker.setMap(null);
+        dragMarker = null;
+    }
+}
+function wmwMoveDragMarker(x, y) {
+    if (dragMarker) {
+        dragMarker.setPosition(wmwPixelToLatLngObject(x ,y));
+    }
+}
+function wmwSetDragMarker(x, y, markerCount, markerSelectedCount) {
+    wmwRemoveDragMarker();
+    var latlng = wmwPixelToLatLngObject(x, y);
+    var colorCode = wmwGetPixmapName(markerCount, markerSelectedCount);
+    var clusterIcon = new google.maps.MarkerImage('marker-'+colorCode+'.png', new google.maps.Size(20, 32));
+    dragMarker = new google.maps.Marker({
+        position: latlng,
+        map: map,
+        icon: clusterIcon
+    });
 }
 function initialize() {
     var latlng = new google.maps.LatLng(52.0, 6.0);

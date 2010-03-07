@@ -958,5 +958,11 @@ void BackendMarble::updateDragDropMarker(const QPoint& pos, const WMWDragData* c
     // TODO: hide dragged markers on the map
 }
 
+void BackendMarble::updateDragDropMarkerPosition(const QPoint& pos)
+{
+    d->dragDropMarkerPos = pos;
+    d->marbleWidget->update();
+}
+
 } /* WMW2 */
 

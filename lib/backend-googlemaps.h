@@ -66,6 +66,10 @@ public:
     virtual int getMarkerModelLevel();
     virtual WMWGeoCoordinate::PairList getNormalizedBounds();
 
+    virtual void updateDragDropMarker(const QPoint& pos, const WMWDragData* const dragData);
+    virtual void updateDragDropMarkerPosition(const QPoint& pos);
+
+
     QString getMapType() const;
     void setMapType(const QString& newMapType);
     void setShowMapTypeControl(const bool state);

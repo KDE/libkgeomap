@@ -1192,7 +1192,7 @@ void WorldMapWidget2::dragMoveEvent(QDragMoveEvent* event)
         return;
 
     if (!dragData->haveDragPixmap)
-        d->currentBackend->updateDragDropMarker(event->pos(), dragData);
+        d->currentBackend->updateDragDropMarkerPosition(event->pos());
 }
 
 void WorldMapWidget2::dropEvent(QDropEvent* event)

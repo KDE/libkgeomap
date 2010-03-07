@@ -76,7 +76,8 @@ public:
     virtual WMWGeoCoordinate::PairList getNormalizedBounds() = 0;
 
     // TODO: = 0
-    virtual void updateDragDropMarker(const QPoint& pos, const WMWDragData* const dragData) { Q_UNUSED(pos); Q_UNUSED(dragData);};
+    virtual void updateDragDropMarker(const QPoint& pos, const WMWDragData* const dragData) { Q_UNUSED(pos); Q_UNUSED(dragData);}
+    virtual void updateDragDropMarkerPosition(const QPoint& pos) { Q_UNUSED(pos) }
 
     const QExplicitlySharedDataPointer<WMWSharedData> s;
 
