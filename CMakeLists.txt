@@ -62,7 +62,7 @@ SET( backend_googlemaps_sources
 )
 
 SET( backend_osm_sources
-    lib/backend-osm.cpp
+#     lib/backend-osm.cpp
 )
 
 # TODO: we want to create a shared library
