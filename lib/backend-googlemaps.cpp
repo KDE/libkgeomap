@@ -238,23 +238,8 @@ void BackendGoogleMaps::setMapType(const QString& newMapType)
     if (isReady())
     {
         d->htmlWidget->runScript(QString("wmwSetMapType(\"%1\");").arg(newMapType));
-        updateActionsEnabled();
+        updateActionAvailability();
     }
-}
-
-void BackendGoogleMaps::updateActionsEnabled()
-{
-    if (!isReady())
-        return;
-
-    const QString currentMapType = getMapType();
-    const QList<QAction*> mapTypeActions = d->mapTypeActionGroup->actions();
-    for (int i=0; i<mapTypeActions.size(); ++i)
-    {
-        mapTypeActions.at(i)->setChecked(mapTypeActions.at(i)->data().toString()==currentMapType);
-    }
-
-    // TODO: manage state of the zoom buttons
 }
 
 void BackendGoogleMaps::slotMapTypeActionTriggered(QAction* action)
@@ -289,6 +274,8 @@ void BackendGoogleMaps::addActionsToConfigurationMenu(QMenu* const configuration
     floatItemsSubMenu->addAction(d->showMapTypeControlAction);
     floatItemsSubMenu->addAction(d->showNavigationControlAction);
     floatItemsSubMenu->addAction(d->showScaleControlAction);
+
+    updateActionAvailability();
 }
 
 void BackendGoogleMaps::saveSettingsToGroup(KConfigGroup* const group)
@@ -504,7 +491,7 @@ void BackendGoogleMaps::slotHTMLEvents(const QStringList& events)
     // update the actions if necessary:
     if (zoomProbablyChanged||mapTypeChanged||centerProbablyChanged)
     {
-        updateActionsEnabled();
+        updateActionAvailability();
     }
 
     if (mapBoundsProbablyChanged)
@@ -751,6 +738,21 @@ void BackendGoogleMaps::updateDragDropMarkerPosition(const QPoint& pos)
             .arg(pos.x())
             .arg(pos.y())
         );
+}
+
+void BackendGoogleMaps::updateActionAvailability()
+{
+    if (!isReady())
+        return;
+
+    const QString currentMapType = getMapType();
+    const QList<QAction*> mapTypeActions = d->mapTypeActionGroup->actions();
+    for (int i=0; i<mapTypeActions.size(); ++i)
+    {
+        mapTypeActions.at(i)->setChecked(mapTypeActions.at(i)->data().toString()==currentMapType);
+    }
+
+    // TODO: manage state of the zoom buttons
 }
 
 } /* WMW2 */

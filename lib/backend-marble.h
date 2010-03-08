@@ -79,6 +79,8 @@ public:
     virtual void updateDragDropMarker(const QPoint& pos, const WMWDragData* const dragData);
     virtual void updateDragDropMarkerPosition(const QPoint& pos);
 
+    virtual void updateActionAvailability();
+
     void marbleCustomPaint(Marble::GeoPainter* painter);
     void setShowCompass(const bool state);
     void setShowOverviewMap(const bool state);
@@ -88,7 +90,6 @@ public Q_SLOTS:
     virtual void slotClustersNeedUpdating();
 
 protected:
-    void updateActionsEnabled();
     bool eventFilter(QObject *object, QEvent *event);
     void createActions();
 

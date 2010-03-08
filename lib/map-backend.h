@@ -78,6 +78,8 @@ public:
     virtual void updateDragDropMarker(const QPoint& pos, const WMWDragData* const dragData) = 0;
     virtual void updateDragDropMarkerPosition(const QPoint& pos) = 0;
 
+    virtual void updateActionAvailability() = 0;
+
     const QExplicitlySharedDataPointer<WMWSharedData> s;
 
 public Q_SLOTS:

@@ -69,6 +69,7 @@ public:
     virtual void updateDragDropMarker(const QPoint& pos, const WMWDragData* const dragData);
     virtual void updateDragDropMarkerPosition(const QPoint& pos);
 
+    virtual void updateActionAvailability();
 
     QString getMapType() const;
     void setMapType(const QString& newMapType);
@@ -84,7 +85,6 @@ protected:
 
 private Q_SLOTS:
     void slotHTMLInitialized();
-    void updateActionsEnabled();
     void slotMapTypeActionTriggered(QAction* action);
     void slotHTMLEvents(const QStringList& eventStrings);
     void slotFloatSettingsTriggered(QAction* action);

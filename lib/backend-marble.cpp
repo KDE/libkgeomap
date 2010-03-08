@@ -269,7 +269,7 @@ void BackendMarble::addActionsToConfigurationMenu(QMenu* const configurationMenu
         floatItemsSubMenu->addAction(floatActions.at(i));
     }
 
-    updateActionsEnabled();
+    updateActionAvailability();
 }
 
 void BackendMarble::slotMapThemeActionTriggered(QAction* action)
@@ -304,27 +304,7 @@ void BackendMarble::setMapTheme(const QString& newMapTheme)
     setShowCompass(d->cacheShowCompass);
     setShowOverviewMap(d->cacheShowOverviewMap);
 
-    updateActionsEnabled();
-}
-
-void BackendMarble::updateActionsEnabled()
-{
-
-    const QList<QAction*> mapThemeActions = d->actionGroupMapTheme->actions();
-    for (int i=0; i<mapThemeActions.size(); ++i)
-    {
-        mapThemeActions.at(i)->setChecked(mapThemeActions.at(i)->data().toString()==getMapTheme());
-    }
-
-    const QList<QAction*> projectionActions = d->actionGroupProjection->actions();
-    for (int i=0; i<projectionActions.size(); ++i)
-    {
-        projectionActions.at(i)->setChecked(projectionActions.at(i)->data().toString()==getProjection());
-    }
-
-    d->actionShowCompass->setChecked(d->cacheShowCompass);
-    d->actionShowScaleBar->setChecked(d->cacheShowScaleBar);
-    d->actionShowOverviewMap->setChecked(d->cacheShowOverviewMap);
+    updateActionAvailability();
 }
 
 void BackendMarble::saveSettingsToGroup(KConfigGroup* const group)
@@ -626,7 +606,7 @@ void BackendMarble::setProjection(const QString& newProjection)
         }
     }
 
-    updateActionsEnabled();
+    updateActionAvailability();
 }
 
 void BackendMarble::slotProjectionActionTriggered(QAction* action)
@@ -637,7 +617,7 @@ void BackendMarble::slotProjectionActionTriggered(QAction* action)
 void BackendMarble::setShowCompass(const bool state)
 {
     d->cacheShowCompass = state;
-    updateActionsEnabled();
+    updateActionAvailability();
 
     if (d->marbleWidget)
     {
@@ -648,7 +628,7 @@ void BackendMarble::setShowCompass(const bool state)
 void BackendMarble::setShowOverviewMap(const bool state)
 {
     d->cacheShowOverviewMap = state;
-    updateActionsEnabled();
+    updateActionAvailability();
 
     if (d->marbleWidget)
     {
@@ -659,7 +639,7 @@ void BackendMarble::setShowOverviewMap(const bool state)
 void BackendMarble::setShowScaleBar(const bool state)
 {
     d->cacheShowScaleBar = state;
-    updateActionsEnabled();
+    updateActionAvailability();
 
     if (d->marbleWidget)
     {
@@ -705,10 +685,13 @@ QSize BackendMarble::mapSize() const
 void BackendMarble::slotMarbleZoomChanged(int newZoom)
 {
     Q_UNUSED(newZoom);
+
+    const QString newZoomString = getZoom();
+
     s->worldMapWidget->markClustersAsDirty();
 
-    kDebug()<<getZoom();
-    emit(signalZoomChanged(getZoom()));
+    updateActionAvailability();
+    emit(signalZoomChanged(newZoomString));
 }
 
 void BackendMarble::setZoom(const QString& newZoom)
@@ -964,6 +947,29 @@ void BackendMarble::updateDragDropMarkerPosition(const QPoint& pos)
 {
     d->dragDropMarkerPos = pos;
     d->marbleWidget->update();
+}
+
+void BackendMarble::updateActionAvailability()
+{
+    kDebug()<<d->cacheZoom<<d->marbleWidget->maximumZoom()<<d->marbleWidget->minimumZoom();
+    s->worldMapWidget->getControlAction("zoomin")->setEnabled(d->cacheZoom<d->marbleWidget->maximumZoom());
+    s->worldMapWidget->getControlAction("zoomout")->setEnabled(d->cacheZoom>d->marbleWidget->minimumZoom());
+
+    const QList<QAction*> mapThemeActions = d->actionGroupMapTheme->actions();
+    for (int i=0; i<mapThemeActions.size(); ++i)
+    {
+        mapThemeActions.at(i)->setChecked(mapThemeActions.at(i)->data().toString()==getMapTheme());
+    }
+
+    const QList<QAction*> projectionActions = d->actionGroupProjection->actions();
+    for (int i=0; i<projectionActions.size(); ++i)
+    {
+        projectionActions.at(i)->setChecked(projectionActions.at(i)->data().toString()==getProjection());
+    }
+
+    d->actionShowCompass->setChecked(d->cacheShowCompass);
+    d->actionShowScaleBar->setChecked(d->cacheShowScaleBar);
+    d->actionShowOverviewMap->setChecked(d->cacheShowOverviewMap);
 }
 
 } /* WMW2 */
