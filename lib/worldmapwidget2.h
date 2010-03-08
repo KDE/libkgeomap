@@ -65,6 +65,7 @@ public:
 
     void updateMarkers();
     void updateClusters();
+    void markClustersAsDirty();
 
     void getColorInfos(const int clusterIndex, QColor *fillColor, QColor *strokeColor,
                        Qt::PenStyle *strokeStyle, QString *labelText, QColor *labelColor,
@@ -112,7 +113,7 @@ protected Q_SLOTS:
     void slotClustersClicked(const QIntList& clusterIndices);
     void slotGroupModeChanged(QAction* triggeredAction);
     void slotRequestLazyReclustering();
-    void slotLazyReclusteringRequested();
+    void slotLazyReclusteringRequestCallBack();
 
 private:
     const QExplicitlySharedDataPointer<WMWSharedData> s;

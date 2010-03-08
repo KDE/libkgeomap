@@ -515,6 +515,7 @@ void BackendGoogleMaps::slotHTMLEvents(const QStringList& events)
 
     if (mapBoundsProbablyChanged||!movedClusters.isEmpty())
     {
+        s->worldMapWidget->markClustersAsDirty();
         s->worldMapWidget->updateClusters();
     }
 }

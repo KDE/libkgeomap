@@ -70,7 +70,10 @@ public:
       mouseMoveObjectCoordinates(),
       mouseMoveCenterOffset(0,0),
       dragDropMarkerCount(0),
-      dragDropMarkerPos()
+      dragDropMarkerPos(),
+      clustersDirtyCacheProjection(),
+      clustersDirtyCacheLat(),
+      clustersDirtyCacheLon()
     {
     }
 
@@ -97,6 +100,9 @@ public:
     QPoint mouseMoveCenterOffset;
     int dragDropMarkerCount;
     QPoint dragDropMarkerPos;
+    int clustersDirtyCacheProjection;
+    qreal clustersDirtyCacheLat;
+    qreal clustersDirtyCacheLon;
 };
 
 BackendMarble::BackendMarble(const QExplicitlySharedDataPointer<WMWSharedData>& sharedData, QObject* const parent)
@@ -396,6 +402,18 @@ bool BackendMarble::geoCoordinates(const QPoint& point, WMWGeoCoordinate* const 
 
 void BackendMarble::marbleCustomPaint(Marble::GeoPainter* painter)
 {
+    // check whether the parameters of the map changed and we may have to update the clusters:
+    if ( (d->clustersDirtyCacheLat != d->marbleWidget->centerLatitude()) ||
+         (d->clustersDirtyCacheLon != d->marbleWidget->centerLongitude()) ||
+         (d->clustersDirtyCacheProjection != d->marbleWidget->projection()) )
+    {
+//         kDebug()<<d->marbleWidget->centerLatitude()<<d->marbleWidget->centerLongitude()<<d->marbleWidget->projection();
+        d->clustersDirtyCacheLat = d->marbleWidget->centerLatitude();
+        d->clustersDirtyCacheLon = d->marbleWidget->centerLongitude();
+        d->clustersDirtyCacheProjection = d->marbleWidget->projection();
+        s->worldMapWidget->markClustersAsDirty();
+    }
+
     painter->save();
     painter->autoMapQuality();
 
@@ -426,7 +444,7 @@ void BackendMarble::marbleCustomPaint(Marble::GeoPainter* painter)
     }
 
     // now for the clusters:
-    generateClusters();
+    s->worldMapWidget->updateClusters();
 
     int markersInMovingCluster = 0;
     for (int i = 0; i<s->clusterList.size(); ++i)
@@ -563,11 +581,6 @@ void BackendMarble::marbleCustomPaint(Marble::GeoPainter* painter)
     painter->restore();
 }
 
-void BackendMarble::generateClusters()
-{
-    s->worldMapWidget->updateClusters();
-}
-
 QString BackendMarble::getProjection() const
 {
     if (d->marbleWidget)
@@ -692,6 +705,7 @@ QSize BackendMarble::mapSize() const
 void BackendMarble::slotMarbleZoomChanged(int newZoom)
 {
     Q_UNUSED(newZoom);
+    s->worldMapWidget->markClustersAsDirty();
 
     kDebug()<<getZoom();
     emit(signalZoomChanged(getZoom()));

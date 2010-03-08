@@ -89,7 +89,6 @@ public Q_SLOTS:
 
 protected:
     void updateActionsEnabled();
-    void generateClusters();
     bool eventFilter(QObject *object, QEvent *event);
     void createActions();
 

@@ -85,7 +85,8 @@ public:
       actionEditMode(0),
       actionGroupMode(0),
       controlWidget(0),
-      lazyReclusteringRequested(false)
+      lazyReclusteringRequested(false),
+      clustersDirty(false)
     {
     }
 
@@ -111,6 +112,7 @@ public:
     QPointer<QWidget> controlWidget;
 
     bool lazyReclusteringRequested;
+    bool clustersDirty;
 };
 
 WorldMapWidget2::WorldMapWidget2(QWidget* const parent)
@@ -365,6 +367,7 @@ void WorldMapWidget2::slotBackendReady(const QString& backendName)
     applyCacheToBackend();
 
     updateMarkers();
+    markClustersAsDirty();
 
     rebuildConfigurationMenu();
 }
@@ -535,6 +538,11 @@ void WorldMapWidget2::updateClusters()
         // do not re-cluster while a cluster is being moved
         return;
     }
+
+    if (!d->clustersDirty)
+        return;
+
+    d->clustersDirty = false;
 
     // constants for clusters
     const int ClusterRadius          = s->inEditMode ? 3 : 15;
@@ -1117,14 +1125,15 @@ void WorldMapWidget2::slotRequestLazyReclustering()
     if (d->lazyReclusteringRequested)
         return;
 
+    d->clustersDirty = true;
     d->lazyReclusteringRequested = true;
-    QTimer::singleShot(0, this, SLOT(slotLazyReclusteringRequested()));
+    QTimer::singleShot(0, this, SLOT(slotLazyReclusteringRequestCallBack()));
 }
 
 /**
  * @brief Helper function to buffer reclustering
  */
-void WorldMapWidget2::slotLazyReclusteringRequested()
+void WorldMapWidget2::slotLazyReclusteringRequestCallBack()
 {
     if (!d->lazyReclusteringRequested)
         return;
@@ -1217,6 +1226,11 @@ void WorldMapWidget2::dragLeaveEvent(QDragLeaveEvent* event)
 
     // remove the marker:
     d->currentBackend->updateDragDropMarker(QPoint(), 0);
+}
+
+void WorldMapWidget2::markClustersAsDirty()
+{
+    d->clustersDirty = true;
 }
 
 } /* WMW2 */
