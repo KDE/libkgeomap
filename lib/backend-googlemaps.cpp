@@ -57,6 +57,8 @@ public:
       cacheShowNavigationControl(true),
       cacheShowScaleControl(true),
       cacheZoom(1),
+      cacheMaxZoom(0),
+      cacheMinZoom(0),
       cacheCenter(0.0,0.0),
       cacheBounds()
     {
@@ -76,6 +78,8 @@ public:
     bool cacheShowNavigationControl;
     bool cacheShowScaleControl;
     int cacheZoom;
+    int cacheMaxZoom;
+    int cacheMinZoom;
     WMWGeoCoordinate cacheCenter;
     QPair<WMWGeoCoordinate, WMWGeoCoordinate> cacheBounds;
 };
@@ -238,6 +242,7 @@ void BackendGoogleMaps::setMapType(const QString& newMapType)
     if (isReady())
     {
         d->htmlWidget->runScript(QString("wmwSetMapType(\"%1\");").arg(newMapType));
+        updateZoomMinMaxCache();
         updateActionAvailability();
     }
 }
@@ -477,6 +482,9 @@ void BackendGoogleMaps::slotHTMLEvents(const QStringList& events)
     }
 
     // now process the buffered events:
+    if (mapTypeChanged) {
+        updateZoomMinMaxCache();
+    }
     if (zoomProbablyChanged)
     {
         d->cacheZoom = d->htmlWidget->runScript(QString("wmwGetZoom();")).toInt();
@@ -752,7 +760,15 @@ void BackendGoogleMaps::updateActionAvailability()
         mapTypeActions.at(i)->setChecked(mapTypeActions.at(i)->data().toString()==currentMapType);
     }
 
-    // TODO: manage state of the zoom buttons
+    s->worldMapWidget->getControlAction("zoomin")->setEnabled(true/*d->cacheZoom<d->cacheMaxZoom*/);
+    s->worldMapWidget->getControlAction("zoomout")->setEnabled(true/*d->cacheZoom>d->cacheMinZoom*/);
+}
+
+void BackendGoogleMaps::updateZoomMinMaxCache()
+{
+    // TODO: these functions seem to cause problems, the map is not fully updated after a few calls
+//     d->cacheMaxZoom = d->htmlWidget->runScript("wmwGetMaxZoom();").toInt();
+//     d->cacheMinZoom = d->htmlWidget->runScript("wmwGetMinZoom();").toInt();
 }
 
 } /* WMW2 */

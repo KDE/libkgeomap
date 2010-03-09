@@ -92,6 +92,7 @@ private Q_SLOTS:
 private:
     BackendGoogleMapsPrivate* const d;
     void loadInitialHTML();
+    void updateZoomMinMaxCache();
 };
 
 } /* WMW2 */

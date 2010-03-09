@@ -56,6 +56,16 @@ function wmwSetZoom(zoomvalue) {
 function wmwGetZoom() {
     return map.getZoom();
 }
+function wmwGetMaxZoom() {
+    return map.mapTypes[map.getMapTypeId()].maxZoom;
+}
+function wmwGetMinZoom() {
+    var minZoom = map.mapTypes[map.getMapTypeId()].minZoom;
+    if (minZoom==null) {
+        minZoom = 1;
+    }
+    return minZoom;
+}
 function wmwZoomIn() {
     map.setZoom(map.getZoom()+1);
 }
