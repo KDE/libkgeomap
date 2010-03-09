@@ -83,6 +83,8 @@ public:
     void setSpecialMarkersModel(QAbstractItemModel* const specialMarkersModel, const int coordinatesRole);
     void setDisplayMarkersModel(QAbstractItemModel* const displayMarkersModel, const int coordinatesRole, QItemSelectionModel* const selectionModel = 0);
 
+    void setEditModeAvailable(const bool state);
+
 public Q_SLOTS:
     void slotZoomIn();
     void slotZoomOut();

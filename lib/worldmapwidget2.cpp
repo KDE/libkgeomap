@@ -86,7 +86,8 @@ public:
       actionGroupMode(0),
       controlWidget(0),
       lazyReclusteringRequested(false),
-      clustersDirty(false)
+      clustersDirty(false),
+      editModeAvailable(false)
     {
     }
 
@@ -113,6 +114,7 @@ public:
 
     bool lazyReclusteringRequested;
     bool clustersDirty;
+    bool editModeAvailable;
 };
 
 WorldMapWidget2::WorldMapWidget2(QWidget* const parent)
@@ -451,6 +453,10 @@ KAction* WorldMapWidget2::getControlAction(const QString& actionName)
     return 0;
 }
 
+/**
+ * @brief Returns the control widget.
+ * If you want to disable the edit mode, call setEditModeAvailable before calling this function!
+ */
 QWidget* WorldMapWidget2::getControlWidget()
 {
     if (!d->controlWidget)
@@ -469,15 +475,18 @@ QWidget* WorldMapWidget2::getControlWidget()
         QToolButton* const zoomOutButton = new QToolButton(d->controlWidget);
         zoomOutButton->setDefaultAction(d->actionZoomOut);
 
-        QFrame* const hLine1 = new QFrame(d->controlWidget);
-        hLine1->setFrameShape(QFrame::VLine);
-        hLine1->setFrameShadow(QFrame::Sunken);
+        if (d->editModeAvailable)
+        {
+            QFrame* const hLine1 = new QFrame(d->controlWidget);
+            hLine1->setFrameShape(QFrame::VLine);
+            hLine1->setFrameShadow(QFrame::Sunken);
 
-        QToolButton* const browseModeButton = new QToolButton(d->controlWidget);
-        browseModeButton->setDefaultAction(d->actionBrowseMode);
+            QToolButton* const browseModeButton = new QToolButton(d->controlWidget);
+            browseModeButton->setDefaultAction(d->actionBrowseMode);
 
-        QToolButton* const editModeButton = new QToolButton(d->controlWidget);
-        editModeButton->setDefaultAction(d->actionEditMode);
+            QToolButton* const editModeButton = new QToolButton(d->controlWidget);
+            editModeButton->setDefaultAction(d->actionEditMode);
+        }
 
         QHBoxLayout* const hBoxLayout = reinterpret_cast<QHBoxLayout*>(d->controlWidget->layout());
         if (hBoxLayout)
@@ -1231,6 +1240,19 @@ void WorldMapWidget2::dragLeaveEvent(QDragLeaveEvent* event)
 void WorldMapWidget2::markClustersAsDirty()
 {
     d->clustersDirty = true;
+}
+
+/**
+ * @brief Controls whether the user can switch from browse to edit mode.
+ * Note that you have to call this function before calling getControlWidget!
+ */
+void WorldMapWidget2::setEditModeAvailable(const bool state)
+{
+    if (d->controlWidget)
+    {
+        kDebug()<<"Warning: changing the edit mode availability after creating the control widget does not hide the buttons!";
+    }
+    d->editModeAvailable = state;
 }
 
 } /* WMW2 */

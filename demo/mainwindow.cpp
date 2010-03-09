@@ -142,6 +142,7 @@ MainWindow::MainWindow(KCmdLineArgs* const cmdLineArgs, QWidget* const parent)
     setCentralWidget(d->splitter);
 
     d->mapWidget = new WorldMapWidget2(d->splitter);
+    d->mapWidget->setEditModeAvailable(true);
     d->mapWidget->setSpecialMarkersModel(d->specialMarkersModel, RoleCoordinates);
     d->mapWidget->setDisplayMarkersModel(d->displayMarkersModel, RoleCoordinates, d->selectionModel);
 
