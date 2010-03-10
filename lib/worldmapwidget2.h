@@ -29,6 +29,7 @@
 // local includes
 
 #include "worldmapwidget2_primitives.h"
+#include "worldmapwidget2_export.h"
 
 class KAction;
 class KConfigGroup;
@@ -40,7 +41,7 @@ namespace WMW2 {
 
 class WorldMapWidget2Private;
 
-class WorldMapWidget2 : public QWidget
+class WORLDMAPWIDGET2_EXPORT WorldMapWidget2 : public QWidget
 {
 Q_OBJECT
 

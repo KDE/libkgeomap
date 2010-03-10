@@ -25,7 +25,7 @@
 namespace WMW2
 {
 
-class AltitudeBackend : public QObject
+class WORLDMAPWIDGET2_EXPORT AltitudeBackend : public QObject
 {
 Q_OBJECT
 

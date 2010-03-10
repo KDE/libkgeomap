@@ -29,13 +29,14 @@
 // local includes
 
 #include "worldmapwidget2_primitives.h"
+#include "worldmapwidget2_export.h"
 
 namespace WMW2 {
 
 class MarkerModelPrivate;
 class MarkerModelNonEmptyIteratorPrivate;
 
-class MarkerModel : public QObject/* : public QAbstractItemModel*/
+class WORLDMAPWIDGET2_EXPORT MarkerModel : public QObject/* : public QAbstractItemModel*/
 {
 Q_OBJECT
 

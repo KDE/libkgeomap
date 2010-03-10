@@ -29,7 +29,6 @@ INCLUDE_DIRECTORIES(
     ${KEXIV2_INCLUDE_DIR}
 )
 
-ADD_DEFINITIONS(-Wall)
 INCLUDE(CheckIncludeFile)
 CHECK_INCLUDE_FILE("valgrind/valgrind.h" HAVE_VALGRIND)
 IF(${HAVE_VALGRIND})
@@ -65,12 +64,12 @@ SET( backend_osm_sources
 #     lib/backend-osm.cpp
 )
 
-# TODO: we want to create a shared library
-KDE4_ADD_LIBRARY( worldmapwidget2 STATIC ${widget_sources} ${backend_marble_sources} ${backend_googlemaps_sources} ${backend_osm_sources})
+KDE4_ADD_LIBRARY( worldmapwidget2 SHARED ${widget_sources} ${backend_marble_sources} ${backend_googlemaps_sources} ${backend_osm_sources})
+# TODO: soname version numbers of the library
 SET( worldmapwidget2_libs
     ${KDE4_UI_LIBS} ${KDE4_KPARTS_LIBS} ${LIBMARBLEWIDGET_LIBRARY} ${KDE4_KHTML_LIBS}
 )
-target_link_libraries( worldmapwidget2 ${KDE4_UI_LIBS} ${KDE4_KPARTS_LIBS} ${LIBMARBLEWIDGET_LIBRARY} ${KDE4_KHTML_LIBS} )
+target_link_libraries( worldmapwidget2 ${worldmapwidget2_libs} )
 SET_TARGET_PROPERTIES( worldmapwidget2 PROPERTIES COMPILE_FLAGS "${COMPILE_FLAGS} ${MY_COMPILER_WARNINGS}")
 SET( worldmapwidget2_libs
     worldmapwidget2 ${worldmapwidget2_libs}
@@ -114,9 +113,14 @@ INSTALL(FILES lib-data/backend-osm.html
               lib-data/marker-ffff00-selected.png
         DESTINATION ${DATA_INSTALL_DIR}/libworldmapwidget2/)
 
-INSTALL(FILES lib/worldmapwidget2.h
-              lib/worldmapwidget2_primitives.h
-        DESTINATION ${INCLUDE_INSTALL_DIR}/libworldmapwidget2 COMPONENT Devel)
+SET(worldmapwidget2_headers
+    lib/worldmapwidget2_export.h
+    lib/worldmapwidget2.h
+    lib/worldmapwidget2_primitives.h
+    lib/altitude-backend.h
+)
+INSTALL(FILES ${worldmapwidget2_headers}
+        DESTINATION ${INCLUDE_INSTALL_DIR}/worldmapwidget2 COMPONENT Devel)
 
 # demo widget
 SET( demo_sources
@@ -139,7 +143,7 @@ IF(KDE4_BUILD_TESTS)
         tests/test-model.cpp
     )
     kde4_add_executable( test_model ${test_model_sources} )
-    target_link_libraries( test_model ${worldmapwidget2_libs} ${QT_QTTEST_LIBRARY} )
+    target_link_libraries( test_model worldmapwidget2 ${worldmapwidget2_libs} ${QT_QTTEST_LIBRARY} )
     SET_TARGET_PROPERTIES( test_model PROPERTIES COMPILE_FLAGS "${COMPILE_FLAGS} ${MY_COMPILER_WARNINGS}")
     ADD_TEST( test_model ${EXECUTABLE_OUTPUT_PATH}/test_model )
 
@@ -148,7 +152,7 @@ IF(KDE4_BUILD_TESTS)
         tests/test-primitives.cpp
     )
     kde4_add_executable( test_primitives ${test_primitives_sources} )
-    target_link_libraries( test_primitives ${worldmapwidget2_libs} ${QT_QTTEST_LIBRARY} )
+    target_link_libraries( test_primitives worldmapwidget2 ${worldmapwidget2_libs} ${QT_QTTEST_LIBRARY} )
     SET_TARGET_PROPERTIES( test_primitives PROPERTIES COMPILE_FLAGS "${COMPILE_FLAGS} ${MY_COMPILER_WARNINGS}")
     ADD_TEST( test_primitives ${EXECUTABLE_OUTPUT_PATH}/test_primitives )
 

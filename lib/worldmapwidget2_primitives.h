@@ -37,6 +37,10 @@
 #include <kstandarddirs.h>
 #include <kurl.h>
 
+// local includes
+
+#include "worldmapwidget2_export.h"
+
 #ifdef WMW2_HAVE_VALGRIND
 #include <valgrind/valgrind.h>
 #endif /* WMW2_HAVE_VALGRIND */
@@ -65,7 +69,7 @@ inline void WMW2_assert(const char* const condition, const char* const filename,
     
 }
 
-class WMWGeoCoordinate
+class WORLDMAPWIDGET2_EXPORT  WMWGeoCoordinate
 {
 public:
 
@@ -194,7 +198,7 @@ public:
     }
 };
 
-class WMWMarker
+class WORLDMAPWIDGET2_EXPORT WMWMarker
 {
 public:
     WMWMarker()
@@ -247,7 +251,7 @@ enum WMWSelectionState {
     WMWSelectedAll = 2
 };
 
-class WMWCluster
+class WORLDMAPWIDGET2_EXPORT WMWCluster
 {
 public:
 
@@ -331,13 +335,13 @@ namespace WMW2
 
 // helper functions:
 
-bool WMWHelperParseLatLonString(const QString& latLonString, WMWGeoCoordinate* const coordinates);
-bool WMWHelperParseXYStringToPoint(const QString& xyString, QPoint* const point);
-bool WMWHelperParseBoundsString(const QString& boundsString, QPair<WMWGeoCoordinate, WMWGeoCoordinate>* const boundsCoordinates);
-WMWGeoCoordinate::PairList WMWHelperNormalizeBounds(const WMWGeoCoordinate::Pair& boundsPair);
+WORLDMAPWIDGET2_EXPORT bool WMWHelperParseLatLonString(const QString& latLonString, WMWGeoCoordinate* const coordinates);
+WORLDMAPWIDGET2_EXPORT bool WMWHelperParseXYStringToPoint(const QString& xyString, QPoint* const point);
+WORLDMAPWIDGET2_EXPORT bool WMWHelperParseBoundsString(const QString& boundsString, QPair<WMWGeoCoordinate, WMWGeoCoordinate>* const boundsCoordinates);
+WORLDMAPWIDGET2_EXPORT WMWGeoCoordinate::PairList WMWHelperNormalizeBounds(const WMWGeoCoordinate::Pair& boundsPair);
 
 // primitives for altitude lookup:
-class WMWAltitudeLookup
+class WORLDMAPWIDGET2_EXPORT WMWAltitudeLookup
 {
 public:
     WMWGeoCoordinate coordinates;
@@ -346,7 +350,7 @@ public:
     typedef QList<WMWAltitudeLookup> List;
 };
 
-class WMWDragData : public QMimeData
+class WORLDMAPWIDGET2_EXPORT WMWDragData : public QMimeData
 {
 Q_OBJECT
 
