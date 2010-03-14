@@ -764,33 +764,36 @@ bool BackendMarble::eventFilter(QObject *object, QEvent *event)
         // scan in reverse order, because the user would expect
         // the topmost marker to be picked up and not the
         // one below
-        for (int row = s->specialMarkersModel->rowCount()-1; row>=0; --row)
+        if (s->specialMarkersModel)
         {
-            const QModelIndex currentIndex = s->specialMarkersModel->index(row, 0);
-            const WMWGeoCoordinate currentCoordinates = s->specialMarkersModel->data(currentIndex, s->specialMarkersCoordinatesRole).value<WMWGeoCoordinate>();
-
-            QPoint markerPoint;
-            if (!screenCoordinates(currentCoordinates, &markerPoint))
+            for (int row = s->specialMarkersModel->rowCount()-1; row>=0; --row)
             {
-                continue;
+                const QModelIndex currentIndex = s->specialMarkersModel->index(row, 0);
+                const WMWGeoCoordinate currentCoordinates = s->specialMarkersModel->data(currentIndex, s->specialMarkersCoordinatesRole).value<WMWGeoCoordinate>();
+
+                QPoint markerPoint;
+                if (!screenCoordinates(currentCoordinates, &markerPoint))
+                {
+                    continue;
+                }
+
+                const int markerPixmapHeight = s->markerPixmap.height();
+                const int markerPixmapWidth = s->markerPixmap.width();
+                const QRect markerRect(markerPoint.x()-markerPixmapWidth/2, markerPoint.y()-markerPixmapHeight, markerPixmapWidth, markerPixmapHeight);
+                if (!markerRect.contains(mouseEvent->pos()))
+                {
+                    continue;
+                }
+
+                // the user clicked on a marker:
+                d->mouseMoveMarkerIndex = QPersistentModelIndex(currentIndex);
+                d->mouseMoveCenterOffset = mouseEvent->pos() - markerPoint;
+                d->mouseMoveObjectCoordinates = currentCoordinates;
+                doFilterEvent = true;
+                d->havePotentiallyMouseMovingObject = true;
+
+                break;
             }
-
-            const int markerPixmapHeight = s->markerPixmap.height();
-            const int markerPixmapWidth = s->markerPixmap.width();
-            const QRect markerRect(markerPoint.x()-markerPixmapWidth/2, markerPoint.y()-markerPixmapHeight, markerPixmapWidth, markerPixmapHeight);
-            if (!markerRect.contains(mouseEvent->pos()))
-            {
-                continue;
-            }
-
-            // the user clicked on a marker:
-            d->mouseMoveMarkerIndex = QPersistentModelIndex(currentIndex);
-            d->mouseMoveCenterOffset = mouseEvent->pos() - markerPoint;
-            d->mouseMoveObjectCoordinates = currentCoordinates;
-            doFilterEvent = true;
-            d->havePotentiallyMouseMovingObject = true;
-
-            break;
         }
 
         if (/*s->inEditMode&&*/!doFilterEvent)
