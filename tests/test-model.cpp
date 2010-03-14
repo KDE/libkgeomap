@@ -250,6 +250,18 @@ void TestModel::testMoveMarkers2()
 //     mm.clear();
 }
 
+void TestModel::testIteratorWholeWorldNoBackingModel()
+{
+    MarkerModel mm;
+    const int maxLevel = mm.maxLevel();
+
+    for (int l = 0; l<=maxLevel; ++l)
+    {
+        MarkerModel::NonEmptyIterator it(&mm, l);
+        QVERIFY( CountMarkersInIterator(&it) == 0 );
+    }
+}
+
 void TestModel::testIteratorWholeWorld()
 {
     const QSharedPointer<QStandardItemModel> itemModel(new QStandardItemModel());

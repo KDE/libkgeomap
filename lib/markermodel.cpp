@@ -313,7 +313,7 @@ int MarkerModel::getTileSelectedCount(const QIntList& tileIndex)
 
 QList<QPersistentModelIndex> MarkerModel::getTileMarkerIndices(const QIntList& tileIndex)
 {
-        if (d->isDirty)
+    if (d->isDirty)
     {
         regenerateTiles();
     }
@@ -1014,14 +1014,12 @@ void MarkerModel::slotSelectionChanged(const QItemSelection& selected, const QIt
 void MarkerModel::regenerateTiles()
 {
     delete d->rootTile;
-    d->rootTile = 0;
+    d->rootTile = new Tile();
+    d->rootTile->prepareForChildren(d->tesselationSizes.first());
+    d->isDirty = false;
 
     if (!d->markerModel)
         return;
-
-    d->isDirty = false;
-    d->rootTile = new Tile();
-    d->rootTile->prepareForChildren(d->tesselationSizes.first());
 
     // read out all existing markers into tiles:
     for (int row=0; row<d->markerModel->rowCount(); ++row)

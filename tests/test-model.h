@@ -42,6 +42,7 @@ private Q_SLOTS:
     void testRemoveMarkers2();
     void testMoveMarkers1();
     void testMoveMarkers2();
+    void testIteratorWholeWorldNoBackingModel();
     void testIteratorWholeWorld();
     void testIteratorPartial1();
     void testIteratorPartial2();

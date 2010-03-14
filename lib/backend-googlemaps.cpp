@@ -313,7 +313,10 @@ void BackendGoogleMaps::updateMarkers()
     WMW2_ASSERT(isReady());
     if (!isReady())
         return;
-    
+
+    if (!s->specialMarkersModel)
+        return;
+
     // re-transfer all markers to the javascript-part:
     d->htmlWidget->runScript(QString("wmwClearMarkers();"));
     for (int row = 0; row<s->specialMarkersModel->rowCount(); ++row)

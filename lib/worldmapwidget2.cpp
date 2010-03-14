@@ -495,6 +495,9 @@ QWidget* WorldMapWidget2::getControlWidget()
         }
     }
 
+    // make sure the menu exists, even if no backend has been set:
+    rebuildConfigurationMenu();
+
     return d->controlWidget;
 }
 
@@ -541,6 +544,10 @@ void WorldMapWidget2::updateMarkers()
 
 void WorldMapWidget2::updateClusters()
 {
+    kDebug()<<s->markerModel;
+    if (!s->markerModel)
+        return;
+
     kDebug()<<s->haveMovingCluster;
     if (s->haveMovingCluster)
     {

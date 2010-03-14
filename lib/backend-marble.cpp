@@ -401,104 +401,110 @@ void BackendMarble::marbleCustomPaint(Marble::GeoPainter* painter)
     QBrush circleBrush(Qt::blue);
     const int circleRadius = 15;
 
-    // render all visible markers:
-    for (int row = 0; row<s->specialMarkersModel->rowCount(); ++row)
+    if (s->specialMarkersModel)
     {
-        const QModelIndex currentIndex = s->specialMarkersModel->index(row, 0);
-        
-        WMWGeoCoordinate markerCoordinates = s->specialMarkersModel->data(currentIndex, s->specialMarkersCoordinatesRole).value<WMWGeoCoordinate>();
-        // is the marker being moved right now?
-        if (currentIndex == d->mouseMoveMarkerIndex)
+        // render all visible markers:
+        for (int row = 0; row<s->specialMarkersModel->rowCount(); ++row)
         {
-            markerCoordinates = d->mouseMoveObjectCoordinates;
+            const QModelIndex currentIndex = s->specialMarkersModel->index(row, 0);
+
+            WMWGeoCoordinate markerCoordinates = s->specialMarkersModel->data(currentIndex, s->specialMarkersCoordinatesRole).value<WMWGeoCoordinate>();
+            // is the marker being moved right now?
+            if (currentIndex == d->mouseMoveMarkerIndex)
+            {
+                markerCoordinates = d->mouseMoveObjectCoordinates;
+            }
+
+            QPoint markerPoint;
+            if (!screenCoordinates(markerCoordinates, &markerPoint))
+                continue;
+
+            painter->drawPixmap(markerPoint.x()-s->markerPixmap.width()/2, markerPoint.y()-s->markerPixmap.height(), s->markerPixmap);
+    //         painter->setPen(circlePen);
+    //         painter->setBrush(circleBrush);
+    //         painter->drawEllipse(markerPoint.x()-circleRadius, markerPoint.y()-circleRadius, 2*circleRadius, 2*circleRadius);
         }
-
-        QPoint markerPoint;
-        if (!screenCoordinates(markerCoordinates, &markerPoint))
-            continue;
-
-        painter->drawPixmap(markerPoint.x()-s->markerPixmap.width()/2, markerPoint.y()-s->markerPixmap.height(), s->markerPixmap);
-//         painter->setPen(circlePen);
-//         painter->setBrush(circleBrush);
-//         painter->drawEllipse(markerPoint.x()-circleRadius, markerPoint.y()-circleRadius, 2*circleRadius, 2*circleRadius);
     }
 
-    // now for the clusters:
-    s->worldMapWidget->updateClusters();
-
     int markersInMovingCluster = 0;
-    for (int i = 0; i<s->clusterList.size(); ++i)
+    if (s->markerModel)
     {
-        const WMWCluster& cluster = s->clusterList.at(i);
-        WMWGeoCoordinate clusterCoordinates = cluster.coordinates;
-        int markerCountOverride = cluster.markerCount;
-        WMWSelectionState selectionStateOverride = cluster.selectedState;
-        if (d->haveMouseMovingObject&&(d->mouseMoveClusterIndex>=0))
+        // now for the clusters:
+        s->worldMapWidget->updateClusters();
+
+        for (int i = 0; i<s->clusterList.size(); ++i)
         {
-            bool movingSelectedMarkers = s->clusterList.at(d->mouseMoveClusterIndex).selectedState!=WMWSelectedNone;
-            if (movingSelectedMarkers)
+            const WMWCluster& cluster = s->clusterList.at(i);
+            WMWGeoCoordinate clusterCoordinates = cluster.coordinates;
+            int markerCountOverride = cluster.markerCount;
+            WMWSelectionState selectionStateOverride = cluster.selectedState;
+            if (d->haveMouseMovingObject&&(d->mouseMoveClusterIndex>=0))
             {
-                markersInMovingCluster+=cluster.markerSelectedCount;
-                markerCountOverride-=cluster.markerSelectedCount;
-                selectionStateOverride = WMWSelectedNone;
+                bool movingSelectedMarkers = s->clusterList.at(d->mouseMoveClusterIndex).selectedState!=WMWSelectedNone;
+                if (movingSelectedMarkers)
+                {
+                    markersInMovingCluster+=cluster.markerSelectedCount;
+                    markerCountOverride-=cluster.markerSelectedCount;
+                    selectionStateOverride = WMWSelectedNone;
+                }
+                else if (d->mouseMoveClusterIndex == i)
+                {
+                    markerCountOverride = 0;
+                }
+                if (markerCountOverride==0)
+                    continue;
             }
-            else if (d->mouseMoveClusterIndex == i)
-            {
-                markerCountOverride = 0;
-            }
-            if (markerCountOverride==0)
+
+            QPoint clusterPoint;
+            if (!screenCoordinates(clusterCoordinates, &clusterPoint))
                 continue;
-        }
 
-        QPoint clusterPoint;
-        if (!screenCoordinates(clusterCoordinates, &clusterPoint))
-            continue;
+            // determine the colors:
+            QColor       fillColor;
+            QColor       strokeColor;
+            Qt::PenStyle strokeStyle;
+            QColor       labelColor;
+            QString      labelText;
+            s->worldMapWidget->getColorInfos(i, &fillColor, &strokeColor,
+                                &strokeStyle, &labelText, &labelColor,
+                                &selectionStateOverride,
+                                &markerCountOverride);
 
-        // determine the colors:
-        QColor       fillColor;
-        QColor       strokeColor;
-        Qt::PenStyle strokeStyle;
-        QColor       labelColor;
-        QString      labelText;
-        s->worldMapWidget->getColorInfos(i, &fillColor, &strokeColor,
-                            &strokeStyle, &labelText, &labelColor,
-                            &selectionStateOverride,
-                            &markerCountOverride);
-
-        if (s->inEditMode)
-        {
-            QString pixmapName = fillColor.name().mid(1);
-            if (selectionStateOverride==WMWSelectedAll)
+            if (s->inEditMode)
             {
-                pixmapName+="-selected";
+                QString pixmapName = fillColor.name().mid(1);
+                if (selectionStateOverride==WMWSelectedAll)
+                {
+                    pixmapName+="-selected";
+                }
+                if (selectionStateOverride==WMWSelectedSome)
+                {
+                    pixmapName+="-someselected";
+                }
+                const QPixmap& markerPixmap = s->markerPixmaps[pixmapName];
+                painter->drawPixmap(clusterPoint.x()-markerPixmap.width()/2, clusterPoint.y()-markerPixmap.height(), markerPixmap);
             }
-            if (selectionStateOverride==WMWSelectedSome)
+            else
             {
-                pixmapName+="-someselected";
+
+                QPen circlePen;
+                circlePen.setColor(strokeColor);
+                circlePen.setStyle(strokeStyle);
+                circlePen.setWidth(2);
+                QBrush circleBrush(fillColor);
+                QPen labelPen;
+                labelPen.setColor(labelColor);
+
+                const QRect circleRect(clusterPoint.x()-circleRadius, clusterPoint.y()-circleRadius, 2*circleRadius, 2*circleRadius);
+
+                painter->setPen(circlePen);
+                painter->setBrush(circleBrush);
+                painter->drawEllipse(circleRect);
+
+                painter->setPen(labelPen);
+                painter->setBrush(Qt::NoBrush);
+                painter->drawText(circleRect, Qt::AlignHCenter|Qt::AlignVCenter, labelText);
             }
-            const QPixmap& markerPixmap = s->markerPixmaps[pixmapName];
-            painter->drawPixmap(clusterPoint.x()-markerPixmap.width()/2, clusterPoint.y()-markerPixmap.height(), markerPixmap);
-        }
-        else
-        {
-
-            QPen circlePen;
-            circlePen.setColor(strokeColor);
-            circlePen.setStyle(strokeStyle);
-            circlePen.setWidth(2);
-            QBrush circleBrush(fillColor);
-            QPen labelPen;
-            labelPen.setColor(labelColor);
-
-            const QRect circleRect(clusterPoint.x()-circleRadius, clusterPoint.y()-circleRadius, 2*circleRadius, 2*circleRadius);
-
-            painter->setPen(circlePen);
-            painter->setBrush(circleBrush);
-            painter->drawEllipse(circleRect);
-
-            painter->setPen(labelPen);
-            painter->setBrush(Qt::NoBrush);
-            painter->drawText(circleRect, Qt::AlignHCenter|Qt::AlignVCenter, labelText);
         }
     }
 
