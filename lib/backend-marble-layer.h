@@ -17,33 +17,42 @@
  *
  * ============================================================ */
 
-#include "bm-widget.moc"
+#ifndef BACKEND_MARBLE_LAYER_H
+#define BACKEND_MARBLE_LAYER_H
 
-// local includes
+// Qt includes
 
-#include "backend-marble.h"
+#include <QPointer>
+
+// KDE includes
+
+#include <marble/LayerInterface.h>
+
+namespace Marble {
+    class GeoPainter;
+    class ViewportParams;
+    class GeoSceneLayer;
+}
 
 namespace WMW2 {
 
-BMWidget::BMWidget(BackendMarble* const pMarbleBackend, QWidget* const parent)
-: Marble::MarbleWidget(parent), marbleBackend(pMarbleBackend)
-{
-    WMW2_ASSERT(marbleBackend!=0);
-}
+class BackendMarble;
 
-BMWidget::~BMWidget()
+class BMLayer : public Marble::LayerInterface
 {
-}
+public:
+    BMLayer(BackendMarble* const pMarbleBackend);
+    virtual ~BMLayer();
 
-void BMWidget::customPaint(Marble::GeoPainter* painter)
-{
-    if (marbleBackend)
-    {
-        marbleBackend->marbleCustomPaint(painter);
-    }
-}
+    virtual bool render(Marble::GeoPainter *painter, Marble::ViewportParams *viewport,
+                        const QString& renderPos = "NONE", Marble::GeoSceneLayer *layer = 0);
+    virtual QStringList renderPosition () const;
+
+private:
+    QPointer<BackendMarble> const marbleBackend;
+};
 
 } /* WMW2 */
 
-
+#endif /* BACKEND_MARBLE_LAYER_H */
 

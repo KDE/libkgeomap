@@ -17,8 +17,8 @@
  *
  * ============================================================ */
 
-#ifndef BM_MARBLE_H
-#define BM_MARBLE_H
+#ifndef BACKEND_MARBLE_SUBWIDGET_H
+#define BACKEND_MARBLE_SUBWIDGET_H
 
 // Qt includes
 
@@ -49,5 +49,5 @@ private:
 
 } /* WMW2 */
 
-#endif /* BM_MARBLE_H */
+#endif /* BACKEND_MARBLE_SUBWIDGET_H */
 

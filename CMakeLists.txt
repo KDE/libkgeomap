@@ -40,6 +40,8 @@ INCLUDE_DIRECTORIES(
     ${CMAKE_CURRENT_SOURCE_DIR}/lib
 )
 
+
+
 SET( widget_sources
     lib/worldmapwidget2.cpp
     lib/map-backend.cpp
@@ -53,8 +55,14 @@ SET( widget_sources
 
 SET( backend_marble_sources
     lib/backend-marble.cpp
-    lib/bm-widget.cpp
 )
+IF (${KDE_VERSION} VERSION_GREATER "4.4.66")
+    ADD_DEFINITIONS(-DWMW2_MARBLE_ADD_LAYER)
+    SET( backend_marble_sources ${backend_marble_sources} lib/backend-marble-layer.cpp )
+ELSE (${KDE_VERSION} VERSION_GREATER "4.4.66")
+    SET( backend_marble_sources ${backend_marble_sources} lib/backend-marble-subwidget.cpp )
+ENDIF (${KDE_VERSION} VERSION_GREATER "4.4.66")
+
 
 SET( backend_googlemaps_sources
     lib/backend-googlemaps.cpp

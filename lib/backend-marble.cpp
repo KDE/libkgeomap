@@ -33,12 +33,18 @@
 #include <kstandarddirs.h>
 #include <marble/GeoPainter.h>
 #include <marble/MarbleMap.h>
+#include <marble/MarbleModel.h>
+#include <marble/MarbleWidget.h>
 #include <marble/ViewParams.h>
 #include <marble/ViewportParams.h>
 
 // local includes
 
-#include "bm-widget.h"
+#ifdef WMW2_MARBLE_ADD_LAYER
+#include "backend-marble-layer.h"
+#else
+#include "backend-marble-subwidget.h"
+#endif
 #include "markermodel.h"
 #include "worldmapwidget2.h"
 
@@ -77,7 +83,7 @@ public:
     {
     }
 
-    QPointer<BMWidget> marbleWidget;
+    QPointer<MarbleWidget> marbleWidget;
 
     QActionGroup* actionGroupMapTheme;
     QActionGroup* actionGroupProjection;
@@ -110,7 +116,12 @@ BackendMarble::BackendMarble(const QExplicitlySharedDataPointer<WMWSharedData>& 
 {
     createActions();
 
+#ifdef WMW2_MARBLE_ADD_LAYER
+    d->marbleWidget = new MarbleWidget();
+    d->marbleWidget->model()->addLayer(new BMLayer(this));
+#else
     d->marbleWidget = new BMWidget(this);
+#endif
 
     d->marbleWidget->installEventFilter(this);
 
