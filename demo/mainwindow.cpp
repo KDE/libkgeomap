@@ -111,6 +111,9 @@ public:
 MainWindow::MainWindow(KCmdLineArgs* const cmdLineArgs, QWidget* const parent)
 : KMainWindow(parent), d(new MainWindowPrivate())
 {
+    // initialize kexiv2 before doing any multitasking
+    KExiv2Iface::KExiv2::initializeExiv2();
+
     d->specialMarkersModel = new QStandardItemModel(this);
     d->displayMarkersModel = new QStandardItemModel(this);
     d->selectionModel = new QItemSelectionModel(d->displayMarkersModel);
@@ -235,6 +238,9 @@ MainWindow::MainWindow(KCmdLineArgs* const cmdLineArgs, QWidget* const parent)
 
 MainWindow::~MainWindow()
 {
+    // clean up the kexiv2 memory:
+    KExiv2Iface::KExiv2::cleanupExiv2();
+
     if (d->progressBar)
     {
         delete d->progressBar;
