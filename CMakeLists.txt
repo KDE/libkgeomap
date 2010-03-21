@@ -49,6 +49,7 @@ SET( widget_sources
     lib/markermodel.cpp
     lib/worldmapwidget2_primitives.cpp
     lib/altitude-backend.cpp
+    lib/worldmapwidget2_dragdrophandler.cpp
 
     lib/backend-altitude-geonames.cpp
 )
@@ -124,6 +125,7 @@ INSTALL(FILES lib-data/backend-osm.html
 SET(worldmapwidget2_headers
     lib/worldmapwidget2_export.h
     lib/worldmapwidget2.h
+    lib/worldmapwidget2_dragdrophandler.h
     lib/worldmapwidget2_primitives.h
     lib/altitude-backend.h
 )
@@ -134,7 +136,9 @@ INSTALL(FILES ${worldmapwidget2_headers}
 SET( demo_sources
     demo/demo-main.cpp
     demo/mainwindow.cpp
+    demo/myimageitem.cpp
     demo/mytreewidget.cpp
+    demo/dragdrophandler.cpp
 )
 kde4_add_executable( worldmapwidget2_demo  ${demo_sources} )
 target_link_libraries( worldmapwidget2_demo ${worldmapwidget2_libs} ${KEXIV2_LIBRARIES})

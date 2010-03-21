@@ -40,6 +40,7 @@ class QDropEvent;
 namespace WMW2 {
 
 class WorldMapWidget2Private;
+class DragDropHandler;
 
 class WORLDMAPWIDGET2_EXPORT WorldMapWidget2 : public QWidget
 {
@@ -85,6 +86,7 @@ public:
     void setDisplayMarkersModel(QAbstractItemModel* const displayMarkersModel, const int coordinatesRole, QItemSelectionModel* const selectionModel = 0);
 
     void setEditModeAvailable(const bool state);
+    void setDragDropHandler(DragDropHandler* const dragDropHandler);
 
 public Q_SLOTS:
     void slotZoomIn();

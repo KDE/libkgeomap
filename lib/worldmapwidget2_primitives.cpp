@@ -170,12 +170,4 @@ WMWGeoCoordinate::PairList WMWHelperNormalizeBounds(const WMWGeoCoordinate::Pair
     return boundsList;
 }
 
-WMWDragData::WMWDragData()
-: QMimeData(),
-  itemCount(0),
-  itemIndices(),
-  haveDragPixmap(false)
-{
-}
-
 } /* WMW2 */

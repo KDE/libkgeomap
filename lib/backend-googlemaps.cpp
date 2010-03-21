@@ -717,39 +717,39 @@ WMWGeoCoordinate::PairList BackendGoogleMaps::getNormalizedBounds()
     return WMWHelperNormalizeBounds(d->cacheBounds);
 }
 
-void BackendGoogleMaps::updateDragDropMarker(const QPoint& pos, const WMWDragData* const dragData)
-{
-    if (!isReady())
-        return;
-
-    if (!dragData)
-    {
-        d->htmlWidget->runScript("wmwRemoveDragMarker();");
-    }
-    else
-    {
-        d->htmlWidget->runScript(QString("wmwSetDragMarker(%1, %2, %3, %4);")
-                .arg(pos.x())
-                .arg(pos.y())
-                .arg(dragData->itemCount)
-                .arg(dragData->itemCount)
-            );
-    }
-
-    // TODO: hide dragged markers on the map
-}
-
-void BackendGoogleMaps::updateDragDropMarkerPosition(const QPoint& pos)
-{
-    // TODO: buffer this!
-    if (!isReady())
-        return;
-
-    d->htmlWidget->runScript(QString("wmwMoveDragMarker(%1, %2);")
-            .arg(pos.x())
-            .arg(pos.y())
-        );
-}
+// void BackendGoogleMaps::updateDragDropMarker(const QPoint& pos, const WMWDragData* const dragData)
+// {
+//     if (!isReady())
+//         return;
+// 
+//     if (!dragData)
+//     {
+//         d->htmlWidget->runScript("wmwRemoveDragMarker();");
+//     }
+//     else
+//     {
+//         d->htmlWidget->runScript(QString("wmwSetDragMarker(%1, %2, %3, %4);")
+//                 .arg(pos.x())
+//                 .arg(pos.y())
+//                 .arg(dragData->itemCount)
+//                 .arg(dragData->itemCount)
+//             );
+//     }
+// 
+//     // TODO: hide dragged markers on the map
+// }
+// 
+// void BackendGoogleMaps::updateDragDropMarkerPosition(const QPoint& pos)
+// {
+//     // TODO: buffer this!
+//     if (!isReady())
+//         return;
+// 
+//     d->htmlWidget->runScript(QString("wmwMoveDragMarker(%1, %2);")
+//             .arg(pos.x())
+//             .arg(pos.y())
+//         );
+// }
 
 void BackendGoogleMaps::updateActionAvailability()
 {

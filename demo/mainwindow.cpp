@@ -60,6 +60,8 @@
 #include "worldmapwidget2.h"
 #include "markermodel.h"
 #include "mytreewidget.h"
+#include "dragdrophandler.h"
+#include "myimageitem.h"
 
 using namespace WMW2;
 
@@ -103,8 +105,7 @@ public:
     KCmdLineArgs* cmdLineArgs;
     KUrl lastImageOpenDir;
 
-    QStandardItemModel* specialMarkersModel;
-    QStandardItemModel* displayMarkersModel;
+    QAbstractItemModel* displayMarkersModel;
     QItemSelectionModel* selectionModel;
 };
 
@@ -114,16 +115,13 @@ MainWindow::MainWindow(KCmdLineArgs* const cmdLineArgs, QWidget* const parent)
     // initialize kexiv2 before doing any multitasking
     KExiv2Iface::KExiv2::initializeExiv2();
 
-    d->specialMarkersModel = new QStandardItemModel(this);
-    d->displayMarkersModel = new QStandardItemModel(this);
-    d->selectionModel = new QItemSelectionModel(d->displayMarkersModel);
+    d->treeWidget = new MyTreeWidget(this);
+    d->treeWidget->setColumnCount(2);
+    d->treeWidget->setHeaderLabels(QStringList()<<i18n("Filename")<<i18n("Coordinates"));
+    d->treeWidget->setSelectionMode(QAbstractItemView::ExtendedSelection);
 
-    connect(d->displayMarkersModel, SIGNAL(dataChanged(const QModelIndex&, const QModelIndex&)),
-            this, SLOT(slotDisplayMarkersDataChanged(const QModelIndex&, const QModelIndex&)));
-    connect(d->specialMarkersModel, SIGNAL(dataChanged(const QModelIndex&, const QModelIndex&)),
-            this, SLOT(slotSpecialMarkersDataChanged(const QModelIndex&, const QModelIndex&)));
-    connect(d->selectionModel, SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)),
-            this, SLOT(slotSelectionChanged(const QItemSelection&, const QItemSelection&)));
+    d->displayMarkersModel = d->treeWidget->model();
+    d->selectionModel = d->treeWidget->selectionModel();
 
     resize(512, 512);
     setWindowTitle(i18n("WorldMapWidget2 demo"));
@@ -146,14 +144,11 @@ MainWindow::MainWindow(KCmdLineArgs* const cmdLineArgs, QWidget* const parent)
 
     d->mapWidget = new WorldMapWidget2(d->splitter);
     d->mapWidget->setEditModeAvailable(true);
-    d->mapWidget->setSpecialMarkersModel(d->specialMarkersModel, RoleCoordinates);
     d->mapWidget->setDisplayMarkersModel(d->displayMarkersModel, RoleCoordinates, d->selectionModel);
+    d->mapWidget->setDragDropHandler(new DemoDragDropHandler(d->displayMarkersModel, d->mapWidget));
 
     connect(d->mapWidget, SIGNAL(signalAltitudeLookupReady(const WMW2::WMWAltitudeLookup::List&)),
             this, SLOT(slotAltitudeLookupReady(const WMW2::WMWAltitudeLookup::List&)));
-
-    connect(d->mapWidget, SIGNAL(signalSpecialMarkersMoved(const QList<QPersistentModelIndex>&)),
-            this, SLOT(slotMarkersMoved(const QList<QPersistentModelIndex>&)));
 
     connect(d->mapWidget, SIGNAL(signalDisplayMarkersMoved(const QList<QPersistentModelIndex>&)),
             this, SLOT(slotMarkersMoved(const QList<QPersistentModelIndex>&)));
@@ -169,14 +164,7 @@ MainWindow::MainWindow(KCmdLineArgs* const cmdLineArgs, QWidget* const parent)
 
     vbox->addWidget(d->mapWidget->getControlWidget());
 
-    d->treeWidget = new MyTreeWidget(this);
-    d->treeWidget->setColumnCount(2);
-    d->treeWidget->setHeaderLabels(QStringList()<<i18n("Filename")<<i18n("Coordinates"));
-    d->treeWidget->setSelectionMode(QAbstractItemView::ExtendedSelection);
     vbox->addWidget(d->treeWidget);
-
-    connect(d->treeWidget, SIGNAL(itemSelectionChanged()),
-            this, SLOT(slotTreeWidgetSelectionChanged()));
 
     d->progressBar = new QProgressBar();
     d->progressBar->setFormat(i18n("Loading images - %p%"));
@@ -214,24 +202,6 @@ MainWindow::MainWindow(KCmdLineArgs* const cmdLineArgs, QWidget* const parent)
             treeItem->setText(1, markerList.at(i).geoUrl());
 
             d->treeWidget->addTopLevelItem(treeItem);
-
-            if (cmdLineArgs->isSet("demopoints_single"))
-            {
-                QStandardItem* const standardItem = new QStandardItem(markerList.at(i).geoUrl());
-                standardItem->setData(QVariant::fromValue<WMWGeoCoordinate>(markerList.at(i)), RoleCoordinates);
-                standardItem->setData(QVariant::fromValue(treeItem), RoleMyData);
-
-                d->specialMarkersModel->appendRow(standardItem);
-            }
-
-            if (cmdLineArgs->isSet("demopoints_group"))
-            {
-                QStandardItem* const standardItem = new QStandardItem(markerList.at(i).geoUrl());
-                standardItem->setData(QVariant::fromValue<WMWGeoCoordinate>(markerList.at(i)), RoleCoordinates);
-                standardItem->setData(QVariant::fromValue(treeItem), RoleMyData);
-
-                d->displayMarkersModel->appendRow(standardItem);
-            }
         }
     }
 }
@@ -400,66 +370,11 @@ void MainWindow::slotImageLoadingBunchReady()
         const MyImageData& currentInfo = d->imageLoadingBuncher.at(i);
 
         // add the item to the tree widget:
-        QTreeWidgetItem* const treeItem = new QTreeWidgetItem();
-        treeItem->setText(0, currentInfo.url.fileName());
-        treeItem->setText(1, currentInfo.coordinates.geoUrl());
-
+        QTreeWidgetItem* const treeItem = new MyImageItem(currentInfo.url, currentInfo.coordinates);
         d->treeWidget->addTopLevelItem(treeItem);
-
-        QStandardItem* const standardItem = new QStandardItem(currentInfo.url.fileName());
-        standardItem->setData(QVariant::fromValue(currentInfo.coordinates), RoleCoordinates);
-        standardItem->setData(QVariant::fromValue(treeItem), RoleMyData);
-
-        if (d->cmdLineArgs->isSet("single"))
-        {
-            d->specialMarkersModel->appendRow(standardItem);
-        }
-        else
-        {
-            d->displayMarkersModel->appendRow(standardItem);
-            QPersistentModelIndex itemIndex = d->displayMarkersModel->indexFromItem(standardItem);
-            treeItem->setData(0, RoleMyData, QVariant::fromValue(itemIndex));
-        }
     }
 
     d->imageLoadingBuncher.clear();
-}
-
-void MainWindow::slotSpecialMarkersDataChanged(const QModelIndex& topLeft, const QModelIndex& bottomRight)
-{
-    const int startRow = topLeft.row();
-    const int endRow = bottomRight.row();
-    kDebug()<<startRow<<endRow;
-
-    // only update the views at this point:
-    for (int row = startRow; row<=endRow; ++row)
-    {
-        const QModelIndex currentIndex = d->specialMarkersModel->index(row, 0, topLeft.parent());
-        const WMWGeoCoordinate newCoordinates = d->specialMarkersModel->data(currentIndex, RoleCoordinates).value<WMWGeoCoordinate>();
-        QTreeWidgetItem* const treeItem = d->specialMarkersModel->data(currentIndex, RoleMyData).value<QTreeWidgetItem*>();
-        if (!treeItem)
-            continue;
-
-        treeItem->setText(1, newCoordinates.geoUrl());
-    }
-}
-
-void MainWindow::slotDisplayMarkersDataChanged(const QModelIndex& topLeft, const QModelIndex& bottomRight)
-{
-    const int startRow = topLeft.row();
-    const int endRow = bottomRight.row();
-
-    // only update the views at this point:
-    for (int row = startRow; row<=endRow; ++row)
-    {
-        const QModelIndex currentIndex = d->displayMarkersModel->index(row, 0, topLeft.parent());
-        const WMWGeoCoordinate newCoordinates = d->displayMarkersModel->data(currentIndex, RoleCoordinates).value<WMWGeoCoordinate>();
-        QTreeWidgetItem* const treeItem = d->displayMarkersModel->data(currentIndex, RoleMyData).value<QTreeWidgetItem*>();
-        if (!treeItem)
-            continue;
-
-        treeItem->setText(1, newCoordinates.geoUrl());
-    }
 }
 
 void MainWindow::slotMarkersMoved(const QList<QPersistentModelIndex>& markerIndices)
@@ -500,19 +415,6 @@ void MainWindow::slotAltitudeLookupReady(const WMWAltitudeLookup::List& altitude
     }
 }
 
-void MainWindow::slotTreeWidgetSelectionChanged()
-{
-    for (int i=0; i<d->treeWidget->topLevelItemCount(); ++i)
-    {
-        QTreeWidgetItem* const treeItem = d->treeWidget->topLevelItem(i);
-        const QPersistentModelIndex itemIndex = treeItem->data(0, RoleMyData).value<QPersistentModelIndex>();
-        if (!itemIndex.isValid())
-            continue;
-
-        d->selectionModel->select(itemIndex, treeItem->isSelected() ? QItemSelectionModel::Select : QItemSelectionModel::Deselect);
-    }
-}
-
 void MainWindow::slotAddImages()
 {
     const KUrl::List fileNames = KFileDialog::getOpenUrls(d->lastImageOpenDir, QString("*.jpg|*.jpeg|*.png"), this, i18n("Add image files"));
@@ -537,45 +439,3 @@ void MainWindow::createMenus()
     menuBar()->addMenu(helpMenu());
 }
 
-void MainWindow::slotSelectionChanged(const QItemSelection& selected, const QItemSelection& deselected)
-{
-    kDebug()<<selected<<deselected;
-
-    for (int i=0; i<selected.count(); ++i)
-    {
-        const QItemSelectionRange selectionRange = selected.at(i);
-        for (int row = selectionRange.top(); row<=selectionRange.bottom(); ++row)
-        {
-            const QModelIndex currentIndex = d->displayMarkersModel->index(row, 0, selectionRange.parent());
-
-            QTreeWidgetItem* const treeItem = d->displayMarkersModel->data(currentIndex, RoleMyData).value<QTreeWidgetItem*>();
-            WMW2_ASSERT(treeItem!=0);
-            if (!treeItem)
-                continue;
-
-            if (!treeItem->isSelected())
-            {
-                treeItem->setSelected(true);
-            }
-        }
-    }
-
-    for (int i=0; i<deselected.count(); ++i)
-    {
-        const QItemSelectionRange selectionRange = deselected.at(i);
-        for (int row = selectionRange.top(); row<=selectionRange.bottom(); ++row)
-        {
-            const QModelIndex currentIndex = d->displayMarkersModel->index(row, 0, selectionRange.parent());
-
-            QTreeWidgetItem* const treeItem = d->displayMarkersModel->data(currentIndex, RoleMyData).value<QTreeWidgetItem*>();
-            WMW2_ASSERT(treeItem!=0);
-            if (!treeItem)
-                continue;
-
-            if (treeItem->isSelected())
-            {
-                treeItem->setSelected(false);
-            }
-        }
-    }
-}

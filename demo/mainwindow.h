@@ -3,7 +3,7 @@
  * Date        : 2009-12-01
  * Description : main-window of the demo application
  *
-* Copyright (C) 2009 by Michael G. Hansen <mike at mghansen dot de>
+ * Copyright (C) 2009 by Michael G. Hansen <mike at mghansen dot de>
  *
  * This program is free software; you can redistribute it
  * and/or modify it under the terms of the GNU General
@@ -57,13 +57,9 @@ protected:
 private Q_SLOTS:
     void slotFutureResultsReadyAt(int startIndex, int endIndex);
     void slotImageLoadingBunchReady();
-    void slotSpecialMarkersDataChanged(const QModelIndex& topLeft, const QModelIndex& bottomRight);
-    void slotDisplayMarkersDataChanged(const QModelIndex& topLeft, const QModelIndex& bottomRight);
     void slotMarkersMoved(const QList<QPersistentModelIndex>& markerIndices);
     void slotAltitudeLookupReady(const WMW2::WMWAltitudeLookup::List& altitudes);
-    void slotTreeWidgetSelectionChanged();
     void slotAddImages();
-    void slotSelectionChanged(const QItemSelection& selected, const QItemSelection& deselected);
 
 private:
     MainWindowPrivate* const d;

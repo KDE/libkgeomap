@@ -304,21 +304,6 @@ public:
     typedef QList<WMWAltitudeLookup> List;
 };
 
-class WORLDMAPWIDGET2_EXPORT WMWDragData : public QMimeData
-{
-Q_OBJECT
-
-public:
-    WMWDragData();
-
-    //! Total number of items in the drag, in case there are items which are not yet in the model
-    int itemCount;
-    QList<QPersistentModelIndex> itemIndices;
-    bool haveDragPixmap;
-
-    // TODO: find a way to retrieve the items which are not yet in the model
-};
-
 } /* WMW2 */
 
 inline QDebug operator<<(QDebug debugOut, const WMW2::WMWGeoCoordinate& coordinate)

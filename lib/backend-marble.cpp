@@ -947,27 +947,27 @@ bool BackendMarble::eventFilter(QObject *object, QEvent *event)
     return QObject::eventFilter(object, event);
 }
 
-void BackendMarble::updateDragDropMarker(const QPoint& pos, const WMWDragData* const dragData)
-{
-    if (!dragData)
-    {
-        d->dragDropMarkerCount = 0;
-    }
-    else
-    {
-        d->dragDropMarkerPos = pos;
-        d->dragDropMarkerCount = dragData->itemCount;
-    }
-    d->marbleWidget->update();
-
-    // TODO: hide dragged markers on the map
-}
-
-void BackendMarble::updateDragDropMarkerPosition(const QPoint& pos)
-{
-    d->dragDropMarkerPos = pos;
-    d->marbleWidget->update();
-}
+// void BackendMarble::updateDragDropMarker(const QPoint& pos, const WMWDragData* const dragData)
+// {
+//     if (!dragData)
+//     {
+//         d->dragDropMarkerCount = 0;
+//     }
+//     else
+//     {
+//         d->dragDropMarkerPos = pos;
+//         d->dragDropMarkerCount = dragData->itemCount;
+//     }
+//     d->marbleWidget->update();
+// 
+//     // TODO: hide dragged markers on the map
+// }
+// 
+// void BackendMarble::updateDragDropMarkerPosition(const QPoint& pos)
+// {
+//     d->dragDropMarkerPos = pos;
+//     d->marbleWidget->update();
+// }
 
 void BackendMarble::updateActionAvailability()
 {

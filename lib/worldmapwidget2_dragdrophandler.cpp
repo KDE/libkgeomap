@@ -1,7 +1,7 @@
 /* ============================================================
  *
- * Date        : 2010-03-06
- * Description : sub class of QTreeWidget for drag-and-drop support
+ * Date        : 2010-03-18
+ * Description : Drag-and-drop handler for WorldMapWidget2
  *
  * Copyright (C) 2010 by Michael G. Hansen <mike at mghansen dot de>
  *
@@ -17,40 +17,26 @@
  *
  * ============================================================ */
 
-#ifndef MYTREEWIDGET_H
-#define MYTREEWIDGET_H
+#include "worldmapwidget2_dragdrophandler.moc"
 
 // Qt includes
 
-#include <QTreeWidget>
-#include <QPersistentModelIndex>
+#include <QAbstractItemModel>
 
 // local includes
 
-#include "myimageitem.h"
+#include "worldmapwidget2_primitives.h"
+#include "worldmapwidget2_export.h"
 
-class MyTreeWidgetPrivate;
-class QMouseEvent;
+namespace WMW2 {
 
-Q_DECLARE_METATYPE(QTreeWidgetItem*)
-
-class MyTreeWidget : public QTreeWidget
+DragDropHandler::DragDropHandler(QObject* const parent)
+: QObject(parent)
 {
-Q_OBJECT
+}
 
-public:
-    MyTreeWidget(QWidget* const parent = 0);
-    ~MyTreeWidget();
+DragDropHandler::~DragDropHandler()
+{
+}
 
-protected:
-//     void mousePressEvent(QMouseEvent* event);
-//     void mouseMoveEvent(QMouseEvent* event);
-    void startDrag(Qt::DropActions supportedActions);
-    virtual QMimeData* mimeData(const QModelIndexList items) const;
-
-private:
-    MyTreeWidgetPrivate* const d;
-};
-
-#endif /* MYTREEWIDGET_H */
-
+} /* WMW2 */

@@ -50,6 +50,7 @@
 // #include "backend-osm.h"
 #include "markermodel.h"
 #include "backend-altitude-geonames.h"
+#include "worldmapwidget2_dragdrophandler.h"
 
 namespace WMW2 {
 
@@ -87,7 +88,8 @@ public:
       controlWidget(0),
       lazyReclusteringRequested(false),
       clustersDirty(false),
-      editModeAvailable(false)
+      editModeAvailable(false),
+      dragDropHandler(0)
     {
     }
 
@@ -115,6 +117,8 @@ public:
     bool lazyReclusteringRequested;
     bool clustersDirty;
     bool editModeAvailable;
+
+    DragDropHandler* dragDropHandler;
 };
 
 WorldMapWidget2::WorldMapWidget2(QWidget* const parent)
@@ -1122,7 +1126,7 @@ void WorldMapWidget2::setDisplayMarkersModel(QAbstractItemModel* const displayMa
     s->markerModel->setMarkerModel(displayMarkersModel, coordinatesRole);
     s->markerModel->setSelectionModel(selectionModel);
 
-    slotClustersNeedUpdating();
+    slotRequestLazyReclustering();
 }
 
 void WorldMapWidget2::slotGroupModeChanged(QAction* triggeredAction)
@@ -1130,7 +1134,7 @@ void WorldMapWidget2::slotGroupModeChanged(QAction* triggeredAction)
     Q_UNUSED(triggeredAction);
     s->inEditMode = d->actionEditMode->isChecked();
 
-    slotClustersNeedUpdating();
+    slotRequestLazyReclustering();
 }
 
 /**
@@ -1185,7 +1189,7 @@ void WorldMapWidget2::slotClustersClicked(const QIntList& clusterIndices)
                 kDebug()<<k<<currentMarkers.at(k)<<doSelect;
                 if (selectionModel->isSelected(currentMarkers.at(k))!=doSelect)
                 {
-                    selectionModel->select(currentMarkers.at(k), doSelect ? QItemSelectionModel::Select : QItemSelectionModel::Deselect);
+                    selectionModel->select(currentMarkers.at(k), (doSelect ? QItemSelectionModel::Select : QItemSelectionModel::Deselect) | QItemSelectionModel::Rows);
                 }
             }
         }
@@ -1194,46 +1198,60 @@ void WorldMapWidget2::slotClustersClicked(const QIntList& clusterIndices)
 
 void WorldMapWidget2::dragEnterEvent(QDragEnterEvent* event)
 {
-    const WMWDragData* const dragData = qobject_cast<const WMWDragData*>(event->mimeData());
-    if (!dragData)
+    if (!d->dragDropHandler)
+        event->ignore();
+
+    if (d->dragDropHandler->accepts(event)==Qt::IgnoreAction)
+    {
+        event->ignore();
         return;
+    }
 
-    if (!dragData->haveDragPixmap)
-        d->currentBackend->updateDragDropMarker(event->pos(), dragData);
-
+    // TODO: need data about the dragged object: #markers, selected, icon, ...
     event->accept();
+
+//     if (!dragData->haveDragPixmap)
+//         d->currentBackend->updateDragDropMarker(event->pos(), dragData);
+    
 }
 
 void WorldMapWidget2::dragMoveEvent(QDragMoveEvent* event)
 {
-    const WMWDragData* const dragData = qobject_cast<const WMWDragData*>(event->mimeData());
-    if (!dragData)
-        return;
-
-    if (!dragData->haveDragPixmap)
-        d->currentBackend->updateDragDropMarkerPosition(event->pos());
+    // TODO: update the position of the drag marker if it is to be shown
+//     if (!dragData->haveDragPixmap)
+//         d->currentBackend->updateDragDropMarkerPosition(event->pos());
 }
 
 void WorldMapWidget2::dropEvent(QDropEvent* event)
 {
-    const WMWDragData* const dragData = qobject_cast<const WMWDragData*>(event->mimeData());
-    if (!dragData)
-        return;
+    // remove the drag marker:
+//     d->currentBackend->updateDragDropMarker(QPoint(), 0);
 
-    event->acceptProposedAction();
-
-    // remove the marker:
-    d->currentBackend->updateDragDropMarker(QPoint(), 0);
+    if (!d->dragDropHandler)
+    {
+        event->ignore();
+    }
 
     WMWGeoCoordinate dropCoordinates;
     if (!d->currentBackend->geoCoordinates(event->pos(), &dropCoordinates))
         return;
 
-    for (int i=0; i<dragData->itemIndices.count(); ++i)
+    QList<QPersistentModelIndex> droppedIndices;
+    if (d->dragDropHandler->dropEvent(event, dropCoordinates, &droppedIndices))
     {
-        s->markerModel->moveMarker(dragData->itemIndices.at(i), dropCoordinates);
+        event->acceptProposedAction();
+
+        if (!droppedIndices.isEmpty())
+        {
+            emit(signalDisplayMarkersMoved(droppedIndices));
+        }
     }
-    emit(signalDisplayMarkersMoved(dragData->itemIndices));
+    // TODO: the drag-and-drop handler should do this now!
+//     for (int i=0; i<dragData->itemIndices.count(); ++i)
+//     {
+//         s->markerModel->moveMarker(dragData->itemIndices.at(i), dropCoordinates);
+//     }
+    
 }
 
 void WorldMapWidget2::dragLeaveEvent(QDragLeaveEvent* event)
@@ -1241,7 +1259,7 @@ void WorldMapWidget2::dragLeaveEvent(QDragLeaveEvent* event)
     Q_UNUSED(event);
 
     // remove the marker:
-    d->currentBackend->updateDragDropMarker(QPoint(), 0);
+//     d->currentBackend->updateDragDropMarker(QPoint(), 0);
 }
 
 void WorldMapWidget2::markClustersAsDirty()
@@ -1260,6 +1278,11 @@ void WorldMapWidget2::setEditModeAvailable(const bool state)
         kDebug()<<"Warning: changing the edit mode availability after creating the control widget does not hide the buttons!";
     }
     d->editModeAvailable = state;
+}
+
+void WorldMapWidget2::setDragDropHandler(DragDropHandler* const dragDropHandler)
+{
+    d->dragDropHandler = dragDropHandler;
 }
 
 } /* WMW2 */

@@ -1,7 +1,7 @@
 /* ============================================================
  *
- * Date        : 2010-03-06
- * Description : sub class of QTreeWidget for drag-and-drop support
+ * Date        : 2010-03-20
+ * Description : sub class of QTreeWidgetItem to represent the images
  *
  * Copyright (C) 2010 by Michael G. Hansen <mike at mghansen dot de>
  *
@@ -17,40 +17,34 @@
  *
  * ============================================================ */
 
-#ifndef MYTREEWIDGET_H
-#define MYTREEWIDGET_H
+#ifndef MYIMAGEITEM_H
+#define MYIMAGEITEM_H
 
 // Qt includes
 
-#include <QTreeWidget>
+#include <QTreeWidgetItem>
 #include <QPersistentModelIndex>
 
-// local includes
+#include <worldmapwidget2/worldmapwidget2_primitives.h>
 
-#include "myimageitem.h"
+const int RoleMyData = Qt::UserRole+0;
+const int RoleCoordinates = Qt::UserRole+1;
 
-class MyTreeWidgetPrivate;
-class QMouseEvent;
+Q_DECLARE_METATYPE(QPersistentModelIndex)
 
-Q_DECLARE_METATYPE(QTreeWidgetItem*)
-
-class MyTreeWidget : public QTreeWidget
+class MyImageItem : public QTreeWidgetItem
 {
-Q_OBJECT
-
 public:
-    MyTreeWidget(QWidget* const parent = 0);
-    ~MyTreeWidget();
+    MyImageItem(const KUrl& url, const WMW2::WMWGeoCoordinate& itemCoordinates);
+    virtual ~MyImageItem();
 
-protected:
-//     void mousePressEvent(QMouseEvent* event);
-//     void mouseMoveEvent(QMouseEvent* event);
-    void startDrag(Qt::DropActions supportedActions);
-    virtual QMimeData* mimeData(const QModelIndexList items) const;
+    virtual QVariant data(int column, int role) const;
+    virtual void setData(int column, int role, const QVariant& value);
 
 private:
-    MyTreeWidgetPrivate* const d;
+    WMW2::WMWGeoCoordinate coordinates;
+    KUrl imageUrl;
 };
 
-#endif /* MYTREEWIDGET_H */
+#endif /* MYIMAGEITEM_H */
 
