@@ -85,6 +85,7 @@ public:
       actionBrowseMode(0),
       actionEditMode(0),
       actionGroupMode(0),
+      browseModeControlsHolder(0),
       controlWidget(0),
       lazyReclusteringRequested(false),
       clustersDirty(false),
@@ -112,6 +113,7 @@ public:
     KAction* actionBrowseMode;
     KAction* actionEditMode;
     QActionGroup* actionGroupMode;
+    QWidget* browseModeControlsHolder;
     QPointer<QWidget> controlWidget;
 
     bool lazyReclusteringRequested;
@@ -459,7 +461,6 @@ KAction* WorldMapWidget2::getControlAction(const QString& actionName)
 
 /**
  * @brief Returns the control widget.
- * If you want to disable the edit mode, call setEditModeAvailable before calling this function!
  */
 QWidget* WorldMapWidget2::getControlWidget()
 {
@@ -479,19 +480,21 @@ QWidget* WorldMapWidget2::getControlWidget()
         QToolButton* const zoomOutButton = new QToolButton(d->controlWidget);
         zoomOutButton->setDefaultAction(d->actionZoomOut);
 
-        if (d->editModeAvailable)
-        {
-            QFrame* const hLine1 = new QFrame(d->controlWidget);
-            hLine1->setFrameShape(QFrame::VLine);
-            hLine1->setFrameShadow(QFrame::Sunken);
+        // browse mode controls:
+        d->browseModeControlsHolder = new KHBox(d->controlWidget);
+        d->browseModeControlsHolder->setVisible(d->editModeAvailable);
 
-            QToolButton* const browseModeButton = new QToolButton(d->controlWidget);
-            browseModeButton->setDefaultAction(d->actionBrowseMode);
+        QFrame* const hLine1 = new QFrame(d->browseModeControlsHolder);
+        hLine1->setFrameShape(QFrame::VLine);
+        hLine1->setFrameShadow(QFrame::Sunken);
 
-            QToolButton* const editModeButton = new QToolButton(d->controlWidget);
-            editModeButton->setDefaultAction(d->actionEditMode);
-        }
+        QToolButton* const browseModeButton = new QToolButton(d->browseModeControlsHolder);
+        browseModeButton->setDefaultAction(d->actionBrowseMode);
 
+        QToolButton* const editModeButton = new QToolButton(d->browseModeControlsHolder);
+        editModeButton->setDefaultAction(d->actionEditMode);
+
+        // add stretch after the controls:
         QHBoxLayout* const hBoxLayout = reinterpret_cast<QHBoxLayout*>(d->controlWidget->layout());
         if (hBoxLayout)
         {
@@ -1269,15 +1272,15 @@ void WorldMapWidget2::markClustersAsDirty()
 
 /**
  * @brief Controls whether the user can switch from browse to edit mode.
- * Note that you have to call this function before calling getControlWidget!
  */
 void WorldMapWidget2::setEditModeAvailable(const bool state)
 {
-    if (d->controlWidget)
-    {
-        kDebug()<<"Warning: changing the edit mode availability after creating the control widget does not hide the buttons!";
-    }
     d->editModeAvailable = state;
+
+    if (d->browseModeControlsHolder)
+    {
+        d->browseModeControlsHolder->setVisible(d->editModeAvailable);
+    }
 }
 
 void WorldMapWidget2::setDragDropHandler(DragDropHandler* const dragDropHandler)
