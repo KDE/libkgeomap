@@ -129,6 +129,9 @@ QIntList MarkerModel::coordinateToTileIndex(const WMWGeoCoordinate& coordinate, 
 {
     WMW2_ASSERT(level<=maxLevel());
 
+    if (!coordinate.hasCoordinates())
+        return QIntList();
+
     qreal tileLatBL = -90.0;
     qreal tileLonBL = -180.0;
     qreal tileLatHeight = 180.0;
@@ -145,8 +148,8 @@ QIntList MarkerModel::coordinateToTileIndex(const WMWGeoCoordinate& coordinate, 
         const qreal dLat = tileLatHeight / latDivisor;
         const qreal dLon = tileLonWidth / lonDivisor;
 
-        int latIndex = int( (coordinate.lat - tileLatBL ) / dLat );
-        int lonIndex = int( (coordinate.lon - tileLonBL ) / dLon );
+        int latIndex = int( (coordinate.lat() - tileLatBL ) / dLat );
+        int lonIndex = int( (coordinate.lon() - tileLonBL ) / dLon );
 
         // protect against invalid indices due to rounding errors
         bool haveRoundingErrors = false;
@@ -225,7 +228,9 @@ void MarkerModel::addMarkerIndexToGrid(const QPersistentModelIndex& markerIndex)
     }
 
     const WMWGeoCoordinate markerCoordinates = markerIndex.data(d->coordinatesRole).value<WMWGeoCoordinate>();
-    
+    if (!markerCoordinates.hasCoordinates())
+        return;
+
     const QIntList tileIndex = coordinateToTileIndex(markerCoordinates, maxLevel());
     WMW2_ASSERT(tileIndex.count()==maxIndexCount());
 
@@ -574,8 +579,8 @@ MarkerModel::NonEmptyIterator::NonEmptyIterator(MarkerModel* const model, const 
     for (int i=0; i<normalizedMapBounds.count(); ++i)
     {
         WMWGeoCoordinate::Pair currentBounds = normalizedMapBounds.at(i);
-        WMW2_ASSERT(currentBounds.first.lat<currentBounds.second.lat);
-        WMW2_ASSERT(currentBounds.first.lon<currentBounds.second.lon);
+        WMW2_ASSERT(currentBounds.first.lat()<currentBounds.second.lat());
+        WMW2_ASSERT(currentBounds.first.lon()<currentBounds.second.lon());
 
         const QIntList startIndex = d->model->coordinateToTileIndex(currentBounds.first, d->level);
         const QIntList endIndex = d->model->coordinateToTileIndex(currentBounds.second, d->level);

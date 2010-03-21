@@ -151,10 +151,10 @@ WMWGeoCoordinate::PairList WMWHelperNormalizeBounds(const WMWGeoCoordinate::Pair
 {
     WMWGeoCoordinate::PairList boundsList;
 
-    const qreal bWest = boundsPair.first.lon;
-    const qreal bEast = boundsPair.second.lon;
-    const qreal bNorth = boundsPair.second.lat;
-    const qreal bSouth = boundsPair.first.lat;
+    const qreal bWest = boundsPair.first.lon();
+    const qreal bEast = boundsPair.second.lon();
+    const qreal bNorth = boundsPair.second.lat();
+    const qreal bSouth = boundsPair.first.lat();
 //     kDebug()<<bWest<<bEast<<bNorth<<bSouth;
 
     if (bEast<bWest)

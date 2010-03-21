@@ -73,6 +73,16 @@ class WORLDMAPWIDGET2_EXPORT  WMWGeoCoordinate
 {
 public:
 
+    enum HasFlag {
+        HasNothing = 0,
+        HasLatitude = 1,
+        HasLongitude = 2,
+        HasCoordinates = 3,
+        HasAltitude = 4
+    };
+
+    Q_DECLARE_FLAGS(HasFlags, HasFlag)
+
     typedef QList<WMWGeoCoordinate> List;
     typedef QPair<WMWGeoCoordinate, WMWGeoCoordinate> Pair;
     typedef QList<WMWGeoCoordinate::Pair> PairList;
@@ -82,52 +92,76 @@ public:
     }
 
     WMWGeoCoordinate()
-    : lat(0.0),
-      lon(0.0),
-      alt(0.0),
-      hasAlt(false)
+    : m_lat(0.0),
+      m_lon(0.0),
+      m_alt(0.0),
+      m_hasFlags(HasNothing)
     {
     }
 
     WMWGeoCoordinate(const double inLat, const double inLon)
-    : lat(inLat),
-      lon(inLon),
-      alt(0.0),
-      hasAlt(false)
+    : m_lat(inLat),
+      m_lon(inLon),
+      m_alt(0.0),
+      m_hasFlags(HasCoordinates)
     {
     }
 
     WMWGeoCoordinate(const double inLat, const double inLon, const double inAlt)
-    : lat(inLat),
-      lon(inLon),
-      alt(inAlt),
-      hasAlt(true)
+    : m_lat(inLat),
+      m_lon(inLon),
+      m_alt(inAlt),
+      m_hasFlags(HasCoordinates|HasAltitude)
     {
     }
-    
-    double lat;
-    double lon;
-    double alt;
-    bool hasAlt;
+
+    double lat() const { return m_lat; }
+    double lon() const { return m_lon; }
+    double alt() const { return m_alt; }
+
+    bool hasCoordinates() const { return m_hasFlags.testFlag(HasCoordinates); }
+    bool hasLatitude() const { return m_hasFlags.testFlag(HasLatitude); }
+    bool hasLongitude() const { return m_hasFlags.testFlag(HasLongitude); }
+
+    void setLatLon(const double inLat, const double inLon)
+    {
+        m_lat = inLat;
+        m_lon = inLon;
+        m_hasFlags|=HasCoordinates;
+    }
+
+    bool hasAltitude() const { return m_hasFlags.testFlag(HasAltitude); }
+
+    HasFlags hasFlags() const { return m_hasFlags; }
 
     void setAlt(const double inAlt)
     {
-        hasAlt = true;
-        alt = inAlt;
+        m_hasFlags|=HasAltitude;
+        m_alt = inAlt;
     }
 
     void clearAlt()
     {
-        hasAlt = false;
+        m_hasFlags&=~HasAltitude;
     }
 
-    QString altString() const { return QString::number(alt, 'g', 12); }
-    QString latString() const { return QString::number(lat, 'g', 12); }
-    QString lonString() const { return QString::number(lon, 'g', 12); }
+    void clear()
+    {
+        m_hasFlags = HasNothing;
+    }
+
+    QString altString() const { return m_hasFlags.testFlag(HasAltitude) ? QString::number(m_alt, 'g', 12) : QString(); }
+    QString latString() const { return m_hasFlags.testFlag(HasLatitude) ? QString::number(m_lat, 'g', 12) : QString(); }
+    QString lonString() const { return m_hasFlags.testFlag(HasLongitude) ? QString::number(m_lon, 'g', 12) : QString(); }
 
     QString geoUrl() const
     {
-        if (hasAlt)
+        if (!hasCoordinates())
+        {
+            return QString();
+        }
+
+        if (m_hasFlags.testFlag(HasAltitude))
         {
             return QString::fromLatin1("geo:%1,%2,%3").arg(latString()).arg(lonString()).arg(altString());
         }
@@ -139,7 +173,7 @@ public:
 
     bool sameLonLatAs(const WMWGeoCoordinate& other) const
     {
-        return (lat==other.lat)&&(lon==other.lon);
+        return m_hasFlags.testFlag(HasCoordinates)&&other.m_hasFlags.testFlag(HasCoordinates)&&(m_lat==other.m_lat)&&(m_lon==other.m_lon);
     }
 
     static WMWGeoCoordinate fromGeoUrl(const QString& url, bool* const parsedOkay = 0)
@@ -196,6 +230,12 @@ public:
                 *parsedOkay = true;
         return position;
     }
+
+private:
+    double m_lat;
+    double m_lon;
+    double m_alt;
+    HasFlags m_hasFlags;
 };
 
 typedef QList<int> QIntList;
@@ -284,6 +324,8 @@ public:
 
 } /* WMW2 */
 
+Q_DECLARE_OPERATORS_FOR_FLAGS(WMW2::WMWGeoCoordinate::HasFlags)
+
 namespace WMW2
 {
 
@@ -315,10 +357,14 @@ inline QDebug operator<<(QDebug debugOut, const WMW2::WMWGeoCoordinate& coordina
 inline bool operator==(const WMW2::WMWGeoCoordinate& a, const WMW2::WMWGeoCoordinate& b)
 {
     return
-        ( a.lat == b.lat ) &&
-        ( a.lon == b.lon ) &&
-        ( a.hasAlt == b.hasAlt ) &&
-        ( a.hasAlt ? ( a.alt == b.alt ) : true );
+        ( a.hasCoordinates() == b.hasCoordinates() ) &&
+        ( a.hasCoordinates() ?
+            ( ( a.lat() == b.lat() ) &&
+              ( a.lon() == b.lon() )
+            ) : true
+        ) &&
+        ( a.hasAltitude() == b.hasAltitude() ) &&
+        ( a.hasAltitude() ? ( a.alt() == b.alt() ) : true );
 }
 
 Q_DECLARE_METATYPE(WMW2::WMWGeoCoordinate)

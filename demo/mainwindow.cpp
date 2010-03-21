@@ -270,8 +270,7 @@ MyImageData LoadImageData(const KUrl& urlToLoad)
     double lat, lon, alt;
     if (exiv2Iface.getGPSInfo(alt, lat, lon))
     {
-        imageData.coordinates.lat = lat;
-        imageData.coordinates.lon = lon;
+        imageData.coordinates.setLatLon(lat, lon);
         imageData.coordinates.setAlt(alt);
     }
 

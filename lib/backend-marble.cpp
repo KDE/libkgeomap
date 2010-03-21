@@ -164,8 +164,8 @@ WMWGeoCoordinate BackendMarble::getCenter() const
 
 void BackendMarble::setCenter(const WMWGeoCoordinate& coordinate)
 {
-    d->marbleWidget->setCenterLatitude(coordinate.lat);
-    d->marbleWidget->setCenterLongitude(coordinate.lon);
+    d->marbleWidget->setCenterLatitude(coordinate.lat());
+    d->marbleWidget->setCenterLongitude(coordinate.lon());
 }
 
 bool BackendMarble::isReady() const
@@ -355,8 +355,11 @@ bool BackendMarble::screenCoordinates(const WMWGeoCoordinate& coordinates, QPoin
     if (!d->marbleWidget)
         return false;
 
+    if (!coordinates.hasCoordinates())
+        return false;
+
     qreal x, y;
-    const bool isVisible = d->marbleWidget->screenCoordinates(coordinates.lon, coordinates.lat, x, y);
+    const bool isVisible = d->marbleWidget->screenCoordinates(coordinates.lon(), coordinates.lat(), x, y);
     if (!isVisible)
         return false;
 

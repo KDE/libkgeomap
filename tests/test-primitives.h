@@ -36,6 +36,7 @@ class TestPrimitives : public QObject
 
 private Q_SLOTS:
     void testNoOp();
+    void testWMWGeoCoordinates();
     void testParseLatLonString();
     void testParseXYStringToPoint();
     void testParseBoundsString();

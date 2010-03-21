@@ -25,6 +25,21 @@ void TestPrimitives::testNoOp()
 {
 }
 
+void TestPrimitives::testWMWGeoCoordinates()
+{
+    WMWGeoCoordinate coord1(52.0, 6.0);
+    QVERIFY(coord1.hasCoordinates());
+    QCOMPARE(coord1.geoUrl(), QString("geo:52,6"));
+
+    WMWGeoCoordinate coord2(52.0, 6.0);
+    WMWGeoCoordinate coord3(53.0, 6.0);
+    QVERIFY(coord1==coord2);
+    QVERIFY(!(coord1==coord3));
+
+    WMWGeoCoordinate coord4 = WMWGeoCoordinate(52.0, 6.0);
+    QVERIFY(coord1==coord4);
+}
+
 void TestPrimitives::testParseLatLonString()
 {
     // make sure there is no crash on null-pointer
