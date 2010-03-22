@@ -1202,7 +1202,10 @@ void WorldMapWidget2::slotClustersClicked(const QIntList& clusterIndices)
 void WorldMapWidget2::dragEnterEvent(QDragEnterEvent* event)
 {
     if (!d->dragDropHandler)
+    {
         event->ignore();
+        return;
+    }
 
     if (d->dragDropHandler->accepts(event)==Qt::IgnoreAction)
     {
@@ -1233,6 +1236,7 @@ void WorldMapWidget2::dropEvent(QDropEvent* event)
     if (!d->dragDropHandler)
     {
         event->ignore();
+        return;
     }
 
     WMWGeoCoordinate dropCoordinates;
