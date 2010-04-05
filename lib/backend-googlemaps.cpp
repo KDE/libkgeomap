@@ -21,6 +21,7 @@
 
 // Qt includes
 
+#include <QBuffer>
 #include <QActionGroup>
 #include <QMenu>
 #include <QPointer>
@@ -543,6 +544,19 @@ void BackendGoogleMaps::updateClusters()
                 .arg(currentCluster.markerCount)
                 .arg(currentCluster.markerSelectedCount)
             );
+
+        // now set the cluster pixmap:
+        if (s->representativeChooser)
+        {
+            // TODO: sortkey
+            const QVariant representativeMarker = s->worldMapWidget->getClusterRepresentativeMarker(currentIndex, 0);
+            QPixmap clusterPixmap = s->representativeChooser->pixmapFromRepresentativeIndex(representativeMarker, QSize(30, 30));
+
+            if (!clusterPixmap.isNull())
+            {
+                setClusterPixmap(currentIndex,  clusterPixmap);
+            }
+        }
     }
     kDebug()<<"end updateclusters";
 }
@@ -772,6 +786,48 @@ void BackendGoogleMaps::updateZoomMinMaxCache()
     // TODO: these functions seem to cause problems, the map is not fully updated after a few calls
 //     d->cacheMaxZoom = d->htmlWidget->runScript("wmwGetMaxZoom();").toInt();
 //     d->cacheMinZoom = d->htmlWidget->runScript("wmwGetMinZoom();").toInt();
+}
+
+void BackendGoogleMaps::slotThumbnailAvailableForIndex(const QVariant& index, const QPixmap& pixmap)
+{
+    kDebug()<<index<<pixmap.size();
+    if (pixmap.isNull())
+        return;
+
+    // TODO: properly reject pixmaps with the wrong size
+    if ((pixmap.size().height()!=30)&&(pixmap.size().width()!=30))
+        return;
+
+    // find the cluster which is represented by this index:
+    for (int i=0; i<s->clusterList.count(); ++i)
+    {
+        // TODO: use the right sortkey
+        // TODO: let the representativeChooser handle the index comparison
+        const QVariant representativeMarker = s->worldMapWidget->getClusterRepresentativeMarker(i, 0);
+        kDebug()<<i;
+        if (s->representativeChooser->indicesEqual(index, representativeMarker))
+        {
+            kDebug()<<1<<i;
+            setClusterPixmap(i, pixmap);
+            break;
+        }
+    }
+    
+}
+
+void BackendGoogleMaps::setClusterPixmap(const int clusterId, const QPixmap& clusterPixmap)
+{
+    QByteArray bytes;
+    QBuffer buffer(&bytes);
+    buffer.open(QIODevice::WriteOnly);
+    clusterPixmap.save(&buffer, "PNG");
+
+    // http://www.faqs.org/rfcs/rfc2397.html
+    const QString imageData = QString("data:image/png;base64,%1").arg(QString::fromAscii(bytes.toBase64()));
+    d->htmlWidget->runScript(QString("wmwSetClusterPixmap(%1,'%2');")
+                    .arg(clusterId)
+                    .arg(imageData)
+                );
 }
 
 } /* WMW2 */

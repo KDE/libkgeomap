@@ -84,6 +84,7 @@ public:
 
 public Q_SLOTS:
     virtual void slotClustersNeedUpdating() = 0;
+    virtual void slotThumbnailAvailableForIndex(const QVariant& index, const QPixmap& pixmap);
 
 Q_SIGNALS:
     void signalBackendReady(const QString& backendName);

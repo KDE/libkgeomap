@@ -40,5 +40,9 @@ MapBackend::~MapBackend()
     delete d;
 }
 
+void MapBackend::slotThumbnailAvailableForIndex(const QVariant& index, const QPixmap& pixmap)
+{
+}
+
 } /* WMW2 */
 

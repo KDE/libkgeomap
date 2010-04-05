@@ -210,6 +210,9 @@ function wmwGetPixmapName(markerCount, markerSelectedCount)
     }
     return colorCode;
 }
+function wmwSetClusterPixmap(id, pixmapurl) {
+    clusterList[id].setIcon(pixmapurl);
+}
 function wmwAddCluster(id, lat, lon, setDraggable, markerCount, markerSelectedCount) {
     var latlng = new google.maps.LatLng(lat, lon);
     var clusterIcon;

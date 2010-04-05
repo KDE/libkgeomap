@@ -79,9 +79,11 @@ public:
 
 public Q_SLOTS:
     virtual void slotClustersNeedUpdating();
+    virtual void slotThumbnailAvailableForIndex(const QVariant& index, const QPixmap& pixmap);
 
 protected:
     void createActions();
+    void setClusterPixmap(const int clusterId, const QPixmap& clusterPixmap);
 
 private Q_SLOTS:
     void slotHTMLInitialized();

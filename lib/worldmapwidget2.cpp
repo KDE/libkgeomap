@@ -267,6 +267,13 @@ bool WorldMapWidget2::setBackend(const QString& backendName)
 
         disconnect(d->currentBackend, SIGNAL(signalSpecialMarkersMoved(const QList<QPersistentModelIndex>&)),
                     this, SIGNAL(signalSpecialMarkersMoved(const QList<QPersistentModelIndex>&)));
+
+        if (s->representativeChooser)
+        {
+            disconnect(s->representativeChooser, SIGNAL(signalThumbnailAvailableForIndex(const QVariant&, const QPixmap&)),
+                        d->currentBackend, SLOT(slotThumbnailAvailableForIndex(const QVariant&, const QPixmap&)));
+        }
+
     }
 
     MapBackend* backend;
@@ -293,6 +300,12 @@ bool WorldMapWidget2::setBackend(const QString& backendName)
 
             connect(d->currentBackend, SIGNAL(signalSpecialMarkersMoved(const QList<QPersistentModelIndex>&)),
                     this, SIGNAL(signalSpecialMarkersMoved(const QList<QPersistentModelIndex>&)));
+
+            if (s->representativeChooser)
+            {
+                connect(s->representativeChooser, SIGNAL(signalThumbnailAvailableForIndex(const QVariant&, const QPixmap&)),
+                        d->currentBackend, SLOT(slotThumbnailAvailableForIndex(const QVariant&, const QPixmap&)));
+            }
 
             // call this slot manually in case the backend was ready right away:
             if (d->currentBackend->isReady())
@@ -1318,6 +1331,11 @@ QVariant WorldMapWidget2::getClusterRepresentativeMarker(const int clusterIndex,
 void WorldMapWidget2::setRepresentativeChooser(WMWRepresentativeChooser* const chooser)
 {
     s->representativeChooser = chooser;
+    if (d->currentBackend&&chooser)
+    {
+        connect(s->representativeChooser, SIGNAL(signalThumbnailAvailableForIndex(const QVariant&, const QPixmap&)),
+                d->currentBackend, SLOT(slotThumbnailAvailableForIndex(const QVariant&, const QPixmap&)));
+    }
 }
 
 } /* WMW2 */

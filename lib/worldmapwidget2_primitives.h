@@ -288,6 +288,10 @@ public:
 
     virtual QPixmap pixmapFromRepresentativeIndex(const QVariant& index, const QSize& size) = 0;
     virtual QVariant bestRepresentativeIndexFromList(const QList<QVariant>& list, const int sortKey) = 0;
+    virtual bool indicesEqual(const QVariant& indexA, const QVariant& indexB) = 0;
+
+Q_SIGNALS:
+    void signalThumbnailAvailableForIndex(const QVariant& index, const QPixmap& pixmap);
 };
 
 class WMWSharedData : public QSharedData
