@@ -1292,5 +1292,33 @@ void WorldMapWidget2::setDragDropHandler(DragDropHandler* const dragDropHandler)
     d->dragDropHandler = dragDropHandler;
 }
 
+QVariant WorldMapWidget2::getClusterRepresentativeMarker(const int clusterIndex, const int sortKey)
+{
+    if (!s->representativeChooser)
+        return QVariant();
+
+    const WMWCluster cluster = s->clusterList.at(clusterIndex);
+    QMap<int, QVariant>::const_iterator it = cluster.representativeMarkers.find(sortKey);
+    if (it!=cluster.representativeMarkers.end())
+        return *it;
+
+    QList<QVariant> repIndices;
+    for (int i=0; i<cluster.tileIndicesList.count(); ++i)
+    {
+        repIndices <<  s->markerModel->getTileRepresentativeMarker(cluster.tileIndicesList.at(i), sortKey);
+    }
+
+    const QVariant clusterRepresentative = s->representativeChooser->bestRepresentativeIndexFromList(repIndices, sortKey);
+
+    s->clusterList[clusterIndex].representativeMarkers[sortKey] = clusterRepresentative;
+
+    return clusterRepresentative;
+}
+
+void WorldMapWidget2::setRepresentativeChooser(WMWRepresentativeChooser* const chooser)
+{
+    s->representativeChooser = chooser;
+}
+
 } /* WMW2 */
 

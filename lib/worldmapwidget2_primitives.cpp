@@ -170,4 +170,13 @@ WMWGeoCoordinate::PairList WMWHelperNormalizeBounds(const WMWGeoCoordinate::Pair
     return boundsList;
 }
 
+WMWRepresentativeChooser::WMWRepresentativeChooser(QObject* const parent)
+: QObject(parent)
+{
+}
+
+WMWRepresentativeChooser::~WMWRepresentativeChooser()
+{
+}
+
 } /* WMW2 */

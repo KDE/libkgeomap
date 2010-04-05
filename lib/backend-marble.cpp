@@ -501,6 +501,15 @@ void BackendMarble::marbleCustomPaint(Marble::GeoPainter* painter)
             else
             {
 
+                // do we have a pixmap to display for this cluster?
+                QPixmap clusterPixmap;
+                if (s->representativeChooser)
+                {
+                    // TODO: sortkey
+                    const QVariant representativeMarker = s->worldMapWidget->getClusterRepresentativeMarker(i, 0);
+                    clusterPixmap = s->representativeChooser->pixmapFromRepresentativeIndex(representativeMarker, QSize(2*circleRadius, 2*circleRadius));
+                }
+                
                 QPen circlePen;
                 circlePen.setColor(strokeColor);
                 circlePen.setStyle(strokeStyle);
@@ -511,9 +520,17 @@ void BackendMarble::marbleCustomPaint(Marble::GeoPainter* painter)
 
                 const QRect circleRect(clusterPoint.x()-circleRadius, clusterPoint.y()-circleRadius, 2*circleRadius, 2*circleRadius);
 
-                painter->setPen(circlePen);
-                painter->setBrush(circleBrush);
-                painter->drawEllipse(circleRect);
+                if (!clusterPixmap.isNull())
+                {
+                    const QSize cpSize = clusterPixmap.size();
+                    painter->drawPixmap(clusterPoint.x()-cpSize.width()/2, clusterPoint.y()-cpSize.height()/2, clusterPixmap);
+                }
+                else
+                {
+                    painter->setPen(circlePen);
+                    painter->setBrush(circleBrush);
+                    painter->drawEllipse(circleRect);
+                }
 
                 painter->setPen(labelPen);
                 painter->setBrush(Qt::NoBrush);

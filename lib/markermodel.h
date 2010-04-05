@@ -149,6 +149,7 @@ public:
     int getTileMarkerCount(const QIntList& tileIndex);
     int getTileSelectedCount(const QIntList& tileIndex);
     QList<QPersistentModelIndex> getTileMarkerIndices(const QIntList& tileIndex);
+    QVariant getTileRepresentativeMarker(const QIntList& tileIndex, const int sortKey);
     WMWSelectionState getTileSelectedState(const QIntList& tileIndex);
     int maxLevel() const;
     int maxIndexCount() const;

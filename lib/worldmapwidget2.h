@@ -87,6 +87,8 @@ public:
 
     void setEditModeAvailable(const bool state);
     void setDragDropHandler(DragDropHandler* const dragDropHandler);
+    QVariant getClusterRepresentativeMarker(const int clusterIndex, const int sortKey);
+    void setRepresentativeChooser(WMWRepresentativeChooser* const chooser);
 
 public Q_SLOTS:
     void slotZoomIn();

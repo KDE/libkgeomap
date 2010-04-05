@@ -1039,5 +1039,15 @@ QItemSelectionModel* MarkerModel::getSelectionModel() const
     return d->selectionModel;
 }
 
+QVariant MarkerModel::getTileRepresentativeMarker(const QIntList& tileIndex, const int sortKey)
+{
+    // TODO: actually return the result of some sorting and cache it in the tile
+    const QList<QPersistentModelIndex> modelIndices = getTileMarkerIndices(tileIndex);
+    if (modelIndices.isEmpty())
+        return QVariant();
+
+    return QVariant::fromValue(modelIndices.first());
+}
+
 } /* WMW2 */
 

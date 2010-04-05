@@ -24,6 +24,7 @@
 
 #include <QAbstractItemModel>
 #include <QMimeData>
+#include <QPersistentModelIndex>
 #include <QPixmap>
 #include <QPoint>
 #include <QSharedData>
@@ -46,6 +47,8 @@
 #endif /* WMW2_HAVE_VALGRIND */
 
 #define WMW2_ASSERT(cond) ((!(cond)) ? WMW2::WMW2_assert(#cond,__FILE__,__LINE__) : qt_noop())
+
+Q_DECLARE_METATYPE(QPersistentModelIndex)
 
 namespace WMW2 {
 
@@ -259,7 +262,8 @@ public:
       markerSelectedCount(0),
       coordinates(),
       pixelPos(),
-      selectedState(WMWSelectedNone)
+      selectedState(WMWSelectedNone),
+      representativeMarkers()
     {
     }
 
@@ -269,10 +273,22 @@ public:
     WMWGeoCoordinate coordinates;
     QPoint pixelPos;
     WMWSelectionState selectedState;
+    QMap<int, QVariant> representativeMarkers;
 };
 
 class MarkerModel;
 class WorldMapWidget2;
+
+class WORLDMAPWIDGET2_EXPORT WMWRepresentativeChooser : public QObject
+{
+Q_OBJECT
+public:
+    WMWRepresentativeChooser(QObject* const parent = 0);
+    virtual ~WMWRepresentativeChooser();
+
+    virtual QPixmap pixmapFromRepresentativeIndex(const QVariant& index, const QSize& size) = 0;
+    virtual QVariant bestRepresentativeIndexFromList(const QList<QVariant>& list, const int sortKey) = 0;
+};
 
 class WMWSharedData : public QSharedData
 {
@@ -290,7 +306,8 @@ public:
       inEditMode(false),
       haveMovingCluster(false),
       markerPixmap(),
-      markerPixmaps()
+      markerPixmaps(),
+      representativeChooser(0)
     {
         QStringList markerColors;
         markerColors << "00ff00" << "00ffff" << "ff0000" << "ff7f00" << "ffff00";
@@ -320,6 +337,7 @@ public:
     bool haveMovingCluster;
     QPixmap markerPixmap;
     QMap<QString, QPixmap> markerPixmaps;
+    WMWRepresentativeChooser* representativeChooser;
 };
 
 } /* WMW2 */
