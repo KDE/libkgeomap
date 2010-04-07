@@ -342,6 +342,9 @@ public:
     QPixmap markerPixmap;
     QMap<QString, QPixmap> markerPixmaps;
     WMWRepresentativeChooser* representativeChooser;
+    bool previewSingleImages;
+    bool previewGroupedImages;
+    bool showNumbersOnImages;
 };
 
 } /* WMW2 */

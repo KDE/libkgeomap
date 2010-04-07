@@ -115,6 +115,9 @@ public:
     QActionGroup* actionGroupMode;
     QWidget* browseModeControlsHolder;
     QPointer<QWidget> controlWidget;
+    KAction* actionPreviewSingleImages;
+    KAction* actionPreviewGroupedImages;
+    KAction* actionShowNumbersOnImages;
 
     bool lazyReclusteringRequested;
     bool clustersDirty;
@@ -193,8 +196,24 @@ void WorldMapWidget2::createActions()
             this, SLOT(slotChangeBackend(QAction*)));
 
     createActionsForBackendSelection();
-    
+
     d->configurationMenu = new QMenu(this);
+
+    d->actionPreviewSingleImages = new KAction(i18n("Preview single images"), this);
+    d->actionPreviewSingleImages->setCheckable(true);
+    d->actionPreviewGroupedImages = new KAction(i18n("Preview grouped images"), this);
+    d->actionPreviewGroupedImages->setCheckable(true);
+    d->actionShowNumbersOnImages = new KAction(i18n("Show numbers"), this);
+    d->actionShowNumbersOnImages->setCheckable(true);
+
+    connect(d->actionPreviewSingleImages, SIGNAL(changed()),
+            this, SLOT(slotImageDisplaySettingsChanged()));
+
+    connect(d->actionPreviewGroupedImages, SIGNAL(changed()),
+            this, SLOT(slotImageDisplaySettingsChanged()));
+
+    connect(d->actionShowNumbersOnImages, SIGNAL(changed()),
+            this, SLOT(slotImageDisplaySettingsChanged()));
 }
 
 void WorldMapWidget2::createActionsForBackendSelection()
@@ -455,6 +474,13 @@ void WorldMapWidget2::rebuildConfigurationMenu()
     {
         d->currentBackend->addActionsToConfigurationMenu(d->configurationMenu);
     }
+
+    if (!s->inEditMode)
+    {
+        d->configurationMenu->addAction(d->actionPreviewSingleImages);
+        d->configurationMenu->addAction(d->actionPreviewGroupedImages);
+        d->configurationMenu->addAction(d->actionShowNumbersOnImages);
+    }
 }
 
 KAction* WorldMapWidget2::getControlAction(const QString& actionName)
@@ -539,7 +565,6 @@ void WorldMapWidget2::slotZoomOut()
 
 void WorldMapWidget2::slotUpdateActionsEnabled()
 {
-    
 }
 
 void WorldMapWidget2::slotChangeBackend(QAction* action)
@@ -1336,6 +1361,18 @@ void WorldMapWidget2::setRepresentativeChooser(WMWRepresentativeChooser* const c
         connect(s->representativeChooser, SIGNAL(signalThumbnailAvailableForIndex(const QVariant&, const QPixmap&)),
                 d->currentBackend, SLOT(slotThumbnailAvailableForIndex(const QVariant&, const QPixmap&)));
     }
+}
+
+void WorldMapWidget2::slotImageDisplaySettingsChanged()
+{
+    s->previewSingleImages = d->actionPreviewSingleImages->isChecked();
+    s->previewGroupedImages = d->actionPreviewGroupedImages->isChecked();
+    s->showNumbersOnImages = d->actionShowNumbersOnImages->isChecked();
+
+    // TODO: update action availability?
+
+    // TODO: we just need to update the display, no need to recluster?
+    slotRequestLazyReclustering();
 }
 
 } /* WMW2 */

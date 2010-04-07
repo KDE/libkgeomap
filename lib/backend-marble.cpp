@@ -500,14 +500,29 @@ void BackendMarble::marbleCustomPaint(Marble::GeoPainter* painter)
             }
             else
             {
+                // should we try to display a pixmap for this cluster?
+                bool displayPixmap = s->representativeChooser != 0;
+                if (displayPixmap)
+                {
+                    if (markerCountOverride==1)
+                    {
+                        displayPixmap = s->previewSingleImages;
+                    }
+                    else
+                    {
+                        displayPixmap = s->previewGroupedImages;
+                    }
+                }
 
                 // do we have a pixmap to display for this cluster?
                 QPixmap clusterPixmap;
-                if (s->representativeChooser)
+                if (displayPixmap)
                 {
                     // TODO: sortkey
                     const QVariant representativeMarker = s->worldMapWidget->getClusterRepresentativeMarker(i, 0);
                     clusterPixmap = s->representativeChooser->pixmapFromRepresentativeIndex(representativeMarker, QSize(2*circleRadius, 2*circleRadius));
+
+                    displayPixmap = !clusterPixmap.isNull();
                 }
                 
                 QPen circlePen;
@@ -520,7 +535,7 @@ void BackendMarble::marbleCustomPaint(Marble::GeoPainter* painter)
 
                 const QRect circleRect(clusterPoint.x()-circleRadius, clusterPoint.y()-circleRadius, 2*circleRadius, 2*circleRadius);
 
-                if (!clusterPixmap.isNull())
+                if (displayPixmap)
                 {
                     const QSize cpSize = clusterPixmap.size();
                     painter->drawPixmap(clusterPoint.x()-cpSize.width()/2, clusterPoint.y()-cpSize.height()/2, clusterPixmap);
@@ -532,9 +547,12 @@ void BackendMarble::marbleCustomPaint(Marble::GeoPainter* painter)
                     painter->drawEllipse(circleRect);
                 }
 
-                painter->setPen(labelPen);
-                painter->setBrush(Qt::NoBrush);
-                painter->drawText(circleRect, Qt::AlignHCenter|Qt::AlignVCenter, labelText);
+                if (s->showNumbersOnImages || !displayPixmap)
+                {
+                    painter->setPen(labelPen);
+                    painter->setBrush(Qt::NoBrush);
+                    painter->drawText(circleRect, Qt::AlignHCenter|Qt::AlignVCenter, labelText);
+                }
             }
         }
     }
