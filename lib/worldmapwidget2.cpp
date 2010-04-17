@@ -115,9 +115,9 @@ public:
     QActionGroup* actionGroupMode;
     QWidget* browseModeControlsHolder;
     QPointer<QWidget> controlWidget;
-    KAction* actionPreviewSingleImages;
-    KAction* actionPreviewGroupedImages;
-    KAction* actionShowNumbersOnImages;
+    KAction* actionPreviewSingleItems;
+    KAction* actionPreviewGroupedItems;
+    KAction* actionShowNumbersOnItems;
 
     bool lazyReclusteringRequested;
     bool clustersDirty;
@@ -199,21 +199,24 @@ void WorldMapWidget2::createActions()
 
     d->configurationMenu = new QMenu(this);
 
-    d->actionPreviewSingleImages = new KAction(i18n("Preview single images"), this);
-    d->actionPreviewSingleImages->setCheckable(true);
-    d->actionPreviewGroupedImages = new KAction(i18n("Preview grouped images"), this);
-    d->actionPreviewGroupedImages->setCheckable(true);
-    d->actionShowNumbersOnImages = new KAction(i18n("Show numbers"), this);
-    d->actionShowNumbersOnImages->setCheckable(true);
+    d->actionPreviewSingleItems = new KAction(i18n("Preview single items"), this);
+    d->actionPreviewSingleItems->setCheckable(true);
+    d->actionPreviewSingleItems->setChecked(true);
+    d->actionPreviewGroupedItems = new KAction(i18n("Preview grouped items"), this);
+    d->actionPreviewGroupedItems->setCheckable(true);
+    d->actionPreviewGroupedItems->setChecked(true);
+    d->actionShowNumbersOnItems = new KAction(i18n("Show numbers"), this);
+    d->actionShowNumbersOnItems->setCheckable(true);
+    d->actionShowNumbersOnItems->setChecked(true);
 
-    connect(d->actionPreviewSingleImages, SIGNAL(changed()),
-            this, SLOT(slotImageDisplaySettingsChanged()));
+    connect(d->actionPreviewSingleItems, SIGNAL(changed()),
+            this, SLOT(slotItemDisplaySettingsChanged()));
 
-    connect(d->actionPreviewGroupedImages, SIGNAL(changed()),
-            this, SLOT(slotImageDisplaySettingsChanged()));
+    connect(d->actionPreviewGroupedItems, SIGNAL(changed()),
+            this, SLOT(slotItemDisplaySettingsChanged()));
 
-    connect(d->actionShowNumbersOnImages, SIGNAL(changed()),
-            this, SLOT(slotImageDisplaySettingsChanged()));
+    connect(d->actionShowNumbersOnItems, SIGNAL(changed()),
+            this, SLOT(slotItemDisplaySettingsChanged()));
 }
 
 void WorldMapWidget2::createActionsForBackendSelection()
@@ -424,6 +427,9 @@ void WorldMapWidget2::saveSettingsToGroup(KConfigGroup* const group)
     }
     group->writeEntry("Center", getCenter().geoUrl());
     group->writeEntry("Zoom", getZoom());
+    group->writeEntry("Preview Single Items", s->previewSingleItems);
+    group->writeEntry("Preview Grouped Items", s->previewGroupedItems);
+    group->writeEntry("Show numbers on items", s->showNumbersOnItems);
 
     for (int i=0; i<d->loadedBackends.size(); ++i)
     {
@@ -446,6 +452,10 @@ void WorldMapWidget2::readSettingsFromGroup(const KConfigGroup* const group)
     const WMWGeoCoordinate centerCoordinate = WMWGeoCoordinate::fromGeoUrl(centerGeoUrl, &centerGeoUrlValid);
     setCenter(centerGeoUrlValid ? centerCoordinate : centerDefault);
     setZoom(group->readEntry("Zoom", d->cacheZoom));
+
+    d->actionPreviewSingleItems->setChecked(group->readEntry("Preview Single Items", true));
+    d->actionPreviewGroupedItems->setChecked(group->readEntry("Preview Grouped Items", true));
+    d->actionShowNumbersOnItems->setChecked(group->readEntry("Show numbers on items", true));
 
     for (int i=0; i<d->loadedBackends.size(); ++i)
     {
@@ -477,9 +487,9 @@ void WorldMapWidget2::rebuildConfigurationMenu()
 
     if (!s->inEditMode)
     {
-        d->configurationMenu->addAction(d->actionPreviewSingleImages);
-        d->configurationMenu->addAction(d->actionPreviewGroupedImages);
-        d->configurationMenu->addAction(d->actionShowNumbersOnImages);
+        d->configurationMenu->addAction(d->actionPreviewSingleItems);
+        d->configurationMenu->addAction(d->actionPreviewGroupedItems);
+        d->configurationMenu->addAction(d->actionShowNumbersOnItems);
     }
 }
 
@@ -1363,11 +1373,11 @@ void WorldMapWidget2::setRepresentativeChooser(WMWRepresentativeChooser* const c
     }
 }
 
-void WorldMapWidget2::slotImageDisplaySettingsChanged()
+void WorldMapWidget2::slotItemDisplaySettingsChanged()
 {
-    s->previewSingleImages = d->actionPreviewSingleImages->isChecked();
-    s->previewGroupedImages = d->actionPreviewGroupedImages->isChecked();
-    s->showNumbersOnImages = d->actionShowNumbersOnImages->isChecked();
+    s->previewSingleItems = d->actionPreviewSingleItems->isChecked();
+    s->previewGroupedItems = d->actionPreviewGroupedItems->isChecked();
+    s->showNumbersOnItems = d->actionShowNumbersOnItems->isChecked();
 
     // TODO: update action availability?
 

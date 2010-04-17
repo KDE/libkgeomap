@@ -311,7 +311,10 @@ public:
       haveMovingCluster(false),
       markerPixmap(),
       markerPixmaps(),
-      representativeChooser(0)
+      representativeChooser(0),
+      previewSingleItems(true),
+      previewGroupedItems(true),
+      showNumbersOnItems(true)
     {
         QStringList markerColors;
         markerColors << "00ff00" << "00ffff" << "ff0000" << "ff7f00" << "ffff00";
@@ -342,9 +345,9 @@ public:
     QPixmap markerPixmap;
     QMap<QString, QPixmap> markerPixmaps;
     WMWRepresentativeChooser* representativeChooser;
-    bool previewSingleImages;
-    bool previewGroupedImages;
-    bool showNumbersOnImages;
+    bool previewSingleItems;
+    bool previewGroupedItems;
+    bool showNumbersOnItems;
 };
 
 } /* WMW2 */

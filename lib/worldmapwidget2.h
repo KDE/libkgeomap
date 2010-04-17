@@ -121,7 +121,7 @@ protected Q_SLOTS:
     void slotGroupModeChanged(QAction* triggeredAction);
     void slotRequestLazyReclustering();
     void slotLazyReclusteringRequestCallBack();
-    void slotImageDisplaySettingsChanged();
+    void slotItemDisplaySettingsChanged();
 
 private:
     const QExplicitlySharedDataPointer<WMWSharedData> s;

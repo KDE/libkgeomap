@@ -506,11 +506,11 @@ void BackendMarble::marbleCustomPaint(Marble::GeoPainter* painter)
                 {
                     if (markerCountOverride==1)
                     {
-                        displayPixmap = s->previewSingleImages;
+                        displayPixmap = s->previewSingleItems;
                     }
                     else
                     {
-                        displayPixmap = s->previewGroupedImages;
+                        displayPixmap = s->previewGroupedItems;
                     }
                 }
 
@@ -547,7 +547,7 @@ void BackendMarble::marbleCustomPaint(Marble::GeoPainter* painter)
                     painter->drawEllipse(circleRect);
                 }
 
-                if (s->showNumbersOnImages || !displayPixmap)
+                if (s->showNumbersOnItems || !displayPixmap)
                 {
                     painter->setPen(labelPen);
                     painter->setBrush(Qt::NoBrush);
