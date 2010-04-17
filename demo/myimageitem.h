@@ -30,8 +30,6 @@
 const int RoleMyData = Qt::UserRole+0;
 const int RoleCoordinates = Qt::UserRole+1;
 
-Q_DECLARE_METATYPE(QPersistentModelIndex)
-
 class MyImageItem : public QTreeWidgetItem
 {
 public:
