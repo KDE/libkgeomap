@@ -151,7 +151,7 @@ MainWindow::MainWindow(KCmdLineArgs* const cmdLineArgs, QWidget* const parent)
             this, SLOT(slotAltitudeLookupReady(const WMW2::WMWAltitudeLookup::List&)));
 
     connect(d->mapWidget, SIGNAL(signalDisplayMarkersMoved(const QList<QPersistentModelIndex>&)),
-            this, SLOT(slotMarkersMoved(const QList<QPersistentModelIndex>&)));
+            this, SLOT(slotMarkersMoved(const QList<QPersistentModelIndex>&, const WMW2::WMWGeoCoordinate&)));
 
 //     d->mapWidget->resize(d->mapWidget->width(), 200);
     d->splitter->addWidget(d->mapWidget);
@@ -376,7 +376,7 @@ void MainWindow::slotImageLoadingBunchReady()
     d->imageLoadingBuncher.clear();
 }
 
-void MainWindow::slotMarkersMoved(const QList<QPersistentModelIndex>& markerIndices)
+void MainWindow::slotMarkersMoved(const QList<QPersistentModelIndex>& markerIndices, const WMW2::WMWGeoCoordinate& coordinates)
 {
     // prepare altitude lookups
     WMWAltitudeLookup::List altitudeQueries;

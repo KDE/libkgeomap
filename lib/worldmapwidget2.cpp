@@ -90,7 +90,8 @@ public:
       lazyReclusteringRequested(false),
       clustersDirty(false),
       editModeAvailable(false),
-      dragDropHandler(0)
+      dragDropHandler(0),
+      doUpdateMarkerCoordinatesInModel(true)
     {
     }
 
@@ -124,6 +125,7 @@ public:
     bool editModeAvailable;
 
     DragDropHandler* dragDropHandler;
+    bool doUpdateMarkerCoordinatesInModel;
 };
 
 WorldMapWidget2::WorldMapWidget2(QWidget* const parent)
@@ -1131,17 +1133,20 @@ void WorldMapWidget2::slotClustersMoved(const QIntList& clusterIndices)
             movedMarkers << selectedIndices.at(i);
         }
     }
-
-    // update the positions of the markers:
-    for (int i=0; i<movedMarkers.count(); ++i)
+    
+    if (d->doUpdateMarkerCoordinatesInModel)
     {
-        s->markerModel->moveMarker(movedMarkers.at(i), targetCoordinates);
+        // update the positions of the markers:
+        for (int i=0; i<movedMarkers.count(); ++i)
+        {
+            s->markerModel->moveMarker(movedMarkers.at(i), targetCoordinates);
+        }
     }
 
 //     kDebug()<<markerIndices;
     if (!movedMarkers.isEmpty())
     {
-        emit(signalDisplayMarkersMoved(movedMarkers));
+        emit(signalDisplayMarkersMoved(movedMarkers, targetCoordinates));
     }
 
     // TODO: clusters are marked as dirty by slotClustersNeedUpdating which is called
@@ -1298,7 +1303,7 @@ void WorldMapWidget2::dropEvent(QDropEvent* event)
 
         if (!droppedIndices.isEmpty())
         {
-            emit(signalDisplayMarkersMoved(droppedIndices));
+            emit(signalDisplayMarkersMoved(droppedIndices, dropCoordinates));
         }
     }
     // TODO: the drag-and-drop handler should do this now!
@@ -1383,6 +1388,11 @@ void WorldMapWidget2::slotItemDisplaySettingsChanged()
 
     // TODO: we just need to update the display, no need to recluster?
     slotRequestLazyReclustering();
+}
+
+void WorldMapWidget2::setDoUpdateMarkerCoordinatesInModel(const bool doIt)
+{
+    d->doUpdateMarkerCoordinatesInModel = doIt;
 }
 
 } /* WMW2 */

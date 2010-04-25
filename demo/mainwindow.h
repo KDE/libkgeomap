@@ -57,7 +57,7 @@ protected:
 private Q_SLOTS:
     void slotFutureResultsReadyAt(int startIndex, int endIndex);
     void slotImageLoadingBunchReady();
-    void slotMarkersMoved(const QList<QPersistentModelIndex>& markerIndices);
+    void slotMarkersMoved(const QList<QPersistentModelIndex>& markerIndices, const WMW2::WMWGeoCoordinate& coordinates);
     void slotAltitudeLookupReady(const WMW2::WMWAltitudeLookup::List& altitudes);
     void slotAddImages();
 

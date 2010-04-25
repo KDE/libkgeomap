@@ -89,6 +89,7 @@ public:
     void setDragDropHandler(DragDropHandler* const dragDropHandler);
     QVariant getClusterRepresentativeMarker(const int clusterIndex, const int sortKey);
     void setRepresentativeChooser(WMWRepresentativeChooser* const chooser);
+    void setDoUpdateMarkerCoordinatesInModel(const bool doIt);
 
 public Q_SLOTS:
     void slotZoomIn();
@@ -98,7 +99,7 @@ public Q_SLOTS:
 
 Q_SIGNALS:
     void signalAltitudeLookupReady(const WMW2::WMWAltitudeLookup::List& altitudes);
-    void signalDisplayMarkersMoved(const QList<QPersistentModelIndex>& indices);
+    void signalDisplayMarkersMoved(const QList<QPersistentModelIndex>& indices, const WMW2::WMWGeoCoordinate& coordinates);
     void signalSpecialMarkersMoved(const QList<QPersistentModelIndex>& indices);
 
 protected:
