@@ -540,13 +540,13 @@ void BackendGoogleMaps::updateClusters()
                 .arg(currentIndex)
                 .arg(currentCluster.coordinates.latString())
                 .arg(currentCluster.coordinates.lonString())
-                .arg(true?"true":"false")
+                .arg(s->inEditMode?"true":"false")
                 .arg(currentCluster.markerCount)
                 .arg(currentCluster.markerSelectedCount)
             );
 
         // now set the cluster pixmap:
-        if (s->representativeChooser)
+        if (s->representativeChooser&&!s->inEditMode)
         {
             // TODO: sortkey
             const QVariant representativeMarker = s->worldMapWidget->getClusterRepresentativeMarker(currentIndex, 0);
