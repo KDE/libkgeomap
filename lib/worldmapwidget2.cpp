@@ -1134,7 +1134,7 @@ void WorldMapWidget2::slotClustersMoved(const QIntList& clusterIndices)
             QModelIndex movedMarker = selectedIndices.at(i);
             if (movedMarker.column()==0)
             {
-                movedMarkers << selectedIndices.at(i);
+                movedMarkers << movedMarker;
             }
         }
     }
