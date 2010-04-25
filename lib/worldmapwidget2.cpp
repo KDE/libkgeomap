@@ -29,6 +29,7 @@
 #include <QDropEvent>
 #include <QItemSelectionModel>
 #include <QMenu>
+#include <QPainter>
 #include <QPointer>
 #include <QStackedLayout>
 #include <QTimer>
@@ -628,7 +629,7 @@ void WorldMapWidget2::updateClusters()
     d->clustersDirty = false;
 
     // constants for clusters
-    const int ClusterRadius          = s->inEditMode ? 3 : 15;
+    const int ClusterRadius          = s->groupingRadius;
     const QSize ClusterDefaultSize   = QSize(2*ClusterRadius, 2*ClusterRadius);
     const int ClusterGridSizeScreen  = 4*ClusterRadius;
     const QSize ClusterMaxPixmapSize = QSize(ClusterGridSizeScreen, ClusterGridSizeScreen);
@@ -886,7 +887,7 @@ void WorldMapWidget2::slotClustersNeedUpdating()
  * @param clusterIndex Index of the cluster
  * @param fillColor Color used to fill the circle
  * @param strokeColor Color used for the stroke around the circle
- * @param strokeStyle Style used to draw the stroke around the crircle
+ * @param strokeStyle Style used to draw the stroke around the circle
  * @param labelText Text for the label
  * @param labelColor Color for the label text
  * @param overrideSelection Get the colors for a different selection state
@@ -1204,6 +1205,7 @@ void WorldMapWidget2::slotGroupModeChanged(QAction* triggeredAction)
 {
     Q_UNUSED(triggeredAction);
     s->inEditMode = d->actionEditMode->isChecked();
+    s->groupingRadius = s->inEditMode ? 3 : 20;
 
     slotRequestLazyReclustering();
 }
@@ -1423,6 +1425,34 @@ void WorldMapWidget2::setSortKey(const int sortKey)
 
     // this is probably faster than writing a function that changes all the clusters icons...
     slotRequestLazyReclustering();
+}
+
+QPixmap WorldMapWidget2::decoratePixmap(const int clusterId, const QPixmap& clusterPixmap)
+{
+    // determine the colors:
+    QColor       fillColor;
+    QColor       strokeColor;
+    Qt::PenStyle strokeStyle;
+    QColor       labelColor;
+    QString      labelText;
+    getColorInfos(clusterId, &fillColor, &strokeColor,
+                        &strokeStyle, &labelText, &labelColor);
+
+    QPixmap resultPixmap(clusterPixmap.size()+QSize(2,2));
+    QPainter painter(&resultPixmap);
+
+    // TODO: how do we pre-paint the dotted lines?
+    // for now, just use solid lines
+    // we would need a backgroud color for the dotted lines
+    painter.drawPixmap(QPoint(1,1), clusterPixmap);
+    QPen circlePen;
+    circlePen.setColor(strokeColor);
+    circlePen.setStyle(Qt::SolidLine);//strokeStyle);
+    circlePen.setWidth(1);
+    painter.setPen(circlePen);
+    painter.drawRect(0, 0, resultPixmap.size().width()-1, resultPixmap.size().height()-1);
+
+    return resultPixmap;
 }
 
 } /* WMW2 */

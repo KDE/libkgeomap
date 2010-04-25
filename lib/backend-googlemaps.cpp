@@ -24,6 +24,7 @@
 #include <QBuffer>
 #include <QActionGroup>
 #include <QMenu>
+#include <QPainter>
 #include <QPointer>
 
 // KDE includes
@@ -550,7 +551,7 @@ void BackendGoogleMaps::updateClusters()
         {
             // TODO: sortkey
             const QVariant representativeMarker = s->worldMapWidget->getClusterRepresentativeMarker(currentIndex, s->sortKey);
-            QPixmap clusterPixmap = s->representativeChooser->pixmapFromRepresentativeIndex(representativeMarker, QSize(30, 30));
+            QPixmap clusterPixmap = s->representativeChooser->pixmapFromRepresentativeIndex(representativeMarker, QSize(2*s->groupingRadius-2, 2*s->groupingRadius-2));
 
             if (!clusterPixmap.isNull())
             {
@@ -817,10 +818,13 @@ void BackendGoogleMaps::slotThumbnailAvailableForIndex(const QVariant& index, co
 
 void BackendGoogleMaps::setClusterPixmap(const int clusterId, const QPixmap& clusterPixmap)
 {
+    // decorate the pixmap:
+    const QPixmap styledPixmap = s->worldMapWidget->decoratePixmap(clusterId, clusterPixmap);
+
     QByteArray bytes;
     QBuffer buffer(&bytes);
     buffer.open(QIODevice::WriteOnly);
-    clusterPixmap.save(&buffer, "PNG");
+    styledPixmap.save(&buffer, "PNG");
 
     // http://www.faqs.org/rfcs/rfc2397.html
     const QString imageData = QString("data:image/png;base64,%1").arg(QString::fromAscii(bytes.toBase64()));

@@ -413,7 +413,8 @@ void BackendMarble::marbleCustomPaint(Marble::GeoPainter* painter)
 
     QPen circlePen(Qt::green);
     QBrush circleBrush(Qt::blue);
-    const int circleRadius = 15;
+    // TODO: use global radius instead, but check the code here first
+    const int circleRadius = 15; // s->groupingRadius;
 
     if (s->specialMarkersModel)
     {
@@ -520,9 +521,13 @@ void BackendMarble::marbleCustomPaint(Marble::GeoPainter* painter)
                 {
                     // TODO: sortkey
                     const QVariant representativeMarker = s->worldMapWidget->getClusterRepresentativeMarker(i, s->sortKey);
-                    clusterPixmap = s->representativeChooser->pixmapFromRepresentativeIndex(representativeMarker, QSize(2*circleRadius, 2*circleRadius));
+                    clusterPixmap = s->representativeChooser->pixmapFromRepresentativeIndex(representativeMarker, QSize(2*circleRadius-2, 2*circleRadius-2));
 
                     displayPixmap = !clusterPixmap.isNull();
+                    if (displayPixmap)
+                    {
+                        clusterPixmap = s->worldMapWidget->decoratePixmap(i, clusterPixmap);
+                    }
                 }
                 
                 QPen circlePen;
