@@ -36,6 +36,7 @@ class KConfigGroup;
 class QItemSelectionModel;
 class QDragEnterEvent;
 class QDropEvent;
+class QMenu;
 
 namespace WMW2 {
 
@@ -90,6 +91,9 @@ public:
     QVariant getClusterRepresentativeMarker(const int clusterIndex, const int sortKey);
     void setRepresentativeChooser(WMWRepresentativeChooser* const chooser);
     void setDoUpdateMarkerCoordinatesInModel(const bool doIt);
+
+    void setSortOptionsMenu(QMenu* const sortMenu);
+    void setSortKey(const int sortKey);
 
 public Q_SLOTS:
     void slotZoomIn();

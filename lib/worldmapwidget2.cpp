@@ -91,7 +91,8 @@ public:
       clustersDirty(false),
       editModeAvailable(false),
       dragDropHandler(0),
-      doUpdateMarkerCoordinatesInModel(true)
+      doUpdateMarkerCoordinatesInModel(true),
+      sortMenu(0)
     {
     }
 
@@ -126,6 +127,8 @@ public:
 
     DragDropHandler* dragDropHandler;
     bool doUpdateMarkerCoordinatesInModel;
+
+    QMenu *sortMenu;
 };
 
 WorldMapWidget2::WorldMapWidget2(QWidget* const parent)
@@ -489,6 +492,13 @@ void WorldMapWidget2::rebuildConfigurationMenu()
 
     if (!s->inEditMode)
     {
+        d->configurationMenu->addSeparator();
+
+        if (d->sortMenu)
+        {
+            d->configurationMenu->addMenu(d->sortMenu);
+        }
+
         d->configurationMenu->addAction(d->actionPreviewSingleItems);
         d->configurationMenu->addAction(d->actionPreviewGroupedItems);
         d->configurationMenu->addAction(d->actionShowNumbersOnItems);
@@ -1398,6 +1408,21 @@ void WorldMapWidget2::slotItemDisplaySettingsChanged()
 void WorldMapWidget2::setDoUpdateMarkerCoordinatesInModel(const bool doIt)
 {
     d->doUpdateMarkerCoordinatesInModel = doIt;
+}
+
+void WorldMapWidget2::setSortOptionsMenu(QMenu* const sortMenu)
+{
+    d->sortMenu = sortMenu;
+
+    rebuildConfigurationMenu();
+}
+
+void WorldMapWidget2::setSortKey(const int sortKey)
+{
+    s->sortKey = sortKey;
+
+    // this is probably faster than writing a function that changes all the clusters icons...
+    slotRequestLazyReclustering();
 }
 
 } /* WMW2 */

@@ -519,7 +519,7 @@ void BackendMarble::marbleCustomPaint(Marble::GeoPainter* painter)
                 if (displayPixmap)
                 {
                     // TODO: sortkey
-                    const QVariant representativeMarker = s->worldMapWidget->getClusterRepresentativeMarker(i, 0);
+                    const QVariant representativeMarker = s->worldMapWidget->getClusterRepresentativeMarker(i, s->sortKey);
                     clusterPixmap = s->representativeChooser->pixmapFromRepresentativeIndex(representativeMarker, QSize(2*circleRadius, 2*circleRadius));
 
                     displayPixmap = !clusterPixmap.isNull();

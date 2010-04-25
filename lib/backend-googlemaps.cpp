@@ -549,7 +549,7 @@ void BackendGoogleMaps::updateClusters()
         if (s->representativeChooser&&!s->inEditMode)
         {
             // TODO: sortkey
-            const QVariant representativeMarker = s->worldMapWidget->getClusterRepresentativeMarker(currentIndex, 0);
+            const QVariant representativeMarker = s->worldMapWidget->getClusterRepresentativeMarker(currentIndex, s->sortKey);
             QPixmap clusterPixmap = s->representativeChooser->pixmapFromRepresentativeIndex(representativeMarker, QSize(30, 30));
 
             if (!clusterPixmap.isNull())
@@ -803,7 +803,7 @@ void BackendGoogleMaps::slotThumbnailAvailableForIndex(const QVariant& index, co
     {
         // TODO: use the right sortkey
         // TODO: let the representativeChooser handle the index comparison
-        const QVariant representativeMarker = s->worldMapWidget->getClusterRepresentativeMarker(i, 0);
+        const QVariant representativeMarker = s->worldMapWidget->getClusterRepresentativeMarker(i, s->sortKey);
         kDebug()<<i;
         if (s->representativeChooser->indicesEqual(index, representativeMarker))
         {

@@ -314,7 +314,8 @@ public:
       representativeChooser(0),
       previewSingleItems(true),
       previewGroupedItems(true),
-      showNumbersOnItems(true)
+      showNumbersOnItems(true),
+      sortKey(0)
     {
         QStringList markerColors;
         markerColors << "00ff00" << "00ffff" << "ff0000" << "ff7f00" << "ffff00";
@@ -348,6 +349,7 @@ public:
     bool previewSingleItems;
     bool previewGroupedItems;
     bool showNumbersOnItems;
+    int sortKey;
 };
 
 } /* WMW2 */
