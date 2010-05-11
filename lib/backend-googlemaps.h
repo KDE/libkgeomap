@@ -83,7 +83,7 @@ public Q_SLOTS:
 
 protected:
     void createActions();
-    void setClusterPixmap(const int clusterId, const QPixmap& clusterPixmap);
+    void setClusterPixmap(const int clusterId, const QPoint& centerPoint, const QPixmap& clusterPixmap);
 
 private Q_SLOTS:
     void slotHTMLInitialized();

@@ -25,6 +25,7 @@
 
 // Qt includes
 
+#include <QBitmap>
 #include <QDragEnterEvent>
 #include <QDropEvent>
 #include <QItemSelectionModel>
@@ -1453,6 +1454,118 @@ QPixmap WorldMapWidget2::decoratePixmap(const int clusterId, const QPixmap& clus
     painter.drawRect(0, 0, resultPixmap.size().width()-1, resultPixmap.size().height()-1);
 
     return resultPixmap;
+}
+
+QPixmap WorldMapWidget2::getDecoratedPixmapForCluster(const int clusterId, const WMWSelectionState* const selectedStateOverride, const int* const countOverride, QPoint* const centerPoint)
+{
+    const int circleRadius = 15; // s->groupingRadius;
+    const WMWCluster& cluster = s->clusterList.at(clusterId);
+    
+    int markerCount = cluster.markerCount;
+    WMWSelectionState selectedState = cluster.selectedState;
+    if (selectedStateOverride)
+    {
+        selectedState = *selectedStateOverride;
+        markerCount = *countOverride;
+    }
+
+    // determine the colors:
+    QColor       fillColor;
+    QColor       strokeColor;
+    Qt::PenStyle strokeStyle;
+    QColor       labelColor;
+    QString      labelText;
+    getColorInfos(clusterId, &fillColor, &strokeColor,
+                        &strokeStyle, &labelText, &labelColor,
+                        &selectedState,
+                        &markerCount);
+
+    // determine whether we should use a pixmap or a placeholder
+    if (s->inEditMode)
+    {
+        QString pixmapName = fillColor.name().mid(1);
+        if (selectedState==WMWSelectedAll)
+        {
+            pixmapName+="-selected";
+        }
+        if (selectedState==WMWSelectedSome)
+        {
+            pixmapName+="-someselected";
+        }
+        const QPixmap& markerPixmap = s->markerPixmaps[pixmapName];
+
+        if (centerPoint)
+        {
+            *centerPoint = QPoint(markerPixmap.width()/2, 0);
+        }
+
+        return markerPixmap;
+    }
+
+    bool displayThumbnail = (s->representativeChooser != 0);
+    if (displayThumbnail)
+    {
+        if (markerCount==1)
+        {
+            displayThumbnail = s->previewSingleItems;
+        }
+        else
+        {
+            displayThumbnail = s->previewGroupedItems;
+        }
+    }
+
+    if (displayThumbnail)
+    {
+        const QVariant representativeMarker = s->worldMapWidget->getClusterRepresentativeMarker(clusterId, s->sortKey);
+        QPixmap clusterPixmap = s->representativeChooser->pixmapFromRepresentativeIndex(representativeMarker, QSize(2*circleRadius-2, 2*circleRadius-2));
+
+        if (!clusterPixmap.isNull())
+        {
+            // TODO: handle count and selected state override
+            clusterPixmap = s->worldMapWidget->decoratePixmap(clusterId, clusterPixmap);
+
+            // TODO: paint the numbers!
+
+            if (centerPoint)
+            {
+                *centerPoint = QPoint(clusterPixmap.width()/2, clusterPixmap.height()/2);
+            }
+
+            return clusterPixmap;
+        }
+    }
+
+    // we do not have a thumbnail, draw the circle instead:
+    QPen circlePen;
+    circlePen.setColor(strokeColor);
+    circlePen.setStyle(strokeStyle);
+    circlePen.setWidth(2);
+    QBrush circleBrush(fillColor);
+    QPen labelPen;
+    labelPen.setColor(labelColor);
+    const QRect circleRect(0, 0, 2*circleRadius, 2*circleRadius);
+
+    const int pixmapDiameter = 2*(circleRadius+1);
+    QPixmap circlePixmap(pixmapDiameter, pixmapDiameter);
+    // TODO: cache this somehow
+    circlePixmap.fill(QColor(0,0,0,0));
+
+    QPainter circlePainter(&circlePixmap);
+    circlePainter.setPen(circlePen);
+    circlePainter.setBrush(circleBrush);
+    circlePainter.drawEllipse(circleRect);
+
+    circlePainter.setPen(labelPen);
+    circlePainter.setBrush(Qt::NoBrush);
+    circlePainter.drawText(circleRect, Qt::AlignHCenter|Qt::AlignVCenter, labelText);
+
+    if (centerPoint)
+    {
+        *centerPoint = QPoint(circlePixmap.width()/2, circlePixmap.height()/2);
+    }
+
+    return circlePixmap;
 }
 
 } /* WMW2 */

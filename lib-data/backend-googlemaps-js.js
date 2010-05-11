@@ -210,7 +210,8 @@ function wmwGetPixmapName(markerCount, markerSelectedCount)
     }
     return colorCode;
 }
-function wmwSetClusterPixmap(id, pixmapurl) {
+function wmwSetClusterPixmap(id, xOffset, yOffset, pixmapurl) {
+    // TODO: add the offset!
     clusterList[id].setIcon(pixmapurl);
 }
 function wmwAddCluster(id, lat, lon, setDraggable, markerCount, markerSelectedCount) {

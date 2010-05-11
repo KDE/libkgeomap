@@ -546,17 +546,16 @@ void BackendGoogleMaps::updateClusters()
                 .arg(currentCluster.markerSelectedCount)
             );
 
-        // now set the cluster pixmap:
-        if (s->representativeChooser&&!s->inEditMode)
+        // TODO: for now, only set generated pixmaps when not in edit mode
+        // this can be changed once we figure out how to appropriately handle
+        // the selection state changes when a marker is dragged
+        if (!s->inEditMode)
         {
-            // TODO: sortkey
-            const QVariant representativeMarker = s->worldMapWidget->getClusterRepresentativeMarker(currentIndex, s->sortKey);
-            QPixmap clusterPixmap = s->representativeChooser->pixmapFromRepresentativeIndex(representativeMarker, QSize(2*s->groupingRadius-2, 2*s->groupingRadius-2));
+            QPoint clusterCenterPoint;
+            // TODO: who calculates the override values?
+            const QPixmap clusterPixmap = s->worldMapWidget->getDecoratedPixmapForCluster(currentIndex, 0, 0, &clusterCenterPoint);
 
-            if (!clusterPixmap.isNull())
-            {
-                setClusterPixmap(currentIndex,  clusterPixmap);
-            }
+            setClusterPixmap(currentIndex, clusterCenterPoint, clusterPixmap);
         }
     }
     kDebug()<<"end updateclusters";
@@ -805,18 +804,21 @@ void BackendGoogleMaps::slotThumbnailAvailableForIndex(const QVariant& index, co
         // TODO: use the right sortkey
         // TODO: let the representativeChooser handle the index comparison
         const QVariant representativeMarker = s->worldMapWidget->getClusterRepresentativeMarker(i, s->sortKey);
-        kDebug()<<i;
         if (s->representativeChooser->indicesEqual(index, representativeMarker))
         {
-            kDebug()<<1<<i;
-            setClusterPixmap(i, pixmap);
+            QPoint clusterCenterPoint;
+            // TODO: who calculates the override values?
+            const QPixmap clusterPixmap = s->worldMapWidget->getDecoratedPixmapForCluster(i, 0, 0, &clusterCenterPoint);
+
+            setClusterPixmap(i, clusterCenterPoint, clusterPixmap);
+
             break;
         }
     }
     
 }
 
-void BackendGoogleMaps::setClusterPixmap(const int clusterId, const QPixmap& clusterPixmap)
+void BackendGoogleMaps::setClusterPixmap(const int clusterId, const QPoint& centerPoint, const QPixmap& clusterPixmap)
 {
     // decorate the pixmap:
     const QPixmap styledPixmap = s->worldMapWidget->decoratePixmap(clusterId, clusterPixmap);
@@ -828,8 +830,10 @@ void BackendGoogleMaps::setClusterPixmap(const int clusterId, const QPixmap& clu
 
     // http://www.faqs.org/rfcs/rfc2397.html
     const QString imageData = QString("data:image/png;base64,%1").arg(QString::fromAscii(bytes.toBase64()));
-    d->htmlWidget->runScript(QString("wmwSetClusterPixmap(%1,'%2');")
+    d->htmlWidget->runScript(QString("wmwSetClusterPixmap(%1,%2,%3,'%4');")
                     .arg(clusterId)
+                    .arg(centerPoint.x())
+                    .arg(centerPoint.y())
                     .arg(imageData)
                 );
 }

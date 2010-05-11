@@ -474,91 +474,11 @@ void BackendMarble::marbleCustomPaint(Marble::GeoPainter* painter)
             if (!screenCoordinates(clusterCoordinates, &clusterPoint))
                 continue;
 
-            // determine the colors:
-            QColor       fillColor;
-            QColor       strokeColor;
-            Qt::PenStyle strokeStyle;
-            QColor       labelColor;
-            QString      labelText;
-            s->worldMapWidget->getColorInfos(i, &fillColor, &strokeColor,
-                                &strokeStyle, &labelText, &labelColor,
-                                &selectionStateOverride,
-                                &markerCountOverride);
+            QPoint clusterCenterPoint;
+            const QPixmap clusterPixmap = s->worldMapWidget->getDecoratedPixmapForCluster(i, &selectionStateOverride, &markerCountOverride, &clusterCenterPoint);
 
-            if (s->inEditMode)
-            {
-                QString pixmapName = fillColor.name().mid(1);
-                if (selectionStateOverride==WMWSelectedAll)
-                {
-                    pixmapName+="-selected";
-                }
-                if (selectionStateOverride==WMWSelectedSome)
-                {
-                    pixmapName+="-someselected";
-                }
-                const QPixmap& markerPixmap = s->markerPixmaps[pixmapName];
-                painter->drawPixmap(clusterPoint.x()-markerPixmap.width()/2, clusterPoint.y()-markerPixmap.height(), markerPixmap);
-            }
-            else
-            {
-                // should we try to display a pixmap for this cluster?
-                bool displayPixmap = s->representativeChooser != 0;
-                if (displayPixmap)
-                {
-                    if (markerCountOverride==1)
-                    {
-                        displayPixmap = s->previewSingleItems;
-                    }
-                    else
-                    {
-                        displayPixmap = s->previewGroupedItems;
-                    }
-                }
-
-                // do we have a pixmap to display for this cluster?
-                QPixmap clusterPixmap;
-                if (displayPixmap)
-                {
-                    // TODO: sortkey
-                    const QVariant representativeMarker = s->worldMapWidget->getClusterRepresentativeMarker(i, s->sortKey);
-                    clusterPixmap = s->representativeChooser->pixmapFromRepresentativeIndex(representativeMarker, QSize(2*circleRadius-2, 2*circleRadius-2));
-
-                    displayPixmap = !clusterPixmap.isNull();
-                    if (displayPixmap)
-                    {
-                        clusterPixmap = s->worldMapWidget->decoratePixmap(i, clusterPixmap);
-                    }
-                }
-                
-                QPen circlePen;
-                circlePen.setColor(strokeColor);
-                circlePen.setStyle(strokeStyle);
-                circlePen.setWidth(2);
-                QBrush circleBrush(fillColor);
-                QPen labelPen;
-                labelPen.setColor(labelColor);
-
-                const QRect circleRect(clusterPoint.x()-circleRadius, clusterPoint.y()-circleRadius, 2*circleRadius, 2*circleRadius);
-
-                if (displayPixmap)
-                {
-                    const QSize cpSize = clusterPixmap.size();
-                    painter->drawPixmap(clusterPoint.x()-cpSize.width()/2, clusterPoint.y()-cpSize.height()/2, clusterPixmap);
-                }
-                else
-                {
-                    painter->setPen(circlePen);
-                    painter->setBrush(circleBrush);
-                    painter->drawEllipse(circleRect);
-                }
-
-                if (s->showNumbersOnItems || !displayPixmap)
-                {
-                    painter->setPen(labelPen);
-                    painter->setBrush(Qt::NoBrush);
-                    painter->drawText(circleRect, Qt::AlignHCenter|Qt::AlignVCenter, labelText);
-                }
-            }
+            // TODO: handle the centerPoint correctly
+            painter->drawPixmap(clusterPoint.x()-clusterCenterPoint.x(), clusterPoint.y()-clusterCenterPoint.y(), clusterPixmap);
         }
     }
 

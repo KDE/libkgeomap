@@ -95,6 +95,7 @@ public:
     void setSortOptionsMenu(QMenu* const sortMenu);
     void setSortKey(const int sortKey);
     QPixmap decoratePixmap(const int clusterId, const QPixmap& clusterPixmap);
+    QPixmap getDecoratedPixmapForCluster(const int clusterId, const WMWSelectionState* const selectedStateOverride, const int* const countOverride, QPoint* const centerPoint);
 
 public Q_SLOTS:
     void slotZoomIn();
