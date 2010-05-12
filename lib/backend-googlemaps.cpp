@@ -791,7 +791,7 @@ void BackendGoogleMaps::updateZoomMinMaxCache()
 void BackendGoogleMaps::slotThumbnailAvailableForIndex(const QVariant& index, const QPixmap& pixmap)
 {
     kDebug()<<index<<pixmap.size();
-    if (pixmap.isNull())
+    if (pixmap.isNull() || s->inEditMode)
         return;
 
     // TODO: properly reject pixmaps with the wrong size
@@ -821,12 +821,12 @@ void BackendGoogleMaps::slotThumbnailAvailableForIndex(const QVariant& index, co
 void BackendGoogleMaps::setClusterPixmap(const int clusterId, const QPoint& centerPoint, const QPixmap& clusterPixmap)
 {
     // decorate the pixmap:
-    const QPixmap styledPixmap = s->worldMapWidget->decoratePixmap(clusterId, clusterPixmap);
+    const QPixmap styledPixmap = clusterPixmap;
 
     QByteArray bytes;
     QBuffer buffer(&bytes);
     buffer.open(QIODevice::WriteOnly);
-    styledPixmap.save(&buffer, "PNG");
+    clusterPixmap.save(&buffer, "PNG");
 
     // http://www.faqs.org/rfcs/rfc2397.html
     const QString imageData = QString("data:image/png;base64,%1").arg(QString::fromAscii(bytes.toBase64()));
