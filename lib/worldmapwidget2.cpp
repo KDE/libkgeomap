@@ -1428,34 +1428,6 @@ void WorldMapWidget2::setSortKey(const int sortKey)
     slotRequestLazyReclustering();
 }
 
-QPixmap WorldMapWidget2::decoratePixmap(const int clusterId, const QPixmap& clusterPixmap)
-{
-    // determine the colors:
-    QColor       fillColor;
-    QColor       strokeColor;
-    Qt::PenStyle strokeStyle;
-    QColor       labelColor;
-    QString      labelText;
-    getColorInfos(clusterId, &fillColor, &strokeColor,
-                        &strokeStyle, &labelText, &labelColor);
-
-    QPixmap resultPixmap(clusterPixmap.size()+QSize(2,2));
-    QPainter painter(&resultPixmap);
-
-    // TODO: how do we pre-paint the dotted lines?
-    // for now, just use solid lines
-    // we would need a backgroud color for the dotted lines
-    painter.drawPixmap(QPoint(1,1), clusterPixmap);
-    QPen circlePen;
-    circlePen.setColor(strokeColor);
-    circlePen.setStyle(Qt::SolidLine);//strokeStyle);
-    circlePen.setWidth(1);
-    painter.setPen(circlePen);
-    painter.drawRect(0, 0, resultPixmap.size().width()-1, resultPixmap.size().height()-1);
-
-    return resultPixmap;
-}
-
 QPixmap WorldMapWidget2::getDecoratedPixmapForCluster(const int clusterId, const WMWSelectionState* const selectedStateOverride, const int* const countOverride, QPoint* const centerPoint)
 {
     const int circleRadius = 15; // s->groupingRadius;
