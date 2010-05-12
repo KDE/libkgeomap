@@ -949,16 +949,18 @@ void WorldMapWidget2::getColorInfos(const WMWSelectionState selectionState,
     switch (selectionState)
     {
         case WMWSelectedNone:
-            *strokeStyle = Qt::NoPen;
+            *strokeStyle = Qt::SolidLine;
+            *strokeColor = QColor(Qt::black);
             break;
         case WMWSelectedSome:
             *strokeStyle = Qt::DotLine;
+            *strokeColor = QColor(Qt::blue);
             break;
         case WMWSelectedAll:
             *strokeStyle = Qt::SolidLine;
+            *strokeColor = QColor(Qt::blue);
             break;
     }
-    *strokeColor = QColor(Qt::blue);
 
     QColor fillAll, fillSome, fillNone;
     if (nMarkers>=100)
@@ -1496,15 +1498,23 @@ QPixmap WorldMapWidget2::getDecoratedPixmapForCluster(const int clusterId, const
         {
             QPixmap resultPixmap(clusterPixmap.size()+QSize(2,2));
             QPainter painter(&resultPixmap);
+            painter.setRenderHint(QPainter::Antialiasing);
 
-            // TODO: how do we pre-paint the dotted lines?
-            // for now, just use solid lines
-            // we would need a backgroud color for the dotted lines
-            painter.drawPixmap(QPoint(1,1), clusterPixmap);
             QPen circlePen;
+            circlePen.setWidth(1);
+            if (strokeStyle!=Qt::SolidLine)
+            {
+                // paint a white border around the image
+                circlePen.setColor(Qt::white);
+                painter.setPen(circlePen);
+                painter.drawRect(0, 0, resultPixmap.size().width()-1, resultPixmap.size().height()-1);
+            }
+
+            painter.drawPixmap(QPoint(1,1), clusterPixmap);
+
+            // now draw the selection border
             circlePen.setColor(strokeColor);
             circlePen.setStyle(strokeStyle);
-            circlePen.setWidth(1);
             painter.setPen(circlePen);
             painter.drawRect(0, 0, resultPixmap.size().width()-1, resultPixmap.size().height()-1);
 
