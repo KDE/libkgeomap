@@ -1522,17 +1522,48 @@ QPixmap WorldMapWidget2::getDecoratedPixmapForCluster(const int clusterId, const
 
         if (!clusterPixmap.isNull())
         {
-            // TODO: handle count and selected state override
-            clusterPixmap = s->worldMapWidget->decoratePixmap(clusterId, clusterPixmap);
+            QPixmap resultPixmap(clusterPixmap.size()+QSize(2,2));
+            QPainter painter(&resultPixmap);
 
-            // TODO: paint the numbers!
+            // TODO: how do we pre-paint the dotted lines?
+            // for now, just use solid lines
+            // we would need a backgroud color for the dotted lines
+            painter.drawPixmap(QPoint(1,1), clusterPixmap);
+            QPen circlePen;
+            circlePen.setColor(strokeColor);
+            circlePen.setStyle(strokeStyle);
+            circlePen.setWidth(1);
+            painter.setPen(circlePen);
+            painter.drawRect(0, 0, resultPixmap.size().width()-1, resultPixmap.size().height()-1);
+
+            if (s->showNumbersOnItems)
+            {
+                QPen labelPen(labelColor);
+
+                // note: the pen has to be set, otherwise the bounding rect is 0 x 0!!!
+                painter.setPen(labelPen);
+                const QRect textRect(0, 0, resultPixmap.width(), resultPixmap.height());
+                QRect textBoundingRect = painter.boundingRect(textRect, Qt::AlignHCenter|Qt::AlignVCenter, labelText);
+                textBoundingRect.adjust(-1, -1, 1, 1);
+
+                // fill the bounding rect:
+                painter.setPen(Qt::NoPen);
+                painter.setBrush(QColor::fromRgb(0xff, 0xff, 0xff, 0x80));
+                painter.drawRect(textBoundingRect);
+
+                // draw the text:
+                painter.setPen(labelPen);
+                painter.setBrush(Qt::NoBrush);
+                painter.drawText(textRect,
+                            Qt::AlignHCenter|Qt::AlignVCenter, labelText);
+            }
 
             if (centerPoint)
             {
-                *centerPoint = QPoint(clusterPixmap.width()/2, clusterPixmap.height()/2);
+                *centerPoint = QPoint(resultPixmap.width()/2, resultPixmap.height()/2);
             }
 
-            return clusterPixmap;
+            return resultPixmap;
         }
     }
 
