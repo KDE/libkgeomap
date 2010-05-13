@@ -56,6 +56,10 @@
 
 namespace WMW2 {
 
+const int WMW2MinEditGroupingRadius = 1;
+const int WMW2MinGroupingRadius = 15;
+const int WMW2MinThumbnailSize = 30;
+
 /**
  * @brief Helper function, returns the square of the distance between two points
  *
@@ -94,7 +98,12 @@ public:
       editModeAvailable(false),
       dragDropHandler(0),
       doUpdateMarkerCoordinatesInModel(true),
-      sortMenu(0)
+      sortMenu(0),
+      thumbnailSize(WMW2MinThumbnailSize),
+      groupingRadius(WMW2MinGroupingRadius),
+      editGroupingRadius(WMW2MinEditGroupingRadius),
+      actionIncreaseThumbnailSize(0),
+      actionDecreaseThumbnailSize(0)
     {
     }
 
@@ -131,6 +140,11 @@ public:
     bool doUpdateMarkerCoordinatesInModel;
 
     QMenu *sortMenu;
+    int thumbnailSize;
+    int groupingRadius;
+    int editGroupingRadius;
+    KAction* actionIncreaseThumbnailSize;
+    KAction* actionDecreaseThumbnailSize;
 };
 
 WorldMapWidget2::WorldMapWidget2(QWidget* const parent)
@@ -215,6 +229,17 @@ void WorldMapWidget2::createActions()
     d->actionShowNumbersOnItems = new KAction(i18n("Show numbers"), this);
     d->actionShowNumbersOnItems->setCheckable(true);
     d->actionShowNumbersOnItems->setChecked(true);
+
+    d->actionIncreaseThumbnailSize = new KAction(i18n("T+"), this);
+    d->actionIncreaseThumbnailSize->setToolTip(i18n("Increase the thumbnail size on the map"));
+    d->actionDecreaseThumbnailSize = new KAction(i18n("T-"), this);
+    d->actionDecreaseThumbnailSize->setToolTip(i18n("Decrease the thumbnail size on the map"));
+
+    connect(d->actionIncreaseThumbnailSize, SIGNAL(triggered(bool)),
+            this, SLOT(slotIncreaseThumbnailSize()));
+
+    connect(d->actionDecreaseThumbnailSize, SIGNAL(triggered(bool)),
+            this, SLOT(slotDecreaseThumbnailSize()));
 
     connect(d->actionPreviewSingleItems, SIGNAL(changed()),
             this, SLOT(slotItemDisplaySettingsChanged()));
@@ -437,6 +462,9 @@ void WorldMapWidget2::saveSettingsToGroup(KConfigGroup* const group)
     group->writeEntry("Preview Single Items", s->previewSingleItems);
     group->writeEntry("Preview Grouped Items", s->previewGroupedItems);
     group->writeEntry("Show numbers on items", s->showNumbersOnItems);
+    group->writeEntry("Thumbnail Size", d->thumbnailSize);
+    group->readEntry("Grouping Radius", d->groupingRadius);
+    group->readEntry("Edit Grouping Radius", d->editGroupingRadius);
 
     for (int i=0; i<d->loadedBackends.size(); ++i)
     {
@@ -464,10 +492,16 @@ void WorldMapWidget2::readSettingsFromGroup(const KConfigGroup* const group)
     d->actionPreviewGroupedItems->setChecked(group->readEntry("Preview Grouped Items", true));
     d->actionShowNumbersOnItems->setChecked(group->readEntry("Show numbers on items", true));
 
+    setThumnailSize(group->readEntry("Thumbnail Size", WMW2MinThumbnailSize));
+    setGroupingRadius(group->readEntry("Grouping Radius", WMW2MinGroupingRadius));
+    setEditGroupingRadius(group->readEntry("Edit Grouping Radius", WMW2MinEditGroupingRadius));
+
     for (int i=0; i<d->loadedBackends.size(); ++i)
     {
         d->loadedBackends.at(i)->readSettingsFromGroup(group);
     }
+
+    slotUpdateActionsEnabled();
 }
 
 void WorldMapWidget2::rebuildConfigurationMenu()
@@ -547,6 +581,7 @@ QWidget* WorldMapWidget2::getControlWidget()
         d->browseModeControlsHolder = new KHBox(d->controlWidget);
         d->browseModeControlsHolder->setVisible(d->editModeAvailable);
 
+        // TODO: is this the KDE-correct version of a separator?
         QFrame* const hLine1 = new QFrame(d->browseModeControlsHolder);
         hLine1->setFrameShape(QFrame::VLine);
         hLine1->setFrameShadow(QFrame::Sunken);
@@ -556,6 +591,17 @@ QWidget* WorldMapWidget2::getControlWidget()
 
         QToolButton* const editModeButton = new QToolButton(d->browseModeControlsHolder);
         editModeButton->setDefaultAction(d->actionEditMode);
+
+        // TODO: is this the KDE-correct version of a separator?
+        QFrame* const hLine2 = new QFrame(d->browseModeControlsHolder);
+        hLine2->setFrameShape(QFrame::VLine);
+        hLine2->setFrameShadow(QFrame::Sunken);
+
+        QToolButton* const increaseThumbnailSizeButton = new QToolButton(d->controlWidget);
+        increaseThumbnailSizeButton->setDefaultAction(d->actionIncreaseThumbnailSize);
+
+        QToolButton* const decreaseThumbnailSizeButton = new QToolButton(d->controlWidget);
+        decreaseThumbnailSizeButton->setDefaultAction(d->actionDecreaseThumbnailSize);
 
         // add stretch after the controls:
         QHBoxLayout* const hBoxLayout = reinterpret_cast<QHBoxLayout*>(d->controlWidget->layout());
@@ -589,6 +635,9 @@ void WorldMapWidget2::slotZoomOut()
 
 void WorldMapWidget2::slotUpdateActionsEnabled()
 {
+    d->actionDecreaseThumbnailSize->setEnabled((!s->inEditMode)&&(d->thumbnailSize>WMW2MinThumbnailSize));
+    // TODO: define an upper limit!
+    d->actionIncreaseThumbnailSize->setEnabled(!s->inEditMode);
 }
 
 void WorldMapWidget2::slotChangeBackend(QAction* action)
@@ -630,7 +679,7 @@ void WorldMapWidget2::updateClusters()
     d->clustersDirty = false;
 
     // constants for clusters
-    const int ClusterRadius          = s->groupingRadius;
+    const int ClusterRadius          = s->inEditMode ? d->editGroupingRadius : d->groupingRadius;
     const QSize ClusterDefaultSize   = QSize(2*ClusterRadius, 2*ClusterRadius);
     const int ClusterGridSizeScreen  = 4*ClusterRadius;
     const QSize ClusterMaxPixmapSize = QSize(ClusterGridSizeScreen, ClusterGridSizeScreen);
@@ -1208,7 +1257,6 @@ void WorldMapWidget2::slotGroupModeChanged(QAction* triggeredAction)
 {
     Q_UNUSED(triggeredAction);
     s->inEditMode = d->actionEditMode->isChecked();
-    s->groupingRadius = s->inEditMode ? 3 : 20;
 
     slotRequestLazyReclustering();
 }
@@ -1432,7 +1480,7 @@ void WorldMapWidget2::setSortKey(const int sortKey)
 
 QPixmap WorldMapWidget2::getDecoratedPixmapForCluster(const int clusterId, const WMWSelectionState* const selectedStateOverride, const int* const countOverride, QPoint* const centerPoint)
 {
-    const int circleRadius = 15; // s->groupingRadius;
+    const int circleRadius = d->thumbnailSize/2; // s->groupingRadius;
     const WMWCluster& cluster = s->clusterList.at(clusterId);
     
     int markerCount = cluster.markerCount;
@@ -1492,7 +1540,7 @@ QPixmap WorldMapWidget2::getDecoratedPixmapForCluster(const int clusterId, const
     if (displayThumbnail)
     {
         const QVariant representativeMarker = s->worldMapWidget->getClusterRepresentativeMarker(clusterId, s->sortKey);
-        QPixmap clusterPixmap = s->representativeChooser->pixmapFromRepresentativeIndex(representativeMarker, QSize(2*circleRadius-2, 2*circleRadius-2));
+        QPixmap clusterPixmap = s->representativeChooser->pixmapFromRepresentativeIndex(representativeMarker, QSize(d->thumbnailSize-2, d->thumbnailSize-2));
 
         if (!clusterPixmap.isNull())
         {
@@ -1579,6 +1627,71 @@ QPixmap WorldMapWidget2::getDecoratedPixmapForCluster(const int clusterId, const
     }
 
     return circlePixmap;
+}
+
+void WorldMapWidget2::setThumnailSize(const int newThumbnailSize)
+{
+    d->thumbnailSize = qMax(WMW2MinThumbnailSize, newThumbnailSize);
+
+    // make sure the grouping radius is larger than the thumbnail size
+    if (2*d->groupingRadius < newThumbnailSize)
+    {
+        // TODO: more straightforward way for this?
+        d->groupingRadius = newThumbnailSize/2 + newThumbnailSize%2;
+    }
+
+    if (!s->inEditMode)
+    {
+        slotRequestLazyReclustering();
+    }
+    slotUpdateActionsEnabled();
+}
+
+void WorldMapWidget2::setGroupingRadius(const int newGroupingRadius)
+{
+    d->groupingRadius = qMax(WMW2MinGroupingRadius, newGroupingRadius);
+
+    // make sure the thumbnails are smaller than the grouping radius
+    if (2*d->groupingRadius > d->thumbnailSize)
+    {
+        d->thumbnailSize = 2*newGroupingRadius;
+    }
+
+    if (!s->inEditMode)
+    {
+        slotRequestLazyReclustering();
+    }
+    slotUpdateActionsEnabled();
+}
+
+void WorldMapWidget2::setEditGroupingRadius(const int newGroupingRadius)
+{
+    d->editGroupingRadius = qMax(WMW2MinEditGroupingRadius, newGroupingRadius);
+
+    if (s->inEditMode)
+    {
+        slotRequestLazyReclustering();
+    }
+    slotUpdateActionsEnabled();
+}
+
+void WorldMapWidget2::slotDecreaseThumbnailSize()
+{
+    if (s->inEditMode)
+        return;
+
+    if (d->thumbnailSize>WMW2MinThumbnailSize)
+    {
+        setThumnailSize(qMax(WMW2MinThumbnailSize, d->thumbnailSize-5));
+    }
+}
+
+void WorldMapWidget2::slotIncreaseThumbnailSize()
+{
+    if (s->inEditMode)
+        return;
+
+    setThumnailSize(d->thumbnailSize+5);
 }
 
 } /* WMW2 */

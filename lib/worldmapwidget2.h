@@ -95,12 +95,17 @@ public:
     void setSortOptionsMenu(QMenu* const sortMenu);
     void setSortKey(const int sortKey);
     QPixmap getDecoratedPixmapForCluster(const int clusterId, const WMWSelectionState* const selectedStateOverride, const int* const countOverride, QPoint* const centerPoint);
+    void setThumnailSize(const int newThumbnailSize);
+    void setGroupingRadius(const int newGroupingRadius);
+    void setEditGroupingRadius(const int newGroupingRadius);
 
 public Q_SLOTS:
     void slotZoomIn();
     void slotZoomOut();
     void slotUpdateActionsEnabled();
     void slotClustersNeedUpdating();
+    void slotDecreaseThumbnailSize();
+    void slotIncreaseThumbnailSize();
 
 Q_SIGNALS:
     void signalAltitudeLookupReady(const WMW2::WMWAltitudeLookup::List& altitudes);
