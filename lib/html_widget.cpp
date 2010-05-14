@@ -51,9 +51,6 @@ HTMLWidget::HTMLWidget(QWidget* const parent)
     
     widget()->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
-    // TODO: the khtmlpart-widget does not resize automatically, we have to do it manually???
-    parent->installEventFilter(this);
-
     // create a timer for monitoring for javascript events, but do not start it yet:
     d->javascriptScanTimer = new QTimer(this);
     d->javascriptScanTimer->setSingleShot(false);
@@ -63,6 +60,8 @@ HTMLWidget::HTMLWidget(QWidget* const parent)
 
     connect(this, SIGNAL(completed()),
             this, SLOT(slotHTMLCompleted()));
+
+    d->parent->installEventFilter(this);
 }
 
 HTMLWidget::~HTMLWidget()
@@ -78,34 +77,9 @@ void HTMLWidget::loadInitialHTML(const QString& initialHTML)
     end();
 }
 
-bool HTMLWidget::eventFilter(QObject* object, QEvent* event)
-{
-    if (object==d->parent)
-    {
-        if (event->type()==QEvent::Resize)
-        {
-            QResizeEvent* const resizeEvent = dynamic_cast<QResizeEvent*>(event);
-            if (resizeEvent)
-            {
-                widget()->resize(resizeEvent->size());
-                view()->resize(resizeEvent->size());
-
-                // TODO: the map div does not adjust its height properly if height=100%,
-                //       therefore we adjust it manually here
-                if (d->isReady)
-                {
-                    runScript(QString("wmwWidgetResized(%1, %2)").arg(d->parent->width()).arg(d->parent->height()));
-                }
-            }
-        }
-    }
-    return false;
-}
-
 void HTMLWidget::slotHTMLCompleted()
 {
     d->isReady = true;
-    runScript(QString("wmwWidgetResized(%1, %2)").arg(d->parent->width()).arg(d->parent->height()));
 
     // start monitoring for javascript events using a timer:
     d->javascriptScanTimer->start();
@@ -158,7 +132,7 @@ QVariant HTMLWidget::runScript(const QString& scriptCode)
     if (!d->isReady)
         return QVariant();
 
-    kDebug()<<scriptCode;
+//     kDebug()<<scriptCode;
     return executeScript(scriptCode);
 }
 
@@ -170,6 +144,23 @@ bool HTMLWidget::runScript2Coordinates(const QString& scriptCode, WMWGeoCoordina
     const QVariant scriptResult = runScript(scriptCode);
 
     return WMWHelperParseLatLonString(scriptResult.toString(), coordinates);
+}
+
+bool HTMLWidget::eventFilter(QObject* object, QEvent* event)
+{
+    if (object==d->parent)
+    {
+        if (event->type()==QEvent::Resize)
+        {
+            QResizeEvent* const resizeEvent = dynamic_cast<QResizeEvent*>(event);
+            if (resizeEvent)
+            {
+                widget()->resize(resizeEvent->size());
+                view()->resize(resizeEvent->size());
+            }
+        }
+    }
+    return false;
 }
 
 } /* WMW2 */

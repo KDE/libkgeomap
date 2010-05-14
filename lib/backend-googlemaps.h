@@ -82,6 +82,7 @@ public Q_SLOTS:
     virtual void slotThumbnailAvailableForIndex(const QVariant& index, const QPixmap& pixmap);
 
 protected:
+    bool eventFilter(QObject* object, QEvent* event);
     void createActions();
     void setClusterPixmap(const int clusterId, const QPoint& centerPoint, const QPixmap& clusterPixmap);
 

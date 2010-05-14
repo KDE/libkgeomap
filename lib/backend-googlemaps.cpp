@@ -103,6 +103,8 @@ BackendGoogleMaps::BackendGoogleMaps(const QExplicitlySharedDataPointer<WMWShare
             this, SLOT(slotHTMLEvents(const QStringList&)));
 
     loadInitialHTML();
+
+    d->htmlWidgetWrapper->installEventFilter(this);
 }
 
 void BackendGoogleMaps::createActions()
@@ -203,7 +205,7 @@ void BackendGoogleMaps::slotHTMLInitialized()
 {
     kDebug()<<1;
     d->isReady = true;
-    d->htmlWidget->runScript(QString("document.getElementById(\"map_canvas\").style.height=\"%1px\"").arg(d->htmlWidgetWrapper->height()));
+    d->htmlWidget->runScript(QString("wmwWidgetResized(%1, %2)").arg(d->htmlWidgetWrapper->width()).arg(d->htmlWidgetWrapper->height()));
 
     // TODO: call javascript directly here and update action availability in one shot
     setMapType(d->cacheMapType);
@@ -836,6 +838,27 @@ void BackendGoogleMaps::setClusterPixmap(const int clusterId, const QPoint& cent
                     .arg(centerPoint.y())
                     .arg(imageData)
                 );
+}
+
+bool BackendGoogleMaps::eventFilter(QObject* object, QEvent* event)
+{
+    if (object==d->htmlWidgetWrapper)
+    {
+        if (event->type()==QEvent::Resize)
+        {
+            QResizeEvent* const resizeEvent = dynamic_cast<QResizeEvent*>(event);
+            if (resizeEvent)
+            {
+                // TODO: the map div does not adjust its height properly if height=100%,
+                //       therefore we adjust it manually here
+                if (d->isReady)
+                {
+                    d->htmlWidget->runScript(QString("wmwWidgetResized(%1, %2)").arg(d->htmlWidgetWrapper->width()).arg(d->htmlWidgetWrapper->height()));
+                }
+            }
+        }
+    }
+    return false;
 }
 
 } /* WMW2 */
