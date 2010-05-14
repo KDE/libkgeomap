@@ -27,12 +27,13 @@
 // local includes
 
 #include "worldmapwidget2_primitives.h"
+#include "worldmapwidget2_export.h"
 
 namespace WMW2 {
 
 class HTMLWidgetPrivate;
 
-class HTMLWidget : public KHTMLPart
+class WORLDMAPWIDGET2_EXPORT HTMLWidget : public KHTMLPart
 {
 Q_OBJECT
 
