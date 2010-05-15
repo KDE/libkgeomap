@@ -43,6 +43,7 @@
 #include <kconfiggroup.h>
 #include <khbox.h>
 #include <klocale.h>
+#include <kseparator.h>
 
 // local includes
 
@@ -581,10 +582,7 @@ QWidget* WorldMapWidget2::getControlWidget()
         d->browseModeControlsHolder = new KHBox(d->controlWidget);
         d->browseModeControlsHolder->setVisible(d->editModeAvailable);
 
-        // TODO: is this the KDE-correct version of a separator?
-        QFrame* const hLine1 = new QFrame(d->browseModeControlsHolder);
-        hLine1->setFrameShape(QFrame::VLine);
-        hLine1->setFrameShadow(QFrame::Sunken);
+        new KSeparator(Qt::Vertical, d->browseModeControlsHolder);
 
         QToolButton* const browseModeButton = new QToolButton(d->browseModeControlsHolder);
         browseModeButton->setDefaultAction(d->actionBrowseMode);
@@ -592,10 +590,7 @@ QWidget* WorldMapWidget2::getControlWidget()
         QToolButton* const editModeButton = new QToolButton(d->browseModeControlsHolder);
         editModeButton->setDefaultAction(d->actionEditMode);
 
-        // TODO: is this the KDE-correct version of a separator?
-        QFrame* const hLine2 = new QFrame(d->browseModeControlsHolder);
-        hLine2->setFrameShape(QFrame::VLine);
-        hLine2->setFrameShadow(QFrame::Sunken);
+        new KSeparator(Qt::Vertical, d->controlWidget);
 
         QToolButton* const increaseThumbnailSizeButton = new QToolButton(d->controlWidget);
         increaseThumbnailSizeButton->setDefaultAction(d->actionIncreaseThumbnailSize);
