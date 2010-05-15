@@ -797,7 +797,8 @@ void BackendGoogleMaps::slotThumbnailAvailableForIndex(const QVariant& index, co
         return;
 
     // TODO: properly reject pixmaps with the wrong size
-    if ((pixmap.size().height()!=30)&&(pixmap.size().width()!=30))
+    const int expectedThumbnailSize = s->worldMapWidget->getUndecoratedThumbnailSize();
+    if ((pixmap.size().height()!=expectedThumbnailSize)&&(pixmap.size().width()!=expectedThumbnailSize))
         return;
 
     // find the cluster which is represented by this index:

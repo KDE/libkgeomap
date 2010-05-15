@@ -98,6 +98,8 @@ public:
     void setThumnailSize(const int newThumbnailSize);
     void setGroupingRadius(const int newGroupingRadius);
     void setEditGroupingRadius(const int newGroupingRadius);
+    int getThumbnailSize() const;
+    int getUndecoratedThumbnailSize() const;
 
 public Q_SLOTS:
     void slotZoomIn();

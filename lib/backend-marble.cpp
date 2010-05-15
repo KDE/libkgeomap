@@ -953,5 +953,20 @@ void BackendMarble::updateActionAvailability()
     d->actionShowOverviewMap->setChecked(d->cacheShowOverviewMap);
 }
 
+void BackendMarble::slotThumbnailAvailableForIndex(const QVariant& index, const QPixmap& pixmap)
+{
+    kDebug()<<index<<pixmap.size();
+    if (pixmap.isNull() || s->inEditMode)
+        return;
+
+    // TODO: properly reject pixmaps with the wrong size
+    const int expectedThumbnailSize = s->worldMapWidget->getUndecoratedThumbnailSize();
+    if ((pixmap.size().height()!=expectedThumbnailSize)&&(pixmap.size().width()!=expectedThumbnailSize))
+        return;
+
+    // re-paint the map
+    d->marbleWidget->update();
+}
+
 } /* WMW2 */
 

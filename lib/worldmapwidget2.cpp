@@ -1540,7 +1540,8 @@ QPixmap WorldMapWidget2::getDecoratedPixmapForCluster(const int clusterId, const
     if (displayThumbnail)
     {
         const QVariant representativeMarker = getClusterRepresentativeMarker(clusterId, s->sortKey);
-        QPixmap clusterPixmap = s->representativeChooser->pixmapFromRepresentativeIndex(representativeMarker, QSize(d->thumbnailSize-2, d->thumbnailSize-2));
+        const int undecoratedThumbnailSize = getUndecoratedThumbnailSize();
+        QPixmap clusterPixmap = s->representativeChooser->pixmapFromRepresentativeIndex(representativeMarker, QSize(undecoratedThumbnailSize, undecoratedThumbnailSize));
 
         if (!clusterPixmap.isNull())
         {
@@ -1706,6 +1707,16 @@ void WorldMapWidget2::slotIncreaseThumbnailSize()
         return;
 
     setThumnailSize(d->thumbnailSize+5);
+}
+
+int WorldMapWidget2::getThumbnailSize() const
+{
+    return d->thumbnailSize;
+}
+
+int WorldMapWidget2::getUndecoratedThumbnailSize() const
+{
+    return d->thumbnailSize-2;
 }
 
 } /* WMW2 */
