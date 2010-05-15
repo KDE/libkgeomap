@@ -464,8 +464,8 @@ void WorldMapWidget2::saveSettingsToGroup(KConfigGroup* const group)
     group->writeEntry("Preview Grouped Items", s->previewGroupedItems);
     group->writeEntry("Show numbers on items", s->showNumbersOnItems);
     group->writeEntry("Thumbnail Size", d->thumbnailSize);
-    group->readEntry("Grouping Radius", d->groupingRadius);
-    group->readEntry("Edit Grouping Radius", d->editGroupingRadius);
+    group->writeEntry("Grouping Radius", d->groupingRadius);
+    group->writeEntry("Edit Grouping Radius", d->editGroupingRadius);
 
     for (int i=0; i<d->loadedBackends.size(); ++i)
     {
@@ -493,8 +493,8 @@ void WorldMapWidget2::readSettingsFromGroup(const KConfigGroup* const group)
     d->actionPreviewGroupedItems->setChecked(group->readEntry("Preview Grouped Items", true));
     d->actionShowNumbersOnItems->setChecked(group->readEntry("Show numbers on items", true));
 
-    setThumnailSize(group->readEntry("Thumbnail Size", WMW2MinThumbnailSize));
-    setGroupingRadius(group->readEntry("Grouping Radius", WMW2MinGroupingRadius));
+    setThumnailSize(group->readEntry("Thumbnail Size", 2*WMW2MinThumbnailSize));
+    setGroupingRadius(group->readEntry("Grouping Radius", 2*WMW2MinGroupingRadius));
     setEditGroupingRadius(group->readEntry("Edit Grouping Radius", WMW2MinEditGroupingRadius));
 
     for (int i=0; i<d->loadedBackends.size(); ++i)
@@ -1475,7 +1475,7 @@ void WorldMapWidget2::setSortKey(const int sortKey)
 
 QPixmap WorldMapWidget2::getDecoratedPixmapForCluster(const int clusterId, const WMWSelectionState* const selectedStateOverride, const int* const countOverride, QPoint* const centerPoint)
 {
-    const int circleRadius = d->thumbnailSize/2; // s->groupingRadius;
+    const int circleRadius = d->thumbnailSize/2;
     const WMWCluster& cluster = s->clusterList.at(clusterId);
     
     int markerCount = cluster.markerCount;
@@ -1534,7 +1534,7 @@ QPixmap WorldMapWidget2::getDecoratedPixmapForCluster(const int clusterId, const
 
     if (displayThumbnail)
     {
-        const QVariant representativeMarker = s->worldMapWidget->getClusterRepresentativeMarker(clusterId, s->sortKey);
+        const QVariant representativeMarker = getClusterRepresentativeMarker(clusterId, s->sortKey);
         QPixmap clusterPixmap = s->representativeChooser->pixmapFromRepresentativeIndex(representativeMarker, QSize(d->thumbnailSize-2, d->thumbnailSize-2));
 
         if (!clusterPixmap.isNull())
@@ -1647,7 +1647,7 @@ void WorldMapWidget2::setGroupingRadius(const int newGroupingRadius)
     d->groupingRadius = qMax(WMW2MinGroupingRadius, newGroupingRadius);
 
     // make sure the thumbnails are smaller than the grouping radius
-    if (2*d->groupingRadius > d->thumbnailSize)
+    if (2*d->groupingRadius < d->thumbnailSize)
     {
         d->thumbnailSize = 2*newGroupingRadius;
     }
@@ -1677,7 +1677,11 @@ void WorldMapWidget2::slotDecreaseThumbnailSize()
 
     if (d->thumbnailSize>WMW2MinThumbnailSize)
     {
-        setThumnailSize(qMax(WMW2MinThumbnailSize, d->thumbnailSize-5));
+        const int newThumbnailSize = qMax(WMW2MinThumbnailSize, d->thumbnailSize-5);
+
+        // make sure the grouping radius is also decreased
+        // this will automatically decrease the thumbnail size as well
+        setGroupingRadius(newThumbnailSize/2);
     }
 }
 
