@@ -263,7 +263,9 @@ public:
       coordinates(),
       pixelPos(),
       selectedState(WMWSelectedNone),
-      representativeMarkers()
+      representativeMarkers(),
+      pixmapSize(),
+      pixmapOffset()
     {
     }
 
@@ -274,6 +276,15 @@ public:
     QPoint pixelPos;
     WMWSelectionState selectedState;
     QMap<int, QVariant> representativeMarkers;
+    enum PixmapType
+    {
+        PixmapMarker,
+        PixmapCircle,
+        PixmapImage
+    } pixmapType;
+    QSize pixmapSize;
+    //! anchor point of the image, measured from bottom-left
+    QPoint pixmapOffset;
 };
 
 class MarkerModel;

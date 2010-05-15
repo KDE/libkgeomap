@@ -477,8 +477,11 @@ void BackendMarble::marbleCustomPaint(Marble::GeoPainter* painter)
             QPoint clusterCenterPoint;
             const QPixmap clusterPixmap = s->worldMapWidget->getDecoratedPixmapForCluster(i, &selectionStateOverride, &markerCountOverride, &clusterCenterPoint);
 
-            // TODO: handle the centerPoint correctly
-            painter->drawPixmap(clusterPoint.x()-clusterCenterPoint.x(), clusterPoint.y()-clusterCenterPoint.y(), clusterPixmap);
+            // drawPixmap wants to know the top-left point
+            // our offset is counted from the bottom-left
+            // and Qt's coordinate system starts at the top left of the screen!
+            const QPoint drawPoint = clusterPoint - QPoint(0, clusterPixmap.height()) - QPoint(clusterCenterPoint.x(), -clusterCenterPoint.y());
+            painter->drawPixmap(drawPoint, clusterPixmap);
         }
     }
 
@@ -775,7 +778,8 @@ bool BackendMarble::eventFilter(QObject *object, QEvent *event)
             // scan in reverse order of painting!
             for (int clusterIndex = s->clusterList.count()-1; clusterIndex>=0; --clusterIndex)
             {
-                const WMWGeoCoordinate currentCoordinates = s->clusterList.at(clusterIndex).coordinates;
+                const WMWCluster& cluster = s->clusterList.at(clusterIndex);
+                const WMWGeoCoordinate currentCoordinates = cluster.coordinates;
 
                 QPoint clusterPoint;
                 if (!screenCoordinates(currentCoordinates, &clusterPoint))
@@ -784,22 +788,16 @@ bool BackendMarble::eventFilter(QObject *object, QEvent *event)
                 }
 
                 QRect markerRect;
-                if (s->inEditMode)
-                {
-                    const int markerPixmapHeight = s->markerPixmap.height();
-                    const int markerPixmapWidth = s->markerPixmap.width();
-                    markerRect = QRect(clusterPoint.x()-markerPixmapWidth/2, clusterPoint.y()-markerPixmapHeight, markerPixmapWidth, markerPixmapHeight);
-                }
-                else
-                {
-                    const int markerPixmapHeight = 30;
-                    const int markerPixmapWidth = 30;
-                    markerRect = QRect(clusterPoint.x()-markerPixmapWidth/2, clusterPoint.y()-markerPixmapHeight/2, markerPixmapWidth, markerPixmapHeight);
-                }
+                markerRect.setSize(cluster.pixmapSize);
+                markerRect.moveBottomLeft(clusterPoint);
+                markerRect.translate(-QPoint(cluster.pixmapOffset.x(), -cluster.pixmapOffset.y()));
+
                 if (!markerRect.contains(mouseEvent->pos()))
                 {
                     continue;
                 }
+
+                // TODO: for circles, make sure the mouse is really above the circle and not just in the rectangle!
 
                 // the user clicked on a cluster:
                 d->mouseMoveClusterIndex = clusterIndex;

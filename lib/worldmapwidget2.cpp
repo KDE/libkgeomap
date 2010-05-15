@@ -1476,7 +1476,7 @@ void WorldMapWidget2::setSortKey(const int sortKey)
 QPixmap WorldMapWidget2::getDecoratedPixmapForCluster(const int clusterId, const WMWSelectionState* const selectedStateOverride, const int* const countOverride, QPoint* const centerPoint)
 {
     const int circleRadius = d->thumbnailSize/2;
-    const WMWCluster& cluster = s->clusterList.at(clusterId);
+    WMWCluster& cluster = s->clusterList[clusterId];
     
     int markerCount = cluster.markerCount;
     WMWSelectionState selectedState = cluster.selectedState;
@@ -1511,9 +1511,14 @@ QPixmap WorldMapWidget2::getDecoratedPixmapForCluster(const int clusterId, const
         }
         const QPixmap& markerPixmap = s->markerPixmaps[pixmapName];
 
+        // update the display information stored in the cluster:
+        cluster.pixmapType = WMWCluster::PixmapMarker;
+        cluster.pixmapOffset = QPoint(markerPixmap.width()/2, 0);
+        cluster.pixmapSize = markerPixmap.size();
+
         if (centerPoint)
         {
-            *centerPoint = QPoint(markerPixmap.width()/2, 0);
+            *centerPoint = cluster.pixmapOffset;
         }
 
         return markerPixmap;
@@ -1583,9 +1588,14 @@ QPixmap WorldMapWidget2::getDecoratedPixmapForCluster(const int clusterId, const
                             Qt::AlignHCenter|Qt::AlignVCenter, labelText);
             }
 
+            // update the display information stored in the cluster:
+            cluster.pixmapType = WMWCluster::PixmapImage;
+            cluster.pixmapOffset = QPoint(resultPixmap.width()/2, resultPixmap.height()/2);
+            cluster.pixmapSize = resultPixmap.size();
+
             if (centerPoint)
             {
-                *centerPoint = QPoint(resultPixmap.width()/2, resultPixmap.height()/2);
+                *centerPoint = cluster.pixmapOffset;
             }
 
             return resultPixmap;
@@ -1615,6 +1625,11 @@ QPixmap WorldMapWidget2::getDecoratedPixmapForCluster(const int clusterId, const
     circlePainter.setPen(labelPen);
     circlePainter.setBrush(Qt::NoBrush);
     circlePainter.drawText(circleRect, Qt::AlignHCenter|Qt::AlignVCenter, labelText);
+
+    // update the display information stored in the cluster:
+    cluster.pixmapType = WMWCluster::PixmapCircle;
+    cluster.pixmapOffset = QPoint(circlePixmap.width()/2, circlePixmap.height()/2);
+    cluster.pixmapSize = circlePixmap.size();
 
     if (centerPoint)
     {

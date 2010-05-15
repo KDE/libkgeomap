@@ -828,15 +828,17 @@ void BackendGoogleMaps::setClusterPixmap(const int clusterId, const QPoint& cent
     QByteArray bytes;
     QBuffer buffer(&bytes);
     buffer.open(QIODevice::WriteOnly);
-    clusterPixmap.save(&buffer, "PNG");
+    clusterPixmap.save(&buffer, "PNG");    
 
     // http://www.faqs.org/rfcs/rfc2397.html
     const QString imageData = QString("data:image/png;base64,%1").arg(QString::fromAscii(bytes.toBase64()));
-    d->htmlWidget->runScript(QString("wmwSetClusterPixmap(%1,%2,%3,'%4');")
+    d->htmlWidget->runScript(QString("wmwSetClusterPixmap(%1,%5,%6,%2,%3,'%4');")
                     .arg(clusterId)
                     .arg(centerPoint.x())
                     .arg(centerPoint.y())
                     .arg(imageData)
+                    .arg(clusterPixmap.width())
+                    .arg(clusterPixmap.height())
                 );
 }
 

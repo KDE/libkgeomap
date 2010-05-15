@@ -210,9 +210,12 @@ function wmwGetPixmapName(markerCount, markerSelectedCount)
     }
     return colorCode;
 }
-function wmwSetClusterPixmap(id, xOffset, yOffset, pixmapurl) {
-    // TODO: add the offset!
-    clusterList[id].setIcon(pixmapurl);
+function wmwSetClusterPixmap(id, pixmapWidth, pixmapHeight, xOffset, yOffset, pixmapurl) {
+    var pixmapSize = new google.maps.Size(pixmapWidth, pixmapHeight);
+    var pixmapOrigin = new google.maps.Point(0, 0);
+    var anchorPoint = new google.maps.Point(xOffset, yOffset);
+    var markerImage = new google.maps.MarkerImage(pixmapurl, pixmapSize, pixmapOrigin, anchorPoint);
+    clusterList[id].setIcon(markerImage);
 }
 function wmwAddCluster(id, lat, lon, setDraggable, markerCount, markerSelectedCount) {
     var latlng = new google.maps.LatLng(lat, lon);
