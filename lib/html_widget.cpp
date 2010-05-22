@@ -61,7 +61,10 @@ HTMLWidget::HTMLWidget(QWidget* const parent)
     connect(this, SIGNAL(completed()),
             this, SLOT(slotHTMLCompleted()));
 
-    d->parent->installEventFilter(this);
+    if (d->parent)
+    {
+        d->parent->installEventFilter(this);
+    }
 }
 
 HTMLWidget::~HTMLWidget()
@@ -148,7 +151,7 @@ bool HTMLWidget::runScript2Coordinates(const QString& scriptCode, WMWGeoCoordina
 
 bool HTMLWidget::eventFilter(QObject* object, QEvent* event)
 {
-    if (object==d->parent)
+    if (d->parent && object==d->parent)
     {
         if (event->type()==QEvent::Resize)
         {
