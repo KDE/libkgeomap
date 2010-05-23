@@ -128,7 +128,7 @@ public:
     KAction* actionEditMode;
     QActionGroup* actionGroupMode;
     QWidget* browseModeControlsHolder;
-    QPointer<QWidget> controlWidget;
+    QPointer<KHBox> controlWidget;
     KAction* actionPreviewSingleItems;
     KAction* actionPreviewGroupedItems;
     KAction* actionShowNumbersOnItems;
@@ -323,6 +323,9 @@ bool WorldMapWidget2::setBackend(const QString& backendName)
         disconnect(d->currentBackend, SIGNAL(signalSpecialMarkersMoved(const QList<QPersistentModelIndex>&)),
                     this, SIGNAL(signalSpecialMarkersMoved(const QList<QPersistentModelIndex>&)));
 
+        disconnect(this, SIGNAL(signalUngroupedModelChanged(const int)),
+                    d->currentBackend, SLOT(slotUngroupedModelChanged(const int)));
+
         if (s->representativeChooser)
         {
             disconnect(s->representativeChooser, SIGNAL(signalThumbnailAvailableForIndex(const QVariant&, const QPixmap&)),
@@ -355,6 +358,9 @@ bool WorldMapWidget2::setBackend(const QString& backendName)
 
             connect(d->currentBackend, SIGNAL(signalSpecialMarkersMoved(const QList<QPersistentModelIndex>&)),
                     this, SIGNAL(signalSpecialMarkersMoved(const QList<QPersistentModelIndex>&)));
+
+            connect(this, SIGNAL(signalUngroupedModelChanged(const int)),
+                    d->currentBackend, SLOT(slotUngroupedModelChanged(const int)));
 
             if (s->representativeChooser)
             {
@@ -1234,7 +1240,15 @@ void WorldMapWidget2::addUngroupedModel(WMWModelHelper* const modelHelper)
 {
     s->ungroupedModels << modelHelper;
 
-    // TODO: update everything!
+    // TODO: monitor all model signals!
+    connect(modelHelper->model(), SIGNAL(dataChanged(const QModelIndex&, const QModelIndex&)),
+            this, SLOT(slotUngroupedModelChanged()));
+    connect(modelHelper->model(), SIGNAL(rowsInserted(const QModelIndex&, int, int)),
+            this, SLOT(slotUngroupedModelChanged()));
+    connect(modelHelper, SIGNAL(signalVisibilityChanged()),
+            this, SLOT(slotUngroupedModelChanged()));
+
+    emit(signalUngroupedModelChanged(s->ungroupedModels.count() - 1));
 }
 
 void WorldMapWidget2::setDisplayMarkersModel(QAbstractItemModel* const displayMarkersModel, const int coordinatesRole, QItemSelectionModel* const selectionModel)
@@ -1716,6 +1730,55 @@ int WorldMapWidget2::getThumbnailSize() const
 int WorldMapWidget2::getUndecoratedThumbnailSize() const
 {
     return d->thumbnailSize-2;
+}
+
+void WorldMapWidget2::slotUngroupedModelChanged()
+{
+    // determine the index under which we handle this model
+    QObject* const senderObject = sender();
+
+    QAbstractItemModel* const senderModel = qobject_cast<QAbstractItemModel*>(senderObject);
+    if (senderModel)
+    {
+        for (int i=0; i<s->ungroupedModels.count(); ++i)
+        {
+            if (s->ungroupedModels.at(i)->model()==senderModel)
+            {
+                emit(signalUngroupedModelChanged(i));
+
+                break;
+            }
+        }
+        return;
+    }
+
+    WMWModelHelper* const senderHelper = qobject_cast<WMWModelHelper*>(senderObject);
+    if (senderHelper)
+    {
+        for (int i=0; i<s->ungroupedModels.count(); ++i)
+        {
+            if (s->ungroupedModels.at(i)==senderHelper)
+            {
+                emit(signalUngroupedModelChanged(i));
+
+                break;
+            }
+        }
+    }
+}
+
+void WorldMapWidget2::addWidgetToControlWidget(QWidget* const newWidget)
+{
+    // make sure the control widget exists
+    if (!d->controlWidget)
+        getControlWidget();
+
+    const int itemCount = d->controlWidget->layout()->count();
+    QHBoxLayout* const hBoxLayout = reinterpret_cast<QHBoxLayout*>(d->controlWidget->layout());
+    if (hBoxLayout)
+    {
+        hBoxLayout->insertWidget(itemCount-1, newWidget);
+    }
 }
 
 } /* WMW2 */

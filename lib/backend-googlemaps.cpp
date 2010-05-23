@@ -312,40 +312,51 @@ void BackendGoogleMaps::readSettingsFromGroup(const KConfigGroup* const group)
     setShowScaleControl(group->readEntry("GoogleMaps Show Scale Control", true));
 }
 
-void BackendGoogleMaps::updateMarkers()
+void BackendGoogleMaps::slotUngroupedModelChanged(const int mindex)
 {
     WMW2_ASSERT(isReady());
     if (!isReady())
         return;
 
-//     if (s->ungroupedModels->isEmpty())
-//         return;
+    d->htmlWidget->runScript(QString("wmwClearMarkers(%1);").arg(mindex));
+    WMWModelHelper* const modelHelper = s->ungroupedModels.at(mindex);
 
-    // re-transfer all markers to the javascript-part:
-    d->htmlWidget->runScript(QString("wmwClearMarkers();"));
-    for (int i = 0; i < s->ungroupedModels.count(); ++i)
+    if (!modelHelper->visible())
+            return;
+
+    QAbstractItemModel* const model = modelHelper->model();
+
+    for (int row = 0; row<model->rowCount(); ++row)
     {
-        WMWModelHelper* const modelHelper = s->ungroupedModels.at(i);
-        QAbstractItemModel* const model = modelHelper->model();
-        
-        for (int row = 0; row<model->rowCount(); ++row)
-        {
-            const QModelIndex currentIndex = model->index(row, 0);
+        const QModelIndex currentIndex = model->index(row, 0);
 
-            WMWGeoCoordinate currentCoordinates;
-            if (!modelHelper->itemCoordinates(currentIndex, &currentCoordinates))
-                continue;
+        WMWGeoCoordinate currentCoordinates;
+        if (!modelHelper->itemCoordinates(currentIndex, &currentCoordinates))
+            continue;
 
-            // TODO: use the pixmap supplied by the modelHelper
-            d->htmlWidget->runScript(QString("wmwAddMarker(%1, %2, %3, %4);")
-                    .arg(row)
-                    .arg(currentCoordinates.latString())
-                    .arg(currentCoordinates.lonString())
-                    .arg(/*currentMarker.isDraggable()?*/"true"/*:"false"*/)
-                );
-        }
+        // TODO: use the pixmap supplied by the modelHelper
+        d->htmlWidget->runScript(QString("wmwAddMarker(%5, %1, %2, %3, %4);")
+                .arg(row)
+                .arg(currentCoordinates.latString())
+                .arg(currentCoordinates.lonString())
+                .arg(/*currentMarker.isDraggable()?*/"true"/*:"false"*/)
+                .arg(mindex)
+            );
+
+        QPoint markerCenterPoint;
+        QPixmap markerPixmap = modelHelper->itemIcon(currentIndex, &markerCenterPoint);
+
+        setMarkerPixmap(mindex, row, markerCenterPoint, markerPixmap);
     }
     
+}
+void BackendGoogleMaps::updateMarkers()
+{
+    // re-transfer all markers to the javascript-part:
+    for (int i = 0; i < s->ungroupedModels.count(); ++i)
+    {
+        slotUngroupedModelChanged(i);
+    }
 }
 
 void BackendGoogleMaps::slotHTMLEvents(const QStringList& events)
@@ -845,10 +856,30 @@ void BackendGoogleMaps::setClusterPixmap(const int clusterId, const QPoint& cent
     d->htmlWidget->runScript(QString("wmwSetClusterPixmap(%1,%5,%6,%2,%3,'%4');")
                     .arg(clusterId)
                     .arg(centerPoint.x())
-                    .arg(centerPoint.y())
+                    .arg(clusterPixmap.height()-centerPoint.y())
                     .arg(imageData)
                     .arg(clusterPixmap.width())
                     .arg(clusterPixmap.height())
+                );
+}
+
+void BackendGoogleMaps::setMarkerPixmap(const int modelId, const int markerId, const QPoint& centerPoint, const QPixmap& markerPixmap)
+{
+    QByteArray bytes;
+    QBuffer buffer(&bytes);
+    buffer.open(QIODevice::WriteOnly);
+    markerPixmap.save(&buffer, "PNG");
+
+    // http://www.faqs.org/rfcs/rfc2397.html
+    const QString imageData = QString("data:image/png;base64,%1").arg(QString::fromAscii(bytes.toBase64()));
+    d->htmlWidget->runScript(QString("wmwSetMarkerPixmap(%7,%1,%5,%6,%2,%3,'%4');")
+                    .arg(markerId)
+                    .arg(centerPoint.x())
+                    .arg(markerPixmap.height()-centerPoint.y())
+                    .arg(imageData)
+                    .arg(markerPixmap.width())
+                    .arg(markerPixmap.height())
+                    .arg(modelId)
                 );
 }
 

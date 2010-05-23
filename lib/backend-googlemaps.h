@@ -80,11 +80,13 @@ public:
 public Q_SLOTS:
     virtual void slotClustersNeedUpdating();
     virtual void slotThumbnailAvailableForIndex(const QVariant& index, const QPixmap& pixmap);
+    void slotUngroupedModelChanged(const int mindex);
 
 protected:
     bool eventFilter(QObject* object, QEvent* event);
     void createActions();
     void setClusterPixmap(const int clusterId, const QPoint& centerPoint, const QPixmap& clusterPixmap);
+    void setMarkerPixmap(const int modelId, const int markerId, const QPoint& centerPoint, const QPixmap& markerPixmap);
 
 private Q_SLOTS:
     void slotHTMLInitialized();

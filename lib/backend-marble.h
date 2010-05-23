@@ -89,6 +89,7 @@ public:
 public Q_SLOTS:
     virtual void slotClustersNeedUpdating();
     virtual void slotThumbnailAvailableForIndex(const QVariant& index, const QPixmap& pixmap);
+    void slotUngroupedModelChanged(const int index);
 
 protected:
     bool eventFilter(QObject *object, QEvent *event);

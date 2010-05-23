@@ -65,6 +65,7 @@ public:
 
     KAction* getControlAction(const QString& actionName);
     QWidget* getControlWidget();
+    void addWidgetToControlWidget(QWidget* const newWidget);
 
     void updateMarkers();
     void updateClusters();
@@ -113,6 +114,7 @@ Q_SIGNALS:
     void signalAltitudeLookupReady(const WMW2::WMWAltitudeLookup::List& altitudes);
     void signalDisplayMarkersMoved(const QList<QPersistentModelIndex>& indices, const WMW2::WMWGeoCoordinate& coordinates);
     void signalSpecialMarkersMoved(const QList<QPersistentModelIndex>& indices);
+    void signalUngroupedModelChanged(const int index);
 
 protected:
     void applyCacheToBackend();
@@ -135,6 +137,7 @@ protected Q_SLOTS:
     void slotRequestLazyReclustering();
     void slotLazyReclusteringRequestCallBack();
     void slotItemDisplaySettingsChanged();
+    void slotUngroupedModelChanged();
 
 private:
     const QExplicitlySharedDataPointer<WMWSharedData> s;

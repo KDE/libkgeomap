@@ -419,6 +419,9 @@ void BackendMarble::marbleCustomPaint(Marble::GeoPainter* painter)
     for (int i = 0; i<s->ungroupedModels.count(); ++i)
     {
         WMWModelHelper* const modelHelper = s->ungroupedModels.at(i);
+        if (!modelHelper->visible())
+            continue;
+
         QAbstractItemModel* const model = modelHelper->model();
 
         // render all visible markers:
@@ -980,6 +983,11 @@ void BackendMarble::slotThumbnailAvailableForIndex(const QVariant& index, const 
         return;
 
     // re-paint the map
+    d->marbleWidget->update();
+}
+
+void BackendMarble::slotUngroupedModelChanged(const int index)
+{
     d->marbleWidget->update();
 }
 
