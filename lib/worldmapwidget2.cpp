@@ -1230,10 +1230,9 @@ bool WorldMapWidget2::queryAltitudes(const WMWAltitudeLookup::List& queryItems, 
     return false;
 }
 
-void WorldMapWidget2::setSpecialMarkersModel(QAbstractItemModel* const specialMarkersModel, const int coordinatesRole)
+void WorldMapWidget2::addUngroupedModel(WMWModelHelper* const modelHelper)
 {
-    s->specialMarkersModel = specialMarkersModel;
-    s->specialMarkersCoordinatesRole = coordinatesRole;
+    s->ungroupedModels << modelHelper;
 
     // TODO: update everything!
 }

@@ -179,4 +179,13 @@ WMWRepresentativeChooser::~WMWRepresentativeChooser()
 {
 }
 
+WMWModelHelper::WMWModelHelper(QObject* const parent)
+: QObject(parent)
+{
+}
+
+WMWModelHelper::~WMWModelHelper()
+{
+}
+
 } /* WMW2 */

@@ -416,14 +416,20 @@ void BackendMarble::marbleCustomPaint(Marble::GeoPainter* painter)
     // TODO: use global radius instead, but check the code here first
     const int circleRadius = 15; // s->groupingRadius;
 
-    if (s->specialMarkersModel)
+    for (int i = 0; i<s->ungroupedModels.count(); ++i)
     {
-        // render all visible markers:
-        for (int row = 0; row<s->specialMarkersModel->rowCount(); ++row)
-        {
-            const QModelIndex currentIndex = s->specialMarkersModel->index(row, 0);
+        WMWModelHelper* const modelHelper = s->ungroupedModels.at(i);
+        QAbstractItemModel* const model = modelHelper->model();
 
-            WMWGeoCoordinate markerCoordinates = s->specialMarkersModel->data(currentIndex, s->specialMarkersCoordinatesRole).value<WMWGeoCoordinate>();
+        // render all visible markers:
+        for (int row = 0; row<model->rowCount(); ++row)
+        {
+            const QModelIndex currentIndex = model->index(row, 0);
+
+            WMWGeoCoordinate markerCoordinates;
+            if (!modelHelper->itemCoordinates(currentIndex, &markerCoordinates))
+                continue;
+
             // is the marker being moved right now?
             if (currentIndex == d->mouseMoveMarkerIndex)
             {
@@ -434,10 +440,19 @@ void BackendMarble::marbleCustomPaint(Marble::GeoPainter* painter)
             if (!screenCoordinates(markerCoordinates, &markerPoint))
                 continue;
 
-            painter->drawPixmap(markerPoint.x()-s->markerPixmap.width()/2, markerPoint.y()-s->markerPixmap.height(), s->markerPixmap);
-    //         painter->setPen(circlePen);
-    //         painter->setBrush(circleBrush);
-    //         painter->drawEllipse(markerPoint.x()-circleRadius, markerPoint.y()-circleRadius, 2*circleRadius, 2*circleRadius);
+            QPoint markerCenterPoint;
+            QPixmap markerPixmap = modelHelper->itemIcon(currentIndex, &markerCenterPoint);
+            if (markerPixmap.isNull())
+            {
+                markerPixmap = s->markerPixmap;
+                markerCenterPoint = QPoint(markerPixmap.width()/2, 0);
+            }
+
+            // drawPixmap wants to know the top-left point
+            // our offset is counted from the bottom-left
+            // and Qt's coordinate system starts at the top left of the screen!
+            const QPoint drawPoint = markerPoint - QPoint(0, markerPixmap.height()) - QPoint(markerCenterPoint.x(), -markerCenterPoint.y());
+            painter->drawPixmap(drawPoint, markerPixmap);
         }
     }
 
@@ -741,37 +756,37 @@ bool BackendMarble::eventFilter(QObject *object, QEvent *event)
         // scan in reverse order, because the user would expect
         // the topmost marker to be picked up and not the
         // one below
-        if (s->specialMarkersModel)
-        {
-            for (int row = s->specialMarkersModel->rowCount()-1; row>=0; --row)
-            {
-                const QModelIndex currentIndex = s->specialMarkersModel->index(row, 0);
-                const WMWGeoCoordinate currentCoordinates = s->specialMarkersModel->data(currentIndex, s->specialMarkersCoordinatesRole).value<WMWGeoCoordinate>();
-
-                QPoint markerPoint;
-                if (!screenCoordinates(currentCoordinates, &markerPoint))
-                {
-                    continue;
-                }
-
-                const int markerPixmapHeight = s->markerPixmap.height();
-                const int markerPixmapWidth = s->markerPixmap.width();
-                const QRect markerRect(markerPoint.x()-markerPixmapWidth/2, markerPoint.y()-markerPixmapHeight, markerPixmapWidth, markerPixmapHeight);
-                if (!markerRect.contains(mouseEvent->pos()))
-                {
-                    continue;
-                }
-
-                // the user clicked on a marker:
-                d->mouseMoveMarkerIndex = QPersistentModelIndex(currentIndex);
-                d->mouseMoveCenterOffset = mouseEvent->pos() - markerPoint;
-                d->mouseMoveObjectCoordinates = currentCoordinates;
-                doFilterEvent = true;
-                d->havePotentiallyMouseMovingObject = true;
-
-                break;
-            }
-        }
+//         if (s->specialMarkersModel)
+//         {
+//             for (int row = s->specialMarkersModel->rowCount()-1; row>=0; --row)
+//             {
+//                 const QModelIndex currentIndex = s->specialMarkersModel->index(row, 0);
+//                 const WMWGeoCoordinate currentCoordinates = s->specialMarkersModel->data(currentIndex, s->specialMarkersCoordinatesRole).value<WMWGeoCoordinate>();
+// 
+//                 QPoint markerPoint;
+//                 if (!screenCoordinates(currentCoordinates, &markerPoint))
+//                 {
+//                     continue;
+//                 }
+// 
+//                 const int markerPixmapHeight = s->markerPixmap.height();
+//                 const int markerPixmapWidth = s->markerPixmap.width();
+//                 const QRect markerRect(markerPoint.x()-markerPixmapWidth/2, markerPoint.y()-markerPixmapHeight, markerPixmapWidth, markerPixmapHeight);
+//                 if (!markerRect.contains(mouseEvent->pos()))
+//                 {
+//                     continue;
+//                 }
+// 
+//                 // the user clicked on a marker:
+//                 d->mouseMoveMarkerIndex = QPersistentModelIndex(currentIndex);
+//                 d->mouseMoveCenterOffset = mouseEvent->pos() - markerPoint;
+//                 d->mouseMoveObjectCoordinates = currentCoordinates;
+//                 doFilterEvent = true;
+//                 d->havePotentiallyMouseMovingObject = true;
+// 
+//                 break;
+//             }
+//         }
 
         if (/*s->inEditMode&&*/!doFilterEvent)
         {
@@ -878,14 +893,14 @@ bool BackendMarble::eventFilter(QObject *object, QEvent *event)
         {
             if (d->mouseMoveMarkerIndex.isValid())
             {
-                // the marker was dropped to valid coordinates
+/*                // the marker was dropped to valid coordinates
                 s->specialMarkersModel->setData(d->mouseMoveMarkerIndex, QVariant::fromValue(newCoordinates), s->specialMarkersCoordinatesRole);
 
                 QList<QPersistentModelIndex> markerIndices;
                 markerIndices << d->mouseMoveMarkerIndex;
 
                 // also emit a signal that the marker was moved:
-                emit(signalSpecialMarkersMoved(markerIndices));
+                emit(signalSpecialMarkersMoved(markerIndices));*/
             }
             else
             {

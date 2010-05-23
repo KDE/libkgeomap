@@ -83,7 +83,7 @@ public:
     QString convertZoomToBackendZoom(const QString& someZoom, const QString& targetBackend) const;
     bool queryAltitudes(const WMWAltitudeLookup::List& queryItems, const QString& backendName = "");
 
-    void setSpecialMarkersModel(QAbstractItemModel* const specialMarkersModel, const int coordinatesRole);
+    void addUngroupedModel(WMWModelHelper* const modelHelper);
     void setDisplayMarkersModel(QAbstractItemModel* const displayMarkersModel, const int coordinatesRole, QItemSelectionModel* const selectionModel = 0);
 
     void setEditModeAvailable(const bool state);

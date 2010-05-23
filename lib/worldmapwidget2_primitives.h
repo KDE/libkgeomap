@@ -23,6 +23,7 @@
 // Qt includes
 
 #include <QAbstractItemModel>
+#include <QItemSelectionModel>
 #include <QMimeData>
 #include <QPersistentModelIndex>
 #include <QPixmap>
@@ -305,6 +306,20 @@ Q_SIGNALS:
     void signalThumbnailAvailableForIndex(const QVariant& index, const QPixmap& pixmap);
 };
 
+class WORLDMAPWIDGET2_EXPORT WMWModelHelper : public QObject
+{
+Q_OBJECT
+public:
+    WMWModelHelper(QObject* const parent = 0);
+    virtual ~WMWModelHelper();
+
+    virtual QAbstractItemModel* model() const = 0;
+    virtual QItemSelectionModel* selectionModel() const = 0;
+    virtual bool itemCoordinates(const QModelIndex& index, WMWGeoCoordinate* const coordinates) const = 0;
+    virtual QPixmap itemIcon(const QModelIndex& index, QPoint* const offset) const = 0;
+
+};
+
 class WMWSharedData : public QSharedData
 {
 public:
@@ -314,8 +329,6 @@ public:
       visibleMarkers(),
       markerModel(0),
       clusterList(),
-      specialMarkersModel(0),
-      specialMarkersCoordinatesRole(0),
       displayMarkersModel(0),
       displayMarkersCoordinatesRole(0),
       inEditMode(false),
@@ -348,8 +361,7 @@ public:
     QIntList visibleMarkers;
     MarkerModel* markerModel;
     WMWCluster::List clusterList;
-    QAbstractItemModel* specialMarkersModel;
-    int specialMarkersCoordinatesRole;
+    QList<WMWModelHelper*> ungroupedModels;
     QAbstractItemModel* displayMarkersModel;
     int displayMarkersCoordinatesRole;
     bool inEditMode;
@@ -360,7 +372,7 @@ public:
     bool previewSingleItems;
     bool previewGroupedItems;
     bool showNumbersOnItems;
-    int sortKey;
+    int sortKey;    
 };
 
 } /* WMW2 */

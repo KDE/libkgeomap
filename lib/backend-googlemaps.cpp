@@ -318,23 +318,32 @@ void BackendGoogleMaps::updateMarkers()
     if (!isReady())
         return;
 
-    if (!s->specialMarkersModel)
-        return;
+//     if (s->ungroupedModels->isEmpty())
+//         return;
 
     // re-transfer all markers to the javascript-part:
     d->htmlWidget->runScript(QString("wmwClearMarkers();"));
-    for (int row = 0; row<s->specialMarkersModel->rowCount(); ++row)
+    for (int i = 0; i < s->ungroupedModels.count(); ++i)
     {
-        const QModelIndex currentIndex = s->specialMarkersModel->index(row, 0);
+        WMWModelHelper* const modelHelper = s->ungroupedModels.at(i);
+        QAbstractItemModel* const model = modelHelper->model();
+        
+        for (int row = 0; row<model->rowCount(); ++row)
+        {
+            const QModelIndex currentIndex = model->index(row, 0);
 
-        const WMWGeoCoordinate currentCoordinates = s->specialMarkersModel->data(currentIndex, s->specialMarkersCoordinatesRole).value<WMWGeoCoordinate>();
+            WMWGeoCoordinate currentCoordinates;
+            if (!modelHelper->itemCoordinates(currentIndex, &currentCoordinates))
+                continue;
 
-        d->htmlWidget->runScript(QString("wmwAddMarker(%1, %2, %3, %4);")
-                .arg(row)
-                .arg(currentCoordinates.latString())
-                .arg(currentCoordinates.lonString())
-                .arg(/*currentMarker.isDraggable()?*/"true"/*:"false"*/)
-            );
+            // TODO: use the pixmap supplied by the modelHelper
+            d->htmlWidget->runScript(QString("wmwAddMarker(%1, %2, %3, %4);")
+                    .arg(row)
+                    .arg(currentCoordinates.latString())
+                    .arg(currentCoordinates.lonString())
+                    .arg(/*currentMarker.isDraggable()?*/"true"/*:"false"*/)
+                );
+        }
     }
     
 }
@@ -433,35 +442,35 @@ void BackendGoogleMaps::slotHTMLEvents(const QStringList& events)
         }
         else if (eventCode=="mm")
         {
-            // TODO: buffer this event type!
-            // marker moved
-            bool okay = false;
-            const int markerRow= eventParameter.toInt(&okay);
-            WMW2_ASSERT(okay);
-            if (!okay)
-                continue;
-
-            WMW2_ASSERT(markerRow>=0);
-            WMW2_ASSERT(markerRow<s->specialMarkersModel->rowCount());
-            if ((markerRow<0)||(markerRow>=s->specialMarkersModel->rowCount()))
-                continue;
-
-            // re-read the marker position:
-            WMWGeoCoordinate markerCoordinates;
-            const bool isValid = d->htmlWidget->runScript2Coordinates(
-                    QString("wmwGetMarkerPosition(%1);").arg(markerRow),
-                    &markerCoordinates
-                );
-
-            WMW2_ASSERT(isValid);
-            if (!isValid)
-                continue;
-
-            // TODO: this discards the altitude!
-            const QModelIndex markerIndex = s->specialMarkersModel->index(markerRow, 0);
-            s->specialMarkersModel->setData(markerIndex, QVariant::fromValue(markerCoordinates), s->specialMarkersCoordinatesRole);
-
-            movedMarkers << QPersistentModelIndex(markerIndex);
+//             // TODO: buffer this event type!
+//             // marker moved
+//             bool okay = false;
+//             const int markerRow= eventParameter.toInt(&okay);
+//             WMW2_ASSERT(okay);
+//             if (!okay)
+//                 continue;
+// 
+//             WMW2_ASSERT(markerRow>=0);
+//             WMW2_ASSERT(markerRow<s->specialMarkersModel->rowCount());
+//             if ((markerRow<0)||(markerRow>=s->specialMarkersModel->rowCount()))
+//                 continue;
+// 
+//             // re-read the marker position:
+//             WMWGeoCoordinate markerCoordinates;
+//             const bool isValid = d->htmlWidget->runScript2Coordinates(
+//                     QString("wmwGetMarkerPosition(%1);").arg(markerRow),
+//                     &markerCoordinates
+//                 );
+// 
+//             WMW2_ASSERT(isValid);
+//             if (!isValid)
+//                 continue;
+// 
+//             // TODO: this discards the altitude!
+//             const QModelIndex markerIndex = s->specialMarkersModel->index(markerRow, 0);
+//             s->specialMarkersModel->setData(markerIndex, QVariant::fromValue(markerCoordinates), s->specialMarkersCoordinatesRole);
+// 
+//             movedMarkers << QPersistentModelIndex(markerIndex);
         }
         else if (eventCode=="do")
         {
