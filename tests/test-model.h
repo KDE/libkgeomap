@@ -48,6 +48,7 @@ private Q_SLOTS:
     void testIteratorPartial2();
     void testPreExistingMarkers();
     void testSelectionState1();
+    void benchmarkIteratorWholeWorld();
 };
 
 #endif /* TEST_MODEL_H */

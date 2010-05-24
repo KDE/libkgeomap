@@ -34,7 +34,7 @@ public:
       coordinatesRole(0),
       selectionModel(0)
     {
-        const QIntPair level0Sizes(18, 36);
+        const QIntPair level0Sizes(10, 10);
         tesselationSizes << level0Sizes;
         for (int i = 0; i<8; ++i)
         {

@@ -573,5 +573,37 @@ void TestModel::testSelectionState1()
     //       this is currently implemented by simply setting the tiles as dirty
 }
 
+void TestModel::benchmarkIteratorWholeWorld()
+{
+    QBENCHMARK
+    {
+        const QSharedPointer<QStandardItemModel> itemModel(new QStandardItemModel());
+        MarkerModel mm;
+        mm.setMarkerModel(itemModel.data(), CoordinatesRole);
+        const int maxLevel = mm.maxLevel();
+
+        for (int l = 0; l<=maxLevel; ++l)
+        {
+            MarkerModel::NonEmptyIterator it(&mm, l);
+            QVERIFY( CountMarkersInIterator(&it) == 0 );
+        }
+
+        itemModel->appendRow(MakeItemAt(coord_1_2));
+        itemModel->appendRow(MakeItemAt(coord_50_60));
+        for (int x=-50; x<50; ++x)
+        {
+            for (int y=-50; y<50; ++y)
+            {
+                itemModel->appendRow(MakeItemAt(WMW2::WMWGeoCoordinate(x,y)));
+            }
+        }
+        for (int l = 0; l<=maxLevel; ++l)
+        {
+            // iterate over the whole world:
+            MarkerModel::NonEmptyIterator it(&mm, l);
+        }
+    }
+}
+
 QTEST_MAIN(TestModel)
 
