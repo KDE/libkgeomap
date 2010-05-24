@@ -159,8 +159,8 @@ WMWGeoCoordinate::PairList WMWHelperNormalizeBounds(const WMWGeoCoordinate::Pair
 
     if (bEast<bWest)
     {
-        boundsList << WMWGeoCoordinate::makePair(bSouth, bEast, bNorth, 0);
-        boundsList << WMWGeoCoordinate::makePair(bSouth, 0, bNorth, bWest);
+        boundsList << WMWGeoCoordinate::makePair(bSouth, -180, bNorth, bEast);
+        boundsList << WMWGeoCoordinate::makePair(bSouth, bWest, bNorth, 180);
     }
     else
     {

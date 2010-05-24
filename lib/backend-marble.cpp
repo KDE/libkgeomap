@@ -721,7 +721,7 @@ int BackendMarble::getMarkerModelLevel()
 WMWGeoCoordinate::PairList BackendMarble::getNormalizedBounds()
 {
     const GeoDataLatLonAltBox marbleBounds = d->marbleWidget->map()->viewParams()->viewport()->viewLatLonAltBox();
-    kDebug()<<marbleBounds.toString(GeoDataCoordinates::Degree);
+//     kDebug()<<marbleBounds.toString(GeoDataCoordinates::Degree);
 
     const WMWGeoCoordinate::Pair boundsPair = WMWGeoCoordinate::makePair(
             marbleBounds.south(GeoDataCoordinates::Degree),
@@ -729,6 +729,9 @@ WMWGeoCoordinate::PairList BackendMarble::getNormalizedBounds()
             marbleBounds.north(GeoDataCoordinates::Degree),
             marbleBounds.east(GeoDataCoordinates::Degree)
         );
+
+//     kDebug()<<boundsPair.first<<boundsPair.second;
+//     kDebug()<<WMWHelperNormalizeBounds(boundsPair);
 
     return WMWHelperNormalizeBounds(boundsPair);
 }

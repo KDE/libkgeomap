@@ -13,7 +13,6 @@ TODO
 - Marble: find a way to handle selection-clicks for clusters in browse mode and still allow panning with the mouse at the same time
 - Drag and Drop: make it possible to drag items onto the map which have not been in the model yet
 - Drag and Drop: remove dragged marker from the clusters while dragging is active
-- Marble: there seem to be problems with some regions of the globe, where markers in clusters are not shown. Example: Mercator projection, move a marker to the dateline. Move the dateline to the right until a new dateline appears on the left and the one on the right vanishes->marker is not shown any more.
 
 LATER
 - re-implement clustering for the markers
@@ -54,3 +53,4 @@ DONE
 - create a model for the markers
 - Google Maps: show drag-and-drop marker over google maps backend
 - re-arrange clusters only if the map bounds have changed
+- Marble: there seem to be problems with some regions of the globe, where markers in clusters are not shown. Example: Mercator projection, move a marker to the dateline. Move the dateline to the right until a new dateline appears on the left and the one on the right vanishes->marker is not shown any more. -> seems to be fixed, bounds normalization was wrong.

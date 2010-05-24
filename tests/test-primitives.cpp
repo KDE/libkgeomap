@@ -169,20 +169,19 @@ void TestPrimitives::testNormalizeBounds_data()
         << ( WMWGeoCoordinate::PairList() << WMWGeoCoordinate::makePair(-12, -22, 10, 20) );
 
     // these ones should be split:
-    QTest::newRow("cross_date")
-        << WMWGeoCoordinate::makePair(10, 20, 15, -170)
-        << ( WMWGeoCoordinate::PairList()
-                << WMWGeoCoordinate::makePair(10, -170, 15, 0)
-                << WMWGeoCoordinate::makePair(10, 0, 15, 20)
-            );
+    QTest::newRow("cross_date_1")
+    << WMWGeoCoordinate::makePair(10, 20, 15, -170)
+    << ( WMWGeoCoordinate::PairList()
+            << WMWGeoCoordinate::makePair(10, -180, 15, -170)
+            << WMWGeoCoordinate::makePair(10, 20, 15, 180)
+        );
 
-    QTest::newRow("cross_date")
+    QTest::newRow("cross_date_2")
         << WMWGeoCoordinate::makePair(-10, 20, 15, -170)
         << ( WMWGeoCoordinate::PairList()
-                << WMWGeoCoordinate::makePair(-10, -170, 15, 0)
-                << WMWGeoCoordinate::makePair(-10, 0, 15, 20)
+                << WMWGeoCoordinate::makePair(-10, -180, 15, -170)
+                << WMWGeoCoordinate::makePair(-10, 20, 15, 180)
             );
-
 }
 
 void TestPrimitives::testNormalizeBounds()
