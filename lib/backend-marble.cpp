@@ -715,7 +715,7 @@ QString BackendMarble::getZoom() const
 
 int BackendMarble::getMarkerModelLevel()
 {
-    return s->markerModel->maxLevel()-1;
+    return MarkerModel::TileIndex::MaxLevel-1;
 }
 
 WMWGeoCoordinate::PairList BackendMarble::getNormalizedBounds()

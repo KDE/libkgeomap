@@ -716,19 +716,19 @@ void WorldMapWidget2::updateClusters()
     const QSize mapSize  = d->currentBackend->mapSize();
     const int gridWidth  = mapSize.width();
     const int gridHeight = mapSize.height();
-    QVector<QList<QIntList> > pixelNonEmptyTileIndexGrid(gridWidth*gridHeight, QList<QIntList>());
+    QVector<QList<MarkerModel::TileIndex> > pixelNonEmptyTileIndexGrid(gridWidth*gridHeight, QList<MarkerModel::TileIndex>());
     QVector<int> pixelCountGrid(gridWidth*gridHeight, 0);
-    QList<QPair<QPoint, QPair<int, QList<QIntList> > > > leftOverList;
+    QList<QPair<QPoint, QPair<int, QList<MarkerModel::TileIndex> > > > leftOverList;
 
     // TODO: iterate only over the visible part of the map
     int debugCountNonEmptyTiles = 0;
     int debugTilesSearched = 0;
     for (MarkerModel::NonEmptyIterator tileIterator(s->markerModel, markerLevel, mapBounds); !tileIterator.atEnd(); tileIterator.nextIndex())
     {
-        const QIntList tileIndex = tileIterator.currentIndex();
+        const MarkerModel::TileIndex tileIndex = tileIterator.currentIndex();
 
         // find out where the tile is on the map:
-        const WMWGeoCoordinate tileCoordinate = s->markerModel->tileIndexToCoordinate(tileIndex);
+        const WMWGeoCoordinate tileCoordinate = tileIndex.toCoordinates();
         debugTilesSearched++;
         QPoint tilePoint;
         if (!d->currentBackend->screenCoordinates(tileCoordinate, &tilePoint))
@@ -810,7 +810,7 @@ void WorldMapWidget2::updateClusters()
                 if (tooClose)
                 {
                     // move markers into leftover list
-                    leftOverList << QPair<QPoint, QPair<int, QList<QIntList> > >(QPoint(x,y), QPair<int, QList<QIntList> >(pixelCountGrid.at(index), pixelNonEmptyTileIndexGrid.at(index)));
+                    leftOverList << QPair<QPoint, QPair<int, QList<MarkerModel::TileIndex> > >(QPoint(x,y), QPair<int, QList<MarkerModel::TileIndex> >(pixelCountGrid.at(index), pixelNonEmptyTileIndexGrid.at(index)));
                     pixelCountGrid[index] = 0;
                     pixelNonEmptyTileIndexGrid[index].clear();
                     nonEmptyPixelIndices[pixelGridMetaIndex] = -1;
@@ -828,11 +828,11 @@ void WorldMapWidget2::updateClusters()
         if (markerMax==0)
             break;
 
-        WMWGeoCoordinate clusterCoordinates = s->markerModel->tileIndexToCoordinate( pixelNonEmptyTileIndexGrid.at(markerX+markerY*gridWidth).first() );
+        WMWGeoCoordinate clusterCoordinates = pixelNonEmptyTileIndexGrid.at(markerX+markerY*gridWidth).first().toCoordinates();
         WMWCluster cluster;
         cluster.coordinates = clusterCoordinates;
         cluster.pixelPos = QPoint(markerX, markerY);
-        cluster.tileIndicesList = pixelNonEmptyTileIndexGrid.at(markerX+markerY*gridWidth);
+        cluster.tileIndicesList = MarkerModel::TileIndex::listToIntListList(pixelNonEmptyTileIndexGrid.at(markerX+markerY*gridWidth));
         cluster.markerCount = pixelCountGrid.at(markerX+markerY*gridWidth);
 
         // mark the pixel as done:
@@ -854,7 +854,7 @@ void WorldMapWidget2::updateClusters()
             for (int indexY = yStart; indexY <= yEnd; ++indexY)
             {
                 const int index = indexX + indexY*gridWidth;
-                cluster.tileIndicesList << pixelNonEmptyTileIndexGrid.at(index);
+                cluster.tileIndicesList << MarkerModel::TileIndex::listToIntListList(pixelNonEmptyTileIndexGrid.at(index));
                 pixelNonEmptyTileIndexGrid[index].clear();
                 cluster.markerCount+= pixelCountGrid.at(index);
                 pixelCountGrid[index] = 0;
@@ -867,7 +867,7 @@ void WorldMapWidget2::updateClusters()
     }
 
     // now move all leftover markers into clusters:
-    for (QList<QPair<QPoint, QPair<int, QList<QIntList> > > >::const_iterator it = leftOverList.constBegin();
+    for (QList<QPair<QPoint, QPair<int, QList<MarkerModel::TileIndex> > > >::const_iterator it = leftOverList.constBegin();
          it!=leftOverList.constEnd(); ++it)
     {
         const QPoint markerPosition = it->first;
@@ -888,7 +888,7 @@ void WorldMapWidget2::updateClusters()
         if (closestIndex>=0)
         {
             s->clusterList[closestIndex].markerCount+= it->second.first;
-            s->clusterList[closestIndex].tileIndicesList << it->second.second;
+            s->clusterList[closestIndex].tileIndicesList << MarkerModel::TileIndex::listToIntListList(it->second.second);
         }
     }
 
@@ -902,7 +902,7 @@ void WorldMapWidget2::updateClusters()
                 (iTile<cluster.tileIndicesList.count());
                 ++iTile)
         {
-            clusterSelectedCount+= s->markerModel->getTileSelectedCount(cluster.tileIndicesList.at(iTile));
+            clusterSelectedCount+= s->markerModel->getTileSelectedCount(MarkerModel::TileIndex::fromIntList(cluster.tileIndicesList.at(iTile)));
         }
         cluster.markerSelectedCount = clusterSelectedCount;
         if (cluster.markerSelectedCount==0)
@@ -1179,7 +1179,7 @@ void WorldMapWidget2::slotClustersMoved(const QIntList& clusterIndices)
         const WMWCluster& cluster = s->clusterList.at(clusterIndex);
         for (int i=0; i<cluster.tileIndicesList.count(); ++i)
         {
-            const QIntList tileIndex = cluster.tileIndicesList.at(i);
+            const MarkerModel::TileIndex tileIndex = MarkerModel::TileIndex::fromIntList(cluster.tileIndicesList.at(i));
             movedMarkers << s->markerModel->getTileMarkerIndices(tileIndex);
         }
     }
@@ -1312,8 +1312,8 @@ void WorldMapWidget2::slotClustersClicked(const QIntList& clusterIndices)
         kDebug()<<doSelect;
         for (int j=0; j<currentCluster.tileIndicesList.count(); ++j)
         {
-            const QIntList& currentTileIndex = currentCluster.tileIndicesList.at(j);
-            
+            const MarkerModel::TileIndex& currentTileIndex = MarkerModel::TileIndex::fromIntList(currentCluster.tileIndicesList.at(j));
+
             const QList<QPersistentModelIndex> currentMarkers = s->markerModel->getTileMarkerIndices(currentTileIndex);
             kDebug()<<currentTileIndex<<currentMarkers;
             for (int k=0; k<currentMarkers.count(); ++k)
@@ -1434,7 +1434,7 @@ QVariant WorldMapWidget2::getClusterRepresentativeMarker(const int clusterIndex,
     QList<QVariant> repIndices;
     for (int i=0; i<cluster.tileIndicesList.count(); ++i)
     {
-        repIndices <<  s->markerModel->getTileRepresentativeMarker(cluster.tileIndicesList.at(i), sortKey);
+        repIndices <<  s->markerModel->getTileRepresentativeMarker(MarkerModel::TileIndex::fromIntList(cluster.tileIndicesList.at(i)), sortKey);
     }
 
     const QVariant clusterRepresentative = s->representativeChooser->bestRepresentativeIndexFromList(repIndices, sortKey);

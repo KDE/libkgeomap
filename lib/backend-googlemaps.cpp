@@ -741,9 +741,9 @@ int BackendGoogleMaps::getMarkerModelLevel()
     else if (currentZoom==20) { tileLevel = 6; }
     else if (currentZoom==21) { tileLevel = 7; }
     else if (currentZoom==22) { tileLevel = 7; }
-    else { tileLevel = s->markerModel->maxLevel()-1; }
+    else { tileLevel = MarkerModel::TileIndex::MaxLevel-1; }
 
-    WMW2_ASSERT(tileLevel<=s->markerModel->maxLevel()-1);
+    WMW2_ASSERT(tileLevel<=MarkerModel::TileIndex::MaxLevel-1);
     
     return tileLevel;
 }

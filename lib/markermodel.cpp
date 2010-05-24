@@ -27,24 +27,15 @@ class MarkerModelPrivate
 {
 public:
     MarkerModelPrivate()
-    : tesselationSizes(),
-      rootTile(new MarkerModel::Tile()),
+    : rootTile(new MarkerModel::Tile()),
       isDirty(true),
       markerModel(0),
       coordinatesRole(0),
       selectionModel(0)
     {
-        const QIntPair level0Sizes(10, 10);
-        tesselationSizes << level0Sizes;
-        for (int i = 0; i<8; ++i)
-        {
-            tesselationSizes << QIntPair(10, 10);
-        }
-
-        rootTile->prepareForChildren(level0Sizes);
+        rootTile->prepareForChildren(QIntPair(MarkerModel::TileIndex::Tiling, MarkerModel::TileIndex::Tiling));
     }
 
-    QList<QIntPair> tesselationSizes;
     MarkerModel::Tile* rootTile;
     bool isDirty;
     QAbstractItemModel* markerModel;
@@ -85,141 +76,6 @@ MarkerModel::~MarkerModel()
     delete d;
 }
 
-QPair<int, int> MarkerModel::getTesselationSizes(const int level) const
-{
-    return d->tesselationSizes.at(level);
-}
-
-WMWGeoCoordinate MarkerModel::tileIndexToCoordinate(const QIntList& tileIndex)
-{
-    // TODO: safeguards against rounding errors!
-    qreal tileLatBL = -90.0;
-    qreal tileLonBL = -180.0;
-    qreal tileLatHeight = 180.0;
-    qreal tileLonWidth = 360.0;
-
-    WMW2_ASSERT(tileIndex.count()<=maxLevel());
-
-    for (int l = 0; l < qMin(tileIndex.count(), maxLevel()-1); ++l)
-    {
-        // how many tiles are at this level?
-        const QIntPair tesselationSizes = d->tesselationSizes.at(l);
-        const qreal latDivisor = tesselationSizes.first;
-        const qreal lonDivisor = tesselationSizes.second;
-
-        const qreal dLat = tileLatHeight / latDivisor;
-        const qreal dLon = tileLonWidth / lonDivisor;
-
-        const int linearIndex = tileIndex.at(l);
-        int latIndex;
-        int lonIndex;
-        linearIndexToLatLonIndex(linearIndex, l, &latIndex, &lonIndex);
-
-        // update the start position for the next tile:
-        tileLatBL+=latIndex*dLat;
-        tileLonBL+=lonIndex*dLon;
-        tileLatHeight/=latDivisor;
-        tileLonWidth/=lonDivisor;
-    }
-
-    return WMWGeoCoordinate(tileLatBL, tileLonBL);
-}
-
-QIntList MarkerModel::coordinateToTileIndex(const WMWGeoCoordinate& coordinate, const int level)
-{
-    WMW2_ASSERT(level<=maxLevel());
-
-    if (!coordinate.hasCoordinates())
-        return QIntList();
-
-    qreal tileLatBL = -90.0;
-    qreal tileLonBL = -180.0;
-    qreal tileLatHeight = 180.0;
-    qreal tileLonWidth = 360.0;
-
-    QIntList indices;
-    for (int l = 0; l <= level; ++l)
-    {
-        // how many tiles at this level?
-        const QIntPair tesselationSizes = d->tesselationSizes.at(l);
-        const qreal latDivisor = tesselationSizes.first;
-        const qreal lonDivisor = tesselationSizes.second;
-
-        const qreal dLat = tileLatHeight / latDivisor;
-        const qreal dLon = tileLonWidth / lonDivisor;
-
-        int latIndex = int( (coordinate.lat() - tileLatBL ) / dLat );
-        int lonIndex = int( (coordinate.lon() - tileLonBL ) / dLon );
-
-        // protect against invalid indices due to rounding errors
-        bool haveRoundingErrors = false;
-        if (latIndex<0)
-        {
-            haveRoundingErrors = true;
-            latIndex = 0;
-        }
-        if (lonIndex<0)
-        {
-            haveRoundingErrors = true;
-            lonIndex = 0;
-        }
-        if (latIndex>=latDivisor)
-        {
-            haveRoundingErrors = true;
-            latIndex = latDivisor-1;
-        }
-        if (lonIndex>=lonDivisor)
-        {
-            haveRoundingErrors = true;
-            lonIndex = lonDivisor-1;
-        }
-        if (haveRoundingErrors)
-        {
-            kDebug()<<QString("Rounding errors at level %1!").arg(l);
-        }
-
-        const int linearIndex = latLonIndexToLinearIndex(latIndex, lonIndex, l);
-        WMW2_ASSERT(linearIndex<(latDivisor*lonDivisor));
-
-        indices << linearIndex;
-
-        // update the start position for the next tile:
-        // TODO: rounding errors
-        tileLatBL+=latIndex*dLat;
-        tileLonBL+=lonIndex*dLon;
-        tileLatHeight/=latDivisor;
-        tileLonWidth/=lonDivisor;
-    }
-
-    WMW2_ASSERT(indices.count()==level+1);
-    return indices;
-}
-
-int MarkerModel::latLonIndexToLinearIndex(const int latIndex, const int lonIndex, const int level) const
-{
-    WMW2_ASSERT(level<=maxLevel());
-
-    const QIntPair tesselationSizes = d->tesselationSizes.at(level);
-    const int nLon = tesselationSizes.second;
-    const int linearIndex = latIndex*nLon + lonIndex;
-
-    WMW2_ASSERT(linearIndex<(tesselationSizes.first*tesselationSizes.second));
-
-    return linearIndex;
-}
-
-void MarkerModel::linearIndexToLatLonIndex(const int linearIndex, const int level, int* const latIndex, int* const lonIndex) const
-{
-    WMW2_ASSERT(level<=maxLevel());
-
-    const QIntPair tesselationSizes = d->tesselationSizes.at(level);
-    const int nLon = tesselationSizes.second;
-    *latIndex = linearIndex/nLon;
-    *lonIndex = linearIndex%nLon;
-    WMW2_ASSERT(*latIndex<tesselationSizes.first);
-    WMW2_ASSERT(*lonIndex<tesselationSizes.second);
-}
-
 void MarkerModel::addMarkerIndexToGrid(const QPersistentModelIndex& markerIndex)
 {
     if (d->isDirty)
@@ -231,8 +87,8 @@ void MarkerModel::addMarkerIndexToGrid(const QPersistentModelIndex& markerIndex)
     if (!markerCoordinates.hasCoordinates())
         return;
 
-    const QIntList tileIndex = coordinateToTileIndex(markerCoordinates, maxLevel());
-    WMW2_ASSERT(tileIndex.count()==maxIndexCount());
+    TileIndex tileIndex = TileIndex::fromCoordinates(markerCoordinates, TileIndex::MaxLevel);
+    WMW2_ASSERT(tileIndex.level()==TileIndex::MaxLevel);
 
     bool markerIsSelected = false;
     if (d->selectionModel)
@@ -242,7 +98,7 @@ void MarkerModel::addMarkerIndexToGrid(const QPersistentModelIndex& markerIndex)
 
     // add the marker to all existing tiles:
     Tile* currentTile = d->rootTile;
-    for (int l = 0; l<=maxLevel(); ++l)
+    for (int l = 0; l<=TileIndex::MaxLevel; ++l)
     {
         currentTile->markerIndices<<markerIndex;
         if (markerIsSelected)
@@ -265,7 +121,7 @@ void MarkerModel::addMarkerIndexToGrid(const QPersistentModelIndex& markerIndex)
         }
 
         // if this is the last loop iteration, populate the next tile now:
-        if (l==maxLevel())
+        if (l==TileIndex::MaxLevel)
         {
             nextTile->markerIndices<<markerIndex;
             if (markerIsSelected)
@@ -275,17 +131,17 @@ void MarkerModel::addMarkerIndexToGrid(const QPersistentModelIndex& markerIndex)
         }
 
         currentTile = nextTile;
-    }   
+    }
 }
 
-int MarkerModel::getTileMarkerCount(const QIntList& tileIndex)
+int MarkerModel::getTileMarkerCount(const MarkerModel::TileIndex& tileIndex)
 {
     if (d->isDirty)
     {
         regenerateTiles();
     }
 
-    WMW2_ASSERT(tileIndex.count()<=maxIndexCount());
+    WMW2_ASSERT(tileIndex.level()<=TileIndex::MaxLevel);
 
     Tile* const myTile = getTile(tileIndex, true);
 
@@ -297,14 +153,14 @@ int MarkerModel::getTileMarkerCount(const QIntList& tileIndex)
     return myTile->markerIndices.count();
 }
 
-int MarkerModel::getTileSelectedCount(const QIntList& tileIndex)
+int MarkerModel::getTileSelectedCount(const MarkerModel::TileIndex& tileIndex)
 {
     if (d->isDirty)
     {
         regenerateTiles();
     }
 
-    WMW2_ASSERT(tileIndex.count()<=maxIndexCount());
+    WMW2_ASSERT(tileIndex.level()<=TileIndex::MaxLevel);
 
     Tile* const myTile = getTile(tileIndex, true);
 
@@ -316,14 +172,14 @@ int MarkerModel::getTileSelectedCount(const QIntList& tileIndex)
     return myTile->selectedCount;
 }
 
-QList<QPersistentModelIndex> MarkerModel::getTileMarkerIndices(const QIntList& tileIndex)
+QList<QPersistentModelIndex> MarkerModel::getTileMarkerIndices(const MarkerModel::TileIndex& tileIndex)
 {
     if (d->isDirty)
     {
         regenerateTiles();
     }
 
-    WMW2_ASSERT(tileIndex.count()<=maxIndexCount());
+    WMW2_ASSERT(tileIndex.level()<=TileIndex::MaxLevel);
 
     Tile* const myTile = getTile(tileIndex, true);
 
@@ -335,14 +191,14 @@ QList<QPersistentModelIndex> MarkerModel::getTileMarkerIndices(const QIntList& t
     return myTile->markerIndices;
 }
 
-WMWSelectionState MarkerModel::getTileSelectedState(const QIntList& tileIndex)
+WMWSelectionState MarkerModel::getTileSelectedState(const MarkerModel::TileIndex& tileIndex)
 {
     if (d->isDirty)
     {
         regenerateTiles();
     }
 
-    WMW2_ASSERT(tileIndex.count()<=maxIndexCount());
+    WMW2_ASSERT(tileIndex.level()<=TileIndex::MaxLevel);
 
     Tile* const myTile = getTile(tileIndex, true);
 
@@ -364,26 +220,24 @@ WMWSelectionState MarkerModel::getTileSelectedState(const QIntList& tileIndex)
     return WMWSelectedSome;
 }
 
-
-MarkerModel::Tile* MarkerModel::getTile(const QIntList& tileIndex, const bool stopIfEmpty)
+MarkerModel::Tile* MarkerModel::getTile(const MarkerModel::TileIndex& tileIndex, const bool stopIfEmpty)
 {
     if (d->isDirty)
     {
         regenerateTiles();
     }
 
-    WMW2_ASSERT(tileIndex.count()<=maxIndexCount());
+    WMW2_ASSERT(tileIndex.level()<=TileIndex::MaxLevel);
 
     Tile* tile = d->rootTile;
-    for (int level = 0; level < tileIndex.count(); ++level)
+    for (int level = 0; level < tileIndex.indexCount(); ++level)
     {
         const int currentIndex = tileIndex.at(level);
 
         Tile* childTile = 0;
         if (tile->children.isEmpty())
         {
-            WMW2_ASSERT(level<d->tesselationSizes.count());
-            tile->prepareForChildren(d->tesselationSizes.at(level));
+            tile->prepareForChildren(QIntPair(TileIndex::Tiling, TileIndex::Tiling));
 
             // if there are any markers in the tile,
             // we have to sort them into the child tiles:
@@ -395,8 +249,8 @@ MarkerModel::Tile* MarkerModel::getTile(const QIntList& tileIndex, const bool st
                     WMW2_ASSERT(currentMarkerIndex.isValid());
                     
                     // get the tile index for this marker:
-                    const QIntList markerTileIndex = coordinateToTileIndex(currentMarkerIndex.data(d->coordinatesRole).value<WMWGeoCoordinate>(), level);
-                    const int newTileIndex = markerTileIndex.last();
+                    const TileIndex markerTileIndex = TileIndex::fromCoordinates(currentMarkerIndex.data(d->coordinatesRole).value<WMWGeoCoordinate>(), level);
+                    const int newTileIndex = markerTileIndex.toIntList().last();
 
                     Tile* newTile = tile->children.at(newTileIndex);
                     if (newTile==0)
@@ -434,16 +288,6 @@ MarkerModel::Tile* MarkerModel::getTile(const QIntList& tileIndex, const bool st
     return tile;
 }
 
-int MarkerModel::maxLevel() const
-{
-    return d->tesselationSizes.count()-1;
-}
-
-int MarkerModel::maxIndexCount() const
-{
-    return d->tesselationSizes.count();
-}
-
 MarkerModel::Tile* MarkerModel::rootTile()
 {
     if (d->isDirty)
@@ -454,58 +298,15 @@ MarkerModel::Tile* MarkerModel::rootTile()
     return d->rootTile;
 }
 
-bool MarkerModel::indicesEqual(const QIntList& a, const QIntList& b, const int upToLevel) const
-{
-    WMW2_ASSERT(a.count()>upToLevel);
-    WMW2_ASSERT(b.count()>upToLevel);
-
-    for (int i=0; i<=upToLevel; ++i)
-    {
-        if (a.at(i)!=b.at(i))
-            return false;
-    }
-
-    return true;
-}
-
-QList<QIntPair> MarkerModel::linearIndexToLatLonIndex(const QIntList& linearIndex) const
-{
-    QList<QIntPair> result;
-    for (int i=0; i<linearIndex.count(); ++i)
-    {
-        int latIndex;
-        int lonIndex;
-        linearIndexToLatLonIndex(linearIndex.at(i), i, &latIndex, &lonIndex);
-
-        result << QIntPair(latIndex, lonIndex);
-    }
-
-    return result;
-}
-
-QIntList MarkerModel::latLonIndexToLinearIndex(const QList<QIntPair>& latLonIndex) const
-{
-    QIntList result;
-    for (int i=0; i<latLonIndex.count(); ++i)
-    {
-        result << latLonIndexToLinearIndex(latLonIndex.at(i).first, latLonIndex.at(i).second, i);
-    }
-
-    return result;
-}
-
 class MarkerModelNonEmptyIteratorPrivate
 {
 public:
     MarkerModelNonEmptyIteratorPrivate()
     : model(0),
       level(0),
-      startIndexLinear(),
-      endIndexLinear(),
-      currentIndexLinear(),
-      startIndices(),
-      endIndices(),
-      currentIndices(),
+      startIndex(),
+      endIndex(),
+      currentIndex(),
       atEnd(false)
     {
     }
@@ -513,15 +314,11 @@ public:
     MarkerModel* model;
     int level;
 
-    QList<QPair<QIntList, QIntList> > boundsList;
+    QList<QPair<MarkerModel::TileIndex, MarkerModel::TileIndex> > boundsList;
 
-    QIntList startIndexLinear;
-    QIntList endIndexLinear;
-    QIntList currentIndexLinear;
-
-    QList<QIntPair> startIndices;
-    QList<QIntPair> endIndices;
-    QList<QIntPair> currentIndices;
+    MarkerModel::TileIndex startIndex;
+    MarkerModel::TileIndex endIndex;
+    MarkerModel::TileIndex currentIndex;
 
     bool atEnd;
     bool atStartOfLevel;
@@ -536,34 +333,33 @@ MarkerModel::NonEmptyIterator::NonEmptyIterator(MarkerModel* const model, const 
 : d(new MarkerModelNonEmptyIteratorPrivate())
 {
     d->model = model;
-    WMW2_ASSERT(level<=model->maxLevel());
+    WMW2_ASSERT(level<=TileIndex::MaxLevel);
     d->level = level;
 
-    QIntList startIndexLinear;
-    QIntList endIndexLinear;
+    TileIndex startIndex;
+    TileIndex endIndex;
     for (int i=0; i<=level; ++i)
     {
-        startIndexLinear<<0;
-        QIntPair currentSizes = d->model->getTesselationSizes(i);
-        endIndexLinear<<currentSizes.first*currentSizes.second - 1;
+        startIndex.appendLinearIndex(0);
+        endIndex.appendLinearIndex(TileIndex::Tiling*TileIndex::Tiling-1);
     }
 //     kDebug()<<d->startIndexLinear<<d->endIndexLinear;
 
-    d->boundsList << QPair<QIntList, QIntList>(startIndexLinear, endIndexLinear);
+    d->boundsList << QPair<TileIndex, TileIndex>(startIndex, endIndex);
 
     initializeNextBounds();
 }
 
-MarkerModel::NonEmptyIterator::NonEmptyIterator(MarkerModel* const model, const int level, const QIntList& startIndex, const QIntList& endIndex)
+MarkerModel::NonEmptyIterator::NonEmptyIterator(MarkerModel* const model, const int level, const TileIndex& startIndex, const TileIndex& endIndex)
 : d(new MarkerModelNonEmptyIteratorPrivate())
 {
     d->model = model;
-    WMW2_ASSERT(level<=model->maxLevel());
+    WMW2_ASSERT(level<=TileIndex::MaxLevel);
     d->level = level;
 
-    WMW2_ASSERT(startIndex.count()==(level+1));
-    WMW2_ASSERT(endIndex.count()==(level+1));
-    d->boundsList << QPair<QIntList, QIntList>(startIndex, endIndex);
+    WMW2_ASSERT(startIndex.level()==level);
+    WMW2_ASSERT(endIndex.level()==level);
+    d->boundsList << QPair<TileIndex, TileIndex>(startIndex, endIndex);
 
     initializeNextBounds();
 }
@@ -572,7 +368,7 @@ MarkerModel::NonEmptyIterator::NonEmptyIterator(MarkerModel* const model, const 
 : d(new MarkerModelNonEmptyIteratorPrivate())
 {
     d->model = model;
-    WMW2_ASSERT(level<=model->maxLevel());
+    WMW2_ASSERT(level<=TileIndex::MaxLevel);
     d->level = level;
 
     // store the coordinates of the bounds as indices:
@@ -582,11 +378,11 @@ MarkerModel::NonEmptyIterator::NonEmptyIterator(MarkerModel* const model, const 
         WMW2_ASSERT(currentBounds.first.lat()<currentBounds.second.lat());
         WMW2_ASSERT(currentBounds.first.lon()<currentBounds.second.lon());
 
-        const QIntList startIndex = d->model->coordinateToTileIndex(currentBounds.first, d->level);
-        const QIntList endIndex = d->model->coordinateToTileIndex(currentBounds.second, d->level);
+        const TileIndex startIndex = TileIndex::fromCoordinates(currentBounds.first, d->level);
+        const TileIndex endIndex = TileIndex::fromCoordinates(currentBounds.second, d->level);
 
 //         kDebug()<<currentBounds.first.geoUrl()<<startIndex<<currentBounds.second.geoUrl()<<endIndex;
-        d->boundsList << QPair<QIntList, QIntList>(startIndex, endIndex);
+        d->boundsList << QPair<TileIndex, TileIndex>(startIndex, endIndex);
     }
 
     initializeNextBounds();
@@ -600,21 +396,14 @@ bool MarkerModel::NonEmptyIterator::initializeNextBounds()
         return false;
     }
 
-    QPair<QIntList, QIntList> nextBounds = d->boundsList.takeFirst();
-    d->startIndexLinear = nextBounds.first;
-    d->endIndexLinear = nextBounds.second;
+    QPair<TileIndex, TileIndex> nextBounds = d->boundsList.takeFirst();
+    d->startIndex = nextBounds.first;
+    d->endIndex = nextBounds.second;
 
-    WMW2_ASSERT(d->startIndexLinear.count() == d->level + 1);
-    WMW2_ASSERT(d->endIndexLinear.count() == d->level + 1);
+    WMW2_ASSERT(d->startIndex.level() == d->level);
+    WMW2_ASSERT(d->endIndex.level() == d->level);
 
-    // calculate the 'cartesian' start/end indices:
-    d->startIndices = d->model->linearIndexToLatLonIndex(d->startIndexLinear);
-    d->endIndices = d->model->linearIndexToLatLonIndex(d->endIndexLinear);
-//     kDebug()<<d->startIndices<<d->startIndexLinear;
-//     kDebug()<<d->endIndices<<d->endIndexLinear;
-
-    d->currentIndexLinear = d->startIndexLinear.mid(0, 1);
-    d->currentIndices = d->startIndices.mid(0, 1);
+    d->currentIndex = d->startIndex.mid(0, 1);
     d->atStartOfLevel = true;
 
     nextIndex();
@@ -622,17 +411,17 @@ bool MarkerModel::NonEmptyIterator::initializeNextBounds()
     return d->atEnd;
 }
 
-QIntList MarkerModel::NonEmptyIterator::nextIndex()
+MarkerModel::TileIndex MarkerModel::NonEmptyIterator::nextIndex()
 {
     if (d->atEnd)
     {
-        return d->currentIndexLinear;
+        return d->currentIndex;
     }
 
     Q_FOREVER
     {
-        const int currentLevel = d->currentIndexLinear.count() - 1;
-//         kDebug() << d->level << currentLevel << d->atStartOfLevel << d->currentIndexLinear;
+        const int currentLevel = d->currentIndex.level();
+//         kDebug() << d->level << currentLevel << d->atStartOfLevel << d->currentIndex;
 
         if (d->atStartOfLevel)
         {
@@ -645,8 +434,8 @@ QIntList MarkerModel::NonEmptyIterator::nextIndex()
             // determine the limits in the current tile:
             int limitLatBL = 0;
             int limitLonBL = 0;
-            int limitLatTR = d->model->getTesselationSizes(currentLevel).first-1;
-            int limitLonTR = d->model->getTesselationSizes(currentLevel).second-1;
+            int limitLatTR = TileIndex::Tiling-1;
+            int limitLonTR = TileIndex::Tiling-1;
 
             int compareLevel = currentLevel - 1;
 
@@ -654,52 +443,52 @@ QIntList MarkerModel::NonEmptyIterator::nextIndex()
             bool onLimit = true;
             for (int i=0; onLimit&&(i<=compareLevel); ++i)
             {
-                onLimit = d->currentIndices.at(i).first==d->startIndices.at(i).first;
+                onLimit = d->currentIndex.indexLat(i)==d->startIndex.indexLat(i);
             }
             if (onLimit)
             {
-                limitLatBL = d->startIndices.at(currentLevel).first;
+                limitLatBL = d->startIndex.indexLat(currentLevel);
             }
 
             // check limit on the bottom side:
             onLimit = true;
             for (int i=0; onLimit&&(i<=compareLevel); ++i)
             {
-                onLimit = d->currentIndices.at(i).second==d->startIndices.at(i).second;
+                onLimit = d->currentIndex.indexLon(i)==d->startIndex.indexLon(i);
             }
             if (onLimit)
             {
-                limitLonBL = d->startIndices.at(currentLevel).second;
+                limitLonBL = d->startIndex.indexLon(currentLevel);
             }
 
             // check limit on the right side:
             onLimit = true;
             for (int i=0; onLimit&&(i<=compareLevel); ++i)
             {
-                onLimit = d->currentIndices.at(i).first==d->endIndices.at(i).first;
+                onLimit = d->currentIndex.indexLat(i)==d->endIndex.indexLat(i);
             }
             if (onLimit)
             {
-                limitLatTR = d->endIndices.at(currentLevel).first;
+                limitLatTR = d->endIndex.indexLat(currentLevel);
             }
 
             // check limit on the top side:
             onLimit = true;
             for (int i=0; onLimit&&(i<=compareLevel); ++i)
             {
-                onLimit = d->currentIndices.at(i).second==d->endIndices.at(i).second;
+                onLimit = d->currentIndex.indexLon(i)==d->endIndex.indexLon(i);
             }
             if (onLimit)
             {
-                limitLonTR = d->endIndices.at(currentLevel).second;
+                limitLonTR = d->endIndex.indexLon(currentLevel);
             }
 
             WMW2_ASSERT(limitLatBL<=limitLatTR);
             WMW2_ASSERT(limitLonBL<=limitLonTR);
 //             kDebug() << limitLatBL << limitLonBL << limitLatTR << limitLonTR << compareLevel << currentLevel;
 
-            int currentLat = d->currentIndices.last().first;
-            int currentLon = d->currentIndices.last().second;
+            int currentLat = d->currentIndex.indexLat(d->currentIndex.level());
+            int currentLon = d->currentIndex.indexLon(d->currentIndex.level());
 
             currentLon++;
             if (currentLon>limitLonTR)
@@ -715,24 +504,23 @@ QIntList MarkerModel::NonEmptyIterator::nextIndex()
                         initializeNextBounds();
 
                         // initializeNextBounds() call nextIndex which updates d->currentIndexLinear, if possible:
-                        return d->currentIndexLinear;
+                        return d->currentIndex;
                     }
 
                     // we need to go one level up, trim the indices:
-                    d->currentIndexLinear.removeLast();
-                    d->currentIndices.removeLast();
+                    d->currentIndex.oneUp();
 
                     continue;
                 }
             }
 
             // save the new position:
-            d->currentIndices.last() = QIntPair(currentLat, currentLon);
-            d->currentIndexLinear = d->model->latLonIndexToLinearIndex(d->currentIndices);
+            d->currentIndex.oneUp();
+            d->currentIndex.appendLatLonIndex(currentLat, currentLon);
         }
 
         // is the tile empty?
-        if (d->model->getTileMarkerCount(d->currentIndexLinear)==0)
+        if (d->model->getTileMarkerCount(d->currentIndex)==0)
         {
             continue;
         }
@@ -741,7 +529,7 @@ QIntList MarkerModel::NonEmptyIterator::nextIndex()
         if (currentLevel == d->level)
         {
             // yes, return the current index:
-            return d->currentIndexLinear;
+            return d->currentIndex;
         }
 
         // go one level down:
@@ -750,66 +538,65 @@ QIntList MarkerModel::NonEmptyIterator::nextIndex()
         // determine the limits for the next level:
         int limitLatBL = 0;
         int limitLonBL = 0;
-        int limitLatTR = d->model->getTesselationSizes(compareLevel).first-1;
-        int limitLonTR = d->model->getTesselationSizes(compareLevel).second-1;
+        int limitLatTR = TileIndex::Tiling-1;
+        int limitLonTR = TileIndex::Tiling-1;
 
         // check limit on the left side:
         bool onLimit = true;
         for (int i=0; onLimit&&(i<=compareLevel); ++i)
         {
-            onLimit = d->currentIndices.at(i).first==d->startIndices.at(i).first;
+            onLimit = d->currentIndex.indexLat(i)==d->startIndex.indexLat(i);
         }
         if (onLimit)
         {
-            limitLatBL = d->startIndices.at(currentLevel+1).first;
+            limitLatBL = d->startIndex.indexLat(currentLevel+1);
         }
 
         // check limit on the bottom side:
         onLimit = true;
         for (int i=0; onLimit&&(i<=compareLevel); ++i)
         {
-            onLimit = d->currentIndices.at(i).second==d->startIndices.at(i).second;
+            onLimit = d->currentIndex.indexLon(i)==d->startIndex.indexLon(i);
         }
         if (onLimit)
         {
-            limitLonBL = d->startIndices.at(currentLevel+1).second;
+            limitLonBL = d->startIndex.indexLon(currentLevel+1);
         }
 
         // check limit on the right side:
         onLimit = true;
         for (int i=0; onLimit&&(i<=compareLevel); ++i)
         {
-            onLimit = d->currentIndices.at(i).first==d->endIndices.at(i).first;
+            onLimit = d->currentIndex.indexLat(i)==d->endIndex.indexLat(i);
         }
         if (onLimit)
         {
-            limitLatTR = d->endIndices.at(currentLevel+1).first;
+            limitLatTR = d->endIndex.indexLat(currentLevel+1);
         }
 
         // check limit on the top side:
         onLimit = true;
         for (int i=0; onLimit&&(i<=compareLevel); ++i)
         {
-            onLimit = d->currentIndices.at(i).second==d->endIndices.at(i).second;
+            onLimit = d->currentIndex.indexLon(i)==d->endIndex.indexLon(i);
         }
         if (onLimit)
         {
-            limitLonTR = d->endIndices.at(currentLevel+1).second;
+            limitLonTR = d->endIndex.indexLon(currentLevel+1);
         }
 
         WMW2_ASSERT(limitLatBL<=limitLatTR);
         WMW2_ASSERT(limitLonBL<=limitLonTR);
 
         // go one level down:
-        d->currentIndices << QIntPair(limitLatBL, limitLonBL);
-        d->currentIndexLinear = d->model->latLonIndexToLinearIndex(d->currentIndices);
+        d->currentIndex.appendLatLonIndex(limitLatBL, limitLonBL);
         d->atStartOfLevel = true;
     }
 }
 
-QIntList MarkerModel::NonEmptyIterator::currentIndex() const
+MarkerModel::TileIndex MarkerModel::NonEmptyIterator::currentIndex() const
 {
-    return d->currentIndexLinear;
+    return d->currentIndex;
 }
 
 bool MarkerModel::NonEmptyIterator::atEnd() const
@@ -848,11 +635,11 @@ void MarkerModel::removeMarkerIndexFromGrid(const QModelIndex& markerIndex, cons
     
     // remove the marker from the grid:
     const WMWGeoCoordinate markerCoordinates = markerIndex.data(d->coordinatesRole).value<WMWGeoCoordinate>();
-    const QIntList tileIndex = coordinateToTileIndex(markerCoordinates, maxLevel());
+    const TileIndex tileIndex = TileIndex::fromCoordinates(markerCoordinates, TileIndex::MaxLevel);
     QList<Tile*> tiles;
     // here l functions as the number of indices that we actually use, therefore we have to go one more up
     // in this case, l==0 returns the root tile
-    for (int l=0; l<=maxLevel()+1; ++l)
+    for (int l=0; l<=TileIndex::MaxLevel+1; ++l)
     {
         Tile* const currentTile = getTile(tileIndex.mid(0, l), true);
         if (!currentTile)
@@ -972,9 +759,9 @@ void MarkerModel::slotSelectionChanged(const QItemSelection& selected, const QIt
             // get the coordinates of the item
             const WMWGeoCoordinate coordinates = d->markerModel->data(d->markerModel->index(row, 0, selectionRange.parent()), d->coordinatesRole).value<WMWGeoCoordinate>();
 
-            for (int l=0; l<=maxLevel(); ++l)
+            for (int l=0; l<=TileIndex::MaxLevel; ++l)
             {
-                const QIntList tileIndex = coordinateToTileIndex(coordinates, l);
+                const TileIndex tileIndex = TileIndex::fromCoordinates(coordinates, l);
                 MarkerModel::Tile* const myTile = getTile(tileIndex, true);
                 if (!myTile)
                     break;
@@ -997,9 +784,9 @@ void MarkerModel::slotSelectionChanged(const QItemSelection& selected, const QIt
             // get the coordinates of the item
             const WMWGeoCoordinate coordinates = d->markerModel->data(d->markerModel->index(row, 0, selectionRange.parent()), d->coordinatesRole).value<WMWGeoCoordinate>();
 
-            for (int l=0; l<=maxLevel(); ++l)
+            for (int l=0; l<=TileIndex::MaxLevel; ++l)
             {
-                const QIntList tileIndex = coordinateToTileIndex(coordinates, l);
+                const TileIndex tileIndex = TileIndex::fromCoordinates(coordinates, l);
                 MarkerModel::Tile* const myTile = getTile(tileIndex, true);
                 if (!myTile)
                     break;
@@ -1020,7 +807,7 @@ void MarkerModel::regenerateTiles()
 {
     delete d->rootTile;
     d->rootTile = new Tile();
-    d->rootTile->prepareForChildren(d->tesselationSizes.first());
+    d->rootTile->prepareForChildren(QIntPair(TileIndex::Tiling, TileIndex::Tiling));
     d->isDirty = false;
 
     if (!d->markerModel)
@@ -1039,7 +826,7 @@ QItemSelectionModel* MarkerModel::getSelectionModel() const
     return d->selectionModel;
 }
 
-QVariant MarkerModel::getTileRepresentativeMarker(const QIntList& tileIndex, const int sortKey)
+QVariant MarkerModel::getTileRepresentativeMarker(const MarkerModel::TileIndex& tileIndex, const int sortKey)
 {
     // TODO: actually return the result of some sorting and cache it in the tile
     const QList<QPersistentModelIndex> modelIndices = getTileMarkerIndices(tileIndex);
