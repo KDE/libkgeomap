@@ -849,7 +849,10 @@ bool BackendMarble::eventFilter(QObject *object, QEvent *event)
             d->haveMouseMovingObject = true;
 
             // a cluster or marker is being moved. update its position:
-            const QPoint newMarkerPoint = mouseEvent->pos() - d->mouseMoveCenterOffset;
+            QPoint newMarkerPoint = mouseEvent->pos() - d->mouseMoveCenterOffset;
+            QPoint snapPoint;
+            if (findSnapPoint(newMarkerPoint, &snapPoint, 0))
+                newMarkerPoint = snapPoint;
 
             WMWGeoCoordinate newCoordinates;
             if (geoCoordinates(newMarkerPoint, &newCoordinates))
@@ -889,10 +892,16 @@ bool BackendMarble::eventFilter(QObject *object, QEvent *event)
              && (d->haveMouseMovingObject) )
     {
         // the object was dropped, apply the coordinates if it is on screen:
-        const QPoint newMarkerPoint = mouseEvent->pos() - d->mouseMoveCenterOffset;
+        const QPoint dropMarkerPoint = mouseEvent->pos() - d->mouseMoveCenterOffset;
 
         WMWGeoCoordinate newCoordinates;
-        if (geoCoordinates(newMarkerPoint, &newCoordinates))
+        bool haveValidPoint = findSnapPoint(dropMarkerPoint, 0, &newCoordinates);
+        if (!haveValidPoint)
+        {
+            haveValidPoint = geoCoordinates(dropMarkerPoint, &newCoordinates);
+        }
+
+        if (haveValidPoint)
         {
             if (d->mouseMoveMarkerIndex.isValid())
             {
@@ -990,6 +999,65 @@ void BackendMarble::slotUngroupedModelChanged(const int index)
 {
     d->marbleWidget->update();
 }
+
+bool BackendMarble::findSnapPoint(const QPoint& actualPoint, QPoint* const snapPoint, WMWGeoCoordinate* const snapCoordinates)
+{
+    QPoint bestSnapPoint;
+    WMWGeoCoordinate bestSnapCoordinates;
+    int bestSnapDistanceSquared = -1;
+    // now handle snapping: is there any object close by?
+    for (int im = 0; im<s->ungroupedModels.count(); ++im)
+    {
+        WMWModelHelper* const modelHelper = s->ungroupedModels.at(im);
+        // TODO: test for active snapping
+        if ( (!modelHelper->visible()) || (!modelHelper->snaps()) )
+            continue;
+
+        // TODO: configurable snapping radius
+        const int snapRadiusSquared = 10*10;
+        QAbstractItemModel* const itemModel = modelHelper->model();
+
+        for (int row=0; row<itemModel->rowCount(); ++row)
+        {
+            const QModelIndex currentIndex = itemModel->index(row, 0);
+            WMWGeoCoordinate currentCoordinates;
+            if (!modelHelper->itemCoordinates(currentIndex, &currentCoordinates))
+                continue;
+
+            QPoint snapMarkerPoint;
+            if (!screenCoordinates(currentCoordinates, &snapMarkerPoint))
+            {
+                continue;
+            }
+
+            const QPoint distancePoint = snapMarkerPoint - actualPoint;
+            const int snapDistanceSquared = (distancePoint.x()*distancePoint.x()+distancePoint.y()*distancePoint.y());
+            if ( (snapDistanceSquared<=snapRadiusSquared)
+                &&
+                    ((bestSnapDistanceSquared==-1)||(bestSnapDistanceSquared>snapDistanceSquared))
+                    )
+            {
+                bestSnapDistanceSquared = snapDistanceSquared;
+                bestSnapPoint = snapMarkerPoint;
+                bestSnapCoordinates = currentCoordinates;
+            }
+        }
+    }
+
+    const bool foundSnapPoint = (bestSnapDistanceSquared>=0);
+
+    if (foundSnapPoint)
+    {
+        if (snapPoint)
+            *snapPoint = bestSnapPoint;
+
+        if (snapCoordinates)
+            *snapCoordinates = bestSnapCoordinates;
+    }
+
+    return foundSnapPoint;
+}
+
 
 } /* WMW2 */
 

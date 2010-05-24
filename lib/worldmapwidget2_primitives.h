@@ -318,6 +318,7 @@ public:
     virtual bool itemCoordinates(const QModelIndex& index, WMWGeoCoordinate* const coordinates) const = 0;
     virtual QPixmap itemIcon(const QModelIndex& index, QPoint* const offset) const = 0;
     virtual bool visible() const = 0;
+    virtual bool snaps() const = 0;
 
 Q_SIGNALS:
     void signalVisibilityChanged();
