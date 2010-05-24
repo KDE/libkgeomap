@@ -581,7 +581,7 @@ void TestModel::testSelectionState1()
 
 void TestModel::benchmarkIteratorWholeWorld()
 {
-    QBENCHMARK
+//     QBENCHMARK
     {
         const QSharedPointer<QStandardItemModel> itemModel(new QStandardItemModel());
         MarkerModel mm;
@@ -596,17 +596,22 @@ void TestModel::benchmarkIteratorWholeWorld()
 
         itemModel->appendRow(MakeItemAt(coord_1_2));
         itemModel->appendRow(MakeItemAt(coord_50_60));
-        for (int x=-50; x<50; ++x)
+        for (qreal x=-50; x<50; x+=1.0)
         {
-            for (int y=-50; y<50; ++y)
+            for (qreal y=-50; y<50; y+=1.0)
             {
                 itemModel->appendRow(MakeItemAt(WMW2::WMWGeoCoordinate(x,y)));
             }
         }
-        for (int l = 0; l<=maxLevel; ++l)
+
+        QBENCHMARK
         {
-            // iterate over the whole world:
-            MarkerModel::NonEmptyIterator it(&mm, l);
+            for (int l = 0; l<=maxLevel; ++l)
+            {
+                // iterate over the whole world:
+                MarkerModel::NonEmptyIterator it(&mm, l);
+                CountMarkersInIterator(&it);
+            }
         }
     }
 }

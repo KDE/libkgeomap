@@ -111,7 +111,7 @@ void MarkerModel::addMarkerIndexToGrid(const QPersistentModelIndex& markerIndex)
             break;
 
         // the tile has children. make sure the tile for our marker exists:
-        const int nextIndex = tileIndex.at(l);
+        const int nextIndex = tileIndex.linearIndex(l);
         Tile* nextTile = currentTile->children.at(nextIndex);
         if (nextTile==0)
         {
@@ -232,7 +232,7 @@ MarkerModel::Tile* MarkerModel::getTile(const MarkerModel::TileIndex& tileIndex,
     Tile* tile = d->rootTile;
     for (int level = 0; level < tileIndex.indexCount(); ++level)
     {
-        const int currentIndex = tileIndex.at(level);
+        const int currentIndex = tileIndex.linearIndex(level);
 
         Tile* childTile = 0;
         if (tile->children.isEmpty())
@@ -742,7 +742,7 @@ void MarkerModel::setSelectionModel(QItemSelectionModel* const selectionModel)
 
 void MarkerModel::slotSelectionChanged(const QItemSelection& selected, const QItemSelection& deselected)
 {
-    kDebug()<<selected<<deselected;
+//     kDebug()<<selected<<deselected;
     if (d->isDirty)
     {
         return;

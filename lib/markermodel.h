@@ -86,16 +86,6 @@ public:
             return m_indices[getLevel];
         }
 
-        inline int at(const int getLevel) const
-        {
-            return linearIndex(getLevel);
-        }
-
-        inline int operator[](const int getLevel) const
-        {
-            return linearIndex(getLevel);
-        }
-
         inline int indexLat(const int getLevel) const
         {
             return linearIndex(getLevel) / Tiling;
@@ -246,7 +236,7 @@ public:
 
             for (int i=0; i<=upToLevel; ++i)
             {
-                if (a.at(i)!=b.at(i))
+                if (a.linearIndex(i)!=b.linearIndex(i))
                     return false;
             }
 
