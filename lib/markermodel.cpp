@@ -836,5 +836,100 @@ QVariant MarkerModel::getTileRepresentativeMarker(const MarkerModel::TileIndex& 
     return QVariant::fromValue(modelIndices.first());
 }
 
+MarkerModel::TileIndex MarkerModel::TileIndex::fromCoordinates(const WMW2::WMWGeoCoordinate& coordinate, const int getLevel)
+{
+    WMW2_ASSERT(getLevel<=MaxLevel);
+
+    if (!coordinate.hasCoordinates())
+        return TileIndex();
+
+    qreal tileLatBL = -90.0;
+    qreal tileLonBL = -180.0;
+    qreal tileLatHeight = 180.0;
+    qreal tileLonWidth = 360.0;
+
+    TileIndex resultIndex;
+    for (int l = 0; l <= getLevel; ++l)
+    {
+        // how many tiles at this level?
+        const qreal latDivisor = TileIndex::Tiling;
+        const qreal lonDivisor = TileIndex::Tiling;
+
+        const qreal dLat = tileLatHeight / latDivisor;
+        const qreal dLon = tileLonWidth / lonDivisor;
+
+        int latIndex = int( (coordinate.lat() - tileLatBL ) / dLat );
+        int lonIndex = int( (coordinate.lon() - tileLonBL ) / dLon );
+
+        // protect against invalid indices due to rounding errors
+        bool haveRoundingErrors = false;
+        if (latIndex<0)
+        {
+            haveRoundingErrors = true;
+            latIndex = 0;
+        }
+        if (lonIndex<0)
+        {
+            haveRoundingErrors = true;
+            lonIndex = 0;
+        }
+        if (latIndex>=latDivisor)
+        {
+            haveRoundingErrors = true;
+            latIndex = latDivisor-1;
+        }
+        if (lonIndex>=lonDivisor)
+        {
+            haveRoundingErrors = true;
+            lonIndex = lonDivisor-1;
+        }
+        if (haveRoundingErrors)
+        {
+//             kDebug()<<QString("Rounding errors at level %1!").arg(l);
+        }
+
+        resultIndex.appendLatLonIndex(latIndex, lonIndex);
+
+        // update the start position for the next tile:
+        // TODO: rounding errors
+        tileLatBL+=latIndex*dLat;
+        tileLonBL+=lonIndex*dLon;
+        tileLatHeight/=latDivisor;
+        tileLonWidth/=lonDivisor;
+    }
+
+    return resultIndex;
+}
+
+WMWGeoCoordinate MarkerModel::TileIndex::toCoordinates() const
+{
+    // TODO: safeguards against rounding errors!
+    qreal tileLatBL = -90.0;
+    qreal tileLonBL = -180.0;
+    qreal tileLatHeight = 180.0;
+    qreal tileLonWidth = 360.0;
+
+    for (int l = 0; l < m_indicesCount; ++l)
+    {
+        // how many tiles are at this level?
+        const qreal latDivisor = TileIndex::Tiling;
+        const qreal lonDivisor = TileIndex::Tiling;
+
+        const qreal dLat = tileLatHeight / latDivisor;
+        const qreal dLon = tileLonWidth / lonDivisor;
+
+        int latIndex = indexLat(l);
+        int lonIndex = indexLon(l);
+
+        // update the start position for the next tile:
+        tileLatBL+=latIndex*dLat;
+        tileLonBL+=lonIndex*dLon;
+        tileLatHeight/=latDivisor;
+        tileLonWidth/=lonDivisor;
+    }
+
+    return WMWGeoCoordinate(tileLatBL, tileLonBL);
+}
+
 } /* WMW2 */
 
