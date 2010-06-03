@@ -359,8 +359,10 @@ bool WorldMapWidget2::setBackend(const QString& backendName)
             connect(d->currentBackend, SIGNAL(signalSpecialMarkersMoved(const QList<QPersistentModelIndex>&)),
                     this, SIGNAL(signalSpecialMarkersMoved(const QList<QPersistentModelIndex>&)));
 
+            // TODO: this connection is queued because otherwise QAbstractItemModel::itemSelected does not
+            //       reflect the true state. Maybe monitor another signal instead?
             connect(this, SIGNAL(signalUngroupedModelChanged(const int)),
-                    d->currentBackend, SLOT(slotUngroupedModelChanged(const int)));
+                    d->currentBackend, SLOT(slotUngroupedModelChanged(const int)), Qt::QueuedConnection);
 
             if (s->representativeChooser)
             {
@@ -1245,8 +1247,16 @@ void WorldMapWidget2::addUngroupedModel(WMWModelHelper* const modelHelper)
             this, SLOT(slotUngroupedModelChanged()));
     connect(modelHelper->model(), SIGNAL(rowsInserted(const QModelIndex&, int, int)),
             this, SLOT(slotUngroupedModelChanged()));
+    connect(modelHelper->model(), SIGNAL(modelReset()),
+            this, SLOT(slotUngroupedModelChanged()));
     connect(modelHelper, SIGNAL(signalVisibilityChanged()),
             this, SLOT(slotUngroupedModelChanged()));
+
+    if (modelHelper->selectionModel())
+    {
+        connect(modelHelper->selectionModel(), SIGNAL(currentChanged(const QModelIndex&, const QModelIndex&)),
+            this, SLOT(slotUngroupedModelChanged()));
+    }
 
     emit(signalUngroupedModelChanged(s->ungroupedModels.count() - 1));
 }
@@ -1764,6 +1774,21 @@ void WorldMapWidget2::slotUngroupedModelChanged()
                 break;
             }
         }
+    }
+
+    QItemSelectionModel* const senderSelectionModel = qobject_cast<QItemSelectionModel*>(senderObject);
+    if (senderSelectionModel)
+    {
+        for (int i=0; i<s->ungroupedModels.count(); ++i)
+        {
+            if (s->ungroupedModels.at(i)->selectionModel()==senderSelectionModel)
+            {
+                emit(signalUngroupedModelChanged(i));
+
+                break;
+            }
+        }
+        return;
     }
 }
 
