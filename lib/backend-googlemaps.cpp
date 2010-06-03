@@ -321,7 +321,7 @@ void BackendGoogleMaps::slotUngroupedModelChanged(const int mindex)
     d->htmlWidget->runScript(QString("wmwClearMarkers(%1);").arg(mindex));
     WMWModelHelper* const modelHelper = s->ungroupedModels.at(mindex);
 
-    if (!modelHelper->visible())
+    if (!modelHelper->modelFlags().testFlag(WMWModelHelper::FlagVisible))
             return;
 
     QAbstractItemModel* const model = modelHelper->model();
@@ -329,6 +329,11 @@ void BackendGoogleMaps::slotUngroupedModelChanged(const int mindex)
     for (int row = 0; row<model->rowCount(); ++row)
     {
         const QModelIndex currentIndex = model->index(row, 0);
+        const WMWModelHelper::Flags itemFlags = modelHelper->itemFlags(currentIndex);
+
+        // TODO: this is untested! We need to make sure the indices stay correct inside the JavaScript part!
+        if (!itemFlags.testFlag(WMWModelHelper::FlagVisible))
+            continue;
 
         WMWGeoCoordinate currentCoordinates;
         if (!modelHelper->itemCoordinates(currentIndex, &currentCoordinates))
@@ -339,7 +344,7 @@ void BackendGoogleMaps::slotUngroupedModelChanged(const int mindex)
                 .arg(row)
                 .arg(currentCoordinates.latString())
                 .arg(currentCoordinates.lonString())
-                .arg(/*currentMarker.isDraggable()?*/"true"/*:"false"*/)
+                .arg(itemFlags.testFlag(WMWModelHelper::FlagMovable)?"true":"false")
                 .arg(mindex)
             );
 
@@ -493,7 +498,7 @@ void BackendGoogleMaps::slotHTMLEvents(const QStringList& events)
     if (!movedClusters.isEmpty())
     {
         kDebug()<<movedClusters;
-        emit(signalClustersMoved(movedClusters));
+        emit(signalClustersMoved(movedClusters, QPair<int, QModelIndex>(-1, QModelIndex())));
     }
 
     if (!movedMarkers.isEmpty())

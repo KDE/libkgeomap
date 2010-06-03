@@ -419,7 +419,7 @@ void BackendMarble::marbleCustomPaint(Marble::GeoPainter* painter)
     for (int i = 0; i<s->ungroupedModels.count(); ++i)
     {
         WMWModelHelper* const modelHelper = s->ungroupedModels.at(i);
-        if (!modelHelper->visible())
+        if (!modelHelper->modelFlags().testFlag(WMWModelHelper::FlagVisible))
             continue;
 
         QAbstractItemModel* const model = modelHelper->model();
@@ -854,7 +854,7 @@ bool BackendMarble::eventFilter(QObject *object, QEvent *event)
             // a cluster or marker is being moved. update its position:
             QPoint newMarkerPoint = mouseEvent->pos() - d->mouseMoveCenterOffset;
             QPoint snapPoint;
-            if (findSnapPoint(newMarkerPoint, &snapPoint, 0))
+            if (findSnapPoint(newMarkerPoint, &snapPoint, 0, 0))
                 newMarkerPoint = snapPoint;
 
             WMWGeoCoordinate newCoordinates;
@@ -897,8 +897,9 @@ bool BackendMarble::eventFilter(QObject *object, QEvent *event)
         // the object was dropped, apply the coordinates if it is on screen:
         const QPoint dropMarkerPoint = mouseEvent->pos() - d->mouseMoveCenterOffset;
 
+        QPair<int, QModelIndex> snapTargetIndex(-1, QModelIndex());
         WMWGeoCoordinate newCoordinates;
-        bool haveValidPoint = findSnapPoint(dropMarkerPoint, 0, &newCoordinates);
+        bool haveValidPoint = findSnapPoint(dropMarkerPoint, 0, &newCoordinates, &snapTargetIndex);
         if (!haveValidPoint)
         {
             haveValidPoint = geoCoordinates(dropMarkerPoint, &newCoordinates);
@@ -921,7 +922,7 @@ bool BackendMarble::eventFilter(QObject *object, QEvent *event)
             {
                 // a cluster is being moved
                 s->clusterList[d->mouseMoveClusterIndex].coordinates = newCoordinates;
-                emit(signalClustersMoved(QIntList()<<d->mouseMoveClusterIndex));
+                emit(signalClustersMoved(QIntList()<<d->mouseMoveClusterIndex, snapTargetIndex));
             }
         }
 
@@ -1003,17 +1004,21 @@ void BackendMarble::slotUngroupedModelChanged(const int index)
     d->marbleWidget->update();
 }
 
-bool BackendMarble::findSnapPoint(const QPoint& actualPoint, QPoint* const snapPoint, WMWGeoCoordinate* const snapCoordinates)
+bool BackendMarble::findSnapPoint(const QPoint& actualPoint, QPoint* const snapPoint, WMWGeoCoordinate* const snapCoordinates, QPair<int, QModelIndex>* const snapTargetIndex)
 {
     QPoint bestSnapPoint;
     WMWGeoCoordinate bestSnapCoordinates;
     int bestSnapDistanceSquared = -1;
+    QModelIndex bestSnapIndex;
+    int bestSnapUngroupedModel;
+
     // now handle snapping: is there any object close by?
     for (int im = 0; im<s->ungroupedModels.count(); ++im)
     {
         WMWModelHelper* const modelHelper = s->ungroupedModels.at(im);
         // TODO: test for active snapping
-        if ( (!modelHelper->visible()) || (!modelHelper->snaps()) )
+        if (   (!modelHelper->modelFlags().testFlag(WMWModelHelper::FlagVisible))
+            || (!modelHelper->modelFlags().testFlag(WMWModelHelper::FlagSnaps)) )
             continue;
 
         // TODO: configurable snapping radius
@@ -1043,6 +1048,8 @@ bool BackendMarble::findSnapPoint(const QPoint& actualPoint, QPoint* const snapP
                 bestSnapDistanceSquared = snapDistanceSquared;
                 bestSnapPoint = snapMarkerPoint;
                 bestSnapCoordinates = currentCoordinates;
+                bestSnapIndex = currentIndex;
+                bestSnapUngroupedModel = im;
             }
         }
     }
@@ -1056,6 +1063,9 @@ bool BackendMarble::findSnapPoint(const QPoint& actualPoint, QPoint* const snapP
 
         if (snapCoordinates)
             *snapCoordinates = bestSnapCoordinates;
+
+        if (snapTargetIndex)
+            *snapTargetIndex = QPair<int, QModelIndex>(bestSnapUngroupedModel, bestSnapIndex);
     }
 
     return foundSnapPoint;

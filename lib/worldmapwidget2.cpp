@@ -311,8 +311,8 @@ bool WorldMapWidget2::setBackend(const QString& backendName)
         disconnect(d->currentBackend, SIGNAL(signalZoomChanged(const QString&)),
                 this, SLOT(slotBackendZoomChanged(const QString&)));
 
-        disconnect(d->currentBackend, SIGNAL(signalClustersMoved(const QIntList&)),
-                this, SLOT(slotClustersMoved(const QIntList&)));
+        disconnect(d->currentBackend, SIGNAL(signalClustersMoved(const QIntList&, const QPair<int, QModelIndex>&)),
+                this, SLOT(slotClustersMoved(const QIntList&, const QPair<int, QModelIndex>&)));
 
         disconnect(d->currentBackend, SIGNAL(signalClustersClicked(const QIntList&)),
                     this, SLOT(slotClustersClicked(const QIntList&)));
@@ -350,8 +350,8 @@ bool WorldMapWidget2::setBackend(const QString& backendName)
             connect(d->currentBackend, SIGNAL(signalZoomChanged(const QString&)),
                     this, SLOT(slotBackendZoomChanged(const QString&)));
 
-            connect(d->currentBackend, SIGNAL(signalClustersMoved(const QIntList&)),
-                    this, SLOT(slotClustersMoved(const QIntList&)));
+            connect(d->currentBackend, SIGNAL(signalClustersMoved(const QIntList&, const QPair<int, QModelIndex>&)),
+                    this, SLOT(slotClustersMoved(const QIntList&, const QPair<int, QModelIndex>&)));
 
             connect(d->currentBackend, SIGNAL(signalClustersClicked(const QIntList&)),
                     this, SLOT(slotClustersClicked(const QIntList&)));
@@ -1166,7 +1166,7 @@ QString WorldMapWidget2::getZoom()
     return d->cacheZoom;
 }
 
-void WorldMapWidget2::slotClustersMoved(const QIntList& clusterIndices)
+void WorldMapWidget2::slotClustersMoved(const QIntList& clusterIndices, const QPair<int, QModelIndex>& snapTarget)
 {
     kDebug()<<clusterIndices;
 
@@ -1204,7 +1204,15 @@ void WorldMapWidget2::slotClustersMoved(const QIntList& clusterIndices)
             }
         }
     }
-    
+
+    if (snapTarget.first>=0)
+    {
+        kDebug()<<snapTarget.first<<movedMarkers.count()<<s->ungroupedModels.at(snapTarget.first);
+        s->ungroupedModels.at(snapTarget.first)->snapItemsTo(snapTarget.second, movedMarkers);
+        kDebug()<<snapTarget.first;
+        return;
+    }
+
     if (d->doUpdateMarkerCoordinatesInModel)
     {
         // update the positions of the markers:

@@ -188,4 +188,14 @@ WMWModelHelper::~WMWModelHelper()
 {
 }
 
+void WMWModelHelper::snapItemsTo(const QModelIndex& targetIndex, const QList<QPersistentModelIndex>& snappedIndices)
+{
+    QList<QModelIndex> result;
+    for (int i=0; i<snappedIndices.count(); ++i)
+    {
+        result << snappedIndices.at(i);
+    }
+    snapItemsTo(targetIndex, result);
+}
+
 } /* WMW2 */

@@ -310,6 +310,16 @@ class WORLDMAPWIDGET2_EXPORT WMWModelHelper : public QObject
 {
 Q_OBJECT
 public:
+
+    enum Flag {
+        FlagNull = 0,
+        FlagVisible = 1,
+        FlagMovable = 2,
+        FlagSnaps = 4
+    };
+
+    Q_DECLARE_FLAGS(Flags, Flag)
+
     WMWModelHelper(QObject* const parent = 0);
     virtual ~WMWModelHelper();
 
@@ -317,8 +327,10 @@ public:
     virtual QItemSelectionModel* selectionModel() const = 0;
     virtual bool itemCoordinates(const QModelIndex& index, WMWGeoCoordinate* const coordinates) const = 0;
     virtual QPixmap itemIcon(const QModelIndex& index, QPoint* const offset) const = 0;
-    virtual bool visible() const = 0;
-    virtual bool snaps() const = 0;
+    virtual Flags modelFlags() const = 0;
+    virtual Flags itemFlags(const QModelIndex& index) const = 0;
+    void snapItemsTo(const QModelIndex& targetIndex, const QList<QPersistentModelIndex>& snappedIndices);
+    virtual void snapItemsTo(const QModelIndex& targetIndex, const QList<QModelIndex>& snappedIndices) = 0;
 
 Q_SIGNALS:
     void signalVisibilityChanged();
@@ -383,6 +395,7 @@ public:
 } /* WMW2 */
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(WMW2::WMWGeoCoordinate::HasFlags)
+Q_DECLARE_OPERATORS_FOR_FLAGS(WMW2::WMWModelHelper::Flags)
 
 namespace WMW2
 {

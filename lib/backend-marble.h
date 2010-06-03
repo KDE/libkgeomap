@@ -94,7 +94,7 @@ public Q_SLOTS:
 protected:
     bool eventFilter(QObject *object, QEvent *event);
     void createActions();
-    bool findSnapPoint(const QPoint& actualPoint, QPoint* const snapPoint, WMWGeoCoordinate* const snapCoordinates);
+    bool findSnapPoint(const QPoint& actualPoint, QPoint* const snapPoint, WMWGeoCoordinate* const snapCoordinates, QPair<int, QModelIndex>* const snapTargetIndex);
 
 protected Q_SLOTS:
     void slotMapThemeActionTriggered(QAction* action);

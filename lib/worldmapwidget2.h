@@ -131,7 +131,7 @@ protected Q_SLOTS:
     void slotBackendReady(const QString& backendName);
     void slotChangeBackend(QAction* action);
     void slotBackendZoomChanged(const QString& newZoom);
-    void slotClustersMoved(const QIntList& clusterIndices);
+    void slotClustersMoved(const QIntList& clusterIndices, const QPair<int, QModelIndex>& snapTarget);
     void slotClustersClicked(const QIntList& clusterIndices);
     void slotGroupModeChanged(QAction* triggeredAction);
     void slotRequestLazyReclustering();

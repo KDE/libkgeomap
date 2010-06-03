@@ -88,7 +88,7 @@ public Q_SLOTS:
 
 Q_SIGNALS:
     void signalBackendReady(const QString& backendName);
-    void signalClustersMoved(const QIntList& clusterIndices);
+    void signalClustersMoved(const QIntList& clusterIndices, const QPair<int, QModelIndex>& snapTarget);
     void signalClustersClicked(const QIntList& clusterIndices);
     void signalMarkersMoved(const QIntList& markerIndices);
     void signalZoomChanged(const QString& newZoom);
