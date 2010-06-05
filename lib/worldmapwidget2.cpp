@@ -474,6 +474,7 @@ void WorldMapWidget2::saveSettingsToGroup(KConfigGroup* const group)
     group->writeEntry("Thumbnail Size", d->thumbnailSize);
     group->writeEntry("Grouping Radius", d->groupingRadius);
     group->writeEntry("Edit Grouping Radius", d->editGroupingRadius);
+    group->writeEntry("In Edit Mode", s->inEditMode);
 
     for (int i=0; i<d->loadedBackends.size(); ++i)
     {
@@ -504,6 +505,15 @@ void WorldMapWidget2::readSettingsFromGroup(const KConfigGroup* const group)
     setThumnailSize(group->readEntry("Thumbnail Size", 2*WMW2MinThumbnailSize));
     setGroupingRadius(group->readEntry("Grouping Radius", 2*WMW2MinGroupingRadius));
     setEditGroupingRadius(group->readEntry("Edit Grouping Radius", WMW2MinEditGroupingRadius));
+    s->inEditMode = group->readEntry("In Edit Mode", false);
+    if (s->inEditMode)
+    {
+        d->actionEditMode->setChecked(true);
+    }
+    else
+    {
+        d->actionBrowseMode->setChecked(true);
+    }
 
     for (int i=0; i<d->loadedBackends.size(); ++i)
     {
