@@ -132,18 +132,18 @@ SET(worldmapwidget2_headers
 INSTALL(FILES ${worldmapwidget2_headers}
         DESTINATION ${INCLUDE_INSTALL_DIR}/worldmapwidget2 COMPONENT Devel)
 
-# demo widget
-SET( demo_sources
-    demo/demo-main.cpp
-    demo/mainwindow.cpp
-    demo/myimageitem.cpp
-    demo/mytreewidget.cpp
-    demo/dragdrophandler.cpp
-)
-kde4_add_executable( worldmapwidget2_demo  ${demo_sources} )
-target_link_libraries( worldmapwidget2_demo ${worldmapwidget2_libs} ${KEXIV2_LIBRARIES})
-SET_TARGET_PROPERTIES( worldmapwidget2_demo PROPERTIES COMPILE_FLAGS "${COMPILE_FLAGS} ${MY_COMPILER_WARNINGS}")
-INSTALL(TARGETS worldmapwidget2_demo ${INSTALL_TARGETS_DEFAULT_ARGS})
+# # demo widget
+# SET( demo_sources
+#     demo/demo-main.cpp
+#     demo/mainwindow.cpp
+#     demo/myimageitem.cpp
+#     demo/mytreewidget.cpp
+#     demo/dragdrophandler.cpp
+# )
+# kde4_add_executable( worldmapwidget2_demo  ${demo_sources} )
+# target_link_libraries( worldmapwidget2_demo ${worldmapwidget2_libs} ${KEXIV2_LIBRARIES})
+# SET_TARGET_PROPERTIES( worldmapwidget2_demo PROPERTIES COMPILE_FLAGS "${COMPILE_FLAGS} ${MY_COMPILER_WARNINGS}")
+# INSTALL(TARGETS worldmapwidget2_demo ${INSTALL_TARGETS_DEFAULT_ARGS})
 
 IF(KDE4_BUILD_TESTS)
 
