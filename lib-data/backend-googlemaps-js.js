@@ -146,7 +146,7 @@ function wmwSetShowScaleControl(state) {
 }
 function wmwClearMarkers(mid) {
     for (var i in markerList[mid]) {
-        markerList[mid][i].setMap(null);
+        markerList[mid][i].marker.setMap(null);
     }
     markerList[mid] = new Object();
 }
@@ -155,9 +155,9 @@ function wmwSetMarkerPixmap(mid, id, pixmapWidth, pixmapHeight, xOffset, yOffset
     var pixmapOrigin = new google.maps.Point(0, 0);
     var anchorPoint = new google.maps.Point(xOffset, yOffset);
     var markerImage = new google.maps.MarkerImage(pixmapurl, pixmapSize, pixmapOrigin, anchorPoint);
-    markerList[mid][id].setIcon(markerImage);
+    markerList[mid][id].marker.setIcon(markerImage);
 }
-function wmwAddMarker(mid, id, lat, lon, setDraggable) {
+function wmwAddMarker(mid, id, lat, lon, setDraggable, setSnaps) {
     var latlng = new google.maps.LatLng(lat, lon);
     var marker = new google.maps.Marker({
         position: latlng,
@@ -172,12 +172,15 @@ function wmwAddMarker(mid, id, lat, lon, setDraggable) {
     {
         markerList[mid] = new Object();
     }
-    markerList[mid][id] = marker;
+    markerList[mid][id] = {
+            marker: marker,
+            snaps: setSnaps
+        };
 }
 function wmwGetMarkerPosition(mid,id) {
     var latlngString;
     if (markerList[mid.toString()][id.toString()]) {
-        latlngString = markerList[mid.toString()][id.toString()].getPosition().toUrlValue(12);
+        latlngString = markerList[mid.toString()][id.toString()].marker.getPosition().toUrlValue(12);
     }
     return latlngString;
 }

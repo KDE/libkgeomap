@@ -340,12 +340,13 @@ void BackendGoogleMaps::slotUngroupedModelChanged(const int mindex)
             continue;
 
         // TODO: use the pixmap supplied by the modelHelper
-        d->htmlWidget->runScript(QString("wmwAddMarker(%5, %1, %2, %3, %4);")
+        d->htmlWidget->runScript(QString("wmwAddMarker(%5, %1, %2, %3, %4, %5);")
                 .arg(row)
                 .arg(currentCoordinates.latString())
                 .arg(currentCoordinates.lonString())
                 .arg(itemFlags.testFlag(WMWModelHelper::FlagMovable)?"true":"false")
                 .arg(mindex)
+                .arg(itemFlags.testFlag(WMWModelHelper::FlagSnaps)?"true":"false")
             );
 
         QPoint markerCenterPoint;
