@@ -146,6 +146,7 @@ public:
     int editGroupingRadius;
     KAction* actionIncreaseThumbnailSize;
     KAction* actionDecreaseThumbnailSize;
+    KHBox* hBoxForAdditionalControlWidgetItems;
 };
 
 WorldMapWidget2::WorldMapWidget2(QWidget* const parent)
@@ -615,6 +616,8 @@ QWidget* WorldMapWidget2::getControlWidget()
 
         QToolButton* const decreaseThumbnailSizeButton = new QToolButton(d->controlWidget);
         decreaseThumbnailSizeButton->setDefaultAction(d->actionDecreaseThumbnailSize);
+
+        d->hBoxForAdditionalControlWidgetItems = new KHBox(d->controlWidget);
 
         // add stretch after the controls:
         QHBoxLayout* const hBoxLayout = reinterpret_cast<QHBoxLayout*>(d->controlWidget->layout());
@@ -1816,11 +1819,10 @@ void WorldMapWidget2::addWidgetToControlWidget(QWidget* const newWidget)
     if (!d->controlWidget)
         getControlWidget();
 
-    const int itemCount = d->controlWidget->layout()->count();
-    QHBoxLayout* const hBoxLayout = reinterpret_cast<QHBoxLayout*>(d->controlWidget->layout());
+    QHBoxLayout* const hBoxLayout = reinterpret_cast<QHBoxLayout*>(d->hBoxForAdditionalControlWidgetItems->layout());
     if (hBoxLayout)
     {
-        hBoxLayout->insertWidget(itemCount-1, newWidget);
+        hBoxLayout->addWidget(newWidget);
     }
 }
 
