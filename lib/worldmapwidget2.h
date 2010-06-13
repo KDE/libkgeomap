@@ -101,6 +101,7 @@ public:
     void setEditGroupingRadius(const int newGroupingRadius);
     int getThumbnailSize() const;
     int getUndecoratedThumbnailSize() const;
+    void setEditEnabled(const bool state);
 
 public Q_SLOTS:
     void slotZoomIn();

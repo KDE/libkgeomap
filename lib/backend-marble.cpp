@@ -835,9 +835,9 @@ bool BackendMarble::eventFilter(QObject *object, QEvent *event)
     else if (   (event->type() == QEvent::MouseMove)
              && (d->havePotentiallyMouseMovingObject || d->haveMouseMovingObject) )
     {
-        if ((d->mouseMoveClusterIndex>=0)&&!s->inEditMode)
+        if ( (!s->editEnabled) || ((d->mouseMoveClusterIndex>=0)&&!s->inEditMode) )
         {
-            // clusters only move in edit mode
+            // clusters only move in edit mode and when edit mode is enabled
             // TODO: this blocks moving of the map in non-edit mode
             d->havePotentiallyMouseMovingObject = false;
             d->mouseMoveClusterIndex = -1;

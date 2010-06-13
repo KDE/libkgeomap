@@ -1362,7 +1362,7 @@ void WorldMapWidget2::slotClustersClicked(const QIntList& clusterIndices)
 
 void WorldMapWidget2::dragEnterEvent(QDragEnterEvent* event)
 {
-    if (!d->dragDropHandler)
+    if ( (!s->editEnabled) || (!d->dragDropHandler) )
     {
         event->ignore();
         return;
@@ -1394,7 +1394,7 @@ void WorldMapWidget2::dropEvent(QDropEvent* event)
     // remove the drag marker:
 //     d->currentBackend->updateDragDropMarker(QPoint(), 0);
 
-    if (!d->dragDropHandler)
+    if ( (!s->editEnabled) || (!d->dragDropHandler) )
     {
         event->ignore();
         return;
@@ -1825,6 +1825,11 @@ void WorldMapWidget2::addWidgetToControlWidget(QWidget* const newWidget)
     {
         hBoxLayout->addWidget(newWidget);
     }
+}
+
+void WorldMapWidget2::setEditEnabled(const bool state)
+{
+    s->editEnabled = state;
 }
 
 } /* WMW2 */

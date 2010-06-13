@@ -349,6 +349,7 @@ public:
       displayMarkersModel(0),
       displayMarkersCoordinatesRole(0),
       inEditMode(false),
+      editEnabled(true),
       haveMovingCluster(false),
       markerPixmap(),
       markerPixmaps(),
@@ -382,6 +383,7 @@ public:
     QAbstractItemModel* displayMarkersModel;
     int displayMarkersCoordinatesRole;
     bool inEditMode;
+    bool editEnabled;
     bool haveMovingCluster;
     QPixmap markerPixmap;
     QMap<QString, QPixmap> markerPixmaps;
