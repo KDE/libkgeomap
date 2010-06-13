@@ -1297,6 +1297,7 @@ void WorldMapWidget2::slotGroupModeChanged(QAction* triggeredAction)
     Q_UNUSED(triggeredAction);
     s->inEditMode = d->actionEditMode->isChecked();
 
+    slotUpdateActionsEnabled();
     slotRequestLazyReclustering();
 }
 
