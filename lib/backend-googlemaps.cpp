@@ -436,9 +436,43 @@ void BackendGoogleMaps::slotHTMLEvents(const QStringList& events)
                 continue;
 
             // TODO: this discards the altitude!
+            // TODO: is this really necessary? clusters should be regenerated anyway...
             s->clusterList[clusterIndex].coordinates = clusterCoordinates;
 
             movedClusters << clusterIndex;
+        }
+        else if (eventCode=="cs")
+        {
+            // TODO: buffer this event type!
+            // cluster snapped
+            bool okay = false;
+            const int clusterIndex = eventParameters.first().toInt(&okay);
+            WMW2_ASSERT(okay);
+            if (!okay)
+                continue;
+
+            WMW2_ASSERT(clusterIndex>=0);
+            WMW2_ASSERT(clusterIndex<s->clusterList.size());
+            if ((clusterIndex<0)||(clusterIndex>s->clusterList.size()))
+                continue;
+
+            // determine to which marker we snapped:
+            okay = false;
+            const int snapModelId = eventParameters.at(1).toInt(&okay);
+            WMW2_ASSERT(okay);
+            if (!okay)
+                continue;
+            okay = false;
+            const int snapMarkerId = eventParameters.at(2).toInt(&okay);
+            WMW2_ASSERT(okay);
+            if (!okay)
+                continue;
+
+            // TODO: emit signal here or later?
+            WMWModelHelper* const modelHelper = s->ungroupedModels.at(snapModelId);
+            QAbstractItemModel* const model = modelHelper->model();
+            QPair<int, QModelIndex> snapTargetIndex(snapModelId, model->index(snapMarkerId, 0));
+            emit(signalClustersMoved(QIntList()<<clusterIndex, snapTargetIndex));
         }
         else if (eventCode=="cc")
         {

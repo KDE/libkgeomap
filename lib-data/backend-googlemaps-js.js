@@ -25,6 +25,8 @@ var clusterList = new Object();
 var clusterDataList = new Object();
 var isInEditMode = false;
 var dragMarker;
+var dragSnappingToMid = -1;
+var dragSnappingToId = -1;
 
 // ProjectionHelp: http://taapps-javalibs.blogspot.com/2009/10/google-map-v3how-to-use-overlayviews.html
 function ProjectionHelper(overlayMap) {
@@ -85,6 +87,16 @@ function wmwGetBounds() {
 }
 function wmwSetIsInEditMode(state) {
     isInEditMode = state;
+}
+function wmwLatLngToPoint(latLng) {
+    //      There is an offset in fromLatLngToDivPixel once the map has been panned
+    var myPoint = projectionHelper.getProjection().fromLatLngToDivPixel(latLng);
+    var centerPoint = projectionHelper.getProjection().fromLatLngToDivPixel(map.getCenter());
+    var centerOffsetX = Math.floor(mapDiv.offsetWidth / 2);
+    var centerOffsetY = Math.floor(mapDiv.offsetHeight / 2);
+    var pointX = myPoint.x-centerPoint.x+centerOffsetX;
+    var pointY = myPoint.y-centerPoint.y+centerOffsetY;
+    return new google.maps.Point(pointX, pointY);
 }
 function wmwLatLngToPixel(lat, lon) {
     //      There is an offset in fromLatLngToDivPixel once the map has been panned
@@ -287,8 +299,44 @@ function wmwAddCluster(id, lat, lon, setDraggable, markerCount, markerSelectedCo
             clusterList[-1]=leftOverMarker;
         }
     });
+    google.maps.event.addListener(marker, 'drag', function(e) {
+        // get the pixel position:
+        var clusterPoint = wmwLatLngToPoint(e.latLng);
+        // now iterate through all markers to which we can snap
+        var minDistSquared=-1;
+        var minMid;
+        var minId;
+        wmwDebugOut('drag');
+        for (var mid in markerList) {
+            for (var id in markerList[mid]) {
+                if (!markerList[mid][id].snaps)
+                    continue;
+
+                var markerPoint = wmwLatLngToPoint(markerList[mid][id].marker.getPosition());
+                var distanceSquared = (clusterPoint.x-markerPoint.x)*(clusterPoint.x-markerPoint.x) + (clusterPoint.y-markerPoint.y)*(clusterPoint.y-markerPoint.y);
+                if ((distanceSquared<=100)&&((minDistSquared<0)||(distanceSquared<minDistSquared))) {
+                    minDistSquared = distanceSquared;
+                    minMid = mid;
+                    minId = id;
+                }
+            }
+        }
+        if (minDistSquared>=0) {
+            // TODO: emit proper snap signal
+            marker.setPosition(markerList[minMid][minId].marker.getPosition());
+            dragSnappingToId = minId;
+            dragSnappingToMid = minMid;
+        } else {
+            dragSnappingToId = -1;
+            dragSnappingToMid = -1;
+        }
+    });
     google.maps.event.addListener(marker, 'dragend', function() {
-        wmwPostEventString('cm'+id.toString());
+        if (dragSnappingToMid>=0) {
+            wmwPostEventString('cs'+id.toString()+'/'+dragSnappingToMid.toString()+'/'+dragSnappingToId.toString());
+        } else {
+            wmwPostEventString('cm'+id.toString());
+        }
     });
     google.maps.event.addListener(marker, 'click', function() {
         wmwPostEventString('cc'+id.toString());
