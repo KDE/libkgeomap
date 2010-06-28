@@ -41,7 +41,7 @@ public:
 };
 
 MyTreeWidget::MyTreeWidget(QWidget* const parent)
-: QTreeWidget(parent), d(new MyTreeWidgetPrivate())
+            : QTreeWidget(parent), d(new MyTreeWidgetPrivate())
 {
     setDragEnabled(true);
     setDragDropMode(QAbstractItemView::DragOnly);
@@ -52,7 +52,7 @@ MyTreeWidget::~MyTreeWidget()
     delete d;
 }
 
-void MyTreeWidget::startDrag(Qt::DropActions supportedActions)
+void MyTreeWidget::startDrag(Qt::DropActions /*supportedActions*/)
 {
     QMimeData* const dragMimeData = mimeData(selectionModel()->selectedIndexes());
 
