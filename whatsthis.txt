@@ -1,3 +1,3 @@
-
-In this directory, a new version of the WorldMapWidget is developed. It contains the source code for the widget, the backends and a demo application.
+In this directory, a new version of the WorldMapWidget is developed for digiKam GoSC 2010.
+It contains the source code for the widget, the backends and a demo application.
 
