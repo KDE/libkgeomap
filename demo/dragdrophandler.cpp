@@ -28,7 +28,7 @@
 #include "mytreewidget.h"
 
 DemoDragDropHandler::DemoDragDropHandler(QAbstractItemModel* const pModel, QObject* const parent)
- : DragDropHandler(parent), model(pModel)
+                   : DragDropHandler(parent), model(pModel)
 {
 }
 
@@ -36,7 +36,7 @@ DemoDragDropHandler::~DemoDragDropHandler()
 {
 }
 
-Qt::DropAction DemoDragDropHandler::accepts(const QDropEvent* e)
+Qt::DropAction DemoDragDropHandler::accepts(const QDropEvent* /*e*/)
 {
     return Qt::CopyAction;
 }
@@ -67,7 +67,7 @@ bool DemoDragDropHandler::dropEvent(const QDropEvent* e, const WMW2::WMWGeoCoord
     return true;
 }
 
-QMimeData* DemoDragDropHandler::createMimeData(const QList<QPersistentModelIndex>& modelIndices)
+QMimeData* DemoDragDropHandler::createMimeData(const QList<QPersistentModelIndex>& /*modelIndices*/)
 {
     return 0;
 }
