@@ -414,7 +414,7 @@ void BackendMarble::marbleCustomPaint(Marble::GeoPainter* painter)
     QPen circlePen(Qt::green);
     QBrush circleBrush(Qt::blue);
     // TODO: use global radius instead, but check the code here first
-    const int circleRadius = 15; // s->groupingRadius;
+    //const int circleRadius = 15; // s->groupingRadius;
 
     for (int i = 0; i<s->ungroupedModels.count(); ++i)
     {
