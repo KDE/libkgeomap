@@ -25,7 +25,7 @@
 #include <QTreeWidgetItem>
 #include <QPersistentModelIndex>
 
-#include <worldmapwidget2/worldmapwidget2_primitives.h>
+#include "../lib/worldmapwidget2_primitives.h"
 
 const int RoleMyData = Qt::UserRole+0;
 const int RoleCoordinates = Qt::UserRole+1;
