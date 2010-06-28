@@ -17,7 +17,7 @@
  *
  * ============================================================ */
 
-#include "worldmapwidget2_primitives.h"
+#include "worldmapwidget2_primitives.moc"
 
 namespace WMW2
 {
