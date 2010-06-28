@@ -999,7 +999,7 @@ void BackendMarble::slotThumbnailAvailableForIndex(const QVariant& index, const 
     d->marbleWidget->update();
 }
 
-void BackendMarble::slotUngroupedModelChanged(const int index)
+void BackendMarble::slotUngroupedModelChanged(const int /*index*/)
 {
     d->marbleWidget->update();
 }

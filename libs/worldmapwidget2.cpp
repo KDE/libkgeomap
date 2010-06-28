@@ -1379,10 +1379,9 @@ void WorldMapWidget2::dragEnterEvent(QDragEnterEvent* event)
 
 //     if (!dragData->haveDragPixmap)
 //         d->currentBackend->updateDragDropMarker(event->pos(), dragData);
-    
 }
 
-void WorldMapWidget2::dragMoveEvent(QDragMoveEvent* event)
+void WorldMapWidget2::dragMoveEvent(QDragMoveEvent* /*event*/)
 {
     // TODO: update the position of the drag marker if it is to be shown
 //     if (!dragData->haveDragPixmap)

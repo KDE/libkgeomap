@@ -247,7 +247,7 @@ MarkerModel::Tile* MarkerModel::getTile(const MarkerModel::TileIndex& tileIndex,
                 {
                     const QPersistentModelIndex currentMarkerIndex = tile->markerIndices.at(i);
                     WMW2_ASSERT(currentMarkerIndex.isValid());
-                    
+
                     // get the tile index for this marker:
                     const TileIndex markerTileIndex = TileIndex::fromCoordinates(currentMarkerIndex.data(d->coordinatesRole).value<WMWGeoCoordinate>(), level);
                     const int newTileIndex = markerTileIndex.toIntList().last();
@@ -632,7 +632,7 @@ void MarkerModel::removeMarkerIndexFromGrid(const QModelIndex& markerIndex, cons
     {
         markerIsSelected = d->selectionModel->isSelected(markerIndex);
     }
-    
+
     // remove the marker from the grid:
     const WMWGeoCoordinate markerCoordinates = markerIndex.data(d->coordinatesRole).value<WMWGeoCoordinate>();
     const TileIndex tileIndex = TileIndex::fromCoordinates(markerCoordinates, TileIndex::MaxLevel);
@@ -676,7 +676,7 @@ void MarkerModel::moveMarker(const QPersistentModelIndex& markerIndex, const WMW
     d->markerModel->setData(markerIndex, QVariant::fromValue(newPosition), d->coordinatesRole);
 }
 
-void MarkerModel::slotSourceModelDataChanged(const QModelIndex& topLeft, const QModelIndex& bottomRight)
+void MarkerModel::slotSourceModelDataChanged(const QModelIndex& /*topLeft*/, const QModelIndex& /*bottomRight*/)
 {
     d->isDirty = true;
     emit(signalTilesOrSelectionChanged());
@@ -714,7 +714,7 @@ void MarkerModel::slotSourceModelRowsAboutToBeRemoved(const QModelIndex& parentI
     {
         return;
     }
-    
+
     // remove the items from their tiles:
     for (int i=start; i<=end; ++i)
     {
@@ -826,7 +826,7 @@ QItemSelectionModel* MarkerModel::getSelectionModel() const
     return d->selectionModel;
 }
 
-QVariant MarkerModel::getTileRepresentativeMarker(const MarkerModel::TileIndex& tileIndex, const int sortKey)
+QVariant MarkerModel::getTileRepresentativeMarker(const MarkerModel::TileIndex& tileIndex, const int /*sortKey*/)
 {
     // TODO: actually return the result of some sorting and cache it in the tile
     const QList<QPersistentModelIndex> modelIndices = getTileMarkerIndices(tileIndex);

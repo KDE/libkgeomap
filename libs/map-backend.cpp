@@ -30,7 +30,7 @@ public:
 };
 
 MapBackend::MapBackend(const QExplicitlySharedDataPointer<WMWSharedData>& sharedData, QObject* const parent)
-: QObject(parent), s(sharedData), d(new MapBackendPrivate())
+          : QObject(parent), s(sharedData), d(new MapBackendPrivate())
 {
 
 }
@@ -40,7 +40,7 @@ MapBackend::~MapBackend()
     delete d;
 }
 
-void MapBackend::slotThumbnailAvailableForIndex(const QVariant& index, const QPixmap& pixmap)
+void MapBackend::slotThumbnailAvailableForIndex(const QVariant& /*index*/, const QPixmap& /*pixmap*/)
 {
 }
 
