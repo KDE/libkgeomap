@@ -26,7 +26,7 @@
 #include <KAboutData>
 #include <KCmdLineArgs>
 #include <KCmdLineOptions>
-#include <KDebug>
+#include <kdebug.h>
 #include <kicon.h>
 
 // local includes
@@ -62,7 +62,7 @@ int main(int argc, char* argv[])
     KCmdLineArgs::addCmdLineOptions( options );
 
     KCmdLineArgs* const args = KCmdLineArgs::parsedArgs();
-    
+
     // get the list of images to load on startup:
     KUrl::List imagesList;
     for (int i=0; i<args->count(); ++i)

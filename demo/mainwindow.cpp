@@ -110,7 +110,7 @@ public:
 };
 
 MainWindow::MainWindow(KCmdLineArgs* const cmdLineArgs, QWidget* const parent)
-: KMainWindow(parent), d(new MainWindowPrivate())
+          : KMainWindow(parent), d(new MainWindowPrivate())
 {
     // initialize kexiv2 before doing any multitasking
     KExiv2Iface::KExiv2::initializeExiv2();
@@ -376,7 +376,7 @@ void MainWindow::slotImageLoadingBunchReady()
     d->imageLoadingBuncher.clear();
 }
 
-void MainWindow::slotMarkersMoved(const QList<QPersistentModelIndex>& markerIndices, const WMW2::WMWGeoCoordinate& coordinates)
+void MainWindow::slotMarkersMoved(const QList<QPersistentModelIndex>& markerIndices, const WMW2::WMWGeoCoordinate& /*coordinates*/)
 {
     // prepare altitude lookups
     WMWAltitudeLookup::List altitudeQueries;
