@@ -37,40 +37,38 @@ ENDIF(${HAVE_VALGRIND})
 
 INCLUDE_DIRECTORIES(
     ${CMAKE_CURRENT_SOURCE_DIR}/demo
-    ${CMAKE_CURRENT_SOURCE_DIR}/lib
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs
 )
 
-
-
 SET( widget_sources
-    lib/worldmapwidget2.cpp
-    lib/map-backend.cpp
-    lib/html_widget.cpp
-    lib/markermodel.cpp
-    lib/worldmapwidget2_primitives.cpp
-    lib/altitude-backend.cpp
-    lib/worldmapwidget2_dragdrophandler.cpp
+    libs/worldmapwidget2.cpp
+    libs/map-backend.cpp
+    libs/html_widget.cpp
+    libs/markermodel.cpp
+    libs/worldmapwidget2_primitives.cpp
+    libs/altitude-backend.cpp
+    libs/worldmapwidget2_dragdrophandler.cpp
 
-    lib/backend-altitude-geonames.cpp
+    libs/backend-altitude-geonames.cpp
 )
 
 SET( backend_marble_sources
-    lib/backend-marble.cpp
+    libs/backend-marble.cpp
 )
 IF (${KDE_VERSION} VERSION_GREATER "4.4.66")
     ADD_DEFINITIONS(-DWMW2_MARBLE_ADD_LAYER)
-    SET( backend_marble_sources ${backend_marble_sources} lib/backend-marble-layer.cpp )
+    SET( backend_marble_sources ${backend_marble_sources} libs/backend-marble-layer.cpp )
 ELSE (${KDE_VERSION} VERSION_GREATER "4.4.66")
-    SET( backend_marble_sources ${backend_marble_sources} lib/backend-marble-subwidget.cpp )
+    SET( backend_marble_sources ${backend_marble_sources} libs/backend-marble-subwidget.cpp )
 ENDIF (${KDE_VERSION} VERSION_GREATER "4.4.66")
 
 
 SET( backend_googlemaps_sources
-    lib/backend-googlemaps.cpp
+    libs/backend-googlemaps.cpp
 )
 
 SET( backend_osm_sources
-#     lib/backend-osm.cpp
+#     libs/backend-osm.cpp
 )
 
 KDE4_ADD_LIBRARY( worldmapwidget2 SHARED ${widget_sources} ${backend_marble_sources} ${backend_googlemaps_sources} ${backend_osm_sources})
@@ -80,70 +78,70 @@ SET( worldmapwidget2_libs
 )
 target_link_libraries( worldmapwidget2 ${worldmapwidget2_libs} )
 SET_TARGET_PROPERTIES( worldmapwidget2 PROPERTIES COMPILE_FLAGS "${COMPILE_FLAGS} ${MY_COMPILER_WARNINGS}")
-SET( worldmapwidget2_libs
+SET(worldmapwidget2_libs
     worldmapwidget2 ${worldmapwidget2_libs}
 )
 
 INSTALL(TARGETS worldmapwidget2 ${INSTALL_TARGETS_DEFAULT_ARGS})
 
-INSTALL(FILES lib-data/backend-osm.html
-              lib-data/backend-osm-js.js
-              lib-data/backend-googlemaps.html
-              lib-data/backend-googlemaps-js.js
-              lib-data/cluster-circle-00ff00.png
-              lib-data/cluster-circle-00ffff.png
-              lib-data/cluster-circle-ff0000.png
-              lib-data/cluster-circle-ff7f00.png
-              lib-data/cluster-circle-ffff00.png
-              lib-data/cluster-circle-00ff00-someselected.png
-              lib-data/cluster-circle-00ffff-someselected.png
-              lib-data/cluster-circle-ff0000-someselected.png
-              lib-data/cluster-circle-ff7f00-someselected.png
-              lib-data/cluster-circle-ffff00-someselected.png
-              lib-data/cluster-circle-00ff00-selected.png
-              lib-data/cluster-circle-00ffff-selected.png
-              lib-data/cluster-circle-ff0000-selected.png
-              lib-data/cluster-circle-ff7f00-selected.png
-              lib-data/cluster-circle-ffff00-selected.png
-              lib-data/marker-00ff00.png
-              lib-data/marker-00ffff.png
-              lib-data/marker-ff0000.png
-              lib-data/marker-ff7f00.png
-              lib-data/marker-ffff00.png
-              lib-data/marker-00ff00-someselected.png
-              lib-data/marker-00ffff-someselected.png
-              lib-data/marker-ff0000-someselected.png
-              lib-data/marker-ff7f00-someselected.png
-              lib-data/marker-ffff00-someselected.png
-              lib-data/marker-00ff00-selected.png
-              lib-data/marker-00ffff-selected.png
-              lib-data/marker-ff0000-selected.png
-              lib-data/marker-ff7f00-selected.png
-              lib-data/marker-ffff00-selected.png
+INSTALL(FILES data/backend-osm.html
+              data/backend-osm-js.js
+              data/backend-googlemaps.html
+              data/backend-googlemaps-js.js
+              data/cluster-circle-00ff00.png
+              data/cluster-circle-00ffff.png
+              data/cluster-circle-ff0000.png
+              data/cluster-circle-ff7f00.png
+              data/cluster-circle-ffff00.png
+              data/cluster-circle-00ff00-someselected.png
+              data/cluster-circle-00ffff-someselected.png
+              data/cluster-circle-ff0000-someselected.png
+              data/cluster-circle-ff7f00-someselected.png
+              data/cluster-circle-ffff00-someselected.png
+              data/cluster-circle-00ff00-selected.png
+              data/cluster-circle-00ffff-selected.png
+              data/cluster-circle-ff0000-selected.png
+              data/cluster-circle-ff7f00-selected.png
+              data/cluster-circle-ffff00-selected.png
+              data/marker-00ff00.png
+              data/marker-00ffff.png
+              data/marker-ff0000.png
+              data/marker-ff7f00.png
+              data/marker-ffff00.png
+              data/marker-00ff00-someselected.png
+              data/marker-00ffff-someselected.png
+              data/marker-ff0000-someselected.png
+              data/marker-ff7f00-someselected.png
+              data/marker-ffff00-someselected.png
+              data/marker-00ff00-selected.png
+              data/marker-00ffff-selected.png
+              data/marker-ff0000-selected.png
+              data/marker-ff7f00-selected.png
+              data/marker-ffff00-selected.png
         DESTINATION ${DATA_INSTALL_DIR}/libworldmapwidget2/)
 
 SET(worldmapwidget2_headers
-    lib/worldmapwidget2_export.h
-    lib/worldmapwidget2.h
-    lib/worldmapwidget2_dragdrophandler.h
-    lib/worldmapwidget2_primitives.h
-    lib/altitude-backend.h
+    libs/worldmapwidget2_export.h
+    libs/worldmapwidget2.h
+    libs/worldmapwidget2_dragdrophandler.h
+    libs/worldmapwidget2_primitives.h
+    libs/altitude-backend.h
 )
 INSTALL(FILES ${worldmapwidget2_headers}
         DESTINATION ${INCLUDE_INSTALL_DIR}/worldmapwidget2 COMPONENT Devel)
 
 # # demo widget
-# SET( demo_sources
-#     demo/demo-main.cpp
-#     demo/mainwindow.cpp
-#     demo/myimageitem.cpp
-#     demo/mytreewidget.cpp
-#     demo/dragdrophandler.cpp
-# )
-# kde4_add_executable( worldmapwidget2_demo  ${demo_sources} )
-# target_link_libraries( worldmapwidget2_demo ${worldmapwidget2_libs} ${KEXIV2_LIBRARIES})
-# SET_TARGET_PROPERTIES( worldmapwidget2_demo PROPERTIES COMPILE_FLAGS "${COMPILE_FLAGS} ${MY_COMPILER_WARNINGS}")
-# INSTALL(TARGETS worldmapwidget2_demo ${INSTALL_TARGETS_DEFAULT_ARGS})
+ SET( demo_sources
+     demo/demo-main.cpp
+     demo/mainwindow.cpp
+     demo/myimageitem.cpp
+     demo/mytreewidget.cpp
+     demo/dragdrophandler.cpp
+ )
+ kde4_add_executable( worldmapwidget2_demo  ${demo_sources} )
+ target_link_libraries( worldmapwidget2_demo ${worldmapwidget2_libs} ${KEXIV2_LIBRARIES})
+ SET_TARGET_PROPERTIES( worldmapwidget2_demo PROPERTIES COMPILE_FLAGS "${COMPILE_FLAGS} ${MY_COMPILER_WARNINGS}")
+ INSTALL(TARGETS worldmapwidget2_demo ${INSTALL_TARGETS_DEFAULT_ARGS})
 
 IF(KDE4_BUILD_TESTS)
 

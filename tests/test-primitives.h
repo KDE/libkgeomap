@@ -28,7 +28,7 @@
 
 // local includes
 
-#include "worldmapwidget2_primitives.h"
+#include "../lib/worldmapwidget2_primitives.h"
 
 class TestPrimitives : public QObject
 {
