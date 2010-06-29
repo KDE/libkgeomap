@@ -1,166 +1,89 @@
-# * ============================================================
-# *
-# * Copyright (C) 2009,2010 by Michael G. Hansen <mike at mghansen dot de>
-# *
-# * This program is free software; you can redistribute it
-# * and/or modify it under the terms of the GNU General
-# * Public License as published by the Free Software Foundation;
-# * either version 2, or (at your option) any later version.
-# *
-# * This program is distributed in the hope that it will be useful,
-# * but WITHOUT ANY WARRANTY; without even the implied warranty of
-# * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# * GNU General Public License for more details.
-# *
-# * ============================================================
+# ===========================================================
+#
+# This file is a part of digiKam project
+# <a href="http://www.digikam.org">http://www.digikam.org</a>
+#
+# @date   2010-06-29
+# @brief  world maps library interface for KDE
+#
+# @author Copyright (C) 2010 by Gilles Caulier
+#         <a href="mailto:caulier dot gilles at gmail dot com">caulier dot gilles at gmail dot com</a>
+# @author Copyright (C) 2009-2010 by Michael G. Hansen
+#         <a href="mailto:mike at mghansen dot de">mike at mghansen dot de</a>
+#
+# This program is free software; you can redistribute it
+# and/or modify it under the terms of the GNU General
+# Public License as published by the Free Software Foundation;
+# either version 2, or (at your option)
+# any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+# GNU General Public License for more details.
+#
+# ============================================================
 
-PROJECT(worldmapwidget2)
+PROJECT(libkmap)
 
-SET( MY_COMPILER_WARNINGS
-    "-Wall -Wextra -pedantic"
-    # -Wold-style-cast
-)
+FIND_PACKAGE(Qt4 4.6.0 REQUIRED)
+FIND_PACKAGE(KDE4 REQUIRED)
 
-FIND_PACKAGE( KDE4 REQUIRED )
-INCLUDE_DIRECTORIES( ${CMAKE_CURRENT_BINARY_DIR} ${KDE4_INCLUDES} )
+INCLUDE(KDE4Defaults)
+INCLUDE(MacroLibrary)
+INCLUDE(MacroOptionalAddSubdirectory)
+INCLUDE(MacroOptionalFindPackage)
+INCLUDE(FindPackageHandleStandardArgs)
+
 FIND_PACKAGE(MarbleWidget REQUIRED)
 FIND_PACKAGE(Kexiv2 REQUIRED)
-INCLUDE_DIRECTORIES(${KEXIV2_INCLUDE_DIR})
 
-INCLUDE(CheckIncludeFile)
-CHECK_INCLUDE_FILE("valgrind/valgrind.h" HAVE_VALGRIND)
-IF(${HAVE_VALGRIND})
-    ADD_DEFINITIONS(-DWMW2_HAVE_VALGRIND)
-ENDIF(${HAVE_VALGRIND})
+ADD_DEFINITIONS (${QT_DEFINITIONS} ${QT_QTDBUS_DEFINITIONS} ${KDE4_DEFINITIONS})
+INCLUDE_DIRECTORIES (${QDBUS_INCLUDE_DIRS} ${CMAKE_SOURCE_DIR} ${CMAKE_BINARY_DIR} ${KDE4_INCLUDES})
 
-INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/demo
-                    ${CMAKE_CURRENT_SOURCE_DIR}/libkmap
-                   )
+# =======================================================
+# Information to update before to release this library.
 
-SET(widget_sources
-    libkmap/worldmapwidget2.cpp
-    libkmap/map-backend.cpp
-    libkmap/html_widget.cpp
-    libkmap/markermodel.cpp
-    libkmap/worldmapwidget2_primitives.cpp
-    libkmap/altitude-backend.cpp
-    libkmap/worldmapwidget2_dragdrophandler.cpp
-    libkmap/backend-altitude-geonames.cpp
-   )
+# Library version history:
+# API      ABI
+# 0.1.0 => 0.1.0     (Released with KDE 4.6.0)
 
-SET(backend_marble_sources
-    libkmap/backend-marble.cpp
-   )
+# Library API version
+SET(KMAP_LIB_MAJOR_VERSION "0")
+SET(KMAP_LIB_MINOR_VERSION "1")
+SET(KMAP_LIB_PATCH_VERSION "0")
 
-IF (${KDE_VERSION} VERSION_GREATER "4.4.66")
-    ADD_DEFINITIONS(-DWMW2_MARBLE_ADD_LAYER)
-    SET( backend_marble_sources ${backend_marble_sources} libkmap/backend-marble-layer.cpp )
-ELSE (${KDE_VERSION} VERSION_GREATER "4.4.66")
-    SET( backend_marble_sources ${backend_marble_sources} libkmap/backend-marble-subwidget.cpp )
-ENDIF (${KDE_VERSION} VERSION_GREATER "4.4.66")
+# Suffix to add at end of version string. Usual values are:
+# "-svn"   : alpha code unstable from svn. Do not use in production
+# "-beta1" : beta1 release.
+# "-beta2" : beta2 release.
+# "-beta3" : beta3 release.
+# "-rc"    : release candidate.
+# ""       : final relase. Can be used in production.
+SET(KMAP_LIB_SUFFIX_VERSION "-svn")
 
-SET(backend_googlemaps_sources
-    libkmap/backend-googlemaps.cpp
-   )
+# Library ABI version used by linker.
+# For details : http://www.gnu.org/software/libtool/manual/libtool.html#Updating-version-info
+SET(KMAP_LIB_SO_CUR_VERSION "0")
+SET(KMAP_LIB_SO_REV_VERSION "1")
+SET(KMAP_LIB_SO_AGE_VERSION "0")
 
-SET(backend_osm_sources
-    #libkmap/backend-osm.cpp
-   )
+# =======================================================
+# Set env. variables accordinly.
 
-KDE4_ADD_LIBRARY( worldmapwidget2 SHARED ${widget_sources} ${backend_marble_sources} ${backend_googlemaps_sources} ${backend_osm_sources})
-# TODO: soname version numbers of the library
-SET(worldmapwidget2_libs
-    ${KDE4_UI_LIBS} ${KDE4_KPARTS_LIBS} ${LIBMARBLEWIDGET_LIBRARY} ${KDE4_KHTML_LIBS}
-   )
-TARGET_LINK_LIBRARIES( worldmapwidget2 ${worldmapwidget2_libs} )
-SET_TARGET_PROPERTIES( worldmapwidget2 PROPERTIES COMPILE_FLAGS "${COMPILE_FLAGS} ${MY_COMPILER_WARNINGS}")
-SET(worldmapwidget2_libs
-    worldmapwidget2 ${worldmapwidget2_libs}
-   )
+SET(KMAP_LIB_VERSION_STRING "${KMAP_LIB_MAJOR_VERSION}.${KMAP_LIB_MINOR_VERSION}.${KMAP_LIB_PATCH_VERSION}${KMAP_LIB_SUFFIX_VERSION}")
+SET(KMAP_LIB_VERSION_ID "0x0${KMAP_LIB_MAJOR_VERSION}0${KMAP_LIB_MINOR_VERSION}0${KMAP_LIB_PATCH_VERSION}")
+SET(KMAP_LIB_SO_VERSION_STRING "${KMAP_LIB_SO_CUR_VERSION}.${KMAP_LIB_SO_REV_VERSION}.${KMAP_LIB_SO_AGE_VERSION}")
 
-INSTALL(TARGETS worldmapwidget2 ${INSTALL_TARGETS_DEFAULT_ARGS})
+# =======================================================
 
-INSTALL(FILES data/backend-osm.html
-              data/backend-osm-js.js
-              data/backend-googlemaps.html
-              data/backend-googlemaps-js.js
-              data/cluster-circle-00ff00.png
-              data/cluster-circle-00ffff.png
-              data/cluster-circle-ff0000.png
-              data/cluster-circle-ff7f00.png
-              data/cluster-circle-ffff00.png
-              data/cluster-circle-00ff00-someselected.png
-              data/cluster-circle-00ffff-someselected.png
-              data/cluster-circle-ff0000-someselected.png
-              data/cluster-circle-ff7f00-someselected.png
-              data/cluster-circle-ffff00-someselected.png
-              data/cluster-circle-00ff00-selected.png
-              data/cluster-circle-00ffff-selected.png
-              data/cluster-circle-ff0000-selected.png
-              data/cluster-circle-ff7f00-selected.png
-              data/cluster-circle-ffff00-selected.png
-              data/marker-00ff00.png
-              data/marker-00ffff.png
-              data/marker-ff0000.png
-              data/marker-ff7f00.png
-              data/marker-ffff00.png
-              data/marker-00ff00-someselected.png
-              data/marker-00ffff-someselected.png
-              data/marker-ff0000-someselected.png
-              data/marker-ff7f00-someselected.png
-              data/marker-ffff00-someselected.png
-              data/marker-00ff00-selected.png
-              data/marker-00ffff-selected.png
-              data/marker-ff0000-selected.png
-              data/marker-ff7f00-selected.png
-              data/marker-ffff00-selected.png
-        DESTINATION ${DATA_INSTALL_DIR}/libworldmapwidget2/)
+SUBDIRS(libkmap)
+SUBDIRS(test)
+SUBDIRS(demo)
+SUBDIRS(data)
 
-SET(worldmapwidget2_headers
-    libkmap/worldmapwidget2_export.h
-    libkmap/worldmapwidget2.h
-    libkmap/worldmapwidget2_dragdrophandler.h
-    libkmap/worldmapwidget2_primitives.h
-    libkmap/altitude-backend.h
-   )
-INSTALL(FILES ${worldmapwidget2_headers}
-        DESTINATION ${INCLUDE_INSTALL_DIR}/worldmapwidget2 COMPONENT Devel)
-
-# # demo widget
-SET(demo_sources
-    demo/demo-main.cpp
-    demo/mainwindow.cpp
-    demo/myimageitem.cpp
-    demo/mytreewidget.cpp
-    demo/dragdrophandler.cpp
-   )
-
-KDE4_ADD_EXECUTABLE( worldmapwidget2_demo  ${demo_sources} )
-target_link_libraries( worldmapwidget2_demo ${worldmapwidget2_libs} ${KEXIV2_LIBRARIES})
-SET_TARGET_PROPERTIES( worldmapwidget2_demo PROPERTIES COMPILE_FLAGS "${COMPILE_FLAGS} ${MY_COMPILER_WARNINGS}")
-INSTALL(TARGETS worldmapwidget2_demo ${INSTALL_TARGETS_DEFAULT_ARGS})
-
-IF(KDE4_BUILD_TESTS)
-
-    INCLUDE(CTest)
-    ENABLE_TESTING()
-
-    # test the marker model
-    SET(test_model_sources
-        test/test-model.cpp
-       )
-    KDE4_ADD_EXECUTABLE( test_model ${test_model_sources} )
-    TARGET_LINK_LIBRARIES( test_model worldmapwidget2 ${worldmapwidget2_libs} ${QT_QTTEST_LIBRARY} )
-    SET_TARGET_PROPERTIES( test_model PROPERTIES COMPILE_FLAGS "${COMPILE_FLAGS} ${MY_COMPILER_WARNINGS}")
-    ADD_TEST( test_model ${EXECUTABLE_OUTPUT_PATH}/test_model )
-
-    # test the marker model
-    SET(test_primitives_sources
-        test/test-primitives.cpp
-       )
-    KDE4_ADD_EXECUTABLE( test_primitives ${test_primitives_sources} )
-    TARGET_LINK_LIBRARIES( test_primitives worldmapwidget2 ${worldmapwidget2_libs} ${QT_QTTEST_LIBRARY} )
-    SET_TARGET_PROPERTIES( test_primitives PROPERTIES COMPILE_FLAGS "${COMPILE_FLAGS} ${MY_COMPILER_WARNINGS}")
-    ADD_TEST( test_primitives ${EXECUTABLE_OUTPUT_PATH}/test_primitives )
-
-ENDIF(KDE4_BUILD_TESTS)
+IF(NOT WIN32)
+  CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/libkmap.pc.cmake ${CMAKE_CURRENT_BINARY_DIR}/libkmap.pc)
+  CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/libkmap.lsm.cmake ${CMAKE_CURRENT_BINARY_DIR}/libkmap.lsm)
+  INSTALL(FILES ${CMAKE_CURRENT_BINARY_DIR}/libkmap.pc DESTINATION ${LIB_INSTALL_DIR}/pkgconfig )
+ENDIF(NOT WIN32)
