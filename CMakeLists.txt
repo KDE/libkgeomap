@@ -34,37 +34,37 @@ IF(${HAVE_VALGRIND})
 ENDIF(${HAVE_VALGRIND})
 
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/demo
-                    ${CMAKE_CURRENT_SOURCE_DIR}/libs
+                    ${CMAKE_CURRENT_SOURCE_DIR}/libkmap
                    )
 
 SET(widget_sources
-    libs/worldmapwidget2.cpp
-    libs/map-backend.cpp
-    libs/html_widget.cpp
-    libs/markermodel.cpp
-    libs/worldmapwidget2_primitives.cpp
-    libs/altitude-backend.cpp
-    libs/worldmapwidget2_dragdrophandler.cpp
-    libs/backend-altitude-geonames.cpp
+    libkmap/worldmapwidget2.cpp
+    libkmap/map-backend.cpp
+    libkmap/html_widget.cpp
+    libkmap/markermodel.cpp
+    libkmap/worldmapwidget2_primitives.cpp
+    libkmap/altitude-backend.cpp
+    libkmap/worldmapwidget2_dragdrophandler.cpp
+    libkmap/backend-altitude-geonames.cpp
    )
 
 SET(backend_marble_sources
-    libs/backend-marble.cpp
+    libkmap/backend-marble.cpp
    )
 
 IF (${KDE_VERSION} VERSION_GREATER "4.4.66")
     ADD_DEFINITIONS(-DWMW2_MARBLE_ADD_LAYER)
-    SET( backend_marble_sources ${backend_marble_sources} libs/backend-marble-layer.cpp )
+    SET( backend_marble_sources ${backend_marble_sources} libkmap/backend-marble-layer.cpp )
 ELSE (${KDE_VERSION} VERSION_GREATER "4.4.66")
-    SET( backend_marble_sources ${backend_marble_sources} libs/backend-marble-subwidget.cpp )
+    SET( backend_marble_sources ${backend_marble_sources} libkmap/backend-marble-subwidget.cpp )
 ENDIF (${KDE_VERSION} VERSION_GREATER "4.4.66")
 
 SET(backend_googlemaps_sources
-    libs/backend-googlemaps.cpp
+    libkmap/backend-googlemaps.cpp
    )
 
 SET(backend_osm_sources
-    #libs/backend-osm.cpp
+    #libkmap/backend-osm.cpp
    )
 
 KDE4_ADD_LIBRARY( worldmapwidget2 SHARED ${widget_sources} ${backend_marble_sources} ${backend_googlemaps_sources} ${backend_osm_sources})
@@ -117,12 +117,12 @@ INSTALL(FILES data/backend-osm.html
         DESTINATION ${DATA_INSTALL_DIR}/libworldmapwidget2/)
 
 SET(worldmapwidget2_headers
-    libs/worldmapwidget2_export.h
-    libs/worldmapwidget2.h
-    libs/worldmapwidget2_dragdrophandler.h
-    libs/worldmapwidget2_primitives.h
-    libs/altitude-backend.h
-)
+    libkmap/worldmapwidget2_export.h
+    libkmap/worldmapwidget2.h
+    libkmap/worldmapwidget2_dragdrophandler.h
+    libkmap/worldmapwidget2_primitives.h
+    libkmap/altitude-backend.h
+   )
 INSTALL(FILES ${worldmapwidget2_headers}
         DESTINATION ${INCLUDE_INSTALL_DIR}/worldmapwidget2 COMPONENT Devel)
 
