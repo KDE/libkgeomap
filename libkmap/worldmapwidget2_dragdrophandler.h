@@ -27,13 +27,13 @@
 // local includes
 
 #include "worldmapwidget2_primitives.h"
-#include "worldmapwidget2_export.h"
+#include "libkmap_export.h"
 
 class QDropEvent;
 
 namespace WMW2 {
 
-class WORLDMAPWIDGET2_EXPORT DragDropHandler : public QObject
+class KMAP_EXPORT DragDropHandler : public QObject
 {
 Q_OBJECT
 

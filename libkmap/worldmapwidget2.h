@@ -29,7 +29,7 @@
 // local includes
 
 #include "worldmapwidget2_primitives.h"
-#include "worldmapwidget2_export.h"
+#include "libkmap_export.h"
 
 class KAction;
 class KConfigGroup;
@@ -38,12 +38,13 @@ class QDragEnterEvent;
 class QDropEvent;
 class QMenu;
 
-namespace WMW2 {
+namespace WMW2
+{
 
 class WorldMapWidget2Private;
 class DragDropHandler;
 
-class WORLDMAPWIDGET2_EXPORT WorldMapWidget2 : public QWidget
+class KMAP_EXPORT WorldMapWidget2 : public QWidget
 {
 Q_OBJECT
 

@@ -88,7 +88,7 @@ SET_TARGET_PROPERTIES(kmap PROPERTIES VERSION ${KMAP_LIB_SO_VERSION_STRING}
 
 INSTALL(TARGETS kmap ${INSTALL_TARGETS_DEFAULT_ARGS})
 
-INSTALL(FILES worldmapwidget2_export.h
+INSTALL(FILES libkmap_export.h
               worldmapwidget2.h
               worldmapwidget2_dragdrophandler.h
               worldmapwidget2_primitives.h

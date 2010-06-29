@@ -26,12 +26,13 @@
 // local includes
 
 #include "worldmapwidget2_primitives.h"
-#include "worldmapwidget2_export.h"
+#include "libkmap_export.h"
 
-namespace WMW2 {
+namespace WMW2
+{
 
 DragDropHandler::DragDropHandler(QObject* const parent)
-: QObject(parent)
+               : QObject(parent)
 {
 }
 

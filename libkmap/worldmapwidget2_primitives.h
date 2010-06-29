@@ -41,7 +41,7 @@
 
 // local includes
 
-#include "worldmapwidget2_export.h"
+#include "libkmap_export.h"
 
 #ifdef WMW2_HAVE_VALGRIND
 #include <valgrind/valgrind.h>
@@ -73,7 +73,7 @@ inline void WMW2_assert(const char* const condition, const char* const filename,
     
 }
 
-class WORLDMAPWIDGET2_EXPORT  WMWGeoCoordinate
+class KMAP_EXPORT  WMWGeoCoordinate
 {
 public:
 
@@ -251,7 +251,7 @@ enum WMWSelectionState {
     WMWSelectedAll = 2
 };
 
-class WORLDMAPWIDGET2_EXPORT WMWCluster
+class KMAP_EXPORT WMWCluster
 {
 public:
 
@@ -291,7 +291,7 @@ public:
 class MarkerModel;
 class WorldMapWidget2;
 
-class WORLDMAPWIDGET2_EXPORT WMWRepresentativeChooser : public QObject
+class KMAP_EXPORT WMWRepresentativeChooser : public QObject
 {
 Q_OBJECT
 public:
@@ -306,7 +306,7 @@ Q_SIGNALS:
     void signalThumbnailAvailableForIndex(const QVariant& index, const QPixmap& pixmap);
 };
 
-class WORLDMAPWIDGET2_EXPORT WMWModelHelper : public QObject
+class KMAP_EXPORT WMWModelHelper : public QObject
 {
 Q_OBJECT
 public:
@@ -404,13 +404,13 @@ namespace WMW2
 
 // helper functions:
 
-WORLDMAPWIDGET2_EXPORT bool WMWHelperParseLatLonString(const QString& latLonString, WMWGeoCoordinate* const coordinates);
-WORLDMAPWIDGET2_EXPORT bool WMWHelperParseXYStringToPoint(const QString& xyString, QPoint* const point);
-WORLDMAPWIDGET2_EXPORT bool WMWHelperParseBoundsString(const QString& boundsString, QPair<WMWGeoCoordinate, WMWGeoCoordinate>* const boundsCoordinates);
-WORLDMAPWIDGET2_EXPORT WMWGeoCoordinate::PairList WMWHelperNormalizeBounds(const WMWGeoCoordinate::Pair& boundsPair);
+KMAP_EXPORT bool WMWHelperParseLatLonString(const QString& latLonString, WMWGeoCoordinate* const coordinates);
+KMAP_EXPORT bool WMWHelperParseXYStringToPoint(const QString& xyString, QPoint* const point);
+KMAP_EXPORT bool WMWHelperParseBoundsString(const QString& boundsString, QPair<WMWGeoCoordinate, WMWGeoCoordinate>* const boundsCoordinates);
+KMAP_EXPORT WMWGeoCoordinate::PairList WMWHelperNormalizeBounds(const WMWGeoCoordinate::Pair& boundsPair);
 
 // primitives for altitude lookup:
-class WORLDMAPWIDGET2_EXPORT WMWAltitudeLookup
+class KMAP_EXPORT WMWAltitudeLookup
 {
 public:
     WMWGeoCoordinate coordinates;
