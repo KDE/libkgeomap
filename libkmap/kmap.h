@@ -38,7 +38,7 @@ class QDragEnterEvent;
 class QDropEvent;
 class QMenu;
 
-namespace WMW2
+namespace KMapIface
 {
 
 class KMapPrivate;
@@ -116,8 +116,8 @@ public Q_SLOTS:
 
 Q_SIGNALS:
 
-    void signalAltitudeLookupReady(const WMW2::WMWAltitudeLookup::List& altitudes);
-    void signalDisplayMarkersMoved(const QList<QPersistentModelIndex>& indices, const WMW2::WMWGeoCoordinate& coordinates);
+    void signalAltitudeLookupReady(const KMapIface::WMWAltitudeLookup::List& altitudes);
+    void signalDisplayMarkersMoved(const QList<QPersistentModelIndex>& indices, const KMapIface::WMWGeoCoordinate& coordinates);
     void signalSpecialMarkersMoved(const QList<QPersistentModelIndex>& indices);
     void signalUngroupedModelChanged(const int index);
 
@@ -152,6 +152,6 @@ private:
     KMapPrivate* const d;
 };
 
-} /* WMW2 */
+} /* KMapIface */
 
 #endif /* KMAP_H */

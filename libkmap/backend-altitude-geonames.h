@@ -25,7 +25,7 @@
 namespace KIO { class Job; }
 class KJob;
 
-namespace WMW2
+namespace KMapIface
 {
 
 class BackendAltitudeGeonamesPrivate;
@@ -51,7 +51,7 @@ private:
     BackendAltitudeGeonamesPrivate* const d;
 };
 
-} /* WMW2 */
+} /* KMapIface */
 
 #endif /* BACKEND_ALTITUDE_GEONAMES_H */
 

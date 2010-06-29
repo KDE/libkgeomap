@@ -19,7 +19,8 @@
 
 #include "markermodel.moc"
 
-namespace WMW2 {
+namespace KMapIface
+{
 
 typedef QPair<int, int> QIntPair;
 
@@ -44,7 +45,7 @@ public:
 };
 
 MarkerModel::MarkerModel()
-: d(new MarkerModelPrivate())
+           : d(new MarkerModelPrivate())
 {
 }
 
@@ -88,7 +89,7 @@ void MarkerModel::addMarkerIndexToGrid(const QPersistentModelIndex& markerIndex)
         return;
 
     TileIndex tileIndex = TileIndex::fromCoordinates(markerCoordinates, TileIndex::MaxLevel);
-    WMW2_ASSERT(tileIndex.level()==TileIndex::MaxLevel);
+    KMAP_ASSERT(tileIndex.level()==TileIndex::MaxLevel);
 
     bool markerIsSelected = false;
     if (d->selectionModel)
@@ -141,7 +142,7 @@ int MarkerModel::getTileMarkerCount(const MarkerModel::TileIndex& tileIndex)
         regenerateTiles();
     }
 
-    WMW2_ASSERT(tileIndex.level()<=TileIndex::MaxLevel);
+    KMAP_ASSERT(tileIndex.level()<=TileIndex::MaxLevel);
 
     Tile* const myTile = getTile(tileIndex, true);
 
@@ -160,7 +161,7 @@ int MarkerModel::getTileSelectedCount(const MarkerModel::TileIndex& tileIndex)
         regenerateTiles();
     }
 
-    WMW2_ASSERT(tileIndex.level()<=TileIndex::MaxLevel);
+    KMAP_ASSERT(tileIndex.level()<=TileIndex::MaxLevel);
 
     Tile* const myTile = getTile(tileIndex, true);
 
@@ -179,7 +180,7 @@ QList<QPersistentModelIndex> MarkerModel::getTileMarkerIndices(const MarkerModel
         regenerateTiles();
     }
 
-    WMW2_ASSERT(tileIndex.level()<=TileIndex::MaxLevel);
+    KMAP_ASSERT(tileIndex.level()<=TileIndex::MaxLevel);
 
     Tile* const myTile = getTile(tileIndex, true);
 
@@ -198,7 +199,7 @@ WMWSelectionState MarkerModel::getTileSelectedState(const MarkerModel::TileIndex
         regenerateTiles();
     }
 
-    WMW2_ASSERT(tileIndex.level()<=TileIndex::MaxLevel);
+    KMAP_ASSERT(tileIndex.level()<=TileIndex::MaxLevel);
 
     Tile* const myTile = getTile(tileIndex, true);
 
@@ -227,7 +228,7 @@ MarkerModel::Tile* MarkerModel::getTile(const MarkerModel::TileIndex& tileIndex,
         regenerateTiles();
     }
 
-    WMW2_ASSERT(tileIndex.level()<=TileIndex::MaxLevel);
+    KMAP_ASSERT(tileIndex.level()<=TileIndex::MaxLevel);
 
     Tile* tile = d->rootTile;
     for (int level = 0; level < tileIndex.indexCount(); ++level)
@@ -246,7 +247,7 @@ MarkerModel::Tile* MarkerModel::getTile(const MarkerModel::TileIndex& tileIndex,
                 for (int i=0; i<tile->markerIndices.count(); ++i)
                 {
                     const QPersistentModelIndex currentMarkerIndex = tile->markerIndices.at(i);
-                    WMW2_ASSERT(currentMarkerIndex.isValid());
+                    KMAP_ASSERT(currentMarkerIndex.isValid());
 
                     // get the tile index for this marker:
                     const TileIndex markerTileIndex = TileIndex::fromCoordinates(currentMarkerIndex.data(d->coordinatesRole).value<WMWGeoCoordinate>(), level);
@@ -333,7 +334,7 @@ MarkerModel::NonEmptyIterator::NonEmptyIterator(MarkerModel* const model, const 
 : d(new MarkerModelNonEmptyIteratorPrivate())
 {
     d->model = model;
-    WMW2_ASSERT(level<=TileIndex::MaxLevel);
+    KMAP_ASSERT(level<=TileIndex::MaxLevel);
     d->level = level;
 
     TileIndex startIndex;
@@ -354,11 +355,11 @@ MarkerModel::NonEmptyIterator::NonEmptyIterator(MarkerModel* const model, const 
 : d(new MarkerModelNonEmptyIteratorPrivate())
 {
     d->model = model;
-    WMW2_ASSERT(level<=TileIndex::MaxLevel);
+    KMAP_ASSERT(level<=TileIndex::MaxLevel);
     d->level = level;
 
-    WMW2_ASSERT(startIndex.level()==level);
-    WMW2_ASSERT(endIndex.level()==level);
+    KMAP_ASSERT(startIndex.level()==level);
+    KMAP_ASSERT(endIndex.level()==level);
     d->boundsList << QPair<TileIndex, TileIndex>(startIndex, endIndex);
 
     initializeNextBounds();
@@ -368,15 +369,15 @@ MarkerModel::NonEmptyIterator::NonEmptyIterator(MarkerModel* const model, const 
 : d(new MarkerModelNonEmptyIteratorPrivate())
 {
     d->model = model;
-    WMW2_ASSERT(level<=TileIndex::MaxLevel);
+    KMAP_ASSERT(level<=TileIndex::MaxLevel);
     d->level = level;
 
     // store the coordinates of the bounds as indices:
     for (int i=0; i<normalizedMapBounds.count(); ++i)
     {
         WMWGeoCoordinate::Pair currentBounds = normalizedMapBounds.at(i);
-        WMW2_ASSERT(currentBounds.first.lat()<currentBounds.second.lat());
-        WMW2_ASSERT(currentBounds.first.lon()<currentBounds.second.lon());
+        KMAP_ASSERT(currentBounds.first.lat()<currentBounds.second.lat());
+        KMAP_ASSERT(currentBounds.first.lon()<currentBounds.second.lon());
 
         const TileIndex startIndex = TileIndex::fromCoordinates(currentBounds.first, d->level);
         const TileIndex endIndex = TileIndex::fromCoordinates(currentBounds.second, d->level);
@@ -400,8 +401,8 @@ bool MarkerModel::NonEmptyIterator::initializeNextBounds()
     d->startIndex = nextBounds.first;
     d->endIndex = nextBounds.second;
 
-    WMW2_ASSERT(d->startIndex.level() == d->level);
-    WMW2_ASSERT(d->endIndex.level() == d->level);
+    KMAP_ASSERT(d->startIndex.level() == d->level);
+    KMAP_ASSERT(d->endIndex.level() == d->level);
 
     d->currentIndex = d->startIndex.mid(0, 1);
     d->atStartOfLevel = true;
@@ -483,8 +484,8 @@ MarkerModel::TileIndex MarkerModel::NonEmptyIterator::nextIndex()
                 limitLonTR = d->endIndex.indexLon(currentLevel);
             }
 
-            WMW2_ASSERT(limitLatBL<=limitLatTR);
-            WMW2_ASSERT(limitLonBL<=limitLonTR);
+            KMAP_ASSERT(limitLatBL<=limitLatTR);
+            KMAP_ASSERT(limitLonBL<=limitLonTR);
 //             kDebug() << limitLatBL << limitLonBL << limitLatTR << limitLonTR << compareLevel << currentLevel;
 
             int currentLat = d->currentIndex.indexLat(d->currentIndex.level());
@@ -585,8 +586,8 @@ MarkerModel::TileIndex MarkerModel::NonEmptyIterator::nextIndex()
             limitLonTR = d->endIndex.indexLon(currentLevel+1);
         }
 
-        WMW2_ASSERT(limitLatBL<=limitLatTR);
-        WMW2_ASSERT(limitLonBL<=limitLonTR);
+        KMAP_ASSERT(limitLatBL<=limitLatTR);
+        KMAP_ASSERT(limitLonBL<=limitLonTR);
 
         // go one level down:
         d->currentIndex.appendLatLonIndex(limitLatBL, limitLonBL);
@@ -625,7 +626,7 @@ void MarkerModel::removeMarkerIndexFromGrid(const QModelIndex& markerIndex, cons
         return;
     }
 
-    WMW2_ASSERT(markerIndex.isValid());
+    KMAP_ASSERT(markerIndex.isValid());
 
     bool markerIsSelected = false;
     if (d->selectionModel)
@@ -651,7 +652,7 @@ void MarkerModel::removeMarkerIndexFromGrid(const QModelIndex& markerIndex, cons
         if (markerIsSelected&&!ignoreSelection)
         {
             currentTile->selectedCount--;
-            WMW2_ASSERT(currentTile->selectedCount>=0);
+            KMAP_ASSERT(currentTile->selectedCount>=0);
         }
     }
 
@@ -671,7 +672,7 @@ void MarkerModel::removeMarkerIndexFromGrid(const QModelIndex& markerIndex, cons
 
 void MarkerModel::moveMarker(const QPersistentModelIndex& markerIndex, const WMWGeoCoordinate& newPosition)
 {
-    WMW2_ASSERT(markerIndex.isValid());
+    KMAP_ASSERT(markerIndex.isValid());
     // TODO: is there a way to move the marker without resetting the tiles?
     d->markerModel->setData(markerIndex, QVariant::fromValue(newPosition), d->coordinatesRole);
 }
@@ -768,7 +769,7 @@ void MarkerModel::slotSelectionChanged(const QItemSelection& selected, const QIt
 
                 myTile->selectedCount++;
 //                 kDebug()<<l<<tileIndex<<myTile->selectedCount;
-                WMW2_ASSERT(myTile->selectedCount <= myTile->markerIndices.count());
+                KMAP_ASSERT(myTile->selectedCount <= myTile->markerIndices.count());
 
                 if (myTile->children.isEmpty())
                     break;
@@ -792,7 +793,7 @@ void MarkerModel::slotSelectionChanged(const QItemSelection& selected, const QIt
                     break;
 
                 myTile->selectedCount--;
-                WMW2_ASSERT(myTile->selectedCount >= 0);
+                KMAP_ASSERT(myTile->selectedCount >= 0);
 
                 if (myTile->children.isEmpty())
                     break;
@@ -836,9 +837,9 @@ QVariant MarkerModel::getTileRepresentativeMarker(const MarkerModel::TileIndex& 
     return QVariant::fromValue(modelIndices.first());
 }
 
-MarkerModel::TileIndex MarkerModel::TileIndex::fromCoordinates(const WMW2::WMWGeoCoordinate& coordinate, const int getLevel)
+MarkerModel::TileIndex MarkerModel::TileIndex::fromCoordinates(const KMapIface::WMWGeoCoordinate& coordinate, const int getLevel)
 {
-    WMW2_ASSERT(getLevel<=MaxLevel);
+    KMAP_ASSERT(getLevel<=MaxLevel);
 
     if (!coordinate.hasCoordinates())
         return TileIndex();
@@ -931,5 +932,5 @@ WMWGeoCoordinate MarkerModel::TileIndex::toCoordinates() const
     return WMWGeoCoordinate(tileLatBL, tileLonBL);
 }
 
-} /* WMW2 */
+} /* KMapIface */
 

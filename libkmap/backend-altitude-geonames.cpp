@@ -24,7 +24,7 @@
 #include <kio/job.h>
 #include <klocale.h>
 
-namespace WMW2
+namespace KMapIface
 {
 
 class MergedAltitudeQueryJobs
@@ -159,14 +159,14 @@ void BackendAltitudeGeonames::slotData(KIO::Job* kioJob, const QByteArray& data)
 void BackendAltitudeGeonames::slotResult(KJob* kJob)
 {
     KIO::Job* kioJob = qobject_cast<KIO::Job*>(kJob);
-    WMW2_ASSERT(kioJob!=0);
+    KMAP_ASSERT(kioJob!=0);
 
     for (int i=0; i<d->jobs.count(); ++i)
     {
         if (d->jobs.at(i).kioJob == kioJob)
         {
             MergedAltitudeQueryJobs myJob = d->jobs.takeAt(i);
-    
+
             QStringList altitudes = QString(myJob.data).split(QRegExp("\\s+"));
 
             int jobIndex = 0;
@@ -208,6 +208,6 @@ void BackendAltitudeGeonames::slotResult(KJob* kJob)
     }
 }
 
-} /* WMW2 */
+} /* KMapIface */
 
 

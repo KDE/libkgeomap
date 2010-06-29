@@ -19,7 +19,7 @@
 
 #include "kmap_primitives.moc"
 
-namespace WMW2
+namespace KMapIface
 {
 
 /**
@@ -198,4 +198,4 @@ void WMWModelHelper::snapItemsTo(const QModelIndex& targetIndex, const QList<QPe
     snapItemsTo(targetIndex, result);
 }
 
-} /* WMW2 */
+} /* KMapIface */

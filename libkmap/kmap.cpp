@@ -55,12 +55,12 @@
 #include "backend-altitude-geonames.h"
 #include "kmap_dragdrophandler.h"
 
-namespace WMW2
+namespace KMapIface
 {
 
-const int WMW2MinEditGroupingRadius = 1;
-const int WMW2MinGroupingRadius     = 15;
-const int WMW2MinThumbnailSize      = 30;
+const int KMapIfaceMinEditGroupingRadius = 1;
+const int KMapIfaceMinGroupingRadius     = 15;
+const int KMapIfaceMinThumbnailSize      = 30;
 
 /**
  * @brief Helper function, returns the square of the distance between two points
@@ -101,9 +101,9 @@ public:
       dragDropHandler(0),
       doUpdateMarkerCoordinatesInModel(true),
       sortMenu(0),
-      thumbnailSize(WMW2MinThumbnailSize),
-      groupingRadius(WMW2MinGroupingRadius),
-      editGroupingRadius(WMW2MinEditGroupingRadius),
+      thumbnailSize(KMapIfaceMinThumbnailSize),
+      groupingRadius(KMapIfaceMinGroupingRadius),
+      editGroupingRadius(KMapIfaceMinEditGroupingRadius),
       actionIncreaseThumbnailSize(0),
       actionDecreaseThumbnailSize(0)
     {
@@ -173,8 +173,8 @@ KMap::KMap(QWidget* const parent)
 
     AltitudeBackend* const geonamesBackend = new BackendAltitudeGeonames(s, this);
     d->loadedAltitudeBackends.append(geonamesBackend);
-    connect(geonamesBackend, SIGNAL(signalAltitudes(const WMW2::WMWAltitudeLookup::List)),
-            this, SIGNAL(signalAltitudeLookupReady(const WMW2::WMWAltitudeLookup::List)));
+    connect(geonamesBackend, SIGNAL(signalAltitudes(const KMapIface::WMWAltitudeLookup::List)),
+            this, SIGNAL(signalAltitudeLookupReady(const KMapIface::WMWAltitudeLookup::List)));
 
     setAcceptDrops(true);
 }
@@ -460,7 +460,7 @@ void KMap::slotBackendReady(const QString& backendName)
 
 void KMap::saveSettingsToGroup(KConfigGroup* const group)
 {
-    WMW2_ASSERT(group != 0);
+    KMAP_ASSERT(group != 0);
     if (!group)
         return;
 
@@ -486,7 +486,7 @@ void KMap::saveSettingsToGroup(KConfigGroup* const group)
 
 void KMap::readSettingsFromGroup(const KConfigGroup* const group)
 {
-    WMW2_ASSERT(group != 0);
+    KMAP_ASSERT(group != 0);
     if (!group)
         return;
 
@@ -504,9 +504,9 @@ void KMap::readSettingsFromGroup(const KConfigGroup* const group)
     d->actionPreviewGroupedItems->setChecked(group->readEntry("Preview Grouped Items", true));
     d->actionShowNumbersOnItems->setChecked(group->readEntry("Show numbers on items", true));
 
-    setThumnailSize(group->readEntry("Thumbnail Size", 2*WMW2MinThumbnailSize));
-    setGroupingRadius(group->readEntry("Grouping Radius", 2*WMW2MinGroupingRadius));
-    setEditGroupingRadius(group->readEntry("Edit Grouping Radius", WMW2MinEditGroupingRadius));
+    setThumnailSize(group->readEntry("Thumbnail Size", 2*KMapIfaceMinThumbnailSize));
+    setGroupingRadius(group->readEntry("Grouping Radius", 2*KMapIfaceMinGroupingRadius));
+    setEditGroupingRadius(group->readEntry("Edit Grouping Radius", KMapIfaceMinEditGroupingRadius));
     s->inEditMode = group->readEntry("In Edit Mode", false);
     if (s->inEditMode)
     {
@@ -652,14 +652,14 @@ void KMap::slotZoomOut()
 
 void KMap::slotUpdateActionsEnabled()
 {
-    d->actionDecreaseThumbnailSize->setEnabled((!s->inEditMode)&&(d->thumbnailSize>WMW2MinThumbnailSize));
+    d->actionDecreaseThumbnailSize->setEnabled((!s->inEditMode)&&(d->thumbnailSize>KMapIfaceMinThumbnailSize));
     // TODO: define an upper limit!
     d->actionIncreaseThumbnailSize->setEnabled(!s->inEditMode);
 }
 
 void KMap::slotChangeBackend(QAction* action)
 {
-    WMW2_ASSERT(action!=0);
+    KMAP_ASSERT(action!=0);
 
     if (!action)
         return;
@@ -1086,7 +1086,7 @@ void KMap::getColorInfos(const WMWSelectionState selectionState,
 QString KMap::convertZoomToBackendZoom(const QString& someZoom, const QString& targetBackend) const
 {
     const QStringList zoomParts = someZoom.split(':');
-    WMW2_ASSERT(zoomParts.count()==2);
+    KMAP_ASSERT(zoomParts.count()==2);
     const QString sourceBackend = zoomParts.first();
 
     if (sourceBackend==targetBackend)
@@ -1149,7 +1149,7 @@ QString KMap::convertZoomToBackendZoom(const QString& someZoom, const QString& t
         else { targetZoom = 20; } // TODO: find values for level 20 and up
     }
 
-    WMW2_ASSERT(targetZoom>=0);
+    KMAP_ASSERT(targetZoom>=0);
 
     return QString("%1:%2").arg(targetBackend).arg(targetZoom);
 }
@@ -1203,7 +1203,7 @@ void KMap::slotClustersMoved(const QIntList& clusterIndices, const QPair<int, QM
     {
         // selected items were moved. Get their indices from the selection model:
         QItemSelectionModel* const selectionModel = s->markerModel->getSelectionModel();
-        WMW2_ASSERT(selectionModel!=0);
+        KMAP_ASSERT(selectionModel!=0);
         if (!selectionModel)
             return;
 
@@ -1687,7 +1687,7 @@ QPixmap KMap::getDecoratedPixmapForCluster(const int clusterId, const WMWSelecti
 
 void KMap::setThumnailSize(const int newThumbnailSize)
 {
-    d->thumbnailSize = qMax(WMW2MinThumbnailSize, newThumbnailSize);
+    d->thumbnailSize = qMax(KMapIfaceMinThumbnailSize, newThumbnailSize);
 
     // make sure the grouping radius is larger than the thumbnail size
     if (2*d->groupingRadius < newThumbnailSize)
@@ -1705,7 +1705,7 @@ void KMap::setThumnailSize(const int newThumbnailSize)
 
 void KMap::setGroupingRadius(const int newGroupingRadius)
 {
-    d->groupingRadius = qMax(WMW2MinGroupingRadius, newGroupingRadius);
+    d->groupingRadius = qMax(KMapIfaceMinGroupingRadius, newGroupingRadius);
 
     // make sure the thumbnails are smaller than the grouping radius
     if (2*d->groupingRadius < d->thumbnailSize)
@@ -1722,7 +1722,7 @@ void KMap::setGroupingRadius(const int newGroupingRadius)
 
 void KMap::setEditGroupingRadius(const int newGroupingRadius)
 {
-    d->editGroupingRadius = qMax(WMW2MinEditGroupingRadius, newGroupingRadius);
+    d->editGroupingRadius = qMax(KMapIfaceMinEditGroupingRadius, newGroupingRadius);
 
     if (s->inEditMode)
     {
@@ -1736,9 +1736,9 @@ void KMap::slotDecreaseThumbnailSize()
     if (s->inEditMode)
         return;
 
-    if (d->thumbnailSize>WMW2MinThumbnailSize)
+    if (d->thumbnailSize>KMapIfaceMinThumbnailSize)
     {
-        const int newThumbnailSize = qMax(WMW2MinThumbnailSize, d->thumbnailSize-5);
+        const int newThumbnailSize = qMax(KMapIfaceMinThumbnailSize, d->thumbnailSize-5);
 
         // make sure the grouping radius is also decreased
         // this will automatically decrease the thumbnail size as well
@@ -1832,4 +1832,4 @@ void KMap::setEditEnabled(const bool state)
     s->editEnabled = state;
 }
 
-} /* WMW2 */
+} /* KMapIface */

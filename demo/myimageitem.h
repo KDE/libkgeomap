@@ -36,7 +36,7 @@ class MyImageItem : public QTreeWidgetItem
 {
 public:
 
-    MyImageItem(const KUrl& url, const WMW2::WMWGeoCoordinate& itemCoordinates);
+    MyImageItem(const KUrl& url, const KMapIface::WMWGeoCoordinate& itemCoordinates);
     virtual ~MyImageItem();
 
     virtual QVariant data(int column, int role) const;
@@ -44,7 +44,7 @@ public:
 
 private:
 
-    WMW2::WMWGeoCoordinate coordinates;
+    KMapIface::WMWGeoCoordinate coordinates;
     KUrl imageUrl;
 };
 

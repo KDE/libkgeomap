@@ -24,7 +24,8 @@
 
 #include "map-backend.h"
 
-namespace WMW2 {
+namespace KMapIface
+{
 
 class BackendGoogleMapsPrivate;
 
@@ -100,7 +101,7 @@ private:
     void updateZoomMinMaxCache();
 };
 
-} /* WMW2 */
+} /* KMapIface */
 
 #endif /* BACKEND_GOOGLEMAPS_H */
 

@@ -28,13 +28,15 @@
 
 #include <marble/LayerInterface.h>
 
-namespace Marble {
+namespace Marble
+{
     class GeoPainter;
     class ViewportParams;
     class GeoSceneLayer;
 }
 
-namespace WMW2 {
+namespace KMapIface
+{
 
 class BackendMarble;
 
@@ -52,7 +54,7 @@ private:
     QPointer<BackendMarble> const marbleBackend;
 };
 
-} /* WMW2 */
+} /* KMapIface */
 
 #endif /* BACKEND_MARBLE_LAYER_H */
 

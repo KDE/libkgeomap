@@ -40,7 +40,8 @@
 #include "kmap.h"
 #include "markermodel.h"
 
-namespace WMW2 {
+namespace KMapIface
+{
 
 class BackendGoogleMapsPrivate
 {
@@ -259,7 +260,7 @@ void BackendGoogleMaps::slotMapTypeActionTriggered(QAction* action)
 
 void BackendGoogleMaps::addActionsToConfigurationMenu(QMenu* const configurationMenu)
 {
-    WMW2_ASSERT(configurationMenu!=0);
+    KMAP_ASSERT(configurationMenu!=0);
 
     if (!d->isReady)
         return;
@@ -289,7 +290,7 @@ void BackendGoogleMaps::addActionsToConfigurationMenu(QMenu* const configuration
 
 void BackendGoogleMaps::saveSettingsToGroup(KConfigGroup* const group)
 {
-    WMW2_ASSERT(group != 0);
+    KMAP_ASSERT(group != 0);
     if (!group)
         return;
 
@@ -301,7 +302,7 @@ void BackendGoogleMaps::saveSettingsToGroup(KConfigGroup* const group)
 
 void BackendGoogleMaps::readSettingsFromGroup(const KConfigGroup* const group)
 {
-    WMW2_ASSERT(group != 0);
+    KMAP_ASSERT(group != 0);
     if (!group)
         return;
 
@@ -314,7 +315,7 @@ void BackendGoogleMaps::readSettingsFromGroup(const KConfigGroup* const group)
 
 void BackendGoogleMaps::slotUngroupedModelChanged(const int mindex)
 {
-    WMW2_ASSERT(isReady());
+    KMAP_ASSERT(isReady());
     if (!isReady())
         return;
 
@@ -415,12 +416,12 @@ void BackendGoogleMaps::slotHTMLEvents(const QStringList& events)
             // cluster moved
             bool okay = false;
             const int clusterIndex = eventParameter.toInt(&okay);
-            WMW2_ASSERT(okay);
+            KMAP_ASSERT(okay);
             if (!okay)
                 continue;
 
-            WMW2_ASSERT(clusterIndex>=0);
-            WMW2_ASSERT(clusterIndex<s->clusterList.size());
+            KMAP_ASSERT(clusterIndex>=0);
+            KMAP_ASSERT(clusterIndex<s->clusterList.size());
             if ((clusterIndex<0)||(clusterIndex>s->clusterList.size()))
                 continue;
 
@@ -431,7 +432,7 @@ void BackendGoogleMaps::slotHTMLEvents(const QStringList& events)
                     &clusterCoordinates
                 );
 
-            WMW2_ASSERT(isValid);
+            KMAP_ASSERT(isValid);
             if (!isValid)
                 continue;
 
@@ -447,24 +448,24 @@ void BackendGoogleMaps::slotHTMLEvents(const QStringList& events)
             // cluster snapped
             bool okay = false;
             const int clusterIndex = eventParameters.first().toInt(&okay);
-            WMW2_ASSERT(okay);
+            KMAP_ASSERT(okay);
             if (!okay)
                 continue;
 
-            WMW2_ASSERT(clusterIndex>=0);
-            WMW2_ASSERT(clusterIndex<s->clusterList.size());
+            KMAP_ASSERT(clusterIndex>=0);
+            KMAP_ASSERT(clusterIndex<s->clusterList.size());
             if ((clusterIndex<0)||(clusterIndex>s->clusterList.size()))
                 continue;
 
             // determine to which marker we snapped:
             okay = false;
             const int snapModelId = eventParameters.at(1).toInt(&okay);
-            WMW2_ASSERT(okay);
+            KMAP_ASSERT(okay);
             if (!okay)
                 continue;
             okay = false;
             const int snapMarkerId = eventParameters.at(2).toInt(&okay);
-            WMW2_ASSERT(okay);
+            KMAP_ASSERT(okay);
             if (!okay)
                 continue;
 
@@ -480,12 +481,12 @@ void BackendGoogleMaps::slotHTMLEvents(const QStringList& events)
             // cluster clicked
             bool okay = false;
             const int clusterIndex = eventParameter.toInt(&okay);
-            WMW2_ASSERT(okay);
+            KMAP_ASSERT(okay);
             if (!okay)
                 continue;
 
-            WMW2_ASSERT(clusterIndex>=0);
-            WMW2_ASSERT(clusterIndex<s->clusterList.size());
+            KMAP_ASSERT(clusterIndex>=0);
+            KMAP_ASSERT(clusterIndex<s->clusterList.size());
             if ((clusterIndex<0)||(clusterIndex>s->clusterList.size()))
                 continue;
 
@@ -497,12 +498,12 @@ void BackendGoogleMaps::slotHTMLEvents(const QStringList& events)
 //             // marker moved
 //             bool okay = false;
 //             const int markerRow= eventParameter.toInt(&okay);
-//             WMW2_ASSERT(okay);
+//             KMAP_ASSERT(okay);
 //             if (!okay)
 //                 continue;
 // 
-//             WMW2_ASSERT(markerRow>=0);
-//             WMW2_ASSERT(markerRow<s->specialMarkersModel->rowCount());
+//             KMAP_ASSERT(markerRow>=0);
+//             KMAP_ASSERT(markerRow<s->specialMarkersModel->rowCount());
 //             if ((markerRow<0)||(markerRow>=s->specialMarkersModel->rowCount()))
 //                 continue;
 // 
@@ -513,7 +514,7 @@ void BackendGoogleMaps::slotHTMLEvents(const QStringList& events)
 //                     &markerCoordinates
 //                 );
 // 
-//             WMW2_ASSERT(isValid);
+//             KMAP_ASSERT(isValid);
 //             if (!isValid)
 //                 continue;
 // 
@@ -586,7 +587,7 @@ void BackendGoogleMaps::updateClusters()
 {
     kDebug()<<"start updateclusters";
     // re-transfer the clusters to the map:
-    WMW2_ASSERT(isReady());
+    KMAP_ASSERT(isReady());
     if (!isReady())
         return;
 
@@ -657,7 +658,7 @@ bool BackendGoogleMaps::geoCoordinates(const QPoint& point, WMWGeoCoordinate* co
 
 QSize BackendGoogleMaps::mapSize() const
 {
-    WMW2_ASSERT(d->htmlWidgetWrapper!=0);
+    KMAP_ASSERT(d->htmlWidgetWrapper!=0);
 
     return d->htmlWidgetWrapper->size();
 }
@@ -728,7 +729,7 @@ void BackendGoogleMaps::slotClustersNeedUpdating()
 void BackendGoogleMaps::setZoom(const QString& newZoom)
 {
     const QString myZoomString = s->worldMapWidget->convertZoomToBackendZoom(newZoom, "googlemaps");
-    WMW2_ASSERT(myZoomString.startsWith("googlemaps:"));
+    KMAP_ASSERT(myZoomString.startsWith("googlemaps:"));
 
     const int myZoom = myZoomString.mid(QString("googlemaps:").length()).toInt();
     kDebug()<<myZoom;
@@ -748,7 +749,7 @@ QString BackendGoogleMaps::getZoom() const
 
 int BackendGoogleMaps::getMarkerModelLevel()
 {
-    WMW2_ASSERT(isReady());
+    KMAP_ASSERT(isReady());
     if (!isReady())
     {
         return 0;
@@ -783,7 +784,7 @@ int BackendGoogleMaps::getMarkerModelLevel()
     else if (currentZoom==22) { tileLevel = 7; }
     else { tileLevel = MarkerModel::TileIndex::MaxLevel-1; }
 
-    WMW2_ASSERT(tileLevel<=MarkerModel::TileIndex::MaxLevel-1);
+    KMAP_ASSERT(tileLevel<=MarkerModel::TileIndex::MaxLevel-1);
     
     return tileLevel;
 }
@@ -944,5 +945,5 @@ bool BackendGoogleMaps::eventFilter(QObject* object, QEvent* event)
     return false;
 }
 
-} /* WMW2 */
+} /* KMapIface */
 

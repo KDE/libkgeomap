@@ -22,7 +22,7 @@
 
 #include "kmap_primitives.h"
 
-namespace WMW2
+namespace KMapIface
 {
 
 class KMAP_EXPORT AltitudeBackend : public QObject
@@ -41,11 +41,11 @@ public:
     const QExplicitlySharedDataPointer<WMWSharedData> s;
 
 Q_SIGNALS:
-    void signalAltitudes(const WMW2::WMWAltitudeLookup::List results);
+    void signalAltitudes(const KMapIface::WMWAltitudeLookup::List results);
 
 };
 
-} /* WMW2 */
+} /* KMapIface */
 
 #endif /* ALTITUDE_BACKEND_H */
 

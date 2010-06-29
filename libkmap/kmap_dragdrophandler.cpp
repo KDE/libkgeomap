@@ -28,7 +28,7 @@
 #include "kmap_primitives.h"
 #include "libkmap_export.h"
 
-namespace WMW2
+namespace KMapIface
 {
 
 DragDropHandler::DragDropHandler(QObject* const parent)
@@ -40,4 +40,4 @@ DragDropHandler::~DragDropHandler()
 {
 }
 
-} /* WMW2 */
+} /* KMapIface */

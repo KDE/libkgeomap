@@ -29,7 +29,7 @@ namespace Marble
     class GeoPainter;
 }
 
-namespace WMW2
+namespace KMapIface
 {
 
 class BackendMarblePrivate;
@@ -113,6 +113,6 @@ private:
     BackendMarblePrivate* const d;
 };
 
-} /* namespace WMW2 */
+} /* namespace KMapIface */
 
 #endif /* BACKEND_MARBLE_H */

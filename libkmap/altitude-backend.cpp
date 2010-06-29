@@ -19,18 +19,16 @@
 
 #include "altitude-backend.moc"
 
-namespace WMW2
+namespace KMapIface
 {
 
 AltitudeBackend::AltitudeBackend(const QExplicitlySharedDataPointer<WMWSharedData>& sharedData, QObject* const parent)
-: QObject(parent), s(sharedData)
+               : QObject(parent), s(sharedData)
 {
-
 }
 
 AltitudeBackend::~AltitudeBackend()
 {
 }
 
-} /* WMW2 */
-
+} /* KMapIface */

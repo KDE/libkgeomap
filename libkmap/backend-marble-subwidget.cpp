@@ -23,12 +23,13 @@
 
 #include "backend-marble.h"
 
-namespace WMW2 {
+namespace KMapIface
+{
 
 BMWidget::BMWidget(BackendMarble* const pMarbleBackend, QWidget* const parent)
-: Marble::MarbleWidget(parent), marbleBackend(pMarbleBackend)
+        : Marble::MarbleWidget(parent), marbleBackend(pMarbleBackend)
 {
-    WMW2_ASSERT(marbleBackend!=0);
+    KMAP_ASSERT(marbleBackend!=0);
 }
 
 BMWidget::~BMWidget()
@@ -43,7 +44,7 @@ void BMWidget::customPaint(Marble::GeoPainter* painter)
     }
 }
 
-} /* WMW2 */
+} /* KMapIface */
 
 
 

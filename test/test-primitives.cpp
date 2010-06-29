@@ -19,7 +19,7 @@
 
 #include "test-primitives.moc"
 
-using namespace WMW2;
+using namespace KMapIface;
 
 void TestPrimitives::testNoOp()
 {

@@ -43,21 +43,21 @@
 
 #include "libkmap_export.h"
 
-#ifdef WMW2_HAVE_VALGRIND
+#ifdef KMAP_HAVE_VALGRIND
 #include <valgrind/valgrind.h>
-#endif /* WMW2_HAVE_VALGRIND */
+#endif /* KMAP_HAVE_VALGRIND */
 
-#define WMW2_ASSERT(cond) ((!(cond)) ? WMW2::WMW2_assert(#cond,__FILE__,__LINE__) : qt_noop())
+#define KMAP_ASSERT(cond) ((!(cond)) ? KMapIface::KMapIface_assert(#cond,__FILE__,__LINE__) : qt_noop())
 
 Q_DECLARE_METATYPE(QPersistentModelIndex)
 
-namespace WMW2
+namespace KMapIface
 {
 
-inline void WMW2_assert(const char* const condition, const char* const filename, const int lineNumber)
+inline void KMapIface_assert(const char* const condition, const char* const filename, const int lineNumber)
 {
     const QString debugString = QString("ASSERT: %1 - %2:%3").arg(condition).arg(filename).arg(lineNumber);
-#ifdef WMW2_HAVE_VALGRIND
+#ifdef KMAP_HAVE_VALGRIND
     if (RUNNING_ON_VALGRIND>0)
     {
         // TODO: which encoding?
@@ -70,7 +70,7 @@ inline void WMW2_assert(const char* const condition, const char* const filename,
     }
 #else
     kDebug(0)<<debugString;
-#endif /* WMW2_HAVE_VALGRIND */
+#endif /* KMAP_HAVE_VALGRIND */
 }
 
 class KMAP_EXPORT WMWGeoCoordinate
@@ -399,12 +399,12 @@ public:
     int sortKey;
 };
 
-} /* WMW2 */
+} /* KMapIface */
 
-Q_DECLARE_OPERATORS_FOR_FLAGS(WMW2::WMWGeoCoordinate::HasFlags)
-Q_DECLARE_OPERATORS_FOR_FLAGS(WMW2::WMWModelHelper::Flags)
+Q_DECLARE_OPERATORS_FOR_FLAGS(KMapIface::WMWGeoCoordinate::HasFlags)
+Q_DECLARE_OPERATORS_FOR_FLAGS(KMapIface::WMWModelHelper::Flags)
 
-namespace WMW2
+namespace KMapIface
 {
 
 // helper functions:
@@ -425,15 +425,15 @@ public:
     typedef QList<WMWAltitudeLookup> List;
 };
 
-} /* WMW2 */
+} /* KMapIface */
 
-inline QDebug operator<<(QDebug debugOut, const WMW2::WMWGeoCoordinate& coordinate)
+inline QDebug operator<<(QDebug debugOut, const KMapIface::WMWGeoCoordinate& coordinate)
 {
     debugOut << coordinate.geoUrl();
     return debugOut;
 }
 
-inline bool operator==(const WMW2::WMWGeoCoordinate& a, const WMW2::WMWGeoCoordinate& b)
+inline bool operator==(const KMapIface::WMWGeoCoordinate& a, const KMapIface::WMWGeoCoordinate& b)
 {
     return
         ( a.hasCoordinates() == b.hasCoordinates() ) &&
@@ -446,9 +446,9 @@ inline bool operator==(const WMW2::WMWGeoCoordinate& a, const WMW2::WMWGeoCoordi
         ( a.hasAltitude() ? ( a.alt() == b.alt() ) : true );
 }
 
-Q_DECLARE_METATYPE(WMW2::WMWGeoCoordinate)
-Q_DECLARE_METATYPE(WMW2::WMWGeoCoordinate::Pair)
-Q_DECLARE_METATYPE(WMW2::WMWGeoCoordinate::PairList)
-Q_DECLARE_METATYPE(WMW2::WMWAltitudeLookup)
+Q_DECLARE_METATYPE(KMapIface::WMWGeoCoordinate)
+Q_DECLARE_METATYPE(KMapIface::WMWGeoCoordinate::Pair)
+Q_DECLARE_METATYPE(KMapIface::WMWGeoCoordinate::PairList)
+Q_DECLARE_METATYPE(KMapIface::WMWAltitudeLookup)
 
 #endif /* KMAP_PRIMITIVES_H */

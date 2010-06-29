@@ -38,7 +38,8 @@
 #include "kmap.h"
 #include "markermodel.h"
 
-namespace WMW2 {
+namespace KMapIface
+{
 
 class BackendOSMPrivate
 {
@@ -63,7 +64,7 @@ public:
 };
 
 BackendOSM::BackendOSM(const QExplicitlySharedDataPointer<WMWSharedData>& sharedData, QObject* const parent)
-: MapBackend(sharedData, parent), d(new BackendOSMPrivate())
+          : MapBackend(sharedData, parent), d(new BackendOSMPrivate())
 {
     d->htmlWidgetWrapper = new QWidget();
     d->htmlWidgetWrapper->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
@@ -90,7 +91,7 @@ BackendOSM::~BackendOSM()
 {
     if (d->htmlWidgetWrapper)
         delete d->htmlWidgetWrapper;
-    
+
     delete d;
 }
 
@@ -165,7 +166,7 @@ void BackendOSM::updateActionsEnabled()
 
 void BackendOSM::addActionsToConfigurationMenu(QMenu* const configurationMenu)
 {
-    WMW2_ASSERT(configurationMenu!=0);
+    KMAP_ASSERT(configurationMenu!=0);
 
     if (!d->isReady)
         return;
@@ -173,24 +174,24 @@ void BackendOSM::addActionsToConfigurationMenu(QMenu* const configurationMenu)
 
 void BackendOSM::saveSettingsToGroup(KConfigGroup* const group)
 {
-    WMW2_ASSERT(group != 0);
+    KMAP_ASSERT(group != 0);
     if (!group)
         return;
 }
 
 void BackendOSM::readSettingsFromGroup(const KConfigGroup* const group)
 {
-    WMW2_ASSERT(group != 0);
+    KMAP_ASSERT(group != 0);
     if (!group)
         return;
 }
 
 void BackendOSM::updateMarkers()
 {
-    WMW2_ASSERT(isReady());
+    KMAP_ASSERT(isReady());
     if (!isReady())
         return;
-    
+
     // re-transfer all markers to the javascript-part:
     d->htmlWidget->runScript(QString("wmwClearMarkers();"));
     for (int row = 0; row<s->specialMarkersModel->rowCount(); ++row)
@@ -206,7 +207,6 @@ void BackendOSM::updateMarkers()
                 .arg(/*currentMarker.isDraggable()?*/"true"/*:"false"*/)
             );
     }
-    
 }
 
 void BackendOSM::slotHTMLEvents(const QStringList& events)
@@ -351,7 +351,7 @@ void BackendOSM::updateClusters()
 {
     kDebug()<<"start updateclusters";
     // re-transfer the clusters to the map:
-    WMW2_ASSERT(isReady());
+    KMAP_ASSERT(isReady());
     if (!isReady())
         return;
 
@@ -420,7 +420,7 @@ bool BackendOSM::geoCoordinates(const QPoint& point, WMWGeoCoordinate* const coo
 
 QSize BackendOSM::mapSize() const
 {
-    WMW2_ASSERT(d->htmlWidgetWrapper!=0);
+    KMAP_ASSERT(d->htmlWidgetWrapper!=0);
 
     return d->htmlWidgetWrapper->size();
 }
@@ -434,7 +434,7 @@ void BackendOSM::setZoom(const QString& newZoom)
 {
     // zoom settings for OSM are basically the same as for Google Maps, so just re-use the prefix
     const QString myZoomString = s->worldMapWidget->convertZoomToBackendZoom(newZoom, "googlemaps");
-    WMW2_ASSERT(myZoomString.startsWith("googlemaps:"));
+    KMAP_ASSERT(myZoomString.startsWith("googlemaps:"));
 
     const int myZoom = myZoomString.mid(QString("googlemaps:").length()).toInt();
     kDebug()<<myZoom;
@@ -455,7 +455,7 @@ QString BackendOSM::getZoom() const
 
 int BackendOSM::getMarkerModelLevel()
 {
-    WMW2_ASSERT(isReady());
+    KMAP_ASSERT(isReady());
     if (!isReady())
     {
         return 0;
@@ -490,7 +490,7 @@ int BackendOSM::getMarkerModelLevel()
     else if (currentZoom==22) { tileLevel = 7; }
     else { tileLevel = s->markerModel->maxLevel()-1; }
 
-    WMW2_ASSERT(tileLevel<=s->markerModel->maxLevel()-1);
+    KMAP_ASSERT(tileLevel<=s->markerModel->maxLevel()-1);
     
     return tileLevel;
 }
@@ -500,5 +500,5 @@ WMWGeoCoordinate::PairList BackendOSM::getNormalizedBounds()
     return WMWHelperNormalizeBounds(d->cacheBounds);
 }
 
-} /* WMW2 */
+} /* KMapIface */
 

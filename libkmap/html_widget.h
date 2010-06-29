@@ -29,15 +29,17 @@
 #include "kmap_primitives.h"
 #include "libkmap_export.h"
 
-namespace WMW2 {
+namespace KMapIface
+{
 
 class HTMLWidgetPrivate;
 
 class KMAP_EXPORT HTMLWidget : public KHTMLPart
 {
-Q_OBJECT
+    Q_OBJECT
 
 public:
+
     HTMLWidget(QWidget* const parent = 0);
     ~HTMLWidget();
 
@@ -46,25 +48,28 @@ public:
     bool runScript2Coordinates(const QString& scriptCode, WMWGeoCoordinate* const coordinates);
 
 protected:
+
     bool eventFilter(QObject* object, QEvent* event);
     void khtmlMousePressEvent(khtml::MousePressEvent* e);
     void khtmlMouseReleaseEvent(khtml::MouseReleaseEvent* e);
     void khtmlMouseMoveEvent(khtml::MouseMoveEvent *e);
 
 protected Q_SLOTS:
+
     void slotHTMLCompleted();
     void slotScanForJSMessages();
 
 Q_SIGNALS:
+
     void signalHTMLEvents(const QStringList& events);
     void signalJavaScriptReady();
 
 private:
+
     HTMLWidgetPrivate* const d;
 };
 
 
-} /* WMW2 */
+} /* KMapIface */
 
 #endif /* HTML_WIDGET_H */
-

@@ -27,7 +27,8 @@
 
 #include <khtmlview.h>
 
-namespace WMW2 {
+namespace KMapIface
+{
 
 class HTMLWidgetPrivate
 {
@@ -45,10 +46,10 @@ public:
 };
 
 HTMLWidget::HTMLWidget(QWidget* const parent)
-: KHTMLPart(parent), d(new HTMLWidgetPrivate())
+          : KHTMLPart(parent), d(new HTMLWidgetPrivate())
 {
     d->parent = parent;
-    
+
     widget()->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
     // create a timer for monitoring for javascript events, but do not start it yet:
@@ -130,7 +131,7 @@ void HTMLWidget::slotScanForJSMessages()
  */
 QVariant HTMLWidget::runScript(const QString& scriptCode)
 {
-    WMW2_ASSERT(d->isReady);
+    KMAP_ASSERT(d->isReady);
 
     if (!d->isReady)
         return QVariant();
@@ -166,5 +167,4 @@ bool HTMLWidget::eventFilter(QObject* object, QEvent* event)
     return false;
 }
 
-} /* WMW2 */
-
+} /* KMapIface */

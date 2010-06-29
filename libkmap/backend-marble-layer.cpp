@@ -27,10 +27,11 @@
 
 #include "backend-marble.h"
 
-namespace WMW2 {
+namespace KMapIface
+{
 
 BMLayer::BMLayer(BackendMarble* const pMarbleBackend)
- : marbleBackend(pMarbleBackend)
+       : marbleBackend(pMarbleBackend)
 {
 
 }
@@ -59,5 +60,5 @@ QStringList BMLayer::renderPosition () const
 }
 
 
-} /* WMW2 */
+} /* KMapIface */
 

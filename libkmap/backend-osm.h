@@ -24,7 +24,8 @@
 
 #include "map-backend.h"
 
-namespace WMW2 {
+namespace KMapIface
+{
 
 class BackendOSMPrivate;
 
@@ -79,7 +80,7 @@ private:
     void loadInitialHTML();
 };
 
-} /* WMW2 */
+} /* KMapIface */
 
 #endif /* BACKEND_OSM_H */
 

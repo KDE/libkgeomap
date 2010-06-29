@@ -63,7 +63,7 @@
 #include "dragdrophandler.h"
 #include "myimageitem.h"
 
-using namespace WMW2;
+using namespace KMapIface;
 
 class MyImageData
 {
@@ -147,11 +147,11 @@ MainWindow::MainWindow(KCmdLineArgs* const cmdLineArgs, QWidget* const parent)
     d->mapWidget->setDisplayMarkersModel(d->displayMarkersModel, RoleCoordinates, d->selectionModel);
     d->mapWidget->setDragDropHandler(new DemoDragDropHandler(d->displayMarkersModel, d->mapWidget));
 
-    connect(d->mapWidget, SIGNAL(signalAltitudeLookupReady(const WMW2::WMWAltitudeLookup::List&)),
-            this, SLOT(slotAltitudeLookupReady(const WMW2::WMWAltitudeLookup::List&)));
+    connect(d->mapWidget, SIGNAL(signalAltitudeLookupReady(const KMapIface::WMWAltitudeLookup::List&)),
+            this, SLOT(slotAltitudeLookupReady(const KMapIface::WMWAltitudeLookup::List&)));
 
     connect(d->mapWidget, SIGNAL(signalDisplayMarkersMoved(const QList<QPersistentModelIndex>&)),
-            this, SLOT(slotMarkersMoved(const QList<QPersistentModelIndex>&, const WMW2::WMWGeoCoordinate&)));
+            this, SLOT(slotMarkersMoved(const QList<QPersistentModelIndex>&, const KMapIface::WMWGeoCoordinate&)));
 
 //     d->mapWidget->resize(d->mapWidget->width(), 200);
     d->splitter->addWidget(d->mapWidget);
@@ -283,7 +283,7 @@ void MainWindow::slotFutureResultsReadyAt(int startIndex, int endIndex)
 
     // determine the sender:
     QFutureWatcher<MyImageData>* const futureSender = reinterpret_cast<QFutureWatcher<MyImageData>*>(sender());
-    WMW2_ASSERT(futureSender!=0);
+    KMAP_ASSERT(futureSender!=0);
     if (futureSender==0)
         return;
 
@@ -296,7 +296,7 @@ void MainWindow::slotFutureResultsReadyAt(int startIndex, int endIndex)
             break;
         }
     }
-    WMW2_ASSERT(futureIndex>=0);
+    KMAP_ASSERT(futureIndex>=0);
     if (futureIndex<0)
     {
         // TODO: error!
@@ -376,7 +376,7 @@ void MainWindow::slotImageLoadingBunchReady()
     d->imageLoadingBuncher.clear();
 }
 
-void MainWindow::slotMarkersMoved(const QList<QPersistentModelIndex>& markerIndices, const WMW2::WMWGeoCoordinate& /*coordinates*/)
+void MainWindow::slotMarkersMoved(const QList<QPersistentModelIndex>& markerIndices, const KMapIface::WMWGeoCoordinate& /*coordinates*/)
 {
     // prepare altitude lookups
     WMWAltitudeLookup::List altitudeQueries;

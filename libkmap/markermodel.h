@@ -31,7 +31,8 @@
 #include "kmap_primitives.h"
 #include "libkmap_export.h"
 
-namespace WMW2 {
+namespace KMapIface
+{
 
 class MarkerModelPrivate;
 class MarkerModelNonEmptyIteratorPrivate;
@@ -75,14 +76,14 @@ public:
 
         inline void appendLinearIndex(const int newIndex)
         {
-            WMW2_ASSERT(m_indicesCount+1<=MaxIndexCount);
+            KMAP_ASSERT(m_indicesCount+1<=MaxIndexCount);
             m_indices[m_indicesCount] = newIndex;
             m_indicesCount++;
         }
 
         inline int linearIndex(const int getLevel) const
         {
-            WMW2_ASSERT(getLevel<=level());
+            KMAP_ASSERT(getLevel<=level());
             return m_indices[getLevel];
         }
 
@@ -103,11 +104,11 @@ public:
 
         inline void latLonIndex(const int getLevel, int* const latIndex, int* const lonIndex) const
         {
-            WMW2_ASSERT(getLevel<=level());
+            KMAP_ASSERT(getLevel<=level());
             *latIndex = indexLat(getLevel);
             *lonIndex = indexLon(getLevel);
-            WMW2_ASSERT(*latIndex<Tiling);
-            WMW2_ASSERT(*lonIndex<Tiling);
+            KMAP_ASSERT(*latIndex<Tiling);
+            KMAP_ASSERT(*lonIndex<Tiling);
         }
 
         inline void appendLatLonIndex(const int latIndex, const int lonIndex)
@@ -125,7 +126,7 @@ public:
             return result;
         }
 
-        static TileIndex fromCoordinates(const WMW2::WMWGeoCoordinate& coordinate, const int getLevel);
+        static TileIndex fromCoordinates(const KMapIface::WMWGeoCoordinate& coordinate, const int getLevel);
 
         WMWGeoCoordinate toCoordinates() const;
 
@@ -140,8 +141,8 @@ public:
 
         inline static bool indicesEqual(const TileIndex& a, const TileIndex& b, const int upToLevel)
         {
-            WMW2_ASSERT(a.level()>=upToLevel);
-            WMW2_ASSERT(b.level()>=upToLevel);
+            KMAP_ASSERT(a.level()>=upToLevel);
+            KMAP_ASSERT(b.level()>=upToLevel);
 
             for (int i=0; i<=upToLevel; ++i)
             {
@@ -154,7 +155,7 @@ public:
 
         inline TileIndex mid(const int first, const int len) const
         {
-            WMW2_ASSERT(first+(len-1)<=m_indicesCount);
+            KMAP_ASSERT(first+(len-1)<=m_indicesCount);
             TileIndex result;
             for (int i = first; i<first+len; ++i)
             {
@@ -166,7 +167,7 @@ public:
 
         inline void oneUp()
         {
-            WMW2_ASSERT(m_indicesCount>0);
+            KMAP_ASSERT(m_indicesCount>0);
             m_indicesCount--;
         }
 
@@ -340,9 +341,9 @@ private:
     MarkerModelPrivate* const d;
 };
 
-} /* WMW2 */
+} /* KMapIface */
 
-inline QDebug operator<<(QDebug debugOut, const WMW2::MarkerModel::TileIndex& tileIndex)
+inline QDebug operator<<(QDebug debugOut, const KMapIface::MarkerModel::TileIndex& tileIndex)
 {
     debugOut << tileIndex.toIntList();
     return debugOut;

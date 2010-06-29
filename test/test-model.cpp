@@ -23,7 +23,7 @@
 
 #include <QStandardItemModel>
 
-using namespace WMW2;
+using namespace KMapIface;
 
 const int CoordinatesRole = Qt::UserRole + 0;
 
@@ -156,7 +156,7 @@ void TestModel::testMoveMarkers1()
     itemModel->appendRow(item1);
     const QModelIndex markerIndex1 = itemModel->indexFromItem(item1);
     
-    WMW2_ASSERT(markerIndex1.isValid());
+    KMapIface_ASSERT(markerIndex1.isValid());
     for (int l = 1; l<=fillLevel; ++l)
     {
         const MarkerModel::TileIndex tileIndex = MarkerModel::TileIndex::fromCoordinates(coord_1_2, l);
@@ -600,7 +600,7 @@ void TestModel::benchmarkIteratorWholeWorld()
         {
             for (qreal y=-50; y<50; y+=1.0)
             {
-                itemModel->appendRow(MakeItemAt(WMW2::WMWGeoCoordinate(x,y)));
+                itemModel->appendRow(MakeItemAt(KMapIface::WMWGeoCoordinate(x,y)));
             }
         }
 

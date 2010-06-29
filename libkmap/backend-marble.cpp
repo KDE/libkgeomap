@@ -40,17 +40,18 @@
 
 // local includes
 
-#ifdef WMW2_MARBLE_ADD_LAYER
+#ifdef KMAP_MARBLE_ADD_LAYER
 #include "backend-marble-layer.h"
 #else
 #include "backend-marble-subwidget.h"
-#endif
+#endif // KMAP_MARBLE_ADD_LAYER
+
 #include "markermodel.h"
 #include "kmap.h"
 
 using namespace Marble;
 
-namespace WMW2
+namespace KMapIface
 {
 
 class BackendMarblePrivate
@@ -117,7 +118,7 @@ BackendMarble::BackendMarble(const QExplicitlySharedDataPointer<WMWSharedData>& 
 {
     createActions();
 
-#ifdef WMW2_MARBLE_ADD_LAYER
+#ifdef KMapIface_MARBLE_ADD_LAYER
     d->marbleWidget = new MarbleWidget();
     d->marbleWidget->model()->addLayer(new BMLayer(this));
 #else
@@ -252,7 +253,7 @@ void BackendMarble::createActions()
 
 void BackendMarble::addActionsToConfigurationMenu(QMenu* const configurationMenu)
 {
-    WMW2_ASSERT(configurationMenu!=0);
+    KMAP_ASSERT(configurationMenu!=0);
 
     configurationMenu->addSeparator();
 
@@ -321,7 +322,7 @@ void BackendMarble::setMapTheme(const QString& newMapTheme)
 
 void BackendMarble::saveSettingsToGroup(KConfigGroup* const group)
 {
-    WMW2_ASSERT(group!=0);
+    KMAP_ASSERT(group!=0);
     if (!group)
         return;
 
@@ -334,7 +335,7 @@ void BackendMarble::saveSettingsToGroup(KConfigGroup* const group)
 
 void BackendMarble::readSettingsFromGroup(const KConfigGroup* const group)
 {
-    WMW2_ASSERT(group!=0);
+    KMAP_ASSERT(group!=0);
     if (!group)
         return;
 
@@ -699,7 +700,7 @@ void BackendMarble::slotMarbleZoomChanged(int newZoom)
 void BackendMarble::setZoom(const QString& newZoom)
 {
     const QString myZoomString = s->worldMapWidget->convertZoomToBackendZoom(newZoom, "marble");
-    WMW2_ASSERT(myZoomString.startsWith("marble:"));
+    KMAP_ASSERT(myZoomString.startsWith("marble:"));
 
     const int myZoom = myZoomString.mid(QString("marble:").length()).toInt();
     kDebug()<<myZoom;
@@ -1072,4 +1073,4 @@ bool BackendMarble::findSnapPoint(const QPoint& actualPoint, QPoint* const snapP
     return foundSnapPoint;
 }
 
-} /* namespace WMW2 */
+} /* namespace KMapIface */

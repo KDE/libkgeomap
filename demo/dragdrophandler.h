@@ -25,7 +25,7 @@
 #include <QAbstractItemModel>
 #include <QTreeWidgetItem>
 
-// WorldMapWidget2 includes
+// local includes
 
 #include "kmap_dragdrophandler.h"
 
@@ -43,7 +43,7 @@ public:
     QList<QPersistentModelIndex> draggedIndices;
 };
 
-class DemoDragDropHandler : public WMW2::DragDropHandler
+class DemoDragDropHandler : public KMapIface::DragDropHandler
 {
 Q_OBJECT
 
@@ -52,7 +52,7 @@ public:
     virtual ~DemoDragDropHandler();
 
     virtual Qt::DropAction accepts(const QDropEvent* e);
-    virtual bool dropEvent(const QDropEvent* e, const WMW2::WMWGeoCoordinate& dropCoordinates, QList<QPersistentModelIndex>* const droppedIndices);
+    virtual bool dropEvent(const QDropEvent* e, const KMapIface::WMWGeoCoordinate& dropCoordinates, QList<QPersistentModelIndex>* const droppedIndices);
     virtual QMimeData* createMimeData(const QList<QPersistentModelIndex>& modelIndices);
 
 private:

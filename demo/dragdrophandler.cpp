@@ -41,7 +41,7 @@ Qt::DropAction DemoDragDropHandler::accepts(const QDropEvent* /*e*/)
     return Qt::CopyAction;
 }
 
-bool DemoDragDropHandler::dropEvent(const QDropEvent* e, const WMW2::WMWGeoCoordinate& dropCoordinates, QList<QPersistentModelIndex>* const droppedIndices)
+bool DemoDragDropHandler::dropEvent(const QDropEvent* e, const KMapIface::WMWGeoCoordinate& dropCoordinates, QList<QPersistentModelIndex>* const droppedIndices)
 {
     const MyDragData* const mimeData = qobject_cast<const MyDragData*>(e->mimeData());
     if (!mimeData)

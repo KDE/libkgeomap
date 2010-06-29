@@ -19,7 +19,8 @@
 
 #include "map-backend.moc"
 
-namespace WMW2 {
+namespace KMapIface
+{
 
 class MapBackendPrivate
 {
@@ -44,5 +45,5 @@ void MapBackend::slotThumbnailAvailableForIndex(const QVariant& /*index*/, const
 {
 }
 
-} /* WMW2 */
+} /* KMapIface */
 

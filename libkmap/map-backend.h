@@ -31,7 +31,8 @@
 class QMenu;
 class KConfigGroup;
 
-namespace WMW2 {
+namespace KMapIface
+{
 
 class MapBackendPrivate;
 
@@ -98,6 +99,6 @@ private:
     MapBackendPrivate* const d;
 };
 
-} /* WMW2 */
+} /* KMapIface */
 
 #endif /* MAP_BACKEND_H */
