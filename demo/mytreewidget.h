@@ -51,7 +51,7 @@ protected:
     virtual QMimeData* mimeData(const QModelIndexList items) const;
 
 private:
-mime
+
     MyTreeWidgetPrivate* const d;
 };
 
