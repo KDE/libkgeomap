@@ -31,7 +31,7 @@
 
 // local includes
 
-#include <worldmapwidget2_primitives.h>
+#include "kmap_primitives.h"
 
 class KCmdLineArgs;
 
@@ -39,22 +39,26 @@ class MainWindowPrivate;
 
 class MainWindow : public KMainWindow
 {
-Q_OBJECT
+    Q_OBJECT
 
 public:
+
     MainWindow(KCmdLineArgs* const cmdLineArgs, QWidget* const parent = 0);
     ~MainWindow();
 
 public Q_SLOTS:
+
     void slotScheduleImagesForLoading(const KUrl::List imagesToSchedule);
 
 protected:
+
     void readSettings();
     void saveSettings();
     void closeEvent(QCloseEvent* e);
     void createMenus();
 
 private Q_SLOTS:
+
     void slotFutureResultsReadyAt(int startIndex, int endIndex);
     void slotImageLoadingBunchReady();
     void slotMarkersMoved(const QList<QPersistentModelIndex>& markerIndices, const WMW2::WMWGeoCoordinate& coordinates);
@@ -62,8 +66,8 @@ private Q_SLOTS:
     void slotAddImages();
 
 private:
+
     MainWindowPrivate* const d;
 };
 
 #endif /* MAINWINDOW_H */
-

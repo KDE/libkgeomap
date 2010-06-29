@@ -35,7 +35,7 @@
 // local includes
 
 #include "html_widget.h"
-#include "worldmapwidget2.h"
+#include "kmap.h"
 #include "markermodel.h"
 
 namespace WMW2 {
@@ -81,7 +81,7 @@ BackendOSM::BackendOSM(const QExplicitlySharedDataPointer<WMWSharedData>& shared
 
 void BackendOSM::loadInitialHTML()
 {
-    const KUrl htmlUrl = KStandardDirs::locate("data", "libworldmapwidget2/backend-osm.html");
+    const KUrl htmlUrl = KStandardDirs::locate("data", "libkmap/backend-osm.html");
 
     d->htmlWidget->openUrl(htmlUrl);
 }

@@ -37,7 +37,7 @@
 // local includes
 
 #include "html_widget.h"
-#include "worldmapwidget2.h"
+#include "kmap.h"
 #include "markermodel.h"
 
 namespace WMW2 {
@@ -153,7 +153,7 @@ void BackendGoogleMaps::createActions()
 
 void BackendGoogleMaps::loadInitialHTML()
 {
-    const KUrl htmlUrl = KStandardDirs::locate("data", "libworldmapwidget2/backend-googlemaps.html");
+    const KUrl htmlUrl = KStandardDirs::locate("data", "libkmap/backend-googlemaps.html");
 
     d->htmlWidget->openUrl(htmlUrl);
 }
@@ -162,7 +162,7 @@ BackendGoogleMaps::~BackendGoogleMaps()
 {
     if (d->htmlWidgetWrapper)
         delete d->htmlWidgetWrapper;
-    
+
     delete d;
 }
 

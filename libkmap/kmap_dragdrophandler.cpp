@@ -1,7 +1,7 @@
 /* ============================================================
  *
  * Date        : 2010-03-18
- * Description : Drag-and-drop handler for WorldMapWidget2
+ * Description : Drag-and-drop handler for KMap
  *
  * Copyright (C) 2010 by Michael G. Hansen <mike at mghansen dot de>
  *
@@ -17,7 +17,7 @@
  *
  * ============================================================ */
 
-#include "worldmapwidget2_dragdrophandler.moc"
+#include "kmap_dragdrophandler.moc"
 
 // Qt includes
 
@@ -25,7 +25,7 @@
 
 // local includes
 
-#include "worldmapwidget2_primitives.h"
+#include "kmap_primitives.h"
 #include "libkmap_export.h"
 
 namespace WMW2

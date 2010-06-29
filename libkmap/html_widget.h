@@ -26,7 +26,7 @@
 
 // local includes
 
-#include "worldmapwidget2_primitives.h"
+#include "kmap_primitives.h"
 #include "libkmap_export.h"
 
 namespace WMW2 {

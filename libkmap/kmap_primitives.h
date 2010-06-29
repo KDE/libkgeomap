@@ -1,7 +1,7 @@
 /* ============================================================
  *
  * Date        : 2009-12-01
- * Description : Primitive datatypes for WorldMapWidget2
+ * Description : Primitive datatypes for KMap
  *
  * Copyright (C) 2009,2010 by Michael G. Hansen <mike at mghansen dot de>
  *
@@ -17,8 +17,8 @@
  *
  * ============================================================ */
 
-#ifndef WORLDMAPWIDGET2_PRIMITIVES_H
-#define WORLDMAPWIDGET2_PRIMITIVES_H
+#ifndef KMAP_PRIMITIVES_H
+#define KMAP_PRIMITIVES_H
 
 // Qt includes
 
@@ -51,7 +51,8 @@
 
 Q_DECLARE_METATYPE(QPersistentModelIndex)
 
-namespace WMW2 {
+namespace WMW2
+{
 
 inline void WMW2_assert(const char* const condition, const char* const filename, const int lineNumber)
 {
@@ -70,10 +71,9 @@ inline void WMW2_assert(const char* const condition, const char* const filename,
 #else
     kDebug(0)<<debugString;
 #endif /* WMW2_HAVE_VALGRIND */
-    
 }
 
-class KMAP_EXPORT  WMWGeoCoordinate
+class KMAP_EXPORT WMWGeoCoordinate
 {
 public:
 
@@ -236,6 +236,7 @@ public:
     }
 
 private:
+
     double m_lat;
     double m_lon;
     double m_alt;
@@ -245,7 +246,8 @@ private:
 typedef QList<int> QIntList;
 typedef QPair<int, int> QIntPair;
 
-enum WMWSelectionState {
+enum WMWSelectionState
+{
     WMWSelectedNone = 0,
     WMWSelectedSome = 1,
     WMWSelectedAll = 2
@@ -277,6 +279,7 @@ public:
     QPoint pixelPos;
     WMWSelectionState selectedState;
     QMap<int, QVariant> representativeMarkers;
+
     enum PixmapType
     {
         PixmapMarker,
@@ -284,12 +287,13 @@ public:
         PixmapImage
     } pixmapType;
     QSize pixmapSize;
+
     //! anchor point of the image, measured from bottom-left
     QPoint pixmapOffset;
 };
 
 class MarkerModel;
-class WorldMapWidget2;
+class KMap;
 
 class KMAP_EXPORT WMWRepresentativeChooser : public QObject
 {
@@ -311,7 +315,8 @@ class KMAP_EXPORT WMWModelHelper : public QObject
 Q_OBJECT
 public:
 
-    enum Flag {
+    enum Flag
+    {
         FlagNull = 0,
         FlagVisible = 1,
         FlagMovable = 2,
@@ -333,8 +338,8 @@ public:
     virtual void snapItemsTo(const QModelIndex& targetIndex, const QList<QModelIndex>& snappedIndices) = 0;
 
 Q_SIGNALS:
-    void signalVisibilityChanged();
 
+    void signalVisibilityChanged();
 };
 
 class WMWSharedData : public QSharedData
@@ -368,14 +373,14 @@ public:
             for (QStringList::const_iterator sit = stateNames.constBegin(); sit!=stateNames.constEnd(); ++sit)
             {
                 const QString pixmapName = *it + *sit;
-                const KUrl markerUrl = KStandardDirs::locate("data", QString("libworldmapwidget2/marker-%1.png").arg(pixmapName));
+                const KUrl markerUrl = KStandardDirs::locate("data", QString("libkmap/marker-%1.png").arg(pixmapName));
                 markerPixmaps[pixmapName] = QPixmap(markerUrl.toLocalFile());
             }
         }
         markerPixmap = markerPixmaps["00ff00"];
     }
 
-    WorldMapWidget2* worldMapWidget;
+    KMap* worldMapWidget;
     QIntList visibleMarkers;
     MarkerModel* markerModel;
     WMWCluster::List clusterList;
@@ -391,7 +396,7 @@ public:
     bool previewSingleItems;
     bool previewGroupedItems;
     bool showNumbersOnItems;
-    int sortKey;    
+    int sortKey;
 };
 
 } /* WMW2 */
@@ -413,6 +418,7 @@ KMAP_EXPORT WMWGeoCoordinate::PairList WMWHelperNormalizeBounds(const WMWGeoCoor
 class KMAP_EXPORT WMWAltitudeLookup
 {
 public:
+
     WMWGeoCoordinate coordinates;
     QVariant data;
 
@@ -445,4 +451,4 @@ Q_DECLARE_METATYPE(WMW2::WMWGeoCoordinate::Pair)
 Q_DECLARE_METATYPE(WMW2::WMWGeoCoordinate::PairList)
 Q_DECLARE_METATYPE(WMW2::WMWAltitudeLookup)
 
-#endif /* WORLDMAPWIDGET2_PRIMITIVES_H */
+#endif /* KMAP_PRIMITIVES_H */

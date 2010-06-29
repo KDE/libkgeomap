@@ -1,7 +1,7 @@
 /* ============================================================
  *
  * Date        : 2009-12-01
- * Description : Primitive datatypes for WorldMapWidget2
+ * Description : Primitive datatypes for KMap
  *
  * Copyright (C) 2009 by Michael G. Hansen <mike at mghansen dot de>
  *
@@ -17,7 +17,7 @@
  *
  * ============================================================ */
 
-#include "worldmapwidget2_primitives.moc"
+#include "kmap_primitives.moc"
 
 namespace WMW2
 {

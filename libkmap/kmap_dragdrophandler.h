@@ -17,8 +17,8 @@
  *
  * ============================================================ */
 
-#ifndef WORLDMAPWIDGET2_DRAGDROPHANDLER_H
-#define WORLDMAPWIDGET2_DRAGDROPHANDLER_H
+#ifndef KMAP_DRAGDROPHANDLER_H
+#define KMAP_DRAGDROPHANDLER_H
 
 // Qt includes
 
@@ -26,16 +26,17 @@
 
 // local includes
 
-#include "worldmapwidget2_primitives.h"
+#include "kmap_primitives.h"
 #include "libkmap_export.h"
 
 class QDropEvent;
 
-namespace WMW2 {
+namespace WMW2
+{
 
 class KMAP_EXPORT DragDropHandler : public QObject
 {
-Q_OBJECT
+    Q_OBJECT
 
 public:
     DragDropHandler(QObject* const parent = 0);
@@ -46,7 +47,6 @@ public:
     virtual QMimeData* createMimeData(const QList<QPersistentModelIndex>& modelIndices) = 0;
 };
 
-
 } /* WMW2 */
 
-#endif /* WORLDMAPWIDGET2_DRAGDROPHANDLER_H */
+#endif /* KMAP_DRAGDROPHANDLER_H */

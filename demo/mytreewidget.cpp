@@ -26,7 +26,7 @@
 
 // local includes
 
-#include <worldmapwidget2_primitives.h>
+#include "kmap_primitives.h"
 #include "dragdrophandler.h"
 
 class MyTreeWidgetPrivate

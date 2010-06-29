@@ -26,7 +26,7 @@
 
 // local includes
 
-#include "worldmapwidget2_primitives.h"
+#include "kmap_primitives.h"
 
 class QMenu;
 class KConfigGroup;

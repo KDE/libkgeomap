@@ -57,7 +57,7 @@
 
 // local includes
 
-#include "worldmapwidget2.h"
+#include "kmap.h"
 #include "markermodel.h"
 #include "mytreewidget.h"
 #include "dragdrophandler.h"
@@ -93,7 +93,7 @@ public:
     }
 
     QSplitter* splitter;
-    WorldMapWidget2* mapWidget;
+    KMap* mapWidget;
     MyTreeWidget* treeWidget;
     QPointer<QProgressBar> progressBar;
     QList<QFuture<MyImageData> > imageLoadingRunningFutures;
@@ -124,9 +124,9 @@ MainWindow::MainWindow(KCmdLineArgs* const cmdLineArgs, QWidget* const parent)
     d->selectionModel = d->treeWidget->selectionModel();
 
     resize(512, 512);
-    setWindowTitle(i18n("WorldMapWidget2 demo"));
+    setWindowTitle(i18n("LibKMap demo"));
     setWindowIcon(SmallIcon("applications-internet"));
-    setObjectName("Demo-WorldMapWidget2");
+    setObjectName("Demo-KMap");
 
     d->cmdLineArgs = cmdLineArgs;
 
@@ -142,7 +142,7 @@ MainWindow::MainWindow(KCmdLineArgs* const cmdLineArgs, QWidget* const parent)
     d->splitter = new QSplitter(Qt::Vertical, this);
     setCentralWidget(d->splitter);
 
-    d->mapWidget = new WorldMapWidget2(d->splitter);
+    d->mapWidget = new KMap(d->splitter);
     d->mapWidget->setEditModeAvailable(true);
     d->mapWidget->setDisplayMarkersModel(d->displayMarkersModel, RoleCoordinates, d->selectionModel);
     d->mapWidget->setDragDropHandler(new DemoDragDropHandler(d->displayMarkersModel, d->mapWidget));

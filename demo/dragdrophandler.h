@@ -27,7 +27,7 @@
 
 // WorldMapWidget2 includes
 
-#include <worldmapwidget2_dragdrophandler.h>
+#include "kmap_dragdrophandler.h"
 
 class MyDragData : public QMimeData
 {

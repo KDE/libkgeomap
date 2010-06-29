@@ -39,13 +39,13 @@ ADD_DEFINITIONS(${KEXIV2_DEFINITIONS})
 CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/version.h.cmake ${CMAKE_CURRENT_BINARY_DIR}/version.h)
 
 SET(widget_sources
-    worldmapwidget2.cpp
+    kmap.cpp
+    kmap_primitives.cpp
+    kmap_dragdrophandler.cpp
     map-backend.cpp
     html_widget.cpp
     markermodel.cpp
-    worldmapwidget2_primitives.cpp
     altitude-backend.cpp
-    worldmapwidget2_dragdrophandler.cpp
     backend-altitude-geonames.cpp
    )
 
@@ -89,9 +89,9 @@ SET_TARGET_PROPERTIES(kmap PROPERTIES VERSION ${KMAP_LIB_SO_VERSION_STRING}
 INSTALL(TARGETS kmap ${INSTALL_TARGETS_DEFAULT_ARGS})
 
 INSTALL(FILES libkmap_export.h
-              worldmapwidget2.h
-              worldmapwidget2_dragdrophandler.h
-              worldmapwidget2_primitives.h
+              kmap.h
+              kmap_dragdrophandler.h
+              kmap_primitives.h
               altitude-backend.h
               html_widget.h
               ${CMAKE_CURRENT_BINARY_DIR}/version.h

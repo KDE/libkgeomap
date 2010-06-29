@@ -1,7 +1,7 @@
 /* ============================================================
  *
  * Date        : 2009-12-01
- * Description : WorldMapWidget2
+ * Description : KMap
  *
  * Copyright (C) 2009,2010 by Michael G. Hansen <mike at mghansen dot de>
  *
@@ -17,7 +17,7 @@
  *
  * ============================================================ */
 
-#include "worldmapwidget2.moc"
+#include "kmap.moc"
 
 // C++ includes
 
@@ -53,13 +53,14 @@
 // #include "backend-osm.h"
 #include "markermodel.h"
 #include "backend-altitude-geonames.h"
-#include "worldmapwidget2_dragdrophandler.h"
+#include "kmap_dragdrophandler.h"
 
-namespace WMW2 {
+namespace WMW2
+{
 
 const int WMW2MinEditGroupingRadius = 1;
-const int WMW2MinGroupingRadius = 15;
-const int WMW2MinThumbnailSize = 30;
+const int WMW2MinGroupingRadius     = 15;
+const int WMW2MinThumbnailSize      = 30;
 
 /**
  * @brief Helper function, returns the square of the distance between two points
@@ -73,10 +74,10 @@ inline int QPointSquareDistance(const QPoint& a, const QPoint& b)
     return (a.x()-b.x())*(a.x()-b.x()) + (a.y()-b.y())*(a.y()-b.y());
 }
 
-class WorldMapWidget2Private
+class KMapPrivate
 {
 public:
-    WorldMapWidget2Private()
+    KMapPrivate()
     : loadedAltitudeBackends(),
       loadedBackends(),
       currentBackend(0),
@@ -149,13 +150,13 @@ public:
     KHBox* hBoxForAdditionalControlWidgetItems;
 };
 
-WorldMapWidget2::WorldMapWidget2(QWidget* const parent)
-: QWidget(parent), s(new WMWSharedData), d(new WorldMapWidget2Private)
+KMap::KMap(QWidget* const parent)
+    : QWidget(parent), s(new WMWSharedData), d(new KMapPrivate)
 {
     createActions();
 
     // TODO: someone has to delete this model later!
-    s->markerModel = new MarkerModel();
+    s->markerModel    = new MarkerModel();
     s->worldMapWidget = this;
 
     // TODO: this needs some buffering for the google maps backend
@@ -178,7 +179,7 @@ WorldMapWidget2::WorldMapWidget2(QWidget* const parent)
     setAcceptDrops(true);
 }
 
-void WorldMapWidget2::createActions()
+void KMap::createActions()
 {
     d->actionZoomIn = new KAction(this);
     d->actionZoomIn->setIcon(SmallIcon("zoom-in"));
@@ -253,7 +254,7 @@ void WorldMapWidget2::createActions()
             this, SLOT(slotItemDisplaySettingsChanged()));
 }
 
-void WorldMapWidget2::createActionsForBackendSelection()
+void KMap::createActionsForBackendSelection()
 {
     // delete the existing actions:
     qDeleteAll(d->actionGroupBackendSelection->actions());
@@ -269,21 +270,21 @@ void WorldMapWidget2::createActionsForBackendSelection()
     }
 }
 
-WorldMapWidget2::~WorldMapWidget2()
+KMap::~KMap()
 {
     // release all widgets:
     for (int i = 0; i<d->stackedLayout->count(); ++i)
     {
         d->stackedLayout->removeWidget(d->stackedLayout->widget(i));
     }
-    
+
     qDeleteAll(d->loadedBackends);
     delete d;
 
     // TODO: delete s, but make sure it is not accessed by any other objects any more!
 }
 
-QStringList WorldMapWidget2::availableBackends() const
+QStringList KMap::availableBackends() const
 {
     QStringList result;
 
@@ -296,7 +297,7 @@ QStringList WorldMapWidget2::availableBackends() const
     return result;
 }
 
-bool WorldMapWidget2::setBackend(const QString& backendName)
+bool KMap::setBackend(const QString& backendName)
 {
     if (backendName == d->currentBackendName)
         return true;
@@ -388,7 +389,7 @@ bool WorldMapWidget2::setBackend(const QString& backendName)
     return false;
 }
 
-void WorldMapWidget2::applyCacheToBackend()
+void KMap::applyCacheToBackend()
 {
     if (!d->currentBackendReady)
         return;
@@ -398,7 +399,7 @@ void WorldMapWidget2::applyCacheToBackend()
     setZoom(d->cacheZoom);
 }
 
-void WorldMapWidget2::saveBackendToCache()
+void KMap::saveBackendToCache()
 {
     if (!d->currentBackendReady)
         return;
@@ -407,7 +408,7 @@ void WorldMapWidget2::saveBackendToCache()
     d->cacheZoom = getZoom();
 }
 
-WMWGeoCoordinate WorldMapWidget2::getCenter() const
+WMWGeoCoordinate KMap::getCenter() const
 {
     if (!d->currentBackendReady)
         return WMWGeoCoordinate();
@@ -415,7 +416,7 @@ WMWGeoCoordinate WorldMapWidget2::getCenter() const
     return d->currentBackend->getCenter();
 }
 
-void WorldMapWidget2::setCenter(const WMWGeoCoordinate& coordinate)
+void KMap::setCenter(const WMWGeoCoordinate& coordinate)
 {
     d->cacheCenterCoordinate = coordinate;
 
@@ -425,7 +426,7 @@ void WorldMapWidget2::setCenter(const WMWGeoCoordinate& coordinate)
     d->currentBackend->setCenter(coordinate);
 }
 
-void WorldMapWidget2::slotBackendReady(const QString& backendName)
+void KMap::slotBackendReady(const QString& backendName)
 {
     kDebug()<<QString("backend %1 is ready!").arg(backendName);
     if (backendName != d->currentBackendName)
@@ -457,7 +458,7 @@ void WorldMapWidget2::slotBackendReady(const QString& backendName)
     rebuildConfigurationMenu();
 }
 
-void WorldMapWidget2::saveSettingsToGroup(KConfigGroup* const group)
+void KMap::saveSettingsToGroup(KConfigGroup* const group)
 {
     WMW2_ASSERT(group != 0);
     if (!group)
@@ -483,7 +484,7 @@ void WorldMapWidget2::saveSettingsToGroup(KConfigGroup* const group)
     }
 }
 
-void WorldMapWidget2::readSettingsFromGroup(const KConfigGroup* const group)
+void KMap::readSettingsFromGroup(const KConfigGroup* const group)
 {
     WMW2_ASSERT(group != 0);
     if (!group)
@@ -524,7 +525,7 @@ void WorldMapWidget2::readSettingsFromGroup(const KConfigGroup* const group)
     slotUpdateActionsEnabled();
 }
 
-void WorldMapWidget2::rebuildConfigurationMenu()
+void KMap::rebuildConfigurationMenu()
 {
     d->configurationMenu->clear();
 
@@ -561,7 +562,7 @@ void WorldMapWidget2::rebuildConfigurationMenu()
     }
 }
 
-KAction* WorldMapWidget2::getControlAction(const QString& actionName)
+KAction* KMap::getControlAction(const QString& actionName)
 {
     kDebug()<<actionName;
     if (actionName=="zoomin")
@@ -579,7 +580,7 @@ KAction* WorldMapWidget2::getControlAction(const QString& actionName)
 /**
  * @brief Returns the control widget.
  */
-QWidget* WorldMapWidget2::getControlWidget()
+QWidget* KMap::getControlWidget()
 {
     if (!d->controlWidget)
     {
@@ -633,15 +634,15 @@ QWidget* WorldMapWidget2::getControlWidget()
     return d->controlWidget;
 }
 
-void WorldMapWidget2::slotZoomIn()
+void KMap::slotZoomIn()
 {
     if (!d->currentBackendReady)
         return;
-    
+
     d->currentBackend->zoomIn();
 }
 
-void WorldMapWidget2::slotZoomOut()
+void KMap::slotZoomOut()
 {
     if (!d->currentBackendReady)
         return;
@@ -649,14 +650,14 @@ void WorldMapWidget2::slotZoomOut()
     d->currentBackend->zoomOut();
 }
 
-void WorldMapWidget2::slotUpdateActionsEnabled()
+void KMap::slotUpdateActionsEnabled()
 {
     d->actionDecreaseThumbnailSize->setEnabled((!s->inEditMode)&&(d->thumbnailSize>WMW2MinThumbnailSize));
     // TODO: define an upper limit!
     d->actionIncreaseThumbnailSize->setEnabled(!s->inEditMode);
 }
 
-void WorldMapWidget2::slotChangeBackend(QAction* action)
+void KMap::slotChangeBackend(QAction* action)
 {
     WMW2_ASSERT(action!=0);
 
@@ -667,7 +668,7 @@ void WorldMapWidget2::slotChangeBackend(QAction* action)
     setBackend(newBackendName);
 }
 
-void WorldMapWidget2::updateMarkers()
+void KMap::updateMarkers()
 {
     if (!d->currentBackendReady)
         return;
@@ -676,7 +677,7 @@ void WorldMapWidget2::updateMarkers()
     d->currentBackend->updateMarkers();
 }
 
-void WorldMapWidget2::updateClusters()
+void KMap::updateClusters()
 {
     kDebug()<<s->markerModel;
     if (!s->markerModel)
@@ -940,7 +941,7 @@ void WorldMapWidget2::updateClusters()
     d->currentBackend->updateClusters();
 }
 
-void WorldMapWidget2::slotClustersNeedUpdating()
+void KMap::slotClustersNeedUpdating()
 {
     if (d->currentBackendReady)
     {
@@ -959,7 +960,7 @@ void WorldMapWidget2::slotClustersNeedUpdating()
  * @param overrideSelection Get the colors for a different selection state
  * @param overrideCount Get the colors for a different amount of markers
  */
-void WorldMapWidget2::getColorInfos(const int clusterIndex, QColor *fillColor, QColor *strokeColor,
+void KMap::getColorInfos(const int clusterIndex, QColor *fillColor, QColor *strokeColor,
                                     Qt::PenStyle *strokeStyle, QString *labelText, QColor *labelColor,
                                     const WMWSelectionState* const overrideSelection,
                                     const int* const overrideCount) const
@@ -975,7 +976,7 @@ void WorldMapWidget2::getColorInfos(const int clusterIndex, QColor *fillColor, Q
                   fillColor, strokeColor, strokeStyle, labelText, labelColor);
 }
 
-void WorldMapWidget2::getColorInfos(const WMWSelectionState selectionState,
+void KMap::getColorInfos(const WMWSelectionState selectionState,
                        const int nMarkers,
                        QColor *fillColor, QColor *strokeColor,
                        Qt::PenStyle *strokeStyle, QString *labelText, QColor *labelColor) const
@@ -1082,7 +1083,7 @@ void WorldMapWidget2::getColorInfos(const WMWSelectionState selectionState,
 }
 
 
-QString WorldMapWidget2::convertZoomToBackendZoom(const QString& someZoom, const QString& targetBackend) const
+QString KMap::convertZoomToBackendZoom(const QString& someZoom, const QString& targetBackend) const
 {
     const QStringList zoomParts = someZoom.split(':');
     WMW2_ASSERT(zoomParts.count()==2);
@@ -1153,13 +1154,13 @@ QString WorldMapWidget2::convertZoomToBackendZoom(const QString& someZoom, const
     return QString("%1:%2").arg(targetBackend).arg(targetZoom);
 }
 
-void WorldMapWidget2::slotBackendZoomChanged(const QString& newZoom)
+void KMap::slotBackendZoomChanged(const QString& newZoom)
 {
     kDebug()<<newZoom;
     d->cacheZoom = newZoom;
 }
 
-void WorldMapWidget2::setZoom(const QString& newZoom)
+void KMap::setZoom(const QString& newZoom)
 {
     d->cacheZoom = newZoom;
 
@@ -1169,7 +1170,7 @@ void WorldMapWidget2::setZoom(const QString& newZoom)
     }
 }
 
-QString WorldMapWidget2::getZoom()
+QString KMap::getZoom()
 {
     if (d->currentBackendReady)
     {
@@ -1179,7 +1180,7 @@ QString WorldMapWidget2::getZoom()
     return d->cacheZoom;
 }
 
-void WorldMapWidget2::slotClustersMoved(const QIntList& clusterIndices, const QPair<int, QModelIndex>& snapTarget)
+void KMap::slotClustersMoved(const QIntList& clusterIndices, const QPair<int, QModelIndex>& snapTarget)
 {
     kDebug()<<clusterIndices;
 
@@ -1245,7 +1246,7 @@ void WorldMapWidget2::slotClustersMoved(const QIntList& clusterIndices, const QP
     // while we update the model
 }
 
-bool WorldMapWidget2::queryAltitudes(const WMWAltitudeLookup::List& queryItems, const QString& backendName)
+bool KMap::queryAltitudes(const WMWAltitudeLookup::List& queryItems, const QString& backendName)
 {
     for (int i=0; i<d->loadedAltitudeBackends.count(); ++i)
     {
@@ -1259,7 +1260,7 @@ bool WorldMapWidget2::queryAltitudes(const WMWAltitudeLookup::List& queryItems, 
     return false;
 }
 
-void WorldMapWidget2::addUngroupedModel(WMWModelHelper* const modelHelper)
+void KMap::addUngroupedModel(WMWModelHelper* const modelHelper)
 {
     s->ungroupedModels << modelHelper;
 
@@ -1282,7 +1283,7 @@ void WorldMapWidget2::addUngroupedModel(WMWModelHelper* const modelHelper)
     emit(signalUngroupedModelChanged(s->ungroupedModels.count() - 1));
 }
 
-void WorldMapWidget2::setDisplayMarkersModel(QAbstractItemModel* const displayMarkersModel, const int coordinatesRole, QItemSelectionModel* const selectionModel)
+void KMap::setDisplayMarkersModel(QAbstractItemModel* const displayMarkersModel, const int coordinatesRole, QItemSelectionModel* const selectionModel)
 {
     s->displayMarkersModel= displayMarkersModel;
     s->displayMarkersCoordinatesRole = coordinatesRole;
@@ -1292,7 +1293,7 @@ void WorldMapWidget2::setDisplayMarkersModel(QAbstractItemModel* const displayMa
     slotRequestLazyReclustering();
 }
 
-void WorldMapWidget2::slotGroupModeChanged(QAction* triggeredAction)
+void KMap::slotGroupModeChanged(QAction* triggeredAction)
 {
     Q_UNUSED(triggeredAction);
     s->inEditMode = d->actionEditMode->isChecked();
@@ -1304,7 +1305,7 @@ void WorldMapWidget2::slotGroupModeChanged(QAction* triggeredAction)
 /**
  * @brief Request reclustering, repeated calls should generate only one actual update of the clusters
  */
-void WorldMapWidget2::slotRequestLazyReclustering()
+void KMap::slotRequestLazyReclustering()
 {
     if (d->lazyReclusteringRequested)
         return;
@@ -1317,7 +1318,7 @@ void WorldMapWidget2::slotRequestLazyReclustering()
 /**
  * @brief Helper function to buffer reclustering
  */
-void WorldMapWidget2::slotLazyReclusteringRequestCallBack()
+void KMap::slotLazyReclusteringRequestCallBack()
 {
     if (!d->lazyReclusteringRequested)
         return;
@@ -1326,7 +1327,7 @@ void WorldMapWidget2::slotLazyReclusteringRequestCallBack()
     slotClustersNeedUpdating();
 }
 
-void WorldMapWidget2::slotClustersClicked(const QIntList& clusterIndices)
+void KMap::slotClustersClicked(const QIntList& clusterIndices)
 {
     kDebug()<<clusterIndices;
     QItemSelectionModel* const selectionModel = s->markerModel->getSelectionModel();
@@ -1360,7 +1361,7 @@ void WorldMapWidget2::slotClustersClicked(const QIntList& clusterIndices)
     }
 }
 
-void WorldMapWidget2::dragEnterEvent(QDragEnterEvent* event)
+void KMap::dragEnterEvent(QDragEnterEvent* event)
 {
     if ( (!s->editEnabled) || (!d->dragDropHandler) )
     {
@@ -1381,14 +1382,14 @@ void WorldMapWidget2::dragEnterEvent(QDragEnterEvent* event)
 //         d->currentBackend->updateDragDropMarker(event->pos(), dragData);
 }
 
-void WorldMapWidget2::dragMoveEvent(QDragMoveEvent* /*event*/)
+void KMap::dragMoveEvent(QDragMoveEvent* /*event*/)
 {
     // TODO: update the position of the drag marker if it is to be shown
 //     if (!dragData->haveDragPixmap)
 //         d->currentBackend->updateDragDropMarkerPosition(event->pos());
 }
 
-void WorldMapWidget2::dropEvent(QDropEvent* event)
+void KMap::dropEvent(QDropEvent* event)
 {
     // remove the drag marker:
 //     d->currentBackend->updateDragDropMarker(QPoint(), 0);
@@ -1421,7 +1422,7 @@ void WorldMapWidget2::dropEvent(QDropEvent* event)
     
 }
 
-void WorldMapWidget2::dragLeaveEvent(QDragLeaveEvent* event)
+void KMap::dragLeaveEvent(QDragLeaveEvent* event)
 {
     Q_UNUSED(event);
 
@@ -1429,7 +1430,7 @@ void WorldMapWidget2::dragLeaveEvent(QDragLeaveEvent* event)
 //     d->currentBackend->updateDragDropMarker(QPoint(), 0);
 }
 
-void WorldMapWidget2::markClustersAsDirty()
+void KMap::markClustersAsDirty()
 {
     d->clustersDirty = true;
 }
@@ -1437,7 +1438,7 @@ void WorldMapWidget2::markClustersAsDirty()
 /**
  * @brief Controls whether the user can switch from browse to edit mode.
  */
-void WorldMapWidget2::setEditModeAvailable(const bool state)
+void KMap::setEditModeAvailable(const bool state)
 {
     d->editModeAvailable = state;
 
@@ -1447,12 +1448,12 @@ void WorldMapWidget2::setEditModeAvailable(const bool state)
     }
 }
 
-void WorldMapWidget2::setDragDropHandler(DragDropHandler* const dragDropHandler)
+void KMap::setDragDropHandler(DragDropHandler* const dragDropHandler)
 {
     d->dragDropHandler = dragDropHandler;
 }
 
-QVariant WorldMapWidget2::getClusterRepresentativeMarker(const int clusterIndex, const int sortKey)
+QVariant KMap::getClusterRepresentativeMarker(const int clusterIndex, const int sortKey)
 {
     if (!s->representativeChooser)
         return QVariant();
@@ -1475,7 +1476,7 @@ QVariant WorldMapWidget2::getClusterRepresentativeMarker(const int clusterIndex,
     return clusterRepresentative;
 }
 
-void WorldMapWidget2::setRepresentativeChooser(WMWRepresentativeChooser* const chooser)
+void KMap::setRepresentativeChooser(WMWRepresentativeChooser* const chooser)
 {
     s->representativeChooser = chooser;
     if (d->currentBackend&&chooser)
@@ -1485,7 +1486,7 @@ void WorldMapWidget2::setRepresentativeChooser(WMWRepresentativeChooser* const c
     }
 }
 
-void WorldMapWidget2::slotItemDisplaySettingsChanged()
+void KMap::slotItemDisplaySettingsChanged()
 {
     s->previewSingleItems = d->actionPreviewSingleItems->isChecked();
     s->previewGroupedItems = d->actionPreviewGroupedItems->isChecked();
@@ -1497,19 +1498,19 @@ void WorldMapWidget2::slotItemDisplaySettingsChanged()
     slotRequestLazyReclustering();
 }
 
-void WorldMapWidget2::setDoUpdateMarkerCoordinatesInModel(const bool doIt)
+void KMap::setDoUpdateMarkerCoordinatesInModel(const bool doIt)
 {
     d->doUpdateMarkerCoordinatesInModel = doIt;
 }
 
-void WorldMapWidget2::setSortOptionsMenu(QMenu* const sortMenu)
+void KMap::setSortOptionsMenu(QMenu* const sortMenu)
 {
     d->sortMenu = sortMenu;
 
     rebuildConfigurationMenu();
 }
 
-void WorldMapWidget2::setSortKey(const int sortKey)
+void KMap::setSortKey(const int sortKey)
 {
     s->sortKey = sortKey;
 
@@ -1517,7 +1518,7 @@ void WorldMapWidget2::setSortKey(const int sortKey)
     slotRequestLazyReclustering();
 }
 
-QPixmap WorldMapWidget2::getDecoratedPixmapForCluster(const int clusterId, const WMWSelectionState* const selectedStateOverride, const int* const countOverride, QPoint* const centerPoint)
+QPixmap KMap::getDecoratedPixmapForCluster(const int clusterId, const WMWSelectionState* const selectedStateOverride, const int* const countOverride, QPoint* const centerPoint)
 {
     const int circleRadius = d->thumbnailSize/2;
     WMWCluster& cluster = s->clusterList[clusterId];
@@ -1684,7 +1685,7 @@ QPixmap WorldMapWidget2::getDecoratedPixmapForCluster(const int clusterId, const
     return circlePixmap;
 }
 
-void WorldMapWidget2::setThumnailSize(const int newThumbnailSize)
+void KMap::setThumnailSize(const int newThumbnailSize)
 {
     d->thumbnailSize = qMax(WMW2MinThumbnailSize, newThumbnailSize);
 
@@ -1702,7 +1703,7 @@ void WorldMapWidget2::setThumnailSize(const int newThumbnailSize)
     slotUpdateActionsEnabled();
 }
 
-void WorldMapWidget2::setGroupingRadius(const int newGroupingRadius)
+void KMap::setGroupingRadius(const int newGroupingRadius)
 {
     d->groupingRadius = qMax(WMW2MinGroupingRadius, newGroupingRadius);
 
@@ -1719,7 +1720,7 @@ void WorldMapWidget2::setGroupingRadius(const int newGroupingRadius)
     slotUpdateActionsEnabled();
 }
 
-void WorldMapWidget2::setEditGroupingRadius(const int newGroupingRadius)
+void KMap::setEditGroupingRadius(const int newGroupingRadius)
 {
     d->editGroupingRadius = qMax(WMW2MinEditGroupingRadius, newGroupingRadius);
 
@@ -1730,7 +1731,7 @@ void WorldMapWidget2::setEditGroupingRadius(const int newGroupingRadius)
     slotUpdateActionsEnabled();
 }
 
-void WorldMapWidget2::slotDecreaseThumbnailSize()
+void KMap::slotDecreaseThumbnailSize()
 {
     if (s->inEditMode)
         return;
@@ -1745,7 +1746,7 @@ void WorldMapWidget2::slotDecreaseThumbnailSize()
     }
 }
 
-void WorldMapWidget2::slotIncreaseThumbnailSize()
+void KMap::slotIncreaseThumbnailSize()
 {
     if (s->inEditMode)
         return;
@@ -1753,17 +1754,17 @@ void WorldMapWidget2::slotIncreaseThumbnailSize()
     setThumnailSize(d->thumbnailSize+5);
 }
 
-int WorldMapWidget2::getThumbnailSize() const
+int KMap::getThumbnailSize() const
 {
     return d->thumbnailSize;
 }
 
-int WorldMapWidget2::getUndecoratedThumbnailSize() const
+int KMap::getUndecoratedThumbnailSize() const
 {
     return d->thumbnailSize-2;
 }
 
-void WorldMapWidget2::slotUngroupedModelChanged()
+void KMap::slotUngroupedModelChanged()
 {
     // determine the index under which we handle this model
     QObject* const senderObject = sender();
@@ -1813,7 +1814,7 @@ void WorldMapWidget2::slotUngroupedModelChanged()
     }
 }
 
-void WorldMapWidget2::addWidgetToControlWidget(QWidget* const newWidget)
+void KMap::addWidgetToControlWidget(QWidget* const newWidget)
 {
     // make sure the control widget exists
     if (!d->controlWidget)
@@ -1826,10 +1827,9 @@ void WorldMapWidget2::addWidgetToControlWidget(QWidget* const newWidget)
     }
 }
 
-void WorldMapWidget2::setEditEnabled(const bool state)
+void KMap::setEditEnabled(const bool state)
 {
     s->editEnabled = state;
 }
 
 } /* WMW2 */
-

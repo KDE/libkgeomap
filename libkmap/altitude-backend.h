@@ -20,7 +20,7 @@
 #ifndef ALTITUDE_BACKEND_H
 #define ALTITUDE_BACKEND_H
 
-#include "worldmapwidget2_primitives.h"
+#include "kmap_primitives.h"
 
 namespace WMW2
 {

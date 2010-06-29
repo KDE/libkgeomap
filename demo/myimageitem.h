@@ -25,14 +25,17 @@
 #include <QTreeWidgetItem>
 #include <QPersistentModelIndex>
 
-#include "worldmapwidget2_primitives.h"
+// Local includes
 
-const int RoleMyData = Qt::UserRole+0;
+#include "kmap_primitives.h"
+
+const int RoleMyData      = Qt::UserRole+0;
 const int RoleCoordinates = Qt::UserRole+1;
 
 class MyImageItem : public QTreeWidgetItem
 {
 public:
+
     MyImageItem(const KUrl& url, const WMW2::WMWGeoCoordinate& itemCoordinates);
     virtual ~MyImageItem();
 
@@ -40,9 +43,9 @@ public:
     virtual void setData(int column, int role, const QVariant& value);
 
 private:
+
     WMW2::WMWGeoCoordinate coordinates;
     KUrl imageUrl;
 };
 
 #endif /* MYIMAGEITEM_H */
-

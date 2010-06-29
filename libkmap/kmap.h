@@ -1,7 +1,7 @@
 /* ============================================================
  *
  * Date        : 2009-12-01
- * Description : WorldMapWidget2
+ * Description : KMap
  *
  * Copyright (C) 2009 by Michael G. Hansen <mike at mghansen dot de>
  *
@@ -17,8 +17,8 @@
  *
  * ============================================================ */
 
-#ifndef WORLDMAPWIDGET2_H
-#define WORLDMAPWIDGET2_H
+#ifndef KMAP_H
+#define KMAP_H
 
 // Qt includes
 
@@ -28,7 +28,7 @@
 
 // local includes
 
-#include "worldmapwidget2_primitives.h"
+#include "kmap_primitives.h"
 #include "libkmap_export.h"
 
 class KAction;
@@ -41,16 +41,17 @@ class QMenu;
 namespace WMW2
 {
 
-class WorldMapWidget2Private;
+class KMapPrivate;
 class DragDropHandler;
 
-class KMAP_EXPORT WorldMapWidget2 : public QWidget
+class KMAP_EXPORT KMap : public QWidget
 {
-Q_OBJECT
+  Q_OBJECT
 
 public:
-    WorldMapWidget2(QWidget* const parent = 0);
-    ~WorldMapWidget2();
+
+    KMap(QWidget* const parent = 0);
+    ~KMap();
 
     QStringList availableBackends() const;
     bool setBackend(const QString& backendName);
@@ -74,8 +75,8 @@ public:
 
     void getColorInfos(const int clusterIndex, QColor *fillColor, QColor *strokeColor,
                        Qt::PenStyle *strokeStyle, QString *labelText, QColor *labelColor,
-                                    const WMWSelectionState* const overrideSelection = 0,
-                                    const int* const overrideCount = 0) const;
+                       const WMWSelectionState* const overrideSelection = 0,
+                       const int* const overrideCount = 0) const;
 
     void getColorInfos(const WMWSelectionState selectionState,
                        const int nMarkers,
@@ -105,6 +106,7 @@ public:
     void setEditEnabled(const bool state);
 
 public Q_SLOTS:
+
     void slotZoomIn();
     void slotZoomOut();
     void slotUpdateActionsEnabled();
@@ -113,12 +115,14 @@ public Q_SLOTS:
     void slotIncreaseThumbnailSize();
 
 Q_SIGNALS:
+
     void signalAltitudeLookupReady(const WMW2::WMWAltitudeLookup::List& altitudes);
     void signalDisplayMarkersMoved(const QList<QPersistentModelIndex>& indices, const WMW2::WMWGeoCoordinate& coordinates);
     void signalSpecialMarkersMoved(const QList<QPersistentModelIndex>& indices);
     void signalUngroupedModelChanged(const int index);
 
 protected:
+
     void applyCacheToBackend();
     void saveBackendToCache();
     void rebuildConfigurationMenu();
@@ -130,6 +134,7 @@ protected:
     void createActionsForBackendSelection();
 
 protected Q_SLOTS:
+
     void slotBackendReady(const QString& backendName);
     void slotChangeBackend(QAction* action);
     void slotBackendZoomChanged(const QString& newZoom);
@@ -142,11 +147,11 @@ protected Q_SLOTS:
     void slotUngroupedModelChanged();
 
 private:
-    const QExplicitlySharedDataPointer<WMWSharedData> s;
-    WorldMapWidget2Private* const d;
-};
 
+    const QExplicitlySharedDataPointer<WMWSharedData> s;
+    KMapPrivate* const d;
+};
 
 } /* WMW2 */
 
-#endif /* WORLDMAPWIDGET2_H */
+#endif /* KMAP_H */

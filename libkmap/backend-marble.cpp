@@ -46,7 +46,7 @@
 #include "backend-marble-subwidget.h"
 #endif
 #include "markermodel.h"
-#include "worldmapwidget2.h"
+#include "kmap.h"
 
 using namespace Marble;
 
