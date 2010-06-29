@@ -24,19 +24,22 @@
 
 #include "map-backend.h"
 
-namespace Marble {
+namespace Marble
+{
     class GeoPainter;
-} /* Marble */
+}
 
-namespace WMW2 {
+namespace WMW2
+{
 
 class BackendMarblePrivate;
 
 class BackendMarble : public MapBackend
 {
-Q_OBJECT
+    Q_OBJECT
 
 public:
+
     BackendMarble(const QExplicitlySharedDataPointer<WMWSharedData>& sharedData, QObject* const parent = 0);
     virtual ~BackendMarble();
 
@@ -87,26 +90,29 @@ public:
     void setShowScaleBar(const bool state);
 
 public Q_SLOTS:
+
     virtual void slotClustersNeedUpdating();
     virtual void slotThumbnailAvailableForIndex(const QVariant& index, const QPixmap& pixmap);
     void slotUngroupedModelChanged(const int index);
 
 protected:
-    bool eventFilter(QObject *object, QEvent *event);
+
+    bool eventFilter(QObject* object, QEvent* event);
     void createActions();
     bool findSnapPoint(const QPoint& actualPoint, QPoint* const snapPoint, WMWGeoCoordinate* const snapCoordinates, QPair<int, QModelIndex>* const snapTargetIndex);
 
 protected Q_SLOTS:
+
     void slotMapThemeActionTriggered(QAction* action);
     void slotProjectionActionTriggered(QAction* action);
     void slotFloatSettingsTriggered(QAction* action);
     void slotMarbleZoomChanged(int newZoom);
 
 private:
+
     BackendMarblePrivate* const d;
 };
 
-} /* WMW2 */
+} /* namespace WMW2 */
 
 #endif /* BACKEND_MARBLE_H */
-

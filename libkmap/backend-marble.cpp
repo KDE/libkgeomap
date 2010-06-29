@@ -50,7 +50,8 @@
 
 using namespace Marble;
 
-namespace WMW2 {
+namespace WMW2
+{
 
 class BackendMarblePrivate
 {
@@ -112,7 +113,7 @@ public:
 };
 
 BackendMarble::BackendMarble(const QExplicitlySharedDataPointer<WMWSharedData>& sharedData, QObject* const parent)
-: MapBackend(sharedData, parent), d(new BackendMarblePrivate())
+             : MapBackend(sharedData, parent), d(new BackendMarblePrivate())
 {
     createActions();
 
@@ -138,7 +139,7 @@ BackendMarble::~BackendMarble()
 {
     if (d->marbleWidget)
         delete d->marbleWidget;
-    
+
     delete d;
 }
 
@@ -229,7 +230,7 @@ void BackendMarble::createActions()
     // float items:
     d->actionGroupFloatItems = new QActionGroup(this);
     d->actionGroupFloatItems->setExclusive(false);
-    
+
     connect(d->actionGroupFloatItems, SIGNAL(triggered(QAction*)),
             this, SLOT(slotFloatSettingsTriggered(QAction*)));
 
@@ -590,7 +591,7 @@ QString BackendMarble::getProjection() const
 void BackendMarble::setProjection(const QString& newProjection)
 {
     d->cacheProjection = newProjection;
-    
+
     if (d->marbleWidget)
     {
         if (newProjection=="equirectangular")
@@ -652,7 +653,7 @@ void BackendMarble::slotFloatSettingsTriggered(QAction* action)
 {
     const QString actionIdString = action->data().toString();
     const bool actionState = action->isChecked();
-    
+
     if (actionIdString=="showcompass")
     {
         setShowCompass(actionState);
@@ -1071,6 +1072,4 @@ bool BackendMarble::findSnapPoint(const QPoint& actualPoint, QPoint* const snapP
     return foundSnapPoint;
 }
 
-
-} /* WMW2 */
-
+} /* namespace WMW2 */
