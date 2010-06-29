@@ -93,6 +93,7 @@ INSTALL(FILES worldmapwidget2_export.h
               worldmapwidget2_dragdrophandler.h
               worldmapwidget2_primitives.h
               altitude-backend.h
+              html_widget.h
               ${CMAKE_CURRENT_BINARY_DIR}/version.h
         DESTINATION ${INCLUDE_INSTALL_DIR}/libkmap COMPONENT Devel
        )
