@@ -121,6 +121,16 @@ Q_SIGNALS:
     void signalSpecialMarkersMoved(const QList<QPersistentModelIndex>& indices);
     void signalUngroupedModelChanged(const int index);
 
+public:
+
+    /** Return a string version of LibMarbleWidget release in format "major.minor.patch"
+     */
+    static QString LibMarbleWidget();
+
+    /** Return a string version of libkmap release
+     */
+    static QString version();
+
 protected:
 
     void applyCacheToBackend();

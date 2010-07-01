@@ -45,15 +45,22 @@
 #include <klocale.h>
 #include <kseparator.h>
 
+// Marbel Widget includes
+
+#include <marble/global.h>
+
 // local includes
 
-#include "map-backend.h"
+// #include "backend-osm.h"
 #include "backend-marble.h"
 #include "backend-googlemaps.h"
-// #include "backend-osm.h"
-#include "markermodel.h"
 #include "backend-altitude-geonames.h"
+#include "markermodel.h"
+#include "map-backend.h"
 #include "kmap_dragdrophandler.h"
+#include "version.h"
+
+using namespace Marble;
 
 namespace KMapIface
 {
@@ -1832,4 +1839,16 @@ void KMap::setEditEnabled(const bool state)
     s->editEnabled = state;
 }
 
-} /* KMapIface */
+// Static methods ---------------------------------------------------------
+
+QString KMap::LibMarbleWidget()
+{
+    return QString(MARBLE_VERSION_STRING);
+}
+
+QString KMap::version()
+{
+    return QString(kmap_version);
+}
+
+} /* namespace KMapIface */
