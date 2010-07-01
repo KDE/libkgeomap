@@ -87,3 +87,8 @@ IF(NOT WIN32)
   CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/libkmap.lsm.cmake ${CMAKE_CURRENT_BINARY_DIR}/libkmap.lsm)
   INSTALL(FILES ${CMAKE_CURRENT_BINARY_DIR}/libkmap.pc DESTINATION ${LIB_INSTALL_DIR}/pkgconfig )
 ENDIF(NOT WIN32)
+
+# Install find cmake script to the system for client applications.
+
+INSTALL(FILES ${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules/FindKmap.cmake
+        DESTINATION ${DATA_INSTALL_DIR}/cmake/modules)
