@@ -1,4 +1,4 @@
-EXIV2 Library interface for KDE
+World-Map Library interface for KDE
 
 This library is a part of digiKam project (http://www.digikam.org)
 
@@ -8,7 +8,7 @@ See AUTHORS file for details.
 
 -- ABOUT --------------------------------------------------------------
 
-Libkmap  is a wrapper around world map component as marble, openstreetmap and googlemap.
+Libkmap is a wrapper around world map component as marble, openstreetmap and googlemap.
 
 This library is used by kipi-plugins, digiKam and others kipi host programs.
 
