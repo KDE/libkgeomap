@@ -33,7 +33,7 @@ IF(KDE4_BUILD_TESTS)
 
     # test the marker model
     SET(test_model_sources
-        test/test-model.cpp
+        test-model.cpp
        )
     KDE4_ADD_EXECUTABLE( test_model ${test_model_sources} )
     TARGET_LINK_LIBRARIES( test_model kmap ${QT_QTTEST_LIBRARY} )
@@ -41,7 +41,7 @@ IF(KDE4_BUILD_TESTS)
 
     # test the marker model
     SET(test_primitives_sources
-        test/test-primitives.cpp
+        test-primitives.cpp
        )
     KDE4_ADD_EXECUTABLE( test_primitives ${test_primitives_sources} )
     TARGET_LINK_LIBRARIES( test_primitives kmap ${QT_QTTEST_LIBRARY} )
