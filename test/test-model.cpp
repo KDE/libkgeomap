@@ -155,8 +155,8 @@ void TestModel::testMoveMarkers1()
     QStandardItem* const item1 = MakeItemAt(coord_1_2);
     itemModel->appendRow(item1);
     const QModelIndex markerIndex1 = itemModel->indexFromItem(item1);
-    
-    KMapIface_ASSERT(markerIndex1.isValid());
+
+    KMAP_ASSERT(markerIndex1.isValid());
     for (int l = 1; l<=fillLevel; ++l)
     {
         const MarkerModel::TileIndex tileIndex = MarkerModel::TileIndex::fromCoordinates(coord_1_2, l);

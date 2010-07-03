@@ -28,7 +28,7 @@
 
 // local includes
 
-#include "markermodel.h"
+#include "../libkmap/markermodel.h"
 
 class TestModel : public QObject
 {
