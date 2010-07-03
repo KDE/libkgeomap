@@ -118,7 +118,7 @@ BackendMarble::BackendMarble(const QExplicitlySharedDataPointer<WMWSharedData>& 
 {
     createActions();
 
-#ifdef KMapIface_MARBLE_ADD_LAYER
+#ifdef KMAP_MARBLE_ADD_LAYER
     d->marbleWidget = new MarbleWidget();
     d->marbleWidget->model()->addLayer(new BMLayer(this));
 #else

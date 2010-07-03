@@ -54,7 +54,7 @@ SET(backend_marble_sources
    )
 
 IF (${KDE_VERSION} VERSION_GREATER "4.4.66")
-    ADD_DEFINITIONS(-DWMW2_MARBLE_ADD_LAYER)
+    ADD_DEFINITIONS(-DKMAP_MARBLE_ADD_LAYER)
     SET( backend_marble_sources ${backend_marble_sources} backend-marble-layer.cpp )
 ELSE (${KDE_VERSION} VERSION_GREATER "4.4.66")
     SET( backend_marble_sources ${backend_marble_sources} backend-marble-subwidget.cpp )
