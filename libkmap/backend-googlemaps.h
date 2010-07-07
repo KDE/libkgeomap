@@ -1,18 +1,23 @@
-/* ============================================================
+ /** ===========================================================
  *
- * Date        : 2009-12-01
- * Description : Google-Maps-backend for WorldMapWidget2
+ * This file is a part of digiKam project
+ * <a href="http://www.digikam.org">http://www.digikam.org</a>
  *
- * Copyright (C) 2009,2010 by Michael G. Hansen <mike at mghansen dot de>
+ * @date   2009-12-01
+ * @brief  Google-Maps-backend for WorldMapWidget2
+ *
+ * @author Copyright (C) 2009-2010 by Michael G. Hansen
+ *         <a href="mailto:mike at mghansen dot de">mike at mghansen dot de</a>
  *
  * This program is free software; you can redistribute it
  * and/or modify it under the terms of the GNU General
  * Public License as published by the Free Software Foundation;
- * either version 2, or (at your option) any later version.
+ * either version 2, or (at your option)
+ * any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * ============================================================ */
@@ -31,9 +36,10 @@ class BackendGoogleMapsPrivate;
 
 class BackendGoogleMaps : public MapBackend
 {
-Q_OBJECT
+    Q_OBJECT
 
 public:
+
     BackendGoogleMaps(const QExplicitlySharedDataPointer<WMWSharedData>& sharedData, QObject* const parent = 0);
     virtual ~BackendGoogleMaps();
 
@@ -79,29 +85,32 @@ public:
     void setShowNavigationControl(const bool state);
 
 public Q_SLOTS:
+
     virtual void slotClustersNeedUpdating();
     virtual void slotThumbnailAvailableForIndex(const QVariant& index, const QPixmap& pixmap);
     void slotUngroupedModelChanged(const int mindex);
 
 protected:
+
     bool eventFilter(QObject* object, QEvent* event);
     void createActions();
     void setClusterPixmap(const int clusterId, const QPoint& centerPoint, const QPixmap& clusterPixmap);
     void setMarkerPixmap(const int modelId, const int markerId, const QPoint& centerPoint, const QPixmap& markerPixmap);
 
 private Q_SLOTS:
+
     void slotHTMLInitialized();
     void slotMapTypeActionTriggered(QAction* action);
     void slotHTMLEvents(const QStringList& eventStrings);
     void slotFloatSettingsTriggered(QAction* action);
 
 private:
+
     BackendGoogleMapsPrivate* const d;
     void loadInitialHTML();
     void updateZoomMinMaxCache();
 };
 
-} /* KMapIface */
+} /* namespace KMapIface */
 
 #endif /* BACKEND_GOOGLEMAPS_H */
-

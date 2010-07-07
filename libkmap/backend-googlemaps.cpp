@@ -1,18 +1,23 @@
-/* ============================================================
+ /** ===========================================================
  *
- * Date        : 2009-12-01
- * Description : Google-Maps-backend for WorldMapWidget2
+ * This file is a part of digiKam project
+ * <a href="http://www.digikam.org">http://www.digikam.org</a>
  *
- * Copyright (C) 2009,2010 by Michael G. Hansen <mike at mghansen dot de>
+ * @date   2009-12-01
+ * @brief  Google-Maps-backend for WorldMapWidget2
+ *
+ * @author Copyright (C) 2009-2010 by Michael G. Hansen
+ *         <a href="mailto:mike at mghansen dot de">mike at mghansen dot de</a>
  *
  * This program is free software; you can redistribute it
  * and/or modify it under the terms of the GNU General
  * Public License as published by the Free Software Foundation;
- * either version 2, or (at your option) any later version.
+ * either version 2, or (at your option)
+ * any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * ============================================================ */
@@ -46,6 +51,7 @@ namespace KMapIface
 class BackendGoogleMapsPrivate
 {
 public:
+
     BackendGoogleMapsPrivate()
     : htmlWidget(0),
       htmlWidgetWrapper(0),
@@ -67,34 +73,34 @@ public:
     {
     }
 
-    QPointer<HTMLWidget> htmlWidget;
-    QPointer<QWidget> htmlWidgetWrapper;
-    bool isReady;
-    QActionGroup* mapTypeActionGroup;
-    QActionGroup* floatItemsActionGroup;
-    KAction* showMapTypeControlAction;
-    KAction* showNavigationControlAction;
-    KAction* showScaleControlAction;
+    QPointer<HTMLWidget>                      htmlWidget;
+    QPointer<QWidget>                         htmlWidgetWrapper;
+    bool                                      isReady;
+    QActionGroup*                             mapTypeActionGroup;
+    QActionGroup*                             floatItemsActionGroup;
+    KAction*                                  showMapTypeControlAction;
+    KAction*                                  showNavigationControlAction;
+    KAction*                                  showScaleControlAction;
 
-    QString cacheMapType;
-    bool cacheShowMapTypeControl;
-    bool cacheShowNavigationControl;
-    bool cacheShowScaleControl;
-    int cacheZoom;
-    int cacheMaxZoom;
-    int cacheMinZoom;
-    WMWGeoCoordinate cacheCenter;
+    QString                                   cacheMapType;
+    bool                                      cacheShowMapTypeControl;
+    bool                                      cacheShowNavigationControl;
+    bool                                      cacheShowScaleControl;
+    int                                       cacheZoom;
+    int                                       cacheMaxZoom;
+    int                                       cacheMinZoom;
+    WMWGeoCoordinate                          cacheCenter;
     QPair<WMWGeoCoordinate, WMWGeoCoordinate> cacheBounds;
 };
 
 BackendGoogleMaps::BackendGoogleMaps(const QExplicitlySharedDataPointer<WMWSharedData>& sharedData, QObject* const parent)
-: MapBackend(sharedData, parent), d(new BackendGoogleMapsPrivate())
+                 : MapBackend(sharedData, parent), d(new BackendGoogleMapsPrivate())
 {
     createActions();
 
     d->htmlWidgetWrapper = new QWidget();
     d->htmlWidgetWrapper->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    d->htmlWidget = new HTMLWidget(d->htmlWidgetWrapper);
+    d->htmlWidget        = new HTMLWidget(d->htmlWidgetWrapper);
     d->htmlWidgetWrapper->resize(400,400);
 
     connect(d->htmlWidget, SIGNAL(signalJavaScriptReady()),
@@ -108,6 +114,14 @@ BackendGoogleMaps::BackendGoogleMaps(const QExplicitlySharedDataPointer<WMWShare
     d->htmlWidgetWrapper->installEventFilter(this);
 }
 
+BackendGoogleMaps::~BackendGoogleMaps()
+{
+    if (d->htmlWidgetWrapper)
+        delete d->htmlWidgetWrapper;
+
+    delete d;
+}
+
 void BackendGoogleMaps::createActions()
 {
     // actions for selecting the map type:
@@ -116,7 +130,7 @@ void BackendGoogleMaps::createActions()
 
     connect(d->mapTypeActionGroup, SIGNAL(triggered(QAction*)),
             this, SLOT(slotMapTypeActionTriggered(QAction*)));
-    
+
     QStringList mapTypes, mapTypesHumanNames;
     mapTypes           << "ROADMAP"       << "SATELLITE"        << "HYBRID"       << "TERRAIN";
     mapTypesHumanNames << i18n("Roadmap") << i18n("Satellite")  << i18n("Hybrid") << i18n("Terrain");
@@ -159,17 +173,9 @@ void BackendGoogleMaps::loadInitialHTML()
     d->htmlWidget->openUrl(htmlUrl);
 }
 
-BackendGoogleMaps::~BackendGoogleMaps()
-{
-    if (d->htmlWidgetWrapper)
-        delete d->htmlWidgetWrapper;
-
-    delete d;
-}
-
 QString BackendGoogleMaps::backendName() const
 {
-    return "googlemaps";
+    return QString("googlemaps");
 }
 
 QString BackendGoogleMaps::backendHumanName() const
@@ -204,7 +210,7 @@ bool BackendGoogleMaps::isReady() const
 
 void BackendGoogleMaps::slotHTMLInitialized()
 {
-    kDebug()<<1;
+    kDebug() << 1;
     d->isReady = true;
     d->htmlWidget->runScript(QString("wmwWidgetResized(%1, %2)").arg(d->htmlWidgetWrapper->width()).arg(d->htmlWidgetWrapper->height()));
 
@@ -222,7 +228,7 @@ void BackendGoogleMaps::zoomIn()
 {
     if (!d->isReady)
         return;
-    
+
     d->htmlWidget->runScript(QString("wmwZoomIn();"));
 }
 
@@ -355,7 +361,7 @@ void BackendGoogleMaps::slotUngroupedModelChanged(const int mindex)
 
         setMarkerPixmap(mindex, row, markerCenterPoint, markerPixmap);
     }
-    
+
 }
 void BackendGoogleMaps::updateMarkers()
 {
@@ -384,13 +390,13 @@ void BackendGoogleMaps::slotHTMLEvents(const QStringList& events)
         const QString eventParameter = it->mid(2);
         const QStringList eventParameters = eventParameter.split('/');
 
-        if (eventCode=="MT")
+        if (eventCode == "MT")
         {
             // map type changed
             mapTypeChanged = true;
             d->cacheMapType = eventParameter;
         }
-        else if (eventCode=="MB")
+        else if (eventCode == "MB")
         {   // NOTE: event currently disabled in javascript part
             // map bounds changed
             centerProbablyChanged = true;
@@ -410,7 +416,7 @@ void BackendGoogleMaps::slotHTMLEvents(const QStringList& events)
             zoomProbablyChanged = true;
             mapBoundsProbablyChanged = true;
         }
-        else if (eventCode=="cm")
+        else if (eventCode == "cm")
         {
             // TODO: buffer this event type!
             // cluster moved
@@ -442,7 +448,7 @@ void BackendGoogleMaps::slotHTMLEvents(const QStringList& events)
 
             movedClusters << clusterIndex;
         }
-        else if (eventCode=="cs")
+        else if (eventCode == "cs")
         {
             // TODO: buffer this event type!
             // cluster snapped
@@ -475,7 +481,7 @@ void BackendGoogleMaps::slotHTMLEvents(const QStringList& events)
             QPair<int, QModelIndex> snapTargetIndex(snapModelId, model->index(snapMarkerId, 0));
             emit(signalClustersMoved(QIntList()<<clusterIndex, snapTargetIndex));
         }
-        else if (eventCode=="cc")
+        else if (eventCode == "cc")
         {
             // TODO: buffer this event type!
             // cluster clicked
@@ -492,7 +498,7 @@ void BackendGoogleMaps::slotHTMLEvents(const QStringList& events)
 
             clickedClusters << clusterIndex;
         }
-        else if (eventCode=="mm")
+        else if (eventCode == "mm")
         {
 //             // TODO: buffer this event type!
 //             // marker moved
@@ -501,33 +507,33 @@ void BackendGoogleMaps::slotHTMLEvents(const QStringList& events)
 //             KMAP_ASSERT(okay);
 //             if (!okay)
 //                 continue;
-// 
+//
 //             KMAP_ASSERT(markerRow>=0);
 //             KMAP_ASSERT(markerRow<s->specialMarkersModel->rowCount());
 //             if ((markerRow<0)||(markerRow>=s->specialMarkersModel->rowCount()))
 //                 continue;
-// 
+//
 //             // re-read the marker position:
 //             WMWGeoCoordinate markerCoordinates;
 //             const bool isValid = d->htmlWidget->runScript2Coordinates(
 //                     QString("wmwGetMarkerPosition(%1);").arg(markerRow),
 //                     &markerCoordinates
 //                 );
-// 
+//
 //             KMAP_ASSERT(isValid);
 //             if (!isValid)
 //                 continue;
-// 
+//
 //             // TODO: this discards the altitude!
 //             const QModelIndex markerIndex = s->specialMarkersModel->index(markerRow, 0);
 //             s->specialMarkersModel->setData(markerIndex, QVariant::fromValue(markerCoordinates), s->specialMarkersCoordinatesRole);
-// 
+//
 //             movedMarkers << QPersistentModelIndex(markerIndex);
         }
-        else if (eventCode=="do")
+        else if (eventCode == "do")
         {
             // debug output:
-            kDebug()<<QString("javascript:%1").arg(eventParameter);
+            kDebug() << QString("javascript:%1").arg(eventParameter);
         }
     }
 
@@ -550,7 +556,8 @@ void BackendGoogleMaps::slotHTMLEvents(const QStringList& events)
     }
 
     // now process the buffered events:
-    if (mapTypeChanged) {
+    if (mapTypeChanged)
+    {
         updateZoomMinMaxCache();
     }
     if (zoomProbablyChanged)
@@ -585,7 +592,7 @@ void BackendGoogleMaps::slotHTMLEvents(const QStringList& events)
 
 void BackendGoogleMaps::updateClusters()
 {
-    kDebug()<<"start updateclusters";
+    kDebug() << "start updateclusters";
     // re-transfer the clusters to the map:
     KMAP_ASSERT(isReady());
     if (!isReady())
@@ -666,17 +673,17 @@ QSize BackendGoogleMaps::mapSize() const
 void BackendGoogleMaps::slotFloatSettingsTriggered(QAction* action)
 {
     const QString actionIdString = action->data().toString();
-    const bool actionState = action->isChecked();
+    const bool actionState       = action->isChecked();
 
-    if (actionIdString=="showmaptypecontrol")
+    if (actionIdString == "showmaptypecontrol")
     {
         setShowMapTypeControl(actionState);
     }
-    else if (actionIdString=="shownavigationcontrol")
+    else if (actionIdString == "shownavigationcontrol")
     {
         setShowNavigationControl(actionState);
     }
-    else if (actionIdString=="showscalecontrol")
+    else if (actionIdString == "showscalecontrol")
     {
         setShowScaleControl(actionState);
     }
@@ -732,7 +739,7 @@ void BackendGoogleMaps::setZoom(const QString& newZoom)
     KMAP_ASSERT(myZoomString.startsWith("googlemaps:"));
 
     const int myZoom = myZoomString.mid(QString("googlemaps:").length()).toInt();
-    kDebug()<<myZoom;
+    kDebug() << myZoom;
 
     d->cacheZoom = myZoom;
 
@@ -782,10 +789,13 @@ int BackendGoogleMaps::getMarkerModelLevel()
     else if (currentZoom==20) { tileLevel = 6; }
     else if (currentZoom==21) { tileLevel = 7; }
     else if (currentZoom==22) { tileLevel = 7; }
-    else { tileLevel = MarkerModel::TileIndex::MaxLevel-1; }
+    else
+    {
+        tileLevel = MarkerModel::TileIndex::MaxLevel-1;
+    }
 
-    KMAP_ASSERT(tileLevel<=MarkerModel::TileIndex::MaxLevel-1);
-    
+    KMAP_ASSERT(tileLevel <= MarkerModel::TileIndex::MaxLevel-1);
+
     return tileLevel;
 }
 
@@ -798,7 +808,7 @@ WMWGeoCoordinate::PairList BackendGoogleMaps::getNormalizedBounds()
 // {
 //     if (!isReady())
 //         return;
-// 
+//
 //     if (!dragData)
 //     {
 //         d->htmlWidget->runScript("wmwRemoveDragMarker();");
@@ -812,16 +822,16 @@ WMWGeoCoordinate::PairList BackendGoogleMaps::getNormalizedBounds()
 //                 .arg(dragData->itemCount)
 //             );
 //     }
-// 
+//
 //     // TODO: hide dragged markers on the map
 // }
-// 
+//
 // void BackendGoogleMaps::updateDragDropMarkerPosition(const QPoint& pos)
 // {
 //     // TODO: buffer this!
 //     if (!isReady())
 //         return;
-// 
+//
 //     d->htmlWidget->runScript(QString("wmwMoveDragMarker(%1, %2);")
 //             .arg(pos.x())
 //             .arg(pos.y())
@@ -879,7 +889,6 @@ void BackendGoogleMaps::slotThumbnailAvailableForIndex(const QVariant& index, co
             break;
         }
     }
-    
 }
 
 void BackendGoogleMaps::setClusterPixmap(const int clusterId, const QPoint& centerPoint, const QPixmap& clusterPixmap)
@@ -890,7 +899,7 @@ void BackendGoogleMaps::setClusterPixmap(const int clusterId, const QPoint& cent
     QByteArray bytes;
     QBuffer buffer(&bytes);
     buffer.open(QIODevice::WriteOnly);
-    clusterPixmap.save(&buffer, "PNG");    
+    clusterPixmap.save(&buffer, "PNG");
 
     // http://www.faqs.org/rfcs/rfc2397.html
     const QString imageData = QString("data:image/png;base64,%1").arg(QString::fromAscii(bytes.toBase64()));
@@ -945,5 +954,4 @@ bool BackendGoogleMaps::eventFilter(QObject* object, QEvent* event)
     return false;
 }
 
-} /* KMapIface */
-
+} /* namespace KMapIface */
