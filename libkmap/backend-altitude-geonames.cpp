@@ -1,18 +1,23 @@
-/* ============================================================
+/** ===========================================================
  *
- * Date        : 2010-02-13
- * Description : geonames.org based altitude lookup backend
+ * This file is a part of digiKam project
+ * <a href="http://www.digikam.org">http://www.digikam.org</a>
  *
- * Copyright (C) 2010 by Michael G. Hansen <mike at mghansen dot de>
+ * @date   2010-02-13
+ * @brief  geonames.org based altitude lookup backend
+ *
+ * @author Copyright (C) 2010 by Michael G. Hansen
+ *         <a href="mailto:mike at mghansen dot de">mike at mghansen dot de</a>
  *
  * This program is free software; you can redistribute it
  * and/or modify it under the terms of the GNU General
  * Public License as published by the Free Software Foundation;
- * either version 2, or (at your option) any later version.
+ * either version 2, or (at your option)
+ * any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * ============================================================ */
@@ -30,32 +35,37 @@ namespace KMapIface
 class MergedAltitudeQueryJobs
 {
 public:
+
     MergedAltitudeQueryJobs()
-    : lookups(),
-      data(),
-      kioJob(0)
+        : lookups(),
+          data(),
+          kioJob(0)
     {
     }
 
     WMWAltitudeLookup::List lookups;
-    QByteArray data;
-    KIO::Job* kioJob;
+    QByteArray              data;
+    KIO::Job*               kioJob;
 };
+
+// --------------------------------------------------------------------------
 
 class BackendAltitudeGeonamesPrivate
 {
 public:
+
     BackendAltitudeGeonamesPrivate()
-    : jobs()
+        : jobs()
     {
     }
 
     QList<MergedAltitudeQueryJobs> jobs;
-    
 };
 
+// --------------------------------------------------------------------------
+
 BackendAltitudeGeonames::BackendAltitudeGeonames(const QExplicitlySharedDataPointer<WMWSharedData>& sharedData, QObject* const parent)
-: AltitudeBackend(sharedData, parent), d(new BackendAltitudeGeonamesPrivate)
+                       : AltitudeBackend(sharedData, parent), d(new BackendAltitudeGeonamesPrivate)
 {
 }
 
@@ -65,7 +75,7 @@ BackendAltitudeGeonames::~BackendAltitudeGeonames()
 
 QString BackendAltitudeGeonames::backendName() const
 {
-    return "geonames";
+    return QString("geonames");
 }
 
 QString BackendAltitudeGeonames::backendHumanName() const
@@ -208,6 +218,4 @@ void BackendAltitudeGeonames::slotResult(KJob* kJob)
     }
 }
 
-} /* KMapIface */
-
-
+} /* namespace KMapIface */
