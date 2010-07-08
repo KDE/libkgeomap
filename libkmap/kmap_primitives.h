@@ -71,10 +71,10 @@ inline void KMapIface_assert(const char* const condition, const char* const file
     }
     else
     {
-        kDebug(0)<<debugString;
+        kDebug(51006)<<debugString;
     }
 #else
-    kDebug(0)<<debugString;
+    kDebug(51006)<<debugString;
 #endif /* KMAP_HAVE_VALGRIND */
 }
 
@@ -112,17 +112,17 @@ public:
 
     WMWGeoCoordinate(const double inLat, const double inLon)
         : m_lat(inLat),
-        m_lon(inLon),
-        m_alt(0.0),
-        m_hasFlags(HasCoordinates)
+          m_lon(inLon),
+          m_alt(0.0),
+          m_hasFlags(HasCoordinates)
     {
     }
 
     WMWGeoCoordinate(const double inLat, const double inLon, const double inAlt)
         : m_lat(inLat),
-        m_lon(inLon),
-        m_alt(inAlt),
-        m_hasFlags(HasCoordinates|HasAltitude)
+          m_lon(inLon),
+          m_alt(inAlt),
+          m_hasFlags(HasCoordinates|HasAltitude)
     {
     }
 
@@ -207,10 +207,10 @@ public:
         WMWGeoCoordinate position;
         if ((parts.size()==3)||(parts.size()==2))
         {
-            bool okay = true;
-            double ptLongitude = 0.0;
-            double ptLatitude  = 0.0;
-            double ptAltitude  = 0.0;
+            bool okay              = true;
+            double ptLongitude     = 0.0;
+            double ptLatitude      = 0.0;
+            double ptAltitude      = 0.0;
             const bool hasAltitude = parts.size()==3;
 
             ptLatitude = parts[0].toDouble(&okay);

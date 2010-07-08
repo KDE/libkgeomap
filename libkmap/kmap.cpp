@@ -353,7 +353,7 @@ bool KMap::setBackend(const QString& backendName)
     {
         if (backend->backendName() == backendName)
         {
-            kDebug()<<QString("setting backend %1").arg(backendName);
+            kDebug(51006) << QString("setting backend %1").arg(backendName);
             d->currentBackend = backend;
             d->currentBackendName = backendName;
             d->currentBackendReady = false;
@@ -440,7 +440,7 @@ void KMap::setCenter(const WMWGeoCoordinate& coordinate)
 
 void KMap::slotBackendReady(const QString& backendName)
 {
-    kDebug()<<QString("backend %1 is ready!").arg(backendName);
+    kDebug(51006)<<QString("backend %1 is ready!").arg(backendName);
     if (backendName != d->currentBackendName)
         return;
 
@@ -576,7 +576,7 @@ void KMap::rebuildConfigurationMenu()
 
 KAction* KMap::getControlAction(const QString& actionName)
 {
-    kDebug()<<actionName;
+    kDebug(51006)<<actionName;
     if (actionName=="zoomin")
     {
         return d->actionZoomIn;
@@ -691,11 +691,11 @@ void KMap::updateMarkers()
 
 void KMap::updateClusters()
 {
-    kDebug()<<s->markerModel;
+    kDebug(51006)<<s->markerModel;
     if (!s->markerModel)
         return;
 
-    kDebug()<<s->haveMovingCluster;
+    kDebug(51006)<<s->haveMovingCluster;
     if (s->haveMovingCluster)
     {
         // do not re-cluster while a cluster is being moved
@@ -713,7 +713,7 @@ void KMap::updateClusters()
     const int ClusterGridSizeScreen  = 4*ClusterRadius;
     const QSize ClusterMaxPixmapSize = QSize(ClusterGridSizeScreen, ClusterGridSizeScreen);
 
-//     kDebug()<<"updateClusters starting...";
+//     kDebug(51006)<<"updateClusters starting...";
 
     s->clusterList.clear();
 
@@ -737,7 +737,7 @@ void KMap::updateClusters()
 //         QPoint tile1Point, tile2Point;
 //         d->currentBackend->screenCoordinates(tile1Coordinate, &tile1Point);
 //         d->currentBackend->screenCoordinates(tile2Coordinate, &tile2Point);
-//         kDebug()<<i<<tile1Point<<tile2Point<<(tile1Point-tile2Point);
+//         kDebug(51006)<<i<<tile1Point<<tile2Point<<(tile1Point-tile2Point);
 //     }
 
     const int gridSize = ClusterGridSizeScreen;
@@ -773,7 +773,7 @@ void KMap::updateClusters()
         pixelNonEmptyTileIndexGrid[linearIndex] << tileIndex;
         pixelCountGrid[linearIndex]+= s->markerModel->getTileMarkerCount(tileIndex);
 
-//         kDebug()<<QString("pixel at: %1, %2 (%3): %4 markers").arg(tilePoint.x()).arg(tilePoint.y()).arg(linearIndex).arg(pixelCountGrid[linearIndex]);
+//         kDebug(51006)<<QString("pixel at: %1, %2 (%3): %4 markers").arg(tilePoint.x()).arg(tilePoint.y()).arg(linearIndex).arg(pixelCountGrid[linearIndex]);
     }
 
     // TODO: cleanup this list every ... iterations in the next loop, too
@@ -889,7 +889,7 @@ void KMap::updateClusters()
             }
         }
 
-        kDebug()<<QString("created cluster %1: %2 tiles").arg(s->clusterList.size()).arg(cluster.tileIndicesList.count());
+        kDebug(51006)<<QString("created cluster %1: %2 tiles").arg(s->clusterList.size()).arg(cluster.tileIndicesList.count());
 
         s->clusterList << cluster;
     }
@@ -947,8 +947,8 @@ void KMap::updateClusters()
         }
     }
 
-//     kDebug()<<s->clusterList.size();
-    kDebug()<<QString("level %1: %2 non empty tiles sorted into %3 clusters (%4 searched)").arg(markerLevel).arg(debugCountNonEmptyTiles).arg(s->clusterList.count()).arg(debugTilesSearched);
+//     kDebug(51006)<<s->clusterList.size();
+    kDebug(51006)<<QString("level %1: %2 non empty tiles sorted into %3 clusters (%4 searched)").arg(markerLevel).arg(debugCountNonEmptyTiles).arg(s->clusterList.count()).arg(debugTilesSearched);
 
     d->currentBackend->updateClusters();
 }
@@ -1168,7 +1168,7 @@ QString KMap::convertZoomToBackendZoom(const QString& someZoom, const QString& t
 
 void KMap::slotBackendZoomChanged(const QString& newZoom)
 {
-    kDebug()<<newZoom;
+    kDebug(51006)<<newZoom;
     d->cacheZoom = newZoom;
 }
 
@@ -1194,7 +1194,7 @@ QString KMap::getZoom()
 
 void KMap::slotClustersMoved(const QIntList& clusterIndices, const QPair<int, QModelIndex>& snapTarget)
 {
-    kDebug()<<clusterIndices;
+    kDebug(51006)<<clusterIndices;
 
     // TODO: we actually expect only one clusterindex
     int clusterIndex = clusterIndices.first();
@@ -1233,9 +1233,9 @@ void KMap::slotClustersMoved(const QIntList& clusterIndices, const QPair<int, QM
 
     if (snapTarget.first>=0)
     {
-        kDebug()<<snapTarget.first<<movedMarkers.count()<<s->ungroupedModels.at(snapTarget.first);
+        kDebug(51006)<<snapTarget.first<<movedMarkers.count()<<s->ungroupedModels.at(snapTarget.first);
         s->ungroupedModels.at(snapTarget.first)->snapItemsTo(snapTarget.second, movedMarkers);
-        kDebug()<<snapTarget.first;
+        kDebug(51006)<<snapTarget.first;
         return;
     }
 
@@ -1248,7 +1248,7 @@ void KMap::slotClustersMoved(const QIntList& clusterIndices, const QPair<int, QM
         }
     }
 
-//     kDebug()<<markerIndices;
+//     kDebug(51006)<<markerIndices;
     if (!movedMarkers.isEmpty())
     {
         emit(signalDisplayMarkersMoved(movedMarkers, targetCoordinates));
@@ -1341,7 +1341,7 @@ void KMap::slotLazyReclusteringRequestCallBack()
 
 void KMap::slotClustersClicked(const QIntList& clusterIndices)
 {
-    kDebug()<<clusterIndices;
+    kDebug(51006)<<clusterIndices;
     QItemSelectionModel* const selectionModel = s->markerModel->getSelectionModel();
     if (!selectionModel)
         return;
@@ -1350,20 +1350,20 @@ void KMap::slotClustersClicked(const QIntList& clusterIndices)
     for (int i=0; i<clusterIndices.count(); ++i)
     {
         const int clusterIndex = clusterIndices.at(i);
-        kDebug()<<clusterIndex;
+        kDebug(51006)<<clusterIndex;
         const WMWCluster currentCluster = s->clusterList.at(clusterIndex);
 
         const bool doSelect = (currentCluster.selectedState!=WMWSelectedAll);
-        kDebug()<<doSelect;
+        kDebug(51006)<<doSelect;
         for (int j=0; j<currentCluster.tileIndicesList.count(); ++j)
         {
             const MarkerModel::TileIndex& currentTileIndex = MarkerModel::TileIndex::fromIntList(currentCluster.tileIndicesList.at(j));
 
             const QList<QPersistentModelIndex> currentMarkers = s->markerModel->getTileMarkerIndices(currentTileIndex);
-            kDebug()<<currentTileIndex<<currentMarkers;
+            kDebug(51006)<<currentTileIndex<<currentMarkers;
             for (int k=0; k<currentMarkers.count(); ++k)
             {
-                kDebug()<<k<<currentMarkers.at(k)<<doSelect;
+                kDebug(51006)<<k<<currentMarkers.at(k)<<doSelect;
                 if (selectionModel->isSelected(currentMarkers.at(k))!=doSelect)
                 {
                     selectionModel->select(currentMarkers.at(k), (doSelect ? QItemSelectionModel::Select : QItemSelectionModel::Deselect) | QItemSelectionModel::Rows);

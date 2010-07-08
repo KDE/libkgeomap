@@ -55,7 +55,7 @@ int CountMarkersInIterator(MarkerModel::NonEmptyIterator* const it)
         const MarkerModel::TileIndex currentIndex = it->currentIndex();
         markerCount += it->model()->getTileMarkerCount(currentIndex);
         it->nextIndex();
-//         kDebug()<<currentIndex;
+//         kDebug(51006)<<currentIndex;
     }
 
     return markerCount;

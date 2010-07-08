@@ -52,7 +52,7 @@ bool DemoDragDropHandler::dropEvent(const QDropEvent* e, const KMapIface::WMWGeo
     if (!mimeData)
         return false;
 
-    kDebug()<<mimeData->draggedIndices.count();
+    kDebug(51006) << mimeData->draggedIndices.count();
 
     for (int i=0; i<mimeData->draggedIndices.count(); ++i)
     {

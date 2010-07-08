@@ -350,7 +350,7 @@ MarkerModel::NonEmptyIterator::NonEmptyIterator(MarkerModel* const model, const 
         startIndex.appendLinearIndex(0);
         endIndex.appendLinearIndex(TileIndex::Tiling*TileIndex::Tiling-1);
     }
-//     kDebug()<<d->startIndexLinear<<d->endIndexLinear;
+//     kDebug(51006)<<d->startIndexLinear<<d->endIndexLinear;
 
     d->boundsList << QPair<TileIndex, TileIndex>(startIndex, endIndex);
 
@@ -388,7 +388,7 @@ MarkerModel::NonEmptyIterator::NonEmptyIterator(MarkerModel* const model, const 
         const TileIndex startIndex = TileIndex::fromCoordinates(currentBounds.first, d->level);
         const TileIndex endIndex = TileIndex::fromCoordinates(currentBounds.second, d->level);
 
-//         kDebug()<<currentBounds.first.geoUrl()<<startIndex<<currentBounds.second.geoUrl()<<endIndex;
+//         kDebug(51006)<<currentBounds.first.geoUrl()<<startIndex<<currentBounds.second.geoUrl()<<endIndex;
         d->boundsList << QPair<TileIndex, TileIndex>(startIndex, endIndex);
     }
 
@@ -428,7 +428,7 @@ MarkerModel::TileIndex MarkerModel::NonEmptyIterator::nextIndex()
     Q_FOREVER
     {
         const int currentLevel = d->currentIndex.level();
-//         kDebug() << d->level << currentLevel << d->atStartOfLevel << d->currentIndex;
+//         kDebug(51006) << d->level << currentLevel << d->atStartOfLevel << d->currentIndex;
 
         if (d->atStartOfLevel)
         {
@@ -492,7 +492,7 @@ MarkerModel::TileIndex MarkerModel::NonEmptyIterator::nextIndex()
 
             KMAP_ASSERT(limitLatBL<=limitLatTR);
             KMAP_ASSERT(limitLonBL<=limitLonTR);
-//             kDebug() << limitLatBL << limitLonBL << limitLatTR << limitLonTR << compareLevel << currentLevel;
+//             kDebug(51006) << limitLatBL << limitLonBL << limitLatTR << limitLonTR << compareLevel << currentLevel;
 
             int currentLat = d->currentIndex.indexLat(d->currentIndex.level());
             int currentLon = d->currentIndex.indexLon(d->currentIndex.level());
@@ -749,7 +749,7 @@ void MarkerModel::setSelectionModel(QItemSelectionModel* const selectionModel)
 
 void MarkerModel::slotSelectionChanged(const QItemSelection& selected, const QItemSelection& deselected)
 {
-//     kDebug()<<selected<<deselected;
+//     kDebug(51006)<<selected<<deselected;
     if (d->isDirty)
     {
         return;
@@ -774,7 +774,7 @@ void MarkerModel::slotSelectionChanged(const QItemSelection& selected, const QIt
                     break;
 
                 myTile->selectedCount++;
-//                 kDebug()<<l<<tileIndex<<myTile->selectedCount;
+//                 kDebug(51006)<<l<<tileIndex<<myTile->selectedCount;
                 KMAP_ASSERT(myTile->selectedCount <= myTile->markerIndices.count());
 
                 if (myTile->children.isEmpty())
@@ -892,7 +892,7 @@ MarkerModel::TileIndex MarkerModel::TileIndex::fromCoordinates(const KMapIface::
         }
         if (haveRoundingErrors)
         {
-//             kDebug()<<QString("Rounding errors at level %1!").arg(l);
+//             kDebug(51006)<<QString("Rounding errors at level %1!").arg(l);
         }
 
         resultIndex.appendLatLonIndex(latIndex, lonIndex);

@@ -81,7 +81,7 @@ HTMLWidget::~HTMLWidget()
 
 void HTMLWidget::loadInitialHTML(const QString& initialHTML)
 {
-//     kDebug()<<initialHTML;
+//     kDebug(51006)<<initialHTML;
     begin();
     write(initialHTML);
     end();
@@ -122,7 +122,7 @@ void HTMLWidget::slotScanForJSMessages()
     if (status!="(event)")
         return;
 
-    kDebug()<<status;
+    kDebug(51006)<<status;
     const QString eventBufferString = runScript(QString("wmwReadEventStrings();")).toString();
     if (eventBufferString.isEmpty())
         return;
@@ -142,7 +142,7 @@ QVariant HTMLWidget::runScript(const QString& scriptCode)
     if (!d->isReady)
         return QVariant();
 
-//     kDebug()<<scriptCode;
+//     kDebug(51006)<<scriptCode;
     return executeScript(scriptCode);
 }
 

@@ -286,7 +286,7 @@ MyImageData LoadImageData(const KUrl& urlToLoad)
 
 void MainWindow::slotFutureResultsReadyAt(int startIndex, int endIndex)
 {
-//     kDebug()<<"future"<<startIndex<<endIndex;
+//     kDebug(51006)<<"future"<<startIndex<<endIndex;
 
     // determine the sender:
     QFutureWatcher<MyImageData>* const futureSender = reinterpret_cast<QFutureWatcher<MyImageData>*>(sender());
@@ -313,7 +313,7 @@ void MainWindow::slotFutureResultsReadyAt(int startIndex, int endIndex)
     for (int index = startIndex; index<endIndex; ++index)
     {
         MyImageData newData = d->imageLoadingRunningFutures.at(futureIndex).resultAt(index);
-//         kDebug()<<"future"<<newData.url<<newData.coordinates.geoUrl();
+//         kDebug(51006)<<"future"<<newData.url<<newData.coordinates.geoUrl();
 
         d->imageLoadingBuncher << newData;
     }
@@ -369,7 +369,7 @@ void MainWindow::slotScheduleImagesForLoading(const KUrl::List imagesToSchedule)
 
 void MainWindow::slotImageLoadingBunchReady()
 {
-    kDebug()<<"slotImageLoadingBunchReady";
+    kDebug(51006)<<"slotImageLoadingBunchReady";
 
     for (int i=0; i<d->imageLoadingBuncher.count(); ++i)
     {
