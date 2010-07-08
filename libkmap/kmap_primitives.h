@@ -1,18 +1,23 @@
-/* ============================================================
+/** ===========================================================
  *
- * Date        : 2009-12-01
- * Description : Primitive datatypes for KMap
+ * This file is a part of digiKam project
+ * <a href="http://www.digikam.org">http://www.digikam.org</a>
  *
- * Copyright (C) 2009,2010 by Michael G. Hansen <mike at mghansen dot de>
+ * @date   2009-12-01
+ * @brief  Primitive datatypes for KMap
+ *
+ * @author Copyright (C) 2009-2010 by Michael G. Hansen
+ *         <a href="mailto:mike at mghansen dot de">mike at mghansen dot de</a>
  *
  * This program is free software; you can redistribute it
  * and/or modify it under the terms of the GNU General
  * Public License as published by the Free Software Foundation;
- * either version 2, or (at your option) any later version.
+ * either version 2, or (at your option)
+ * any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * ============================================================ */
@@ -77,45 +82,47 @@ class KMAP_EXPORT WMWGeoCoordinate
 {
 public:
 
-    enum HasFlag {
-        HasNothing = 0,
-        HasLatitude = 1,
-        HasLongitude = 2,
+    enum HasFlag
+    {
+        HasNothing     = 0,
+        HasLatitude    = 1,
+        HasLongitude   = 2,
         HasCoordinates = 3,
-        HasAltitude = 4
+        HasAltitude    = 4
     };
 
     Q_DECLARE_FLAGS(HasFlags, HasFlag)
 
-    typedef QList<WMWGeoCoordinate> List;
+    typedef QList<WMWGeoCoordinate>                   List;
     typedef QPair<WMWGeoCoordinate, WMWGeoCoordinate> Pair;
-    typedef QList<WMWGeoCoordinate::Pair> PairList;
+    typedef QList<WMWGeoCoordinate::Pair>             PairList;
+
     static Pair makePair(const qreal lat1, const qreal lon1, const qreal lat2, const qreal lon2)
     {
         return Pair(WMWGeoCoordinate(lat1, lon1), WMWGeoCoordinate(lat2, lon2));
     }
 
     WMWGeoCoordinate()
-    : m_lat(0.0),
-      m_lon(0.0),
-      m_alt(0.0),
-      m_hasFlags(HasNothing)
+        : m_lat(0.0),
+          m_lon(0.0),
+          m_alt(0.0),
+          m_hasFlags(HasNothing)
     {
     }
 
     WMWGeoCoordinate(const double inLat, const double inLon)
-    : m_lat(inLat),
-      m_lon(inLon),
-      m_alt(0.0),
-      m_hasFlags(HasCoordinates)
+        : m_lat(inLat),
+        m_lon(inLon),
+        m_alt(0.0),
+        m_hasFlags(HasCoordinates)
     {
     }
 
     WMWGeoCoordinate(const double inLat, const double inLon, const double inAlt)
-    : m_lat(inLat),
-      m_lon(inLon),
-      m_alt(inAlt),
-      m_hasFlags(HasCoordinates|HasAltitude)
+        : m_lat(inLat),
+        m_lon(inLon),
+        m_alt(inAlt),
+        m_hasFlags(HasCoordinates|HasAltitude)
     {
     }
 
@@ -124,14 +131,14 @@ public:
     double alt() const { return m_alt; }
 
     bool hasCoordinates() const { return m_hasFlags.testFlag(HasCoordinates); }
-    bool hasLatitude() const { return m_hasFlags.testFlag(HasLatitude); }
-    bool hasLongitude() const { return m_hasFlags.testFlag(HasLongitude); }
+    bool hasLatitude() const    { return m_hasFlags.testFlag(HasLatitude);    }
+    bool hasLongitude() const   { return m_hasFlags.testFlag(HasLongitude);   }
 
     void setLatLon(const double inLat, const double inLon)
     {
-        m_lat = inLat;
-        m_lon = inLon;
-        m_hasFlags|=HasCoordinates;
+        m_lat      = inLat;
+        m_lon      = inLon;
+        m_hasFlags |= HasCoordinates;
     }
 
     bool hasAltitude() const { return m_hasFlags.testFlag(HasAltitude); }
@@ -140,13 +147,13 @@ public:
 
     void setAlt(const double inAlt)
     {
-        m_hasFlags|=HasAltitude;
-        m_alt = inAlt;
+        m_hasFlags |= HasAltitude;
+        m_alt      = inAlt;
     }
 
     void clearAlt()
     {
-        m_hasFlags&=~HasAltitude;
+        m_hasFlags &= ~HasAltitude;
     }
 
     void clear()
@@ -154,8 +161,8 @@ public:
         m_hasFlags = HasNothing;
     }
 
-    QString altString() const { return m_hasFlags.testFlag(HasAltitude) ? QString::number(m_alt, 'g', 12) : QString(); }
-    QString latString() const { return m_hasFlags.testFlag(HasLatitude) ? QString::number(m_lat, 'g', 12) : QString(); }
+    QString altString() const { return m_hasFlags.testFlag(HasAltitude)  ? QString::number(m_alt, 'g', 12) : QString(); }
+    QString latString() const { return m_hasFlags.testFlag(HasLatitude)  ? QString::number(m_lat, 'g', 12) : QString(); }
     QString lonString() const { return m_hasFlags.testFlag(HasLongitude) ? QString::number(m_lon, 'g', 12) : QString(); }
 
     QString geoUrl() const
@@ -177,7 +184,9 @@ public:
 
     bool sameLonLatAs(const WMWGeoCoordinate& other) const
     {
-        return m_hasFlags.testFlag(HasCoordinates)&&other.m_hasFlags.testFlag(HasCoordinates)&&(m_lat==other.m_lat)&&(m_lon==other.m_lon);
+        return m_hasFlags.testFlag(HasCoordinates) &&
+               other.m_hasFlags.testFlag(HasCoordinates) &&
+               (m_lat==other.m_lat)&&(m_lon==other.m_lon);
     }
 
     static WMWGeoCoordinate fromGeoUrl(const QString& url, bool* const parsedOkay = 0)
@@ -237,9 +246,9 @@ public:
 
 private:
 
-    double m_lat;
-    double m_lon;
-    double m_alt;
+    double   m_lat;
+    double   m_lon;
+    double   m_alt;
     HasFlags m_hasFlags;
 };
 
@@ -250,7 +259,7 @@ enum WMWSelectionState
 {
     WMWSelectedNone = 0,
     WMWSelectedSome = 1,
-    WMWSelectedAll = 2
+    WMWSelectedAll  = 2
 };
 
 class KMAP_EXPORT WMWCluster
@@ -260,24 +269,24 @@ public:
     typedef QList<WMWCluster> List;
 
     WMWCluster()
-    : tileIndicesList(),
-      markerCount(0),
-      markerSelectedCount(0),
-      coordinates(),
-      pixelPos(),
-      selectedState(WMWSelectedNone),
-      representativeMarkers(),
-      pixmapSize(),
-      pixmapOffset()
+        : tileIndicesList(),
+        markerCount(0),
+        markerSelectedCount(0),
+        coordinates(),
+        pixelPos(),
+        selectedState(WMWSelectedNone),
+        representativeMarkers(),
+        pixmapSize(),
+        pixmapOffset()
     {
     }
 
-    QList<QIntList> tileIndicesList;
-    int markerCount;
-    int markerSelectedCount;
-    WMWGeoCoordinate coordinates;
-    QPoint pixelPos;
-    WMWSelectionState selectedState;
+    QList<QIntList>     tileIndicesList;
+    int                 markerCount;
+    int                 markerSelectedCount;
+    WMWGeoCoordinate    coordinates;
+    QPoint              pixelPos;
+    WMWSelectionState   selectedState;
     QMap<int, QVariant> representativeMarkers;
 
     enum PixmapType
@@ -297,8 +306,10 @@ class KMap;
 
 class KMAP_EXPORT WMWRepresentativeChooser : public QObject
 {
-Q_OBJECT
+    Q_OBJECT
+
 public:
+
     WMWRepresentativeChooser(QObject* const parent = 0);
     virtual ~WMWRepresentativeChooser();
 
@@ -307,20 +318,22 @@ public:
     virtual bool indicesEqual(const QVariant& indexA, const QVariant& indexB) = 0;
 
 Q_SIGNALS:
+
     void signalThumbnailAvailableForIndex(const QVariant& index, const QPixmap& pixmap);
 };
 
 class KMAP_EXPORT WMWModelHelper : public QObject
 {
-Q_OBJECT
+    Q_OBJECT
+
 public:
 
     enum Flag
     {
-        FlagNull = 0,
+        FlagNull    = 0,
         FlagVisible = 1,
         FlagMovable = 2,
-        FlagSnaps = 4
+        FlagSnaps   = 4
     };
 
     Q_DECLARE_FLAGS(Flags, Flag)
@@ -346,23 +359,23 @@ class WMWSharedData : public QSharedData
 {
 public:
     WMWSharedData()
-    : QSharedData(),
-      worldMapWidget(0),
-      visibleMarkers(),
-      markerModel(0),
-      clusterList(),
-      displayMarkersModel(0),
-      displayMarkersCoordinatesRole(0),
-      inEditMode(false),
-      editEnabled(true),
-      haveMovingCluster(false),
-      markerPixmap(),
-      markerPixmaps(),
-      representativeChooser(0),
-      previewSingleItems(true),
-      previewGroupedItems(true),
-      showNumbersOnItems(true),
-      sortKey(0)
+        : QSharedData(),
+        worldMapWidget(0),
+        visibleMarkers(),
+        markerModel(0),
+        clusterList(),
+        displayMarkersModel(0),
+        displayMarkersCoordinatesRole(0),
+        inEditMode(false),
+        editEnabled(true),
+        haveMovingCluster(false),
+        markerPixmap(),
+        markerPixmaps(),
+        representativeChooser(0),
+        previewSingleItems(true),
+        previewGroupedItems(true),
+        showNumbersOnItems(true),
+        sortKey(0)
     {
         QStringList markerColors;
         markerColors << "00ff00" << "00ffff" << "ff0000" << "ff7f00" << "ffff00";
@@ -380,23 +393,23 @@ public:
         markerPixmap = markerPixmaps["00ff00"];
     }
 
-    KMap* worldMapWidget;
-    QIntList visibleMarkers;
-    MarkerModel* markerModel;
-    WMWCluster::List clusterList;
-    QList<WMWModelHelper*> ungroupedModels;
-    QAbstractItemModel* displayMarkersModel;
-    int displayMarkersCoordinatesRole;
-    bool inEditMode;
-    bool editEnabled;
-    bool haveMovingCluster;
-    QPixmap markerPixmap;
-    QMap<QString, QPixmap> markerPixmaps;
+    KMap*                     worldMapWidget;
+    QIntList                  visibleMarkers;
+    MarkerModel*              markerModel;
+    WMWCluster::List          clusterList;
+    QList<WMWModelHelper*>    ungroupedModels;
+    QAbstractItemModel*       displayMarkersModel;
+    int                       displayMarkersCoordinatesRole;
+    bool                      inEditMode;
+    bool                      editEnabled;
+    bool                      haveMovingCluster;
+    QPixmap                   markerPixmap;
+    QMap<QString, QPixmap>    markerPixmaps;
     WMWRepresentativeChooser* representativeChooser;
-    bool previewSingleItems;
-    bool previewGroupedItems;
-    bool showNumbersOnItems;
-    int sortKey;
+    bool                      previewSingleItems;
+    bool                      previewGroupedItems;
+    bool                      showNumbersOnItems;
+    int                       sortKey;
 };
 
 } /* KMapIface */
@@ -419,13 +432,13 @@ class KMAP_EXPORT WMWAltitudeLookup
 {
 public:
 
-    WMWGeoCoordinate coordinates;
-    QVariant data;
+    WMWGeoCoordinate                 coordinates;
+    QVariant                         data;
 
     typedef QList<WMWAltitudeLookup> List;
 };
 
-} /* KMapIface */
+} /* namespace KMapIface */
 
 inline QDebug operator<<(QDebug debugOut, const KMapIface::WMWGeoCoordinate& coordinate)
 {

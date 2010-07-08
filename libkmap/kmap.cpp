@@ -1,18 +1,23 @@
-/* ============================================================
+/** ===========================================================
  *
- * Date        : 2009-12-01
- * Description : KMap
+ * This file is a part of digiKam project
+ * <a href="http://www.digikam.org">http://www.digikam.org</a>
  *
- * Copyright (C) 2009,2010 by Michael G. Hansen <mike at mghansen dot de>
+ * @date   2009-12-01
+ * @brief  world map widget library
+ *
+ * @author Copyright (C) 2009-2010 by Michael G. Hansen
+ *         <a href="mailto:mike at mghansen dot de">mike at mghansen dot de</a>
  *
  * This program is free software; you can redistribute it
  * and/or modify it under the terms of the GNU General
  * Public License as published by the Free Software Foundation;
- * either version 2, or (at your option) any later version.
+ * either version 2, or (at your option)
+ * any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * ============================================================ */
@@ -117,44 +122,44 @@ public:
     }
 
     QList<AltitudeBackend*> loadedAltitudeBackends;
-    QList<MapBackend*> loadedBackends;
-    MapBackend* currentBackend;
-    bool currentBackendReady;
-    QString currentBackendName;
-    QStackedLayout* stackedLayout;
+    QList<MapBackend*>      loadedBackends;
+    MapBackend*             currentBackend;
+    bool                    currentBackendReady;
+    QString                 currentBackendName;
+    QStackedLayout*         stackedLayout;
 
     // these values are cached in case the backend is not ready:
-    WMWGeoCoordinate cacheCenterCoordinate;
-    QString cacheZoom;
+    WMWGeoCoordinate        cacheCenterCoordinate;
+    QString                 cacheZoom;
 
     // actions for controlling the widget
-    QMenu* configurationMenu;
-    QActionGroup* actionGroupBackendSelection;
-    KAction* actionZoomIn;
-    KAction* actionZoomOut;
-    KAction* actionBrowseMode;
-    KAction* actionEditMode;
-    QActionGroup* actionGroupMode;
-    QWidget* browseModeControlsHolder;
-    QPointer<KHBox> controlWidget;
-    KAction* actionPreviewSingleItems;
-    KAction* actionPreviewGroupedItems;
-    KAction* actionShowNumbersOnItems;
+    QMenu*                  configurationMenu;
+    QActionGroup*           actionGroupBackendSelection;
+    KAction*                actionZoomIn;
+    KAction*                actionZoomOut;
+    KAction*                actionBrowseMode;
+    KAction*                actionEditMode;
+    QActionGroup*           actionGroupMode;
+    QWidget*                browseModeControlsHolder;
+    QPointer<KHBox>         controlWidget;
+    KAction*                actionPreviewSingleItems;
+    KAction*                actionPreviewGroupedItems;
+    KAction*                actionShowNumbersOnItems;
 
-    bool lazyReclusteringRequested;
-    bool clustersDirty;
-    bool editModeAvailable;
+    bool                    lazyReclusteringRequested;
+    bool                    clustersDirty;
+    bool                    editModeAvailable;
 
-    DragDropHandler* dragDropHandler;
-    bool doUpdateMarkerCoordinatesInModel;
+    DragDropHandler*        dragDropHandler;
+    bool                    doUpdateMarkerCoordinatesInModel;
 
-    QMenu *sortMenu;
-    int thumbnailSize;
-    int groupingRadius;
-    int editGroupingRadius;
-    KAction* actionIncreaseThumbnailSize;
-    KAction* actionDecreaseThumbnailSize;
-    KHBox* hBoxForAdditionalControlWidgetItems;
+    QMenu*                  sortMenu;
+    int                     thumbnailSize;
+    int                     groupingRadius;
+    int                     editGroupingRadius;
+    KAction*                actionIncreaseThumbnailSize;
+    KAction*                actionDecreaseThumbnailSize;
+    KHBox*                  hBoxForAdditionalControlWidgetItems;
 };
 
 KMap::KMap(QWidget* const parent)
@@ -847,7 +852,7 @@ void KMap::updateClusters()
                 }
             }
         }
-        
+
         if (markerMax==0)
             break;
 
@@ -1426,7 +1431,7 @@ void KMap::dropEvent(QDropEvent* event)
 //     {
 //         s->markerModel->moveMarker(dragData->itemIndices.at(i), dropCoordinates);
 //     }
-    
+
 }
 
 void KMap::dragLeaveEvent(QDragLeaveEvent* event)
@@ -1529,7 +1534,7 @@ QPixmap KMap::getDecoratedPixmapForCluster(const int clusterId, const WMWSelecti
 {
     const int circleRadius = d->thumbnailSize/2;
     WMWCluster& cluster = s->clusterList[clusterId];
-    
+
     int markerCount = cluster.markerCount;
     WMWSelectionState selectedState = cluster.selectedState;
     if (selectedStateOverride)
