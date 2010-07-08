@@ -1,18 +1,23 @@
-/* ============================================================
+/** ===========================================================
  *
- * Date        : 2009-12-01
- * Description : Marble-backend for WorldMapWidget2
+ * This file is a part of digiKam project
+ * <a href="http://www.digikam.org">http://www.digikam.org</a>
  *
- * Copyright (C) 2009,2010 by Michael G. Hansen <mike at mghansen dot de>
+ * @date   2009-12-08
+ * @brief  Marble-backend for WorldMapWidget2
+ *
+ * @author Copyright (C) 2009-2010 by Michael G. Hansen
+ *         <a href="mailto:mike at mghansen dot de">mike at mghansen dot de</a>
  *
  * This program is free software; you can redistribute it
  * and/or modify it under the terms of the GNU General
  * Public License as published by the Free Software Foundation;
- * either version 2, or (at your option) any later version.
+ * either version 2, or (at your option)
+ * any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * ============================================================ */
@@ -31,6 +36,9 @@
 #include <kconfiggroup.h>
 #include <klocale.h>
 #include <kstandarddirs.h>
+
+// Marble widget includes
+
 #include <marble/GeoPainter.h>
 #include <marble/MarbleMap.h>
 #include <marble/MarbleModel.h>
@@ -87,30 +95,30 @@ public:
 
     QPointer<MarbleWidget> marbleWidget;
 
-    QActionGroup* actionGroupMapTheme;
-    QActionGroup* actionGroupProjection;
-    QActionGroup* actionGroupFloatItems;
-    KAction* actionShowCompass;
-    KAction* actionShowOverviewMap;
-    KAction* actionShowScaleBar;
+    QActionGroup*          actionGroupMapTheme;
+    QActionGroup*          actionGroupProjection;
+    QActionGroup*          actionGroupFloatItems;
+    KAction*               actionShowCompass;
+    KAction*               actionShowOverviewMap;
+    KAction*               actionShowScaleBar;
 
-    QString cacheMapTheme;
-    QString cacheProjection;
-    bool cacheShowCompass;
-    bool cacheShowScaleBar;
-    bool cacheShowOverviewMap;
-    int cacheZoom;
-    bool havePotentiallyMouseMovingObject;
-    bool haveMouseMovingObject;
-    int mouseMoveClusterIndex;
-    QPersistentModelIndex mouseMoveMarkerIndex;
-    WMWGeoCoordinate mouseMoveObjectCoordinates;
-    QPoint mouseMoveCenterOffset;
-    int dragDropMarkerCount;
-    QPoint dragDropMarkerPos;
-    int clustersDirtyCacheProjection;
-    qreal clustersDirtyCacheLat;
-    qreal clustersDirtyCacheLon;
+    QString                cacheMapTheme;
+    QString                cacheProjection;
+    bool                   cacheShowCompass;
+    bool                   cacheShowScaleBar;
+    bool                   cacheShowOverviewMap;
+    int                    cacheZoom;
+    bool                   havePotentiallyMouseMovingObject;
+    bool                   haveMouseMovingObject;
+    int                    mouseMoveClusterIndex;
+    QPersistentModelIndex  mouseMoveMarkerIndex;
+    WMWGeoCoordinate       mouseMoveObjectCoordinates;
+    QPoint                 mouseMoveCenterOffset;
+    int                    dragDropMarkerCount;
+    QPoint                 dragDropMarkerPos;
+    int                    clustersDirtyCacheProjection;
+    qreal                  clustersDirtyCacheLat;
+    qreal                  clustersDirtyCacheLon;
 };
 
 BackendMarble::BackendMarble(const QExplicitlySharedDataPointer<WMWSharedData>& sharedData, QObject* const parent)
@@ -146,7 +154,7 @@ BackendMarble::~BackendMarble()
 
 QString BackendMarble::backendName() const
 {
-    return "marble";
+    return QString("marble");
 }
 
 QString BackendMarble::backendHumanName() const
@@ -770,13 +778,13 @@ bool BackendMarble::eventFilter(QObject *object, QEvent *event)
 //             {
 //                 const QModelIndex currentIndex = s->specialMarkersModel->index(row, 0);
 //                 const WMWGeoCoordinate currentCoordinates = s->specialMarkersModel->data(currentIndex, s->specialMarkersCoordinatesRole).value<WMWGeoCoordinate>();
-// 
+//
 //                 QPoint markerPoint;
 //                 if (!screenCoordinates(currentCoordinates, &markerPoint))
 //                 {
 //                     continue;
 //                 }
-// 
+//
 //                 const int markerPixmapHeight = s->markerPixmap.height();
 //                 const int markerPixmapWidth = s->markerPixmap.width();
 //                 const QRect markerRect(markerPoint.x()-markerPixmapWidth/2, markerPoint.y()-markerPixmapHeight, markerPixmapWidth, markerPixmapHeight);
@@ -784,14 +792,14 @@ bool BackendMarble::eventFilter(QObject *object, QEvent *event)
 //                 {
 //                     continue;
 //                 }
-// 
+//
 //                 // the user clicked on a marker:
 //                 d->mouseMoveMarkerIndex = QPersistentModelIndex(currentIndex);
 //                 d->mouseMoveCenterOffset = mouseEvent->pos() - markerPoint;
 //                 d->mouseMoveObjectCoordinates = currentCoordinates;
 //                 doFilterEvent = true;
 //                 d->havePotentiallyMouseMovingObject = true;
-// 
+//
 //                 break;
 //             }
 //         }
@@ -953,10 +961,10 @@ bool BackendMarble::eventFilter(QObject *object, QEvent *event)
 //         d->dragDropMarkerCount = dragData->itemCount;
 //     }
 //     d->marbleWidget->update();
-// 
+//
 //     // TODO: hide dragged markers on the map
 // }
-// 
+//
 // void BackendMarble::updateDragDropMarkerPosition(const QPoint& pos)
 // {
 //     d->dragDropMarkerPos = pos;

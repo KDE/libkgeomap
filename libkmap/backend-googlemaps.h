@@ -106,9 +106,12 @@ private Q_SLOTS:
 
 private:
 
-    BackendGoogleMapsPrivate* const d;
     void loadInitialHTML();
     void updateZoomMinMaxCache();
+
+private:
+
+    BackendGoogleMapsPrivate* const d;
 };
 
 } /* namespace KMapIface */

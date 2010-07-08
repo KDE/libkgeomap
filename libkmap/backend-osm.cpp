@@ -1,18 +1,23 @@
-/* ============================================================
+/** ===========================================================
  *
- * Date        : 2009-12-01
- * Description : OpenStreetMap-backend for WorldMapWidget2
+ * This file is a part of digiKam project
+ * <a href="http://www.digikam.org">http://www.digikam.org</a>
  *
- * Copyright (C) 2009,2010 by Michael G. Hansen <mike at mghansen dot de>
+ * @date   2009-12-01
+ * @brief  OpenStreetMap-backend for WorldMapWidget2
+ *
+ * @author Copyright (C) 2009-2010 by Michael G. Hansen
+ *         <a href="mailto:mike at mghansen dot de">mike at mghansen dot de</a>
  *
  * This program is free software; you can redistribute it
  * and/or modify it under the terms of the GNU General
  * Public License as published by the Free Software Foundation;
- * either version 2, or (at your option) any later version.
+ * either version 2, or (at your option)
+ * any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * ============================================================ */
@@ -54,12 +59,12 @@ public:
     {
     }
 
-    QPointer<HTMLWidget> htmlWidget;
-    QPointer<QWidget> htmlWidgetWrapper;
-    bool isReady;
+    QPointer<HTMLWidget>                      htmlWidget;
+    QPointer<QWidget>                         htmlWidgetWrapper;
+    bool                                      isReady;
 
-    int cacheZoom;
-    WMWGeoCoordinate cacheCenter;
+    int                                       cacheZoom;
+    WMWGeoCoordinate                          cacheCenter;
     QPair<WMWGeoCoordinate, WMWGeoCoordinate> cacheBounds;
 };
 
@@ -68,8 +73,8 @@ BackendOSM::BackendOSM(const QExplicitlySharedDataPointer<WMWSharedData>& shared
 {
     d->htmlWidgetWrapper = new QWidget();
     d->htmlWidgetWrapper->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    d->htmlWidget = new HTMLWidget(d->htmlWidgetWrapper);
-    d->htmlWidgetWrapper->resize(400,400);
+    d->htmlWidget        = new HTMLWidget(d->htmlWidgetWrapper);
+    d->htmlWidgetWrapper->resize(400, 400);
 
     connect(d->htmlWidget, SIGNAL(signalJavaScriptReady()),
             this, SLOT(slotHTMLInitialized()));
@@ -97,7 +102,7 @@ BackendOSM::~BackendOSM()
 
 QString BackendOSM::backendName() const
 {
-    return "osm";
+    return QString("osm");
 }
 
 QString BackendOSM::backendHumanName() const
@@ -147,7 +152,7 @@ void BackendOSM::zoomIn()
 {
     if (!d->isReady)
         return;
-    
+
     d->htmlWidget->runScript(QString("wmwZoomIn();"));
 }
 
@@ -491,7 +496,7 @@ int BackendOSM::getMarkerModelLevel()
     else { tileLevel = s->markerModel->maxLevel()-1; }
 
     KMAP_ASSERT(tileLevel<=s->markerModel->maxLevel()-1);
-    
+
     return tileLevel;
 }
 
@@ -500,5 +505,4 @@ WMWGeoCoordinate::PairList BackendOSM::getNormalizedBounds()
     return WMWHelperNormalizeBounds(d->cacheBounds);
 }
 
-} /* KMapIface */
-
+} /* namespace KMapIface */

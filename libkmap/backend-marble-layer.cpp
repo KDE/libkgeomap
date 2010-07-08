@@ -1,18 +1,23 @@
-/* ============================================================
+/** ===========================================================
  *
- * Date        : 2009-12-08
- * Description : Marble-backend for WorldMapWidget2
+ * This file is a part of digiKam project
+ * <a href="http://www.digikam.org">http://www.digikam.org</a>
  *
- * Copyright (C) 2009 by Michael G. Hansen <mike at mghansen dot de>
+ * @date   2009-12-08
+ * @brief  Marble-backend for WorldMapWidget2
+ *
+ * @author Copyright (C) 2009-2010 by Michael G. Hansen
+ *         <a href="mailto:mike at mghansen dot de">mike at mghansen dot de</a>
  *
  * This program is free software; you can redistribute it
  * and/or modify it under the terms of the GNU General
  * Public License as published by the Free Software Foundation;
- * either version 2, or (at your option) any later version.
+ * either version 2, or (at your option)
+ * any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * ============================================================ */
@@ -33,17 +38,16 @@ namespace KMapIface
 BMLayer::BMLayer(BackendMarble* const pMarbleBackend)
        : marbleBackend(pMarbleBackend)
 {
-
 }
 
 BMLayer::~BMLayer()
 {
 }
 
-bool BMLayer::render(Marble::GeoPainter *painter, Marble::ViewportParams *viewport,
-                        const QString& renderPos, Marble::GeoSceneLayer *layer)
+bool BMLayer::render(Marble::GeoPainter* painter, Marble::ViewportParams* viewport,
+                     const QString& renderPos, Marble::GeoSceneLayer* layer)
 {
-    if (marbleBackend && (renderPos == "HOVERS_ABOVE_SURFACE"))
+    if (marbleBackend && (renderPos == QString("HOVERS_ABOVE_SURFACE")))
     {
         marbleBackend->marbleCustomPaint(painter);
         return true;
@@ -59,6 +63,4 @@ QStringList BMLayer::renderPosition () const
     return layerNames;
 }
 
-
-} /* KMapIface */
-
+} /* namespace KMapIface */
