@@ -71,10 +71,10 @@ inline void KMapIface_assert(const char* const condition, const char* const file
     }
     else
     {
-        kDebug(51006)<<debugString;
+        kDebug()<<debugString;
     }
 #else
-    kDebug(51006)<<debugString;
+    kDebug()<<debugString;
 #endif /* KMAP_HAVE_VALGRIND */
 }
 

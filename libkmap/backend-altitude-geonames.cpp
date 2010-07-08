@@ -184,7 +184,7 @@ void BackendAltitudeGeonames::slotResult(KJob* kJob)
             {
                 bool haveAltitude = false;
                 qreal altitude = altitudeString.toFloat(&haveAltitude);
-                kDebug(51006)<<altitude;
+                kDebug()<<altitude;
 
                 // -32786 means that geonames.org has no data for these coordinates
                 if (altitude==-32768)
@@ -193,7 +193,7 @@ void BackendAltitudeGeonames::slotResult(KJob* kJob)
                 }
 
                 const WMWGeoCoordinate firstJobCoordinates = myJob.lookups.at(jobIndex).coordinates;
-                kDebug(51006)<<firstJobCoordinates.geoUrl();
+                kDebug()<<firstJobCoordinates.geoUrl();
                 for (; jobIndex<myJob.lookups.count(); ++jobIndex)
                 {
                     if (!firstJobCoordinates.sameLonLatAs(myJob.lookups.at(jobIndex).coordinates))

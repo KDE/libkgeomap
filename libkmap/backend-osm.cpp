@@ -122,7 +122,7 @@ WMWGeoCoordinate BackendOSM::getCenter() const
 
 void BackendOSM::setCenter(const WMWGeoCoordinate& coordinate)
 {
-    kDebug(51006)<<isReady()<<coordinate.geoUrl();
+    kDebug()<<isReady()<<coordinate.geoUrl();
     d->cacheCenter = coordinate;
 
     if (isReady())
@@ -138,7 +138,7 @@ bool BackendOSM::isReady() const
 
 void BackendOSM::slotHTMLInitialized()
 {
-    kDebug(51006)<<1;
+    kDebug()<<1;
     d->isReady = true;
     d->htmlWidget->runScript(QString("document.getElementById(\"map_canvas\").style.height=\"%1px\"").arg(d->htmlWidgetWrapper->height()));
 
@@ -306,19 +306,19 @@ void BackendOSM::slotHTMLEvents(const QStringList& events)
         else if (eventCode=="do")
         {
             // debug output:
-            kDebug(51006)<<QString("javascript:%1").arg(eventParameter);
+            kDebug()<<QString("javascript:%1").arg(eventParameter);
         }
     }
 
     if (!movedClusters.isEmpty())
     {
-        kDebug(51006)<<movedClusters;
+        kDebug()<<movedClusters;
         emit(signalClustersMoved(movedClusters));
     }
 
     if (!movedMarkers.isEmpty())
     {
-        kDebug(51006)<<movedMarkers;
+        kDebug()<<movedMarkers;
         emit(signalSpecialMarkersMoved(movedMarkers));
     }
 
@@ -354,7 +354,7 @@ void BackendOSM::slotHTMLEvents(const QStringList& events)
 
 void BackendOSM::updateClusters()
 {
-    kDebug(51006)<<"start updateclusters";
+    kDebug()<<"start updateclusters";
     // re-transfer the clusters to the map:
     KMAP_ASSERT(isReady());
     if (!isReady())
@@ -388,7 +388,7 @@ void BackendOSM::updateClusters()
                 .arg(labelText)
             );
     }
-    kDebug(51006)<<"end updateclusters";
+    kDebug()<<"end updateclusters";
 }
 
 bool BackendOSM::screenCoordinates(const WMWGeoCoordinate& coordinates, QPoint* const point)
@@ -442,7 +442,7 @@ void BackendOSM::setZoom(const QString& newZoom)
     KMAP_ASSERT(myZoomString.startsWith("googlemaps:"));
 
     const int myZoom = myZoomString.mid(QString("googlemaps:").length()).toInt();
-    kDebug(51006)<<myZoom;
+    kDebug()<<myZoom;
 
     d->cacheZoom = myZoom;
 

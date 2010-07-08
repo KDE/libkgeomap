@@ -411,7 +411,7 @@ void BackendMarble::marbleCustomPaint(Marble::GeoPainter* painter)
          (d->clustersDirtyCacheLon != d->marbleWidget->centerLongitude()) ||
          (d->clustersDirtyCacheProjection != d->marbleWidget->projection()) )
     {
-//         kDebug(51006)<<d->marbleWidget->centerLatitude()<<d->marbleWidget->centerLongitude()<<d->marbleWidget->projection();
+//         kDebug()<<d->marbleWidget->centerLatitude()<<d->marbleWidget->centerLongitude()<<d->marbleWidget->projection();
         d->clustersDirtyCacheLat = d->marbleWidget->centerLatitude();
         d->clustersDirtyCacheLon = d->marbleWidget->centerLongitude();
         d->clustersDirtyCacheProjection = d->marbleWidget->projection();
@@ -711,7 +711,7 @@ void BackendMarble::setZoom(const QString& newZoom)
     KMAP_ASSERT(myZoomString.startsWith("marble:"));
 
     const int myZoom = myZoomString.mid(QString("marble:").length()).toInt();
-    kDebug(51006)<<myZoom;
+    kDebug()<<myZoom;
 
     d->cacheZoom = myZoom;
     d->marbleWidget->zoomView(myZoom);
@@ -731,7 +731,7 @@ int BackendMarble::getMarkerModelLevel()
 WMWGeoCoordinate::PairList BackendMarble::getNormalizedBounds()
 {
     const GeoDataLatLonAltBox marbleBounds = d->marbleWidget->map()->viewParams()->viewport()->viewLatLonAltBox();
-//     kDebug(51006)<<marbleBounds.toString(GeoDataCoordinates::Degree);
+//     kDebug()<<marbleBounds.toString(GeoDataCoordinates::Degree);
 
     const WMWGeoCoordinate::Pair boundsPair = WMWGeoCoordinate::makePair(
             marbleBounds.south(GeoDataCoordinates::Degree),
@@ -740,8 +740,8 @@ WMWGeoCoordinate::PairList BackendMarble::getNormalizedBounds()
             marbleBounds.east(GeoDataCoordinates::Degree)
         );
 
-//     kDebug(51006)<<boundsPair.first<<boundsPair.second;
-//     kDebug(51006)<<WMWHelperNormalizeBounds(boundsPair);
+//     kDebug()<<boundsPair.first<<boundsPair.second;
+//     kDebug()<<WMWHelperNormalizeBounds(boundsPair);
 
     return WMWHelperNormalizeBounds(boundsPair);
 }
@@ -973,7 +973,7 @@ bool BackendMarble::eventFilter(QObject *object, QEvent *event)
 
 void BackendMarble::updateActionAvailability()
 {
-    kDebug(51006)<<d->cacheZoom<<d->marbleWidget->maximumZoom()<<d->marbleWidget->minimumZoom();
+    kDebug()<<d->cacheZoom<<d->marbleWidget->maximumZoom()<<d->marbleWidget->minimumZoom();
     s->worldMapWidget->getControlAction("zoomin")->setEnabled(d->cacheZoom<d->marbleWidget->maximumZoom());
     s->worldMapWidget->getControlAction("zoomout")->setEnabled(d->cacheZoom>d->marbleWidget->minimumZoom());
 
@@ -996,7 +996,7 @@ void BackendMarble::updateActionAvailability()
 
 void BackendMarble::slotThumbnailAvailableForIndex(const QVariant& index, const QPixmap& pixmap)
 {
-    kDebug(51006)<<index<<pixmap.size();
+    kDebug()<<index<<pixmap.size();
     if (pixmap.isNull() || s->inEditMode)
         return;
 

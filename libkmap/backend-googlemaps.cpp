@@ -210,7 +210,7 @@ bool BackendGoogleMaps::isReady() const
 
 void BackendGoogleMaps::slotHTMLInitialized()
 {
-    kDebug(51006) << 1;
+    kDebug() << 1;
     d->isReady = true;
     d->htmlWidget->runScript(QString("wmwWidgetResized(%1, %2)").arg(d->htmlWidgetWrapper->width()).arg(d->htmlWidgetWrapper->height()));
 
@@ -248,7 +248,7 @@ QString BackendGoogleMaps::getMapType() const
 void BackendGoogleMaps::setMapType(const QString& newMapType)
 {
     d->cacheMapType = newMapType;
-    kDebug(51006)<<newMapType;
+    kDebug()<<newMapType;
 
     if (isReady())
     {
@@ -533,25 +533,25 @@ void BackendGoogleMaps::slotHTMLEvents(const QStringList& events)
         else if (eventCode == "do")
         {
             // debug output:
-            kDebug(51006) << QString("javascript:%1").arg(eventParameter);
+            kDebug() << QString("javascript:%1").arg(eventParameter);
         }
     }
 
     if (!movedClusters.isEmpty())
     {
-        kDebug(51006)<<movedClusters;
+        kDebug()<<movedClusters;
         emit(signalClustersMoved(movedClusters, QPair<int, QModelIndex>(-1, QModelIndex())));
     }
 
     if (!movedMarkers.isEmpty())
     {
-        kDebug(51006)<<movedMarkers;
+        kDebug()<<movedMarkers;
         emit(signalSpecialMarkersMoved(movedMarkers));
     }
 
     if (!clickedClusters.isEmpty())
     {
-        kDebug(51006)<<clickedClusters;
+        kDebug()<<clickedClusters;
         emit(signalClustersClicked(clickedClusters));
     }
 
@@ -592,7 +592,7 @@ void BackendGoogleMaps::slotHTMLEvents(const QStringList& events)
 
 void BackendGoogleMaps::updateClusters()
 {
-    kDebug(51006) << "start updateclusters";
+    kDebug() << "start updateclusters";
     // re-transfer the clusters to the map:
     KMAP_ASSERT(isReady());
     if (!isReady())
@@ -628,7 +628,7 @@ void BackendGoogleMaps::updateClusters()
             setClusterPixmap(currentIndex, clusterCenterPoint, clusterPixmap);
         }
     }
-    kDebug(51006)<<"end updateclusters";
+    kDebug()<<"end updateclusters";
 }
 
 bool BackendGoogleMaps::screenCoordinates(const WMWGeoCoordinate& coordinates, QPoint* const point)
@@ -739,7 +739,7 @@ void BackendGoogleMaps::setZoom(const QString& newZoom)
     KMAP_ASSERT(myZoomString.startsWith("googlemaps:"));
 
     const int myZoom = myZoomString.mid(QString("googlemaps:").length()).toInt();
-    kDebug(51006) << myZoom;
+    kDebug() << myZoom;
 
     d->cacheZoom = myZoom;
 
@@ -863,7 +863,7 @@ void BackendGoogleMaps::updateZoomMinMaxCache()
 
 void BackendGoogleMaps::slotThumbnailAvailableForIndex(const QVariant& index, const QPixmap& pixmap)
 {
-    kDebug(51006)<<index<<pixmap.size();
+    kDebug()<<index<<pixmap.size();
     if (pixmap.isNull() || s->inEditMode)
         return;
 

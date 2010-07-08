@@ -71,7 +71,7 @@ int main(int argc, char* argv[])
     for (int i=0; i<args->count(); ++i)
     {
         const KUrl argUrl = args->url(i);
-//         kDebug(51006)<<argUrl;
+//         kDebug()<<argUrl;
         imagesList << argUrl;
     }
 
