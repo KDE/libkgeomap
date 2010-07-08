@@ -1,18 +1,23 @@
-/* ============================================================
+/** ===========================================================
  *
- * Date        : 2009-12-01
- * Description : A model to hold the markers
+ * This file is a part of digiKam project
+ * <a href="http://www.digikam.org">http://www.digikam.org</a>
  *
- * Copyright (C) 2009,2010 by Michael G. Hansen <mike at mghansen dot de>
+ * @date   2009-12-01
+ * @brief  A model to hold the markers
+ *
+ * @author Copyright (C) 2009-2010 by Michael G. Hansen
+ *         <a href="mailto:mike at mghansen dot de">mike at mghansen dot de</a>
  *
  * This program is free software; you can redistribute it
  * and/or modify it under the terms of the GNU General
  * Public License as published by the Free Software Foundation;
- * either version 2, or (at your option) any later version.
+ * either version 2, or (at your option)
+ * any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * ============================================================ */
@@ -46,16 +51,17 @@ public:
     class TileIndex
     {
     public:
-        enum Constants {
-            MaxLevel = 9,
-            MaxIndexCount = MaxLevel+1,
-            Tiling = 10,
+        enum Constants
+        {
+            MaxLevel       = 9,
+            MaxIndexCount  = MaxLevel+1,
+            Tiling         = 10,
             MaxLinearIndex = Tiling*Tiling
         };
 
         inline TileIndex()
-        : m_indicesCount(0),
-          m_indices()
+            : m_indicesCount(0),
+              m_indices()
         {
         }
 
@@ -189,12 +195,12 @@ public:
     class Tile
     {
     public:
-        
+
         Tile()
-        : children(),
-          childrenMask(),
-          markerIndices(),
-          selectedCount(0)
+            : children(),
+              childrenMask(),
+              markerIndices(),
+              selectedCount(0)
         {
         }
 
@@ -212,7 +218,7 @@ public:
             children.clear();
             childrenMask.clear();
         }
-    
+
         void prepareForChildren(const QPair<int, int>& childCount)
         {
             prepareForChildren(childCount.first*childCount.second);
@@ -273,10 +279,10 @@ public:
             }
         }
 
-        QVector<Tile*> children;
-        QBitArray childrenMask;
+        QVector<Tile*>               children;
+        QBitArray                    childrenMask;
         QList<QPersistentModelIndex> markerIndices;
-        int selectedCount;
+        int                          selectedCount;
     };
 
     MarkerModel();
@@ -313,6 +319,7 @@ public:
     class NonEmptyIterator
     {
     public:
+
         NonEmptyIterator(MarkerModel* const model, const int level);
         NonEmptyIterator(MarkerModel* const model, const int level, const TileIndex& startIndex, const TileIndex& endIndex);
         NonEmptyIterator(MarkerModel* const model, const int level, const WMWGeoCoordinate::PairList& normalizedMapBounds);
@@ -324,24 +331,28 @@ public:
         MarkerModel* model() const;
 
     private:
+
         bool initializeNextBounds();
         MarkerModelNonEmptyIteratorPrivate* const d;
     };
 
 private Q_SLOTS:
+
     void slotSourceModelRowsInserted(const QModelIndex& parentIndex, int start, int end);
     void slotSourceModelRowsAboutToBeRemoved(const QModelIndex& parentIndex, int start, int end);
     void slotSourceModelDataChanged(const QModelIndex& topLeft, const QModelIndex& bottomRight);
     void slotSelectionChanged(const QItemSelection& selected, const QItemSelection& deselected);
 
 Q_SIGNALS:
+
     void signalTilesOrSelectionChanged();
 
 private:
+
     MarkerModelPrivate* const d;
 };
 
-} /* KMapIface */
+} /* namespace KMapIface */
 
 inline QDebug operator<<(QDebug debugOut, const KMapIface::MarkerModel::TileIndex& tileIndex)
 {
@@ -350,4 +361,3 @@ inline QDebug operator<<(QDebug debugOut, const KMapIface::MarkerModel::TileInde
 }
 
 #endif /* MARKERMODEL_H */
-

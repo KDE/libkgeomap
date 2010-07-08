@@ -1,18 +1,23 @@
-/* ============================================================
+/** ===========================================================
  *
- * Date        : 2009-12-01
- * Description : A model to hold the markers
+ * This file is a part of digiKam project
+ * <a href="http://www.digikam.org">http://www.digikam.org</a>
  *
- * Copyright (C) 2009,2010 by Michael G. Hansen <mike at mghansen dot de>
+ * @date   2009-12-01
+ * @brief  A model to hold the markers
+ *
+ * @author Copyright (C) 2009-2010 by Michael G. Hansen
+ *         <a href="mailto:mike at mghansen dot de">mike at mghansen dot de</a>
  *
  * This program is free software; you can redistribute it
  * and/or modify it under the terms of the GNU General
  * Public License as published by the Free Software Foundation;
- * either version 2, or (at your option) any later version.
+ * either version 2, or (at your option)
+ * any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * ============================================================ */
@@ -27,20 +32,21 @@ typedef QPair<int, int> QIntPair;
 class MarkerModelPrivate
 {
 public:
+
     MarkerModelPrivate()
-    : rootTile(new MarkerModel::Tile()),
-      isDirty(true),
-      markerModel(0),
-      coordinatesRole(0),
-      selectionModel(0)
+        : rootTile(new MarkerModel::Tile()),
+        isDirty(true),
+        markerModel(0),
+        coordinatesRole(0),
+        selectionModel(0)
     {
         rootTile->prepareForChildren(QIntPair(MarkerModel::TileIndex::Tiling, MarkerModel::TileIndex::Tiling));
     }
 
-    MarkerModel::Tile* rootTile;
-    bool isDirty;
-    QAbstractItemModel* markerModel;
-    int coordinatesRole;
+    MarkerModel::Tile*   rootTile;
+    bool                 isDirty;
+    QAbstractItemModel*  markerModel;
+    int                  coordinatesRole;
     QItemSelectionModel* selectionModel;
 };
 
@@ -51,8 +57,8 @@ MarkerModel::MarkerModel()
 
 void MarkerModel::setMarkerModel(QAbstractItemModel* const markerModel, const int coordinatesRole)
 {
-    d->isDirty = true;
-    d->markerModel = markerModel;
+    d->isDirty         = true;
+    d->markerModel     = markerModel;
     d->coordinatesRole = coordinatesRole;
 
     if (d->markerModel!=0)
@@ -303,26 +309,26 @@ class MarkerModelNonEmptyIteratorPrivate
 {
 public:
     MarkerModelNonEmptyIteratorPrivate()
-    : model(0),
-      level(0),
-      startIndex(),
-      endIndex(),
-      currentIndex(),
-      atEnd(false)
+        : model(0),
+          level(0),
+          startIndex(),
+          endIndex(),
+          currentIndex(),
+          atEnd(false)
     {
     }
 
-    MarkerModel* model;
-    int level;
+    MarkerModel*                                                  model;
+    int                                                           level;
 
     QList<QPair<MarkerModel::TileIndex, MarkerModel::TileIndex> > boundsList;
 
-    MarkerModel::TileIndex startIndex;
-    MarkerModel::TileIndex endIndex;
-    MarkerModel::TileIndex currentIndex;
+    MarkerModel::TileIndex                                        startIndex;
+    MarkerModel::TileIndex                                        endIndex;
+    MarkerModel::TileIndex                                        currentIndex;
 
-    bool atEnd;
-    bool atStartOfLevel;
+    bool                                                          atEnd;
+    bool                                                          atStartOfLevel;
 };
 
 MarkerModel::NonEmptyIterator::~NonEmptyIterator()
@@ -331,7 +337,7 @@ MarkerModel::NonEmptyIterator::~NonEmptyIterator()
 }
 
 MarkerModel::NonEmptyIterator::NonEmptyIterator(MarkerModel* const model, const int level)
-: d(new MarkerModelNonEmptyIteratorPrivate())
+           : d(new MarkerModelNonEmptyIteratorPrivate())
 {
     d->model = model;
     KMAP_ASSERT(level<=TileIndex::MaxLevel);
@@ -352,7 +358,7 @@ MarkerModel::NonEmptyIterator::NonEmptyIterator(MarkerModel* const model, const 
 }
 
 MarkerModel::NonEmptyIterator::NonEmptyIterator(MarkerModel* const model, const int level, const TileIndex& startIndex, const TileIndex& endIndex)
-: d(new MarkerModelNonEmptyIteratorPrivate())
+                             : d(new MarkerModelNonEmptyIteratorPrivate())
 {
     d->model = model;
     KMAP_ASSERT(level<=TileIndex::MaxLevel);
@@ -366,7 +372,7 @@ MarkerModel::NonEmptyIterator::NonEmptyIterator(MarkerModel* const model, const 
 }
 
 MarkerModel::NonEmptyIterator::NonEmptyIterator(MarkerModel* const model, const int level, const WMWGeoCoordinate::PairList& normalizedMapBounds)
-: d(new MarkerModelNonEmptyIteratorPrivate())
+                             : d(new MarkerModelNonEmptyIteratorPrivate())
 {
     d->model = model;
     KMAP_ASSERT(level<=TileIndex::MaxLevel);
@@ -932,5 +938,4 @@ WMWGeoCoordinate MarkerModel::TileIndex::toCoordinates() const
     return WMWGeoCoordinate(tileLatBL, tileLonBL);
 }
 
-} /* KMapIface */
-
+} /* namespace KMapIface */
