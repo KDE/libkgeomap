@@ -228,7 +228,7 @@ MainWindow::~MainWindow()
 
 void MainWindow::readSettings()
 {
-    KConfig config("worldmapwidget2-demo-1");
+    KConfig config("kmap-demo-1");
 
     const KConfigGroup groupWidgetConfig = config.group(QString("WidgetConfig"));
     d->mapWidget->readSettingsFromGroup(&groupWidgetConfig);
@@ -247,7 +247,7 @@ void MainWindow::readSettings()
 
 void MainWindow::saveSettings()
 {
-    KConfig config("worldmapwidget2-demo-1");
+    KConfig config("kmap-demo-1");
 
     KConfigGroup groupWidgetConfig = config.group(QString("WidgetConfig"));
     d->mapWidget->saveSettingsToGroup(&groupWidgetConfig);

@@ -63,7 +63,7 @@ bool DemoDragDropHandler::dropEvent(const QDropEvent* e, const KMapIface::WMWGeo
         model->setData(itemIndex, QVariant::fromValue(dropCoordinates), RoleCoordinates);
     }
 
-    // let the WorldMapWidget2 know which markers were dropped:
+    // let KMap know which markers were dropped:
     if (droppedIndices)
     {
         *droppedIndices = mimeData->draggedIndices;

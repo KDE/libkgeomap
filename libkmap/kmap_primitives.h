@@ -360,22 +360,22 @@ class WMWSharedData : public QSharedData
 public:
     WMWSharedData()
         : QSharedData(),
-        worldMapWidget(0),
-        visibleMarkers(),
-        markerModel(0),
-        clusterList(),
-        displayMarkersModel(0),
-        displayMarkersCoordinatesRole(0),
-        inEditMode(false),
-        editEnabled(true),
-        haveMovingCluster(false),
-        markerPixmap(),
-        markerPixmaps(),
-        representativeChooser(0),
-        previewSingleItems(true),
-        previewGroupedItems(true),
-        showNumbersOnItems(true),
-        sortKey(0)
+          worldMapWidget(0),
+          visibleMarkers(),
+          markerModel(0),
+          clusterList(),
+          displayMarkersModel(0),
+          displayMarkersCoordinatesRole(0),
+          inEditMode(false),
+          editEnabled(true),
+          haveMovingCluster(false),
+          markerPixmap(),
+          markerPixmaps(),
+          representativeChooser(0),
+          previewSingleItems(true),
+          previewGroupedItems(true),
+          showNumbersOnItems(true),
+          sortKey(0)
     {
         QStringList markerColors;
         markerColors << "00ff00" << "00ffff" << "ff0000" << "ff7f00" << "ffff00";
