@@ -1,24 +1,26 @@
-/* ============================================================
+/** ===========================================================
  *
- * Date        : 2009-12-01
- * Description : demo-program for WorldMapWidget2
+ * This file is a part of digiKam project
+ * <a href="http://www.digikam.org">http://www.digikam.org</a>
  *
-* Copyright (C) 2009 by Michael G. Hansen <mike at mghansen dot de>
+ * @date   2009-12-01
+ * @brief  demo-program for KMap
+ *
+ * @author Copyright (C) 2009-2010 by Michael G. Hansen
+ *         <a href="mailto:mike at mghansen dot de">mike at mghansen dot de</a>
  *
  * This program is free software; you can redistribute it
  * and/or modify it under the terms of the GNU General
  * Public License as published by the Free Software Foundation;
- * either version 2, or (at your option) any later version.
+ * either version 2, or (at your option)
+ * any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * ============================================================ */
-
-// Qt includes
-
 
 // KDE includes
 
@@ -32,26 +34,27 @@
 // local includes
 
 #include "mainwindow.h"
+#include "version.h"
 
 int main(int argc, char* argv[])
 {
     KAboutData aboutData(
-        "demo-worldmapwidget2",
+        "demo-kmap",
         0,
-        ki18n("WorldMapWidget2 demo application"),
-        "0.1", // version
-        ki18n("Presents the WorldMapWidget2"),
+        ki18n("KMap demo application"),
+        kmap_version,                                      // version
+        ki18n("Presents the World Map Widget Interface"),
         KAboutData::License_GPL,
-        ki18n("(c) 2009 Michael G. Hansen"),
-        ki18n(""), // optional text
-        "", // URI of homepage
-        "" // bugs e-mail address
+        ki18n("(c) 2009-2010 Michael G. Hansen"),
+        ki18n(""),                                         // optional text
+        "http://www.digikam.org/sharedlibs",               // URI of homepage
+        ""                                                 // bugs e-mail address
     );
 
     aboutData.addAuthor(ki18n("Michael G. Hansen"),
-                         ki18n("WorldMapWidget2 library"),
-                         "mike@mghansen.de",
-                         "http://www.mghansen.de/");
+                        ki18n("KMap library"),
+                        "mike@mghansen.de",
+                        "http://www.mghansen.de");
 
     KCmdLineArgs::init(argc, argv, &aboutData);
     KCmdLineOptions options;
@@ -80,5 +83,3 @@ int main(int argc, char* argv[])
 
     return app.exec();
 }
-
-
