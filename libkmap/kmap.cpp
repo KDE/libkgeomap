@@ -111,7 +111,6 @@ public:
       clustersDirty(false),
       editModeAvailable(false),
       dragDropHandler(0),
-      doUpdateMarkerCoordinatesInModel(true),
       sortMenu(0),
       thumbnailSize(KMapIfaceMinThumbnailSize),
       groupingRadius(KMapIfaceMinGroupingRadius),
@@ -151,7 +150,6 @@ public:
     bool                    editModeAvailable;
 
     DragDropHandler*        dragDropHandler;
-    bool                    doUpdateMarkerCoordinatesInModel;
 
     QMenu*                  sortMenu;
     int                     thumbnailSize;
@@ -1490,11 +1488,6 @@ void KMap::slotItemDisplaySettingsChanged()
 
     // TODO: we just need to update the display, no need to recluster?
     slotRequestLazyReclustering();
-}
-
-void KMap::setDoUpdateMarkerCoordinatesInModel(const bool doIt)
-{
-    d->doUpdateMarkerCoordinatesInModel = doIt;
 }
 
 void KMap::setSortOptionsMenu(QMenu* const sortMenu)

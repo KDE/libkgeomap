@@ -97,7 +97,6 @@ public:
     void setEditModeAvailable(const bool state);
     void setDragDropHandler(DragDropHandler* const dragDropHandler);
     QVariant getClusterRepresentativeMarker(const int clusterIndex, const int sortKey);
-    void setDoUpdateMarkerCoordinatesInModel(const bool doIt);
 
     void setSortOptionsMenu(QMenu* const sortMenu);
     void setSortKey(const int sortKey);
