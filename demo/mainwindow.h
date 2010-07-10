@@ -40,6 +40,23 @@
 
 class KCmdLineArgs;
 
+class MarkerModelHelper : public KMapIface::WMWModelHelper
+{
+Q_OBJECT
+
+public:
+    MarkerModelHelper(QAbstractItemModel* const itemModel, QItemSelectionModel* const itemSelectionModel);
+    ~MarkerModelHelper();
+
+    virtual QAbstractItemModel* model() const;
+    virtual QItemSelectionModel* selectionModel() const;
+    virtual bool itemCoordinates(const QModelIndex& index, KMapIface::WMWGeoCoordinate* const coordinates) const;
+
+private:
+    QAbstractItemModel* const m_itemModel;
+    QItemSelectionModel* const m_itemSelectionModel;
+};
+
 class MainWindowPrivate;
 
 class MainWindow : public KMainWindow

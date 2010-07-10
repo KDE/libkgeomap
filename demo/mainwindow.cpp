@@ -70,6 +70,38 @@
 
 using namespace KMapIface;
 
+MarkerModelHelper::MarkerModelHelper(QAbstractItemModel* const itemModel, QItemSelectionModel* const itemSelectionModel)
+ : WMWModelHelper(itemModel),
+   m_itemModel(itemModel),
+   m_itemSelectionModel(itemSelectionModel)
+{
+}
+
+MarkerModelHelper::~MarkerModelHelper()
+{
+}
+
+QAbstractItemModel* MarkerModelHelper::model() const
+{
+    return m_itemModel;
+}
+
+QItemSelectionModel* MarkerModelHelper::selectionModel() const
+{
+    return m_itemSelectionModel;
+}
+
+bool MarkerModelHelper::itemCoordinates(const QModelIndex& index, WMWGeoCoordinate* const coordinates) const
+{
+    if (!index.data(RoleCoordinates).canConvert<WMWGeoCoordinate>())
+        return false;
+
+    if (coordinates)
+        *coordinates = index.data(RoleCoordinates).value<WMWGeoCoordinate>();
+
+    return true;
+}
+
 class MyImageData
 {
 public:
@@ -114,6 +146,7 @@ public:
 
     QAbstractItemModel*                 displayMarkersModel;
     QItemSelectionModel*                selectionModel;
+    MarkerModelHelper*                  markerModelHelper;
 };
 
 MainWindow::MainWindow(KCmdLineArgs* const cmdLineArgs, QWidget* const parent)
@@ -129,6 +162,10 @@ MainWindow::MainWindow(KCmdLineArgs* const cmdLineArgs, QWidget* const parent)
 
     d->displayMarkersModel = d->treeWidget->model();
     d->selectionModel = d->treeWidget->selectionModel();
+    d->markerModelHelper = new MarkerModelHelper(d->displayMarkersModel, d->selectionModel);
+
+    MarkerModel* const mm = new MarkerModel();
+    mm->setMarkerModelHelper(d->markerModelHelper);
 
     resize(512, 512);
     setWindowTitle(i18n("LibKMap demo"));
@@ -151,7 +188,7 @@ MainWindow::MainWindow(KCmdLineArgs* const cmdLineArgs, QWidget* const parent)
 
     d->mapWidget = new KMap(d->splitter);
     d->mapWidget->setEditModeAvailable(true);
-    d->mapWidget->setDisplayMarkersModel(d->displayMarkersModel, RoleCoordinates, d->selectionModel);
+    d->mapWidget->setGroupedModel(mm);
     d->mapWidget->setDragDropHandler(new DemoDragDropHandler(d->displayMarkersModel, d->mapWidget));
 
     connect(d->mapWidget, SIGNAL(signalAltitudeLookupReady(const KMapIface::WMWAltitudeLookup::List&)),
