@@ -77,9 +77,11 @@ void MarkerModel::setMarkerModelHelper(WMWModelHelper* const modelHelper)
         connect(d->modelHelper, SIGNAL(signalThumbnailAvailableForIndex(const QPersistentModelIndex&, const QPixmap&)),
                 this, SLOT(slotThumbnailAvailableForIndex(const QPersistentModelIndex&, const QPixmap&)));
 
-        connect(d->selectionModel, SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)),
-            this, SLOT(slotSelectionChanged(const QItemSelection&, const QItemSelection&)));
-
+        if (d->selectionModel)
+        {
+            connect(d->selectionModel, SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)),
+                this, SLOT(slotSelectionChanged(const QItemSelection&, const QItemSelection&)));
+        }
     }
 
     d->isDirty = true;
@@ -693,14 +695,6 @@ void MarkerModel::removeMarkerIndexFromGrid(const QModelIndex& markerIndex, cons
         parentTile->deleteChild(currentTile);
     }
 
-}
-
-void MarkerModel::moveMarker(const QPersistentModelIndex& markerIndex, const WMWGeoCoordinate& newPosition)
-{
-    KMAP_ASSERT(markerIndex.isValid());
-    // TODO: is there a way to move the marker without resetting the tiles?
-    // TODO: this is not well done here, don't do it for now ;-)
-//     d->markerModel->setData(markerIndex, QVariant::fromValue(newPosition), d->coordinatesRole);
 }
 
 void MarkerModel::slotSourceModelDataChanged(const QModelIndex& /*topLeft*/, const QModelIndex& /*bottomRight*/)

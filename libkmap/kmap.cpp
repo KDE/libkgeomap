@@ -1233,15 +1233,6 @@ void KMap::slotClustersMoved(const QIntList& clusterIndices, const QPair<int, QM
         return;
     }
 
-    if (d->doUpdateMarkerCoordinatesInModel)
-    {
-        // update the positions of the markers:
-        for (int i=0; i<movedMarkers.count(); ++i)
-        {
-            s->markerModel->moveMarker(movedMarkers.at(i), targetCoordinates);
-        }
-    }
-
 //     kDebug()<<markerIndices;
     if (!movedMarkers.isEmpty())
     {

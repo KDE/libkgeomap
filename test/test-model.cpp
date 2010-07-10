@@ -32,6 +32,38 @@ using namespace KMapIface;
 
 const int CoordinatesRole = Qt::UserRole + 0;
 
+MarkerModelHelper::MarkerModelHelper(QAbstractItemModel* const itemModel, QItemSelectionModel* const itemSelectionModel)
+ : WMWModelHelper(itemModel),
+   m_itemModel(itemModel),
+   m_itemSelectionModel(itemSelectionModel)
+{
+}
+
+MarkerModelHelper::~MarkerModelHelper()
+{
+}
+
+QAbstractItemModel* MarkerModelHelper::model() const
+{
+    return m_itemModel;
+}
+
+QItemSelectionModel* MarkerModelHelper::selectionModel() const
+{
+    return m_itemSelectionModel;
+}
+
+bool MarkerModelHelper::itemCoordinates(const QModelIndex& index, WMWGeoCoordinate* const coordinates) const
+{
+    if (!index.data(CoordinatesRole).canConvert<WMWGeoCoordinate>())
+        return false;
+
+    if (coordinates)
+        *coordinates = index.data(CoordinatesRole).value<WMWGeoCoordinate>();
+
+    return true;
+}
+
 const WMWGeoCoordinate coord_1_2 = WMWGeoCoordinate::fromGeoUrl("geo:1,2");
 const WMWGeoCoordinate coord_50_60 = WMWGeoCoordinate::fromGeoUrl("geo:50,60");
 const WMWGeoCoordinate coord_m50_m60 = WMWGeoCoordinate::fromGeoUrl("geo:-50,-60");
@@ -79,9 +111,9 @@ void TestModel::testIndices()
 
 void TestModel::testAddMarkers1()
 {
-    const QSharedPointer<QStandardItemModel> itemModel(new QStandardItemModel());
+    QScopedPointer<QStandardItemModel> itemModel(new QStandardItemModel());
     MarkerModel mm;
-    mm.setMarkerModel(itemModel.data(), CoordinatesRole);
+    mm.setMarkerModelHelper(new MarkerModelHelper(itemModel.data(), 0));
 
     const int maxLevel = MarkerModel::TileIndex::MaxLevel;
 
@@ -117,9 +149,9 @@ void TestModel::testAddMarkers1()
 
 void TestModel::testRemoveMarkers2()
 {
-    const QSharedPointer<QStandardItemModel> itemModel(new QStandardItemModel());
+    QScopedPointer<QStandardItemModel> itemModel(new QStandardItemModel());
     MarkerModel mm;
-    mm.setMarkerModel(itemModel.data(), CoordinatesRole);
+    mm.setMarkerModelHelper(new MarkerModelHelper(itemModel.data(), 0));
 
     const int maxLevel = MarkerModel::TileIndex::MaxLevel;
 
@@ -149,9 +181,9 @@ void TestModel::testRemoveMarkers2()
 
 void TestModel::testMoveMarkers1()
 {
-    const QSharedPointer<QStandardItemModel> itemModel(new QStandardItemModel());
+    QScopedPointer<QStandardItemModel> itemModel(new QStandardItemModel());
     MarkerModel mm;
-    mm.setMarkerModel(itemModel.data(), CoordinatesRole);
+    mm.setMarkerModelHelper(new MarkerModelHelper(itemModel.data(), 0));
     const int maxLevel = MarkerModel::TileIndex::MaxLevel;
 
     const int fillLevel = maxLevel - 2;
@@ -172,7 +204,7 @@ void TestModel::testMoveMarkers1()
     }
 
     // now move marker 1:
-    mm.moveMarker(markerIndex1, coord_50_60);
+    itemModel->setData(markerIndex1, QVariant::fromValue(coord_50_60), CoordinatesRole);
 
     for (int l = 0; l<=fillLevel; ++l)
     {
@@ -195,9 +227,9 @@ void TestModel::testMoveMarkers1()
 
 void TestModel::testMoveMarkers2()
 {
-    const QSharedPointer<QStandardItemModel> itemModel(new QStandardItemModel());
+    QScopedPointer<QStandardItemModel> itemModel(new QStandardItemModel());
     MarkerModel mm;
-    mm.setMarkerModel(itemModel.data(), CoordinatesRole);
+    mm.setMarkerModelHelper(new MarkerModelHelper(itemModel.data(), 0));
     const int maxLevel = MarkerModel::TileIndex::MaxLevel;
 
     const int fillLevel = maxLevel - 2;
@@ -230,7 +262,7 @@ void TestModel::testMoveMarkers2()
     }
 
     // now move marker 1:
-    mm.moveMarker(markerIndex1, coord_50_60);
+    itemModel->setData(markerIndex1, QVariant::fromValue(coord_50_60), CoordinatesRole);
 
     // make sure the item model was also updated:
     QVERIFY(item1->data(CoordinatesRole).value<WMWGeoCoordinate>() == coord_50_60);
@@ -269,9 +301,9 @@ void TestModel::testIteratorWholeWorldNoBackingModel()
 
 void TestModel::testIteratorWholeWorld()
 {
-    const QSharedPointer<QStandardItemModel> itemModel(new QStandardItemModel());
+    QScopedPointer<QStandardItemModel> itemModel(new QStandardItemModel());
     MarkerModel mm;
-    mm.setMarkerModel(itemModel.data(), CoordinatesRole);
+    mm.setMarkerModelHelper(new MarkerModelHelper(itemModel.data(), 0));
     const int maxLevel = MarkerModel::TileIndex::MaxLevel;
 
     for (int l = 0; l<=maxLevel; ++l)
@@ -292,9 +324,9 @@ void TestModel::testIteratorWholeWorld()
 
 void TestModel::testIteratorPartial1()
 {
-    const QSharedPointer<QStandardItemModel> itemModel(new QStandardItemModel());
+    QScopedPointer<QStandardItemModel> itemModel(new QStandardItemModel());
     MarkerModel mm;
-    mm.setMarkerModel(itemModel.data(), CoordinatesRole);
+    mm.setMarkerModelHelper(new MarkerModelHelper(itemModel.data(), 0));
     const int maxLevel = MarkerModel::TileIndex::MaxLevel;
 
     itemModel->appendRow(MakeItemAt(coord_1_2));
@@ -359,9 +391,9 @@ void TestModel::testIteratorPartial1()
 
 void TestModel::testIteratorPartial2()
 {
-    const QSharedPointer<QStandardItemModel> itemModel(new QStandardItemModel());
+    QScopedPointer<QStandardItemModel> itemModel(new QStandardItemModel());
     MarkerModel mm;
-    mm.setMarkerModel(itemModel.data(), CoordinatesRole);
+    mm.setMarkerModelHelper(new MarkerModelHelper(itemModel.data(), 0));
     const int maxLevel = MarkerModel::TileIndex::MaxLevel;
 
     WMWGeoCoordinate::PairList boundsList;
@@ -387,9 +419,9 @@ void TestModel::testIteratorPartial2()
 
 void TestModel::testRemoveMarkers1()
 {
-    const QSharedPointer<QStandardItemModel> itemModel(new QStandardItemModel());
+    QScopedPointer<QStandardItemModel> itemModel(new QStandardItemModel());
     MarkerModel mm;
-    mm.setMarkerModel(itemModel.data(), CoordinatesRole);
+    mm.setMarkerModelHelper(new MarkerModelHelper(itemModel.data(), 0));
     const int maxLevel = MarkerModel::TileIndex::MaxLevel;
 
     for (int l = 0; l<=maxLevel; ++l)
@@ -430,11 +462,11 @@ void TestModel::testRemoveMarkers1()
  */
 void TestModel::testPreExistingMarkers()
 {
-    const QSharedPointer<QStandardItemModel> itemModel(new QStandardItemModel());
+    QScopedPointer<QStandardItemModel> itemModel(new QStandardItemModel());
     itemModel->appendRow(MakeItemAt(coord_50_60));
-
     MarkerModel mm;
-    mm.setMarkerModel(itemModel.data(), CoordinatesRole);
+    mm.setMarkerModelHelper(new MarkerModelHelper(itemModel.data(), 0));
+
     const int maxLevel = MarkerModel::TileIndex::MaxLevel;
 
     for (int l = 0; l<=maxLevel; ++l)
@@ -447,9 +479,10 @@ void TestModel::testPreExistingMarkers()
 
 void TestModel::testSelectionState1()
 {
-    const QSharedPointer<QStandardItemModel> itemModel(new QStandardItemModel());
+    QScopedPointer<QStandardItemModel> itemModel(new QStandardItemModel());
+    QItemSelectionModel* const selectionModel = new QItemSelectionModel(itemModel.data());
     MarkerModel mm;
-    mm.setMarkerModel(itemModel.data(), CoordinatesRole);
+    mm.setMarkerModelHelper(new MarkerModelHelper(itemModel.data(), selectionModel));
 
     const int maxLevel = MarkerModel::TileIndex::MaxLevel;
 
@@ -471,8 +504,6 @@ void TestModel::testSelectionState1()
         QVERIFY(mm.getTileSelectedState(tileIndex)==WMWSelectedNone);
     }
 
-    QItemSelectionModel* const selectionModel = new QItemSelectionModel(itemModel.data());
-    mm.setSelectionModel(selectionModel);
     selectionModel->select(item1Index, QItemSelectionModel::Select);
 
     // verify the selection state of the tiles:
@@ -550,7 +581,7 @@ void TestModel::testSelectionState1()
         QCOMPARE(mm.getTileSelectedCount(tileIndex), 1);
         QVERIFY(mm.getTileSelectedState(tileIndex)==WMWSelectedAll);
     }
-    mm.moveMarker(item3Index, coord_50_60);
+    itemModel->setData(item3Index, QVariant::fromValue(coord_50_60), CoordinatesRole);
     for (int l = 0; l<=maxLevel; ++l)
     {
         const MarkerModel::TileIndex tileIndex = MarkerModel::TileIndex::fromCoordinates(coord_50_60, l);
@@ -560,7 +591,7 @@ void TestModel::testSelectionState1()
         QCOMPARE(mm.getTileSelectedCount(tileIndex), 2);
         QVERIFY(mm.getTileSelectedState(tileIndex)==WMWSelectedAll);
     }
-    mm.moveMarker(item3Index, coord_m50_m60);
+    itemModel->setData(item3Index, QVariant::fromValue(coord_m50_m60), CoordinatesRole);
     for (int l = 0; l<=maxLevel; ++l)
     {
         const MarkerModel::TileIndex tileIndex = MarkerModel::TileIndex::fromCoordinates(coord_50_60, l);
@@ -588,9 +619,9 @@ void TestModel::benchmarkIteratorWholeWorld()
 {
 //     QBENCHMARK
     {
-        const QSharedPointer<QStandardItemModel> itemModel(new QStandardItemModel());
+        QScopedPointer<QStandardItemModel> itemModel(new QStandardItemModel());
         MarkerModel mm;
-        mm.setMarkerModel(itemModel.data(), CoordinatesRole);
+        mm.setMarkerModelHelper(new MarkerModelHelper(itemModel.data(), 0));
         const int maxLevel = MarkerModel::TileIndex::MaxLevel;
 
         for (int l = 0; l<=maxLevel; ++l)

@@ -291,8 +291,6 @@ public:
     void setMarkerModelHelper(WMWModelHelper* const modelHelper);
     QItemSelectionModel* getSelectionModel() const;
 
-    void moveMarker(const QPersistentModelIndex& markerIndex, const WMWGeoCoordinate& newPosition);
-
     int getTileMarkerCount(const TileIndex& tileIndex);
 
     int getTileSelectedCount(const TileIndex& tileIndex);
