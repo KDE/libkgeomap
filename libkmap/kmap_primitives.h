@@ -304,24 +304,6 @@ public:
 class MarkerModel;
 class KMap;
 
-class KMAP_EXPORT WMWRepresentativeChooser : public QObject
-{
-    Q_OBJECT
-
-public:
-
-    WMWRepresentativeChooser(QObject* const parent = 0);
-    virtual ~WMWRepresentativeChooser();
-
-    virtual QPixmap pixmapFromRepresentativeIndex(const QVariant& index, const QSize& size) = 0;
-    virtual QVariant bestRepresentativeIndexFromList(const QList<QVariant>& list, const int sortKey) = 0;
-    virtual bool indicesEqual(const QVariant& indexA, const QVariant& indexB) = 0;
-
-Q_SIGNALS:
-
-    void signalThumbnailAvailableForIndex(const QVariant& index, const QPixmap& pixmap);
-};
-
 class KMAP_EXPORT WMWModelHelper : public QObject
 {
     Q_OBJECT
@@ -341,18 +323,24 @@ public:
     WMWModelHelper(QObject* const parent = 0);
     virtual ~WMWModelHelper();
 
+    void snapItemsTo(const QModelIndex& targetIndex, const QList<QPersistentModelIndex>& snappedIndices);
+
     virtual QAbstractItemModel* model() const = 0;
     virtual QItemSelectionModel* selectionModel() const = 0;
     virtual bool itemCoordinates(const QModelIndex& index, WMWGeoCoordinate* const coordinates) const = 0;
-    virtual QPixmap itemIcon(const QModelIndex& index, QPoint* const offset) const = 0;
-    virtual Flags modelFlags() const = 0;
-    virtual Flags itemFlags(const QModelIndex& index) const = 0;
-    void snapItemsTo(const QModelIndex& targetIndex, const QList<QPersistentModelIndex>& snappedIndices);
-    virtual void snapItemsTo(const QModelIndex& targetIndex, const QList<QModelIndex>& snappedIndices) = 0;
+    virtual QPixmap itemIcon(const QModelIndex& index, QPoint* const offset) const;
+    virtual Flags modelFlags() const;
+    virtual Flags itemFlags(const QModelIndex& index) const;
+    virtual void snapItemsTo(const QModelIndex& targetIndex, const QList<QModelIndex>& snappedIndices);
+
+    // these are only used by the markermodel:
+    virtual QPixmap pixmapFromRepresentativeIndex(const QPersistentModelIndex& index, const QSize& size);
+    virtual QPersistentModelIndex bestRepresentativeIndexFromList(const QList<QPersistentModelIndex>& list, const int sortKey);
 
 Q_SIGNALS:
 
     void signalVisibilityChanged();
+    void signalThumbnailAvailableForIndex(const QPersistentModelIndex& index, const QPixmap& pixmap);
 };
 
 class WMWSharedData : public QSharedData
@@ -364,14 +352,11 @@ public:
           visibleMarkers(),
           markerModel(0),
           clusterList(),
-          displayMarkersModel(0),
-          displayMarkersCoordinatesRole(0),
           inEditMode(false),
           editEnabled(true),
           haveMovingCluster(false),
           markerPixmap(),
           markerPixmaps(),
-          representativeChooser(0),
           previewSingleItems(true),
           previewGroupedItems(true),
           showNumbersOnItems(true),
@@ -398,14 +383,11 @@ public:
     MarkerModel*              markerModel;
     WMWCluster::List          clusterList;
     QList<WMWModelHelper*>    ungroupedModels;
-    QAbstractItemModel*       displayMarkersModel;
-    int                       displayMarkersCoordinatesRole;
     bool                      inEditMode;
     bool                      editEnabled;
     bool                      haveMovingCluster;
     QPixmap                   markerPixmap;
     QMap<QString, QPixmap>    markerPixmaps;
-    WMWRepresentativeChooser* representativeChooser;
     bool                      previewSingleItems;
     bool                      previewGroupedItems;
     bool                      showNumbersOnItems;

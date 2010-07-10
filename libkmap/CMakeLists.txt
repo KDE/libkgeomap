@@ -94,6 +94,7 @@ INSTALL(FILES libkmap_export.h
               kmap_primitives.h
               altitude-backend.h
               html_widget.h
+              markermodel.h
               ${CMAKE_CURRENT_BINARY_DIR}/version.h
         DESTINATION ${INCLUDE_INSTALL_DIR}/libkmap COMPONENT Devel
        )

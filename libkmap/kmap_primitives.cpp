@@ -175,15 +175,6 @@ WMWGeoCoordinate::PairList WMWHelperNormalizeBounds(const WMWGeoCoordinate::Pair
     return boundsList;
 }
 
-WMWRepresentativeChooser::WMWRepresentativeChooser(QObject* const parent)
-                        : QObject(parent)
-{
-}
-
-WMWRepresentativeChooser::~WMWRepresentativeChooser()
-{
-}
-
 WMWModelHelper::WMWModelHelper(QObject* const parent)
               : QObject(parent)
 {
@@ -201,6 +192,39 @@ void WMWModelHelper::snapItemsTo(const QModelIndex& targetIndex, const QList<QPe
         result << snappedIndices.at(i);
     }
     snapItemsTo(targetIndex, result);
+}
+
+QPersistentModelIndex WMWModelHelper::bestRepresentativeIndexFromList(const QList<QPersistentModelIndex>& list, const int sortKey)
+{
+    // this is only a stub to provide some default implementation
+    if (list.isEmpty())
+        return QPersistentModelIndex();
+
+    return list.first();
+}
+
+QPixmap WMWModelHelper::itemIcon(const QModelIndex& index, QPoint* const offset) const
+{
+    return QPixmap();
+}
+
+WMWModelHelper::Flags WMWModelHelper::modelFlags() const
+{
+    return Flags();
+}
+
+WMWModelHelper::Flags WMWModelHelper::itemFlags(const QModelIndex& index) const
+{
+    return Flags();
+}
+
+void WMWModelHelper::snapItemsTo(const QModelIndex& targetIndex, const QList<QModelIndex>& snappedIndices)
+{
+}
+
+QPixmap WMWModelHelper::pixmapFromRepresentativeIndex(const QPersistentModelIndex& index, const QSize& size)
+{
+    return QPixmap();
 }
 
 } /* namespace KMapIface */

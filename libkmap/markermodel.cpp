@@ -37,7 +37,7 @@ public:
         : rootTile(new MarkerModel::Tile()),
         isDirty(true),
         markerModel(0),
-        coordinatesRole(0),
+        modelHelper(0),
         selectionModel(0)
     {
         rootTile->prepareForChildren(QIntPair(MarkerModel::TileIndex::Tiling, MarkerModel::TileIndex::Tiling));
@@ -46,7 +46,7 @@ public:
     MarkerModel::Tile*   rootTile;
     bool                 isDirty;
     QAbstractItemModel*  markerModel;
-    int                  coordinatesRole;
+    WMWModelHelper*      modelHelper;
     QItemSelectionModel* selectionModel;
 };
 
@@ -55,11 +55,12 @@ MarkerModel::MarkerModel()
 {
 }
 
-void MarkerModel::setMarkerModel(QAbstractItemModel* const markerModel, const int coordinatesRole)
+void MarkerModel::setMarkerModelHelper(WMWModelHelper* const modelHelper)
 {
-    d->isDirty         = true;
-    d->markerModel     = markerModel;
-    d->coordinatesRole = coordinatesRole;
+    d->isDirty     = true;
+    d->modelHelper = modelHelper;
+    d->markerModel = modelHelper->model();
+    d->selectionModel = modelHelper->selectionModel();
 
     if (d->markerModel!=0)
     {
@@ -72,7 +73,18 @@ void MarkerModel::setMarkerModel(QAbstractItemModel* const markerModel, const in
 
         connect(d->markerModel, SIGNAL(dataChanged(const QModelIndex&, const QModelIndex&)),
                 this, SLOT(slotSourceModelDataChanged(const QModelIndex&, const QModelIndex&)));
+
+        connect(d->modelHelper, SIGNAL(signalThumbnailAvailableForIndex(const QPersistentModelIndex&, const QPixmap&)),
+                this, SLOT(slotThumbnailAvailableForIndex(const QPersistentModelIndex&, const QPixmap&)));
+
+        connect(d->selectionModel, SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)),
+            this, SLOT(slotSelectionChanged(const QItemSelection&, const QItemSelection&)));
+
     }
+
+    d->isDirty = true;
+
+    emit(signalTilesOrSelectionChanged());
 }
 
 MarkerModel::~MarkerModel()
@@ -90,8 +102,8 @@ void MarkerModel::addMarkerIndexToGrid(const QPersistentModelIndex& markerIndex)
         regenerateTiles();
     }
 
-    const WMWGeoCoordinate markerCoordinates = markerIndex.data(d->coordinatesRole).value<WMWGeoCoordinate>();
-    if (!markerCoordinates.hasCoordinates())
+    WMWGeoCoordinate markerCoordinates;
+    if (!d->modelHelper->itemCoordinates(markerIndex, &markerCoordinates))
         return;
 
     TileIndex tileIndex = TileIndex::fromCoordinates(markerCoordinates, TileIndex::MaxLevel);
@@ -256,7 +268,11 @@ MarkerModel::Tile* MarkerModel::getTile(const MarkerModel::TileIndex& tileIndex,
                     KMAP_ASSERT(currentMarkerIndex.isValid());
 
                     // get the tile index for this marker:
-                    const TileIndex markerTileIndex = TileIndex::fromCoordinates(currentMarkerIndex.data(d->coordinatesRole).value<WMWGeoCoordinate>(), level);
+                    WMWGeoCoordinate currentMarkerCoordinates;
+                    if (!d->modelHelper->itemCoordinates(currentMarkerIndex, &currentMarkerCoordinates))
+                        continue;
+
+                    const TileIndex markerTileIndex = TileIndex::fromCoordinates(currentMarkerCoordinates, level);
                     const int newTileIndex = markerTileIndex.toIntList().last();
 
                     Tile* newTile = tile->children.at(newTileIndex);
@@ -641,7 +657,10 @@ void MarkerModel::removeMarkerIndexFromGrid(const QModelIndex& markerIndex, cons
     }
 
     // remove the marker from the grid:
-    const WMWGeoCoordinate markerCoordinates = markerIndex.data(d->coordinatesRole).value<WMWGeoCoordinate>();
+    WMWGeoCoordinate markerCoordinates;
+    if (!d->modelHelper->itemCoordinates(markerIndex, &markerCoordinates))
+        return;
+
     const TileIndex tileIndex = TileIndex::fromCoordinates(markerCoordinates, TileIndex::MaxLevel);
     QList<Tile*> tiles;
     // here l functions as the number of indices that we actually use, therefore we have to go one more up
@@ -680,7 +699,8 @@ void MarkerModel::moveMarker(const QPersistentModelIndex& markerIndex, const WMW
 {
     KMAP_ASSERT(markerIndex.isValid());
     // TODO: is there a way to move the marker without resetting the tiles?
-    d->markerModel->setData(markerIndex, QVariant::fromValue(newPosition), d->coordinatesRole);
+    // TODO: this is not well done here, don't do it for now ;-)
+//     d->markerModel->setData(markerIndex, QVariant::fromValue(newPosition), d->coordinatesRole);
 }
 
 void MarkerModel::slotSourceModelDataChanged(const QModelIndex& /*topLeft*/, const QModelIndex& /*bottomRight*/)
@@ -734,19 +754,6 @@ void MarkerModel::slotSourceModelRowsAboutToBeRemoved(const QModelIndex& parentI
 #endif
 }
 
-void MarkerModel::setSelectionModel(QItemSelectionModel* const selectionModel)
-{
-    d->selectionModel = selectionModel;
-
-    connect(d->selectionModel, SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)),
-            this, SLOT(slotSelectionChanged(const QItemSelection&, const QItemSelection&)));
-
-    // TODO: read out the selection state of existing items!!!
-    d->isDirty = true;
-
-    emit(signalTilesOrSelectionChanged());
-}
-
 void MarkerModel::slotSelectionChanged(const QItemSelection& selected, const QItemSelection& deselected)
 {
 //     kDebug()<<selected<<deselected;
@@ -764,7 +771,9 @@ void MarkerModel::slotSelectionChanged(const QItemSelection& selected, const QIt
         for (int row = selectionRange.top(); row<=selectionRange.bottom(); ++row)
         {
             // get the coordinates of the item
-            const WMWGeoCoordinate coordinates = d->markerModel->data(d->markerModel->index(row, 0, selectionRange.parent()), d->coordinatesRole).value<WMWGeoCoordinate>();
+            WMWGeoCoordinate coordinates;
+            if (!d->modelHelper->itemCoordinates(d->markerModel->index(row, 0, selectionRange.parent()), &coordinates))
+                continue;
 
             for (int l=0; l<=TileIndex::MaxLevel; ++l)
             {
@@ -789,7 +798,9 @@ void MarkerModel::slotSelectionChanged(const QItemSelection& selected, const QIt
         for (int row = selectionRange.top(); row<=selectionRange.bottom(); ++row)
         {
             // get the coordinates of the item
-            const WMWGeoCoordinate coordinates = d->markerModel->data(d->markerModel->index(row, 0, selectionRange.parent()), d->coordinatesRole).value<WMWGeoCoordinate>();
+            WMWGeoCoordinate coordinates;
+            if (!d->modelHelper->itemCoordinates(d->markerModel->index(row, 0, selectionRange.parent()), &coordinates))
+                continue;
 
             for (int l=0; l<=TileIndex::MaxLevel; ++l)
             {
@@ -833,14 +844,28 @@ QItemSelectionModel* MarkerModel::getSelectionModel() const
     return d->selectionModel;
 }
 
-QVariant MarkerModel::getTileRepresentativeMarker(const MarkerModel::TileIndex& tileIndex, const int /*sortKey*/)
+QVariant MarkerModel::getTileRepresentativeMarker(const MarkerModel::TileIndex& tileIndex, const int sortKey)
 {
-    // TODO: actually return the result of some sorting and cache it in the tile
     const QList<QPersistentModelIndex> modelIndices = getTileMarkerIndices(tileIndex);
     if (modelIndices.isEmpty())
         return QVariant();
 
-    return QVariant::fromValue(modelIndices.first());
+    return QVariant::fromValue(d->modelHelper->bestRepresentativeIndexFromList(modelIndices, sortKey));
+}
+
+QPixmap MarkerModel::pixmapFromRepresentativeIndex(const QVariant& index, const QSize& size)
+{
+    return d->modelHelper->pixmapFromRepresentativeIndex(index.value<QPersistentModelIndex>(), size);
+}
+
+QVariant MarkerModel::bestRepresentativeIndexFromList(const QList<QVariant>& indices, const int sortKey)
+{
+    QList<QPersistentModelIndex> indexList;
+    for (int i=0; i<indices.count(); ++i)
+    {
+        indexList << indices.at(i).value<QPersistentModelIndex>();
+    }
+    return QVariant::fromValue(d->modelHelper->bestRepresentativeIndexFromList(indexList, sortKey));
 }
 
 MarkerModel::TileIndex MarkerModel::TileIndex::fromCoordinates(const KMapIface::WMWGeoCoordinate& coordinate, const int getLevel)
@@ -936,6 +961,16 @@ WMWGeoCoordinate MarkerModel::TileIndex::toCoordinates() const
     }
 
     return WMWGeoCoordinate(tileLatBL, tileLonBL);
+}
+
+bool MarkerModel::indicesEqual(const QVariant& a, const QVariant& b) const
+{
+    return a.value<QPersistentModelIndex>()==b.value<QPersistentModelIndex>();
+}
+
+void MarkerModel::slotThumbnailAvailableForIndex(const QPersistentModelIndex& index, const QPixmap& pixmap)
+{
+    emit(signalThumbnailAvailableForIndex(QVariant::fromValue(index), pixmap));
 }
 
 } /* namespace KMapIface */

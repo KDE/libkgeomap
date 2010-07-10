@@ -288,8 +288,7 @@ public:
     MarkerModel();
     ~MarkerModel();
 
-    void setMarkerModel(QAbstractItemModel* const markerModel, const int coordinatesRole);
-    void setSelectionModel(QItemSelectionModel* const selectionModel);
+    void setMarkerModelHelper(WMWModelHelper* const modelHelper);
     QItemSelectionModel* getSelectionModel() const;
 
     void moveMarker(const QPersistentModelIndex& markerIndex, const WMWGeoCoordinate& newPosition);
@@ -301,6 +300,10 @@ public:
     QList<QPersistentModelIndex> getTileMarkerIndices(const TileIndex& tileIndex);
 
     QVariant getTileRepresentativeMarker(const TileIndex& tileIndex, const int sortKey);
+    QVariant bestRepresentativeIndexFromList(const QList<QVariant>& indices, const int sortKey);
+    QPixmap pixmapFromRepresentativeIndex(const QVariant& index, const QSize& size);
+    bool indicesEqual(const QVariant& a, const QVariant& b) const;
+
     WMWSelectionState getTileSelectedState(const TileIndex& tileIndex);
 
     // to be made protected:
@@ -342,10 +345,12 @@ private Q_SLOTS:
     void slotSourceModelRowsAboutToBeRemoved(const QModelIndex& parentIndex, int start, int end);
     void slotSourceModelDataChanged(const QModelIndex& topLeft, const QModelIndex& bottomRight);
     void slotSelectionChanged(const QItemSelection& selected, const QItemSelection& deselected);
+    void slotThumbnailAvailableForIndex(const QPersistentModelIndex& index, const QPixmap& pixmap);
 
 Q_SIGNALS:
 
     void signalTilesOrSelectionChanged();
+    void signalThumbnailAvailableForIndex(const QVariant& index, const QPixmap& pixmap);
 
 private:
 

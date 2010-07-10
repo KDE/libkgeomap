@@ -92,12 +92,11 @@ public:
     bool queryAltitudes(const WMWAltitudeLookup::List& queryItems, const QString& backendName = "");
 
     void addUngroupedModel(WMWModelHelper* const modelHelper);
-    void setDisplayMarkersModel(QAbstractItemModel* const displayMarkersModel, const int coordinatesRole, QItemSelectionModel* const selectionModel = 0);
+    void setGroupedModel(MarkerModel* const markerModel);
 
     void setEditModeAvailable(const bool state);
     void setDragDropHandler(DragDropHandler* const dragDropHandler);
     QVariant getClusterRepresentativeMarker(const int clusterIndex, const int sortKey);
-    void setRepresentativeChooser(WMWRepresentativeChooser* const chooser);
     void setDoUpdateMarkerCoordinatesInModel(const bool doIt);
 
     void setSortOptionsMenu(QMenu* const sortMenu);

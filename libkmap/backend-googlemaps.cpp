@@ -878,7 +878,7 @@ void BackendGoogleMaps::slotThumbnailAvailableForIndex(const QVariant& index, co
         // TODO: use the right sortkey
         // TODO: let the representativeChooser handle the index comparison
         const QVariant representativeMarker = s->worldMapWidget->getClusterRepresentativeMarker(i, s->sortKey);
-        if (s->representativeChooser->indicesEqual(index, representativeMarker))
+        if (s->markerModel->indicesEqual(index, representativeMarker))
         {
             QPoint clusterCenterPoint;
             // TODO: who calculates the override values?

@@ -167,13 +167,7 @@ KMap::KMap(QWidget* const parent)
 {
     createActions();
 
-    // TODO: someone has to delete this model later!
-    s->markerModel    = new MarkerModel();
     s->worldMapWidget = this;
-
-    // TODO: this needs some buffering for the google maps backend
-    connect(s->markerModel, SIGNAL(signalTilesOrSelectionChanged()),
-            this, SLOT(slotRequestLazyReclustering()));
 
     d->stackedLayout = new QStackedLayout(this);
     setLayout(d->stackedLayout);
@@ -340,9 +334,9 @@ bool KMap::setBackend(const QString& backendName)
         disconnect(this, SIGNAL(signalUngroupedModelChanged(const int)),
                     d->currentBackend, SLOT(slotUngroupedModelChanged(const int)));
 
-        if (s->representativeChooser)
+        if (s->markerModel)
         {
-            disconnect(s->representativeChooser, SIGNAL(signalThumbnailAvailableForIndex(const QVariant&, const QPixmap&)),
+            disconnect(s->markerModel, SIGNAL(signalThumbnailAvailableForIndex(const QVariant&, const QPixmap&)),
                         d->currentBackend, SLOT(slotThumbnailAvailableForIndex(const QVariant&, const QPixmap&)));
         }
 
@@ -378,9 +372,9 @@ bool KMap::setBackend(const QString& backendName)
             connect(this, SIGNAL(signalUngroupedModelChanged(const int)),
                     d->currentBackend, SLOT(slotUngroupedModelChanged(const int)), Qt::QueuedConnection);
 
-            if (s->representativeChooser)
+            if (s->markerModel)
             {
-                connect(s->representativeChooser, SIGNAL(signalThumbnailAvailableForIndex(const QVariant&, const QPixmap&)),
+                connect(s->markerModel, SIGNAL(signalThumbnailAvailableForIndex(const QVariant&, const QPixmap&)),
                         d->currentBackend, SLOT(slotThumbnailAvailableForIndex(const QVariant&, const QPixmap&)));
             }
 
@@ -1295,13 +1289,20 @@ void KMap::addUngroupedModel(WMWModelHelper* const modelHelper)
     emit(signalUngroupedModelChanged(s->ungroupedModels.count() - 1));
 }
 
-void KMap::setDisplayMarkersModel(QAbstractItemModel* const displayMarkersModel, const int coordinatesRole, QItemSelectionModel* const selectionModel)
+void KMap::setGroupedModel(MarkerModel* const markerModel)
 {
-    s->displayMarkersModel= displayMarkersModel;
-    s->displayMarkersCoordinatesRole = coordinatesRole;
-    s->markerModel->setMarkerModel(displayMarkersModel, coordinatesRole);
-    s->markerModel->setSelectionModel(selectionModel);
+    s->markerModel = markerModel;
 
+    // TODO: this needs some buffering for the google maps backend
+    connect(s->markerModel, SIGNAL(signalTilesOrSelectionChanged()),
+            this, SLOT(slotRequestLazyReclustering()));
+
+    if (d->currentBackend)
+    {
+        connect(s->markerModel, SIGNAL(signalThumbnailAvailableForIndex(const QVariant&, const QPixmap&)),
+            d->currentBackend, SLOT(slotThumbnailAvailableForIndex(const QVariant&, const QPixmap&)));
+    }
+ 
     slotRequestLazyReclustering();
 }
 
@@ -1467,7 +1468,7 @@ void KMap::setDragDropHandler(DragDropHandler* const dragDropHandler)
 
 QVariant KMap::getClusterRepresentativeMarker(const int clusterIndex, const int sortKey)
 {
-    if (!s->representativeChooser)
+    if (!s->markerModel)
         return QVariant();
 
     const WMWCluster cluster = s->clusterList.at(clusterIndex);
@@ -1481,21 +1482,11 @@ QVariant KMap::getClusterRepresentativeMarker(const int clusterIndex, const int 
         repIndices <<  s->markerModel->getTileRepresentativeMarker(MarkerModel::TileIndex::fromIntList(cluster.tileIndicesList.at(i)), sortKey);
     }
 
-    const QVariant clusterRepresentative = s->representativeChooser->bestRepresentativeIndexFromList(repIndices, sortKey);
+    const QVariant clusterRepresentative = s->markerModel->bestRepresentativeIndexFromList(repIndices, sortKey);
 
     s->clusterList[clusterIndex].representativeMarkers[sortKey] = clusterRepresentative;
 
     return clusterRepresentative;
-}
-
-void KMap::setRepresentativeChooser(WMWRepresentativeChooser* const chooser)
-{
-    s->representativeChooser = chooser;
-    if (d->currentBackend&&chooser)
-    {
-        connect(s->representativeChooser, SIGNAL(signalThumbnailAvailableForIndex(const QVariant&, const QPixmap&)),
-                d->currentBackend, SLOT(slotThumbnailAvailableForIndex(const QVariant&, const QPixmap&)));
-    }
 }
 
 void KMap::slotItemDisplaySettingsChanged()
@@ -1581,7 +1572,7 @@ QPixmap KMap::getDecoratedPixmapForCluster(const int clusterId, const WMWSelecti
         return markerPixmap;
     }
 
-    bool displayThumbnail = (s->representativeChooser != 0);
+    bool displayThumbnail = (s->markerModel != 0);
     if (displayThumbnail)
     {
         if (markerCount==1)
@@ -1598,7 +1589,7 @@ QPixmap KMap::getDecoratedPixmapForCluster(const int clusterId, const WMWSelecti
     {
         const QVariant representativeMarker = getClusterRepresentativeMarker(clusterId, s->sortKey);
         const int undecoratedThumbnailSize = getUndecoratedThumbnailSize();
-        QPixmap clusterPixmap = s->representativeChooser->pixmapFromRepresentativeIndex(representativeMarker, QSize(undecoratedThumbnailSize, undecoratedThumbnailSize));
+        QPixmap clusterPixmap = s->markerModel->pixmapFromRepresentativeIndex(representativeMarker, QSize(undecoratedThumbnailSize, undecoratedThumbnailSize));
 
         if (!clusterPixmap.isNull())
         {
