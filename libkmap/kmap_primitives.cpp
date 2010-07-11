@@ -28,6 +28,30 @@ namespace KMapIface
 {
 
 /**
+ * @class WMWModelHelper
+ * @brief Helper class to access data in models.
+ *
+ * @c WMWModelHelper is used to access data held in models, which is not suitable for transfer using the
+ * the Qt-style API, like coordinates or custom sized thumbnails.
+ *
+ * The basic functions which have to be implemented are:
+ * @li model(): Returns a pointer to the model
+ * @li selectionModel(): Returns a pointer to the selection model. It may return a null-pointer
+ *     if no selection model is used.
+ * @li itemCoordinates(): Returns the coordinates for a given item index, if it has any.
+ *
+ * For ungrouped models, the following functions should also be implemented:
+ * @li itemIcon(): Returns an icon for an index, and an offset to the 'center' of the item.
+ * @li modelFlags(): Returns flags for the model.
+ * @li itemFlags(): Returns flags for individual items.
+ * @li snapItemsTo(): Grouped items have been moved and should snap to an index.
+ *
+ * For grouped models which are accessed by @c MarkerModel, the following functions should be implemented:
+ * @li bestRepresentativeIndexFromList(): Find the item that should represent a group of items.
+ * @li pixmapFromRepresentativeIndex(): Find a thumbnail for an item.
+ */
+
+/**
  * @brief Parse a 'lat,lon' string a returned by the JavaScript parts
  * @return true if the string could be parsed successfully
  */

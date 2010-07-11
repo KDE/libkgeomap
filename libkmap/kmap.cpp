@@ -70,6 +70,31 @@ using namespace Marble;
 namespace KMapIface
 {
 
+/**
+ * @class KMap
+ * @brief The central map view class of libkmap
+ *
+ * The KMap class is the central widget of libkmap. It provides a widget which can display maps using
+ * either the Marble or Google Maps backend. Using a model, items can be displayed on the map. For
+ * models containing only a small number of items, the items can be shown directly, but for models with
+ * a larger number of items, the items can also be grouped. Currently, any number of ungrouped models
+ * can be shown, but only one grouped model. Item selection models can also be used along with the models,
+ * to interact with the selection states of the items on the map. In order to use a model with libkmap, however,
+ * a model helper has to be implemented, which extracts data from the model that is not provided by the Qt part
+ * of a model's API.
+ * 
+ * Now, a brief introduction on how to get libkmap working is provided:
+ * @li First, an instance of @c KMap has to be created.
+ * @li Next, @c WMWModelHelper has to be subclassed and at least the pure virtual functions have to be implemented.
+ * @li To show the model's data ungrouped, the model helper has to be added to @c KMap instance using addUngroupedModel.
+ * @li To show the model's data grouped, an instance of @c MarkerModel has to be created and the model helper has to be
+ *     set to it using setMarkerModelHelper. The @c MarkerModel has then to be given to KMap using setGroupedModel. If
+ *     the items to be displayed do not reside in a model, a subclass of @c MarkerModel can be created which returns
+ *     just the number of items in a particular area, and picks representative items for thumbnails.
+ * @li To handle dropping of items from the host applications UI onto the map, @c DragDropHandler has to be subclassed
+ *     as well and added to the model using setDragDropHandler.
+ */
+
 const int KMapIfaceMinEditGroupingRadius = 1;
 const int KMapIfaceMinGroupingRadius     = 15;
 const int KMapIfaceMinThumbnailSize      = 30;
