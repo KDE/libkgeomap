@@ -107,8 +107,8 @@ bool WMWHelperParseBoundsString(const QString& boundsString, QPair<WMWGeoCoordin
     const QString myBoundsString = boundsString.trimmed();
 
     // check for minimum length
-    bool valid = myBoundsString.size()>=13;
-    valid&= myBoundsString.startsWith('(') && myBoundsString.endsWith(')');
+    bool valid =  myBoundsString.size() >= 13;
+    valid      &= myBoundsString.startsWith('(') && myBoundsString.endsWith(')');
 
     if (valid)
     {
@@ -116,16 +116,16 @@ bool WMWHelperParseBoundsString(const QString& boundsString, QPair<WMWGeoCoordin
         const QString string1 = myBoundsString.mid(1, myBoundsString.length()-2).trimmed();
 
         // split the string at the middle comma:
-        const int dumpComma = string1.indexOf(",", 0);
+        const int dumpComma  = string1.indexOf(",", 0);
         const int splitComma = string1.indexOf(",", dumpComma+1);
-        valid = (dumpComma>=0) && (splitComma>=0);
+        valid                = (dumpComma>=0) && (splitComma>=0);
 
         if (valid)
         {
-            const QString coord1String = string1.mid(0, splitComma).trimmed();
-            const QString coord2String = string1.mid(splitComma+1).trimmed();
-            valid&= coord1String.startsWith('(') && coord1String.endsWith(')');
-            valid&= coord2String.startsWith('(') && coord2String.endsWith(')');
+            const QString coord1String =  string1.mid(0, splitComma).trimmed();
+            const QString coord2String =  string1.mid(splitComma+1).trimmed();
+            valid                      &= coord1String.startsWith('(') && coord1String.endsWith(')');
+            valid                      &= coord2String.startsWith('(') && coord2String.endsWith(')');
 
             WMWGeoCoordinate coord1, coord2;
             if (valid)
@@ -156,11 +156,11 @@ WMWGeoCoordinate::PairList WMWHelperNormalizeBounds(const WMWGeoCoordinate::Pair
 {
     WMWGeoCoordinate::PairList boundsList;
 
-    const qreal bWest = boundsPair.first.lon();
-    const qreal bEast = boundsPair.second.lon();
+    const qreal bWest  = boundsPair.first.lon();
+    const qreal bEast  = boundsPair.second.lon();
     const qreal bNorth = boundsPair.second.lat();
     const qreal bSouth = boundsPair.first.lat();
-//     kDebug()<<bWest<<bEast<<bNorth<<bSouth;
+//     kDebug() << bWest << bEast << bNorth << bSouth;
 
     if (bEast<bWest)
     {
@@ -194,7 +194,7 @@ void WMWModelHelper::snapItemsTo(const QModelIndex& targetIndex, const QList<QPe
     snapItemsTo(targetIndex, result);
 }
 
-QPersistentModelIndex WMWModelHelper::bestRepresentativeIndexFromList(const QList<QPersistentModelIndex>& list, const int sortKey)
+QPersistentModelIndex WMWModelHelper::bestRepresentativeIndexFromList(const QList<QPersistentModelIndex>& list, const int /*sortKey*/)
 {
     // this is only a stub to provide some default implementation
     if (list.isEmpty())
@@ -203,7 +203,7 @@ QPersistentModelIndex WMWModelHelper::bestRepresentativeIndexFromList(const QLis
     return list.first();
 }
 
-QPixmap WMWModelHelper::itemIcon(const QModelIndex& index, QPoint* const offset) const
+QPixmap WMWModelHelper::itemIcon(const QModelIndex& /*index*/, QPoint* const /*offset*/) const
 {
     return QPixmap();
 }
@@ -213,16 +213,16 @@ WMWModelHelper::Flags WMWModelHelper::modelFlags() const
     return Flags();
 }
 
-WMWModelHelper::Flags WMWModelHelper::itemFlags(const QModelIndex& index) const
+WMWModelHelper::Flags WMWModelHelper::itemFlags(const QModelIndex& /*index*/) const
 {
     return Flags();
 }
 
-void WMWModelHelper::snapItemsTo(const QModelIndex& targetIndex, const QList<QModelIndex>& snappedIndices)
+void WMWModelHelper::snapItemsTo(const QModelIndex& /*targetIndex*/, const QList<QModelIndex>& /*snappedIndices*/)
 {
 }
 
-QPixmap WMWModelHelper::pixmapFromRepresentativeIndex(const QPersistentModelIndex& index, const QSize& size)
+QPixmap WMWModelHelper::pixmapFromRepresentativeIndex(const QPersistentModelIndex& /*index*/, const QSize& /*size*/)
 {
     return QPixmap();
 }
