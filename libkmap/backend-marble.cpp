@@ -45,6 +45,7 @@
 #include <marble/MarbleWidget.h>
 #include <marble/ViewParams.h>
 #include <marble/ViewportParams.h>
+#include <marble/global.h>
 
 // local includes
 
@@ -310,11 +311,13 @@ void BackendMarble::setMapTheme(const QString& newMapTheme)
 
     if (d->marbleWidget)
     {
-        if (newMapTheme=="atlas")
+        if (newMapTheme == QString("atlas"))
         {
+#if MARBLE_VERSION > 0x000903
             d->marbleWidget->setMapThemeId("earth/srtm/srtm.dgml");
+#endif
         }
-        else if (newMapTheme=="openstreetmap")
+        else if (newMapTheme == QString("openstreetmap"))
         {
             d->marbleWidget->setMapThemeId("earth/openstreetmap/openstreetmap.dgml");
         }
