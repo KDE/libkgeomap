@@ -74,6 +74,9 @@ void MarkerModel::setMarkerModelHelper(WMWModelHelper* const modelHelper)
         connect(d->markerModel, SIGNAL(dataChanged(const QModelIndex&, const QModelIndex&)),
                 this, SLOT(slotSourceModelDataChanged(const QModelIndex&, const QModelIndex&)));
 
+        connect(d->markerModel, SIGNAL(modelReset()),
+                this, SLOT(slotSourceModelReset()));
+
         connect(d->modelHelper, SIGNAL(signalThumbnailAvailableForIndex(const QPersistentModelIndex&, const QPixmap&)),
                 this, SLOT(slotThumbnailAvailableForIndex(const QPersistentModelIndex&, const QPixmap&)));
 
@@ -965,6 +968,11 @@ bool MarkerModel::indicesEqual(const QVariant& a, const QVariant& b) const
 void MarkerModel::slotThumbnailAvailableForIndex(const QPersistentModelIndex& index, const QPixmap& pixmap)
 {
     emit(signalThumbnailAvailableForIndex(QVariant::fromValue(index), pixmap));
+}
+
+void MarkerModel::slotSourceModelReset()
+{
+    d->isDirty = true;
 }
 
 } /* namespace KMapIface */

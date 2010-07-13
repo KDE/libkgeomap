@@ -342,6 +342,7 @@ private Q_SLOTS:
     void slotSourceModelRowsInserted(const QModelIndex& parentIndex, int start, int end);
     void slotSourceModelRowsAboutToBeRemoved(const QModelIndex& parentIndex, int start, int end);
     void slotSourceModelDataChanged(const QModelIndex& topLeft, const QModelIndex& bottomRight);
+    void slotSourceModelReset();
     void slotSelectionChanged(const QItemSelection& selected, const QItemSelection& deselected);
     void slotThumbnailAvailableForIndex(const QPersistentModelIndex& index, const QPixmap& pixmap);
 
