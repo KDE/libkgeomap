@@ -40,8 +40,9 @@ CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/version.h.cmake ${CMAKE_CURRENT_BINAR
 
 SET(widget_sources
     kmap.cpp
-    kmap_primitives.cpp
+    kmap_common.cpp
     kmap_dragdrophandler.cpp
+    kmap_primitives.cpp
     map-backend.cpp
     html_widget.cpp
     markermodel.cpp

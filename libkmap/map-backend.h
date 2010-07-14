@@ -31,13 +31,15 @@
 
 // local includes
 
-#include "kmap_primitives.h"
+#include "kmap_common.h"
 
 class QMenu;
 class KConfigGroup;
 
 namespace KMapIface
 {
+
+class WMWSharedData;
 
 class MapBackendPrivate;
 

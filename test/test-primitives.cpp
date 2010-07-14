@@ -24,6 +24,8 @@
 
 #include "test-primitives.moc"
 
+#include "../libkmap/kmap_common.h"
+
 using namespace KMapIface;
 
 void TestPrimitives::testNoOp()

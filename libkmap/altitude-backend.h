@@ -27,7 +27,7 @@
 
 // Local includes
 
-#include "kmap_primitives.h"
+#include "kmap_common.h"
 
 namespace KMapIface
 {

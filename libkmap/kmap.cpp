@@ -56,6 +56,7 @@
 
 // local includes
 
+#include "kmap_common.h"
 // #include "backend-osm.h"
 #include "backend-marble.h"
 #include "backend-googlemaps.h"

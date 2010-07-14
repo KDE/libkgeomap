@@ -346,56 +346,6 @@ Q_SIGNALS:
     void signalThumbnailAvailableForIndex(const QPersistentModelIndex& index, const QPixmap& pixmap);
 };
 
-class WMWSharedData : public QSharedData
-{
-public:
-    WMWSharedData()
-        : QSharedData(),
-          worldMapWidget(0),
-          visibleMarkers(),
-          markerModel(0),
-          clusterList(),
-          inEditMode(false),
-          editEnabled(true),
-          haveMovingCluster(false),
-          markerPixmap(),
-          markerPixmaps(),
-          previewSingleItems(true),
-          previewGroupedItems(true),
-          showNumbersOnItems(true),
-          sortKey(0)
-    {
-        QStringList markerColors;
-        markerColors << "00ff00" << "00ffff" << "ff0000" << "ff7f00" << "ffff00";
-        QStringList stateNames;
-        stateNames << "" << "-selected" << "-someselected";
-        for (QStringList::const_iterator it = markerColors.constBegin(); it!=markerColors.constEnd(); ++it)
-        {
-            for (QStringList::const_iterator sit = stateNames.constBegin(); sit!=stateNames.constEnd(); ++sit)
-            {
-                const QString pixmapName = *it + *sit;
-                const KUrl markerUrl = KStandardDirs::locate("data", QString("libkmap/marker-%1.png").arg(pixmapName));
-                markerPixmaps[pixmapName] = QPixmap(markerUrl.toLocalFile());
-            }
-        }
-        markerPixmap = markerPixmaps["00ff00"];
-    }
-
-    KMap*                     worldMapWidget;
-    QIntList                  visibleMarkers;
-    MarkerModel*              markerModel;
-    WMWCluster::List          clusterList;
-    QList<WMWModelHelper*>    ungroupedModels;
-    bool                      inEditMode;
-    bool                      editEnabled;
-    bool                      haveMovingCluster;
-    QPixmap                   markerPixmap;
-    QMap<QString, QPixmap>    markerPixmaps;
-    bool                      previewSingleItems;
-    bool                      previewGroupedItems;
-    bool                      showNumbersOnItems;
-    int                       sortKey;
-};
 
 } /* KMapIface */
 
@@ -404,13 +354,6 @@ Q_DECLARE_OPERATORS_FOR_FLAGS(KMapIface::WMWModelHelper::Flags)
 
 namespace KMapIface
 {
-
-// helper functions:
-
-KMAP_EXPORT bool WMWHelperParseLatLonString(const QString& latLonString, WMWGeoCoordinate* const coordinates);
-KMAP_EXPORT bool WMWHelperParseXYStringToPoint(const QString& xyString, QPoint* const point);
-KMAP_EXPORT bool WMWHelperParseBoundsString(const QString& boundsString, QPair<WMWGeoCoordinate, WMWGeoCoordinate>* const boundsCoordinates);
-KMAP_EXPORT WMWGeoCoordinate::PairList WMWHelperNormalizeBounds(const WMWGeoCoordinate::Pair& boundsPair);
 
 // primitives for altitude lookup:
 class KMAP_EXPORT WMWAltitudeLookup

@@ -48,6 +48,7 @@ namespace KMapIface
 
 class KMapPrivate;
 class DragDropHandler;
+class WMWSharedData;
 
 class KMAP_EXPORT KMap : public QWidget
 {

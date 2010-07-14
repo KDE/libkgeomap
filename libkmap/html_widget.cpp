@@ -32,6 +32,10 @@
 
 #include <khtmlview.h>
 
+// local includes
+
+#include "kmap_common.h"
+
 namespace KMapIface
 {
 
