@@ -42,7 +42,7 @@ namespace KMapIface
 class MarkerModelPrivate;
 class MarkerModelNonEmptyIteratorPrivate;
 
-class KMAP_EXPORT MarkerModel : public QObject/* : public QAbstractItemModel*/
+class KMAP_EXPORT MarkerModel : public QObject
 {
 Q_OBJECT
 
@@ -285,7 +285,7 @@ public:
         int                          selectedCount;
     };
 
-    MarkerModel();
+    MarkerModel(QObject* const parent = 0);
     ~MarkerModel();
 
     void setMarkerModelHelper(WMWModelHelper* const modelHelper);

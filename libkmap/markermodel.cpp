@@ -50,8 +50,8 @@ public:
     QItemSelectionModel* selectionModel;
 };
 
-MarkerModel::MarkerModel()
-           : d(new MarkerModelPrivate())
+MarkerModel::MarkerModel(QObject* const parent)
+           : QObject(parent), d(new MarkerModelPrivate())
 {
 }
 
