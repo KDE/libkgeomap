@@ -24,7 +24,7 @@
 #include <kdemacros.h>
 
 #ifndef KMAP_EXPORT
-# if defined(MAKE_LIBKMAP_LIB)
+# if defined(MAKE_KMAP_LIB)
    // We are building this library
 #  define KMAP_EXPORT KDE_EXPORT
 # else
