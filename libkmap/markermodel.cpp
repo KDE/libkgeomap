@@ -973,6 +973,7 @@ void MarkerModel::slotThumbnailAvailableForIndex(const QPersistentModelIndex& in
 void MarkerModel::slotSourceModelReset()
 {
     d->isDirty = true;
+    emit(signalTilesOrSelectionChanged());
 }
 
 } /* namespace KMapIface */
