@@ -66,6 +66,11 @@ void MyTreeWidget::startDrag(Qt::DropActions /*supportedActions*/)
     drag->start(Qt::CopyAction);
 }
 
+QMimeData* MyTreeWidget::mimeData(const QList<QTreeWidgetItem*> items) const
+{
+    return QTreeWidget::mimeData(items);
+}
+
 QMimeData* MyTreeWidget::mimeData(const QModelIndexList itemsToDrag) const
 {
     MyDragData* const mimeData = new MyDragData;

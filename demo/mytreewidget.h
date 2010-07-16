@@ -53,6 +53,7 @@ protected:
 //     void mousePressEvent(QMouseEvent* event);
 //     void mouseMoveEvent(QMouseEvent* event);
     void startDrag(Qt::DropActions supportedActions);
+    virtual QMimeData* mimeData(const QList<QTreeWidgetItem*> items) const;
     virtual QMimeData* mimeData(const QModelIndexList items) const;
 
 private:
