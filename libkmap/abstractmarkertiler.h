@@ -314,6 +314,8 @@ public:
 
     Tile* rootTile();
     bool indicesEqual(const QIntList& a, const QIntList& b, const int upToLevel) const;
+    bool isDirty() const;
+    void setDirty();
 
 public:
 

@@ -57,7 +57,6 @@ AbstractMarkerTiler::AbstractMarkerTiler(QObject* const parent)
 
 void AbstractMarkerTiler::setMarkerModelHelper(WMWModelHelper* const modelHelper)
 {
-    d->isDirty     = true;
     d->modelHelper = modelHelper;
     d->markerModel = modelHelper->model();
     d->selectionModel = modelHelper->selectionModel();
@@ -87,9 +86,7 @@ void AbstractMarkerTiler::setMarkerModelHelper(WMWModelHelper* const modelHelper
         }
     }
 
-    d->isDirty = true;
-
-    emit(signalTilesOrSelectionChanged());
+    setDirty();
 }
 
 AbstractMarkerTiler::~AbstractMarkerTiler()
@@ -102,11 +99,12 @@ AbstractMarkerTiler::~AbstractMarkerTiler()
 
 void AbstractMarkerTiler::addMarkerIndexToGrid(const QPersistentModelIndex& markerIndex)
 {
-    if (d->isDirty)
+    if (isDirty())
     {
+        // the model is dirty, so let regenerateTiles do the rest
         regenerateTiles();
+        return;
     }
-
     WMWGeoCoordinate markerCoordinates;
     if (!d->modelHelper->itemCoordinates(markerIndex, &markerCoordinates))
         return;
@@ -160,7 +158,7 @@ void AbstractMarkerTiler::addMarkerIndexToGrid(const QPersistentModelIndex& mark
 
 int AbstractMarkerTiler::getTileMarkerCount(const AbstractMarkerTiler::TileIndex& tileIndex)
 {
-    if (d->isDirty)
+    if (isDirty())
     {
         regenerateTiles();
     }
@@ -179,7 +177,7 @@ int AbstractMarkerTiler::getTileMarkerCount(const AbstractMarkerTiler::TileIndex
 
 int AbstractMarkerTiler::getTileSelectedCount(const AbstractMarkerTiler::TileIndex& tileIndex)
 {
-    if (d->isDirty)
+    if (isDirty())
     {
         regenerateTiles();
     }
@@ -198,7 +196,7 @@ int AbstractMarkerTiler::getTileSelectedCount(const AbstractMarkerTiler::TileInd
 
 QList<QPersistentModelIndex> AbstractMarkerTiler::getTileMarkerIndices(const AbstractMarkerTiler::TileIndex& tileIndex)
 {
-    if (d->isDirty)
+    if (isDirty())
     {
         regenerateTiles();
     }
@@ -217,7 +215,7 @@ QList<QPersistentModelIndex> AbstractMarkerTiler::getTileMarkerIndices(const Abs
 
 WMWSelectionState AbstractMarkerTiler::getTileSelectedState(const AbstractMarkerTiler::TileIndex& tileIndex)
 {
-    if (d->isDirty)
+    if (isDirty())
     {
         regenerateTiles();
     }
@@ -246,7 +244,7 @@ WMWSelectionState AbstractMarkerTiler::getTileSelectedState(const AbstractMarker
 
 AbstractMarkerTiler::Tile* AbstractMarkerTiler::getTile(const AbstractMarkerTiler::TileIndex& tileIndex, const bool stopIfEmpty)
 {
-    if (d->isDirty)
+    if (isDirty())
     {
         regenerateTiles();
     }
@@ -318,7 +316,7 @@ AbstractMarkerTiler::Tile* AbstractMarkerTiler::getTile(const AbstractMarkerTile
 
 AbstractMarkerTiler::Tile* AbstractMarkerTiler::rootTile()
 {
-    if (d->isDirty)
+    if (isDirty())
     {
         regenerateTiles();
     }
@@ -645,7 +643,7 @@ AbstractMarkerTiler* AbstractMarkerTiler::NonEmptyIterator::model() const
  */
 void AbstractMarkerTiler::removeMarkerIndexFromGrid(const QModelIndex& markerIndex, const bool ignoreSelection)
 {
-    if (d->isDirty)
+    if (isDirty())
     {
         // if the model is dirty, there is no need to remove the marker
         // because the tiles will be regenerated on the next call
@@ -702,15 +700,14 @@ void AbstractMarkerTiler::removeMarkerIndexFromGrid(const QModelIndex& markerInd
 
 void AbstractMarkerTiler::slotSourceModelDataChanged(const QModelIndex& /*topLeft*/, const QModelIndex& /*bottomRight*/)
 {
-    d->isDirty = true;
-    emit(signalTilesOrSelectionChanged());
+    setDirty();
 
     // TODO: if only a few items were changed, try to see whether they are still in the right tiles
 }
 
 void AbstractMarkerTiler::slotSourceModelRowsInserted(const QModelIndex& parentIndex, int start, int end)
 {
-    if (d->isDirty)
+    if (isDirty())
     {
         // rows will be added once the tiles are regenerated
         return;
@@ -719,9 +716,8 @@ void AbstractMarkerTiler::slotSourceModelRowsInserted(const QModelIndex& parentI
     // sort the new items into our tiles:
     for (int i=start; i<=end; ++i)
     {
-        addMarkerIndexToGrid(QPersistentModelIndex(d->markerModel->index(start, 0, parentIndex)));
+        addMarkerIndexToGrid(QPersistentModelIndex(d->markerModel->index(i, 0, parentIndex)));
     }
-
     emit(signalTilesOrSelectionChanged());
 }
 
@@ -731,10 +727,10 @@ void AbstractMarkerTiler::slotSourceModelRowsAboutToBeRemoved(const QModelIndex&
 #if QT_VERSION < 0x040600
     // removeMarkerIndexFromGrid does not work in Qt 4.5 because the model has already deleted all
     // the data of the item, but we need the items coordinates to work efficiently
-    d->isDirty = true;
+    setDirty();
     return;
 #else
-    if (d->isDirty)
+    if (isDirty())
     {
         return;
     }
@@ -754,7 +750,7 @@ void AbstractMarkerTiler::slotSourceModelRowsAboutToBeRemoved(const QModelIndex&
 void AbstractMarkerTiler::slotSelectionChanged(const QItemSelection& selected, const QItemSelection& deselected)
 {
 //     kDebug()<<selected<<deselected;
-    if (d->isDirty)
+    if (isDirty())
     {
         return;
     }
@@ -972,8 +968,20 @@ void AbstractMarkerTiler::slotThumbnailAvailableForIndex(const QPersistentModelI
 
 void AbstractMarkerTiler::slotSourceModelReset()
 {
-    d->isDirty = true;
-    emit(signalTilesOrSelectionChanged());
+    setDirty();
 }
 
+bool AbstractMarkerTiler::isDirty() const
+{
+    return d->isDirty;
+}
+
+void AbstractMarkerTiler::setDirty()
+{
+    if (!d->isDirty)
+    {
+        d->isDirty = true;
+        emit(signalTilesOrSelectionChanged());
+    }
+}
 } /* namespace KMapIface */
