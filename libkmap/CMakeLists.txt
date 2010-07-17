@@ -45,7 +45,8 @@ SET(widget_sources
     kmap_primitives.cpp
     map-backend.cpp
     html_widget.cpp
-    markermodel.cpp
+    abstractmarkertiler.cpp
+    itemmarkertiler.cpp
     altitude-backend.cpp
     backend-altitude-geonames.cpp
    )
@@ -95,7 +96,8 @@ INSTALL(FILES libkmap_export.h
               kmap_primitives.h
               altitude-backend.h
               html_widget.h
-              markermodel.h
+              abstractmarkertiler.h
+              itemmarkertiler.h
               ${CMAKE_CURRENT_BINARY_DIR}/version.h
         DESTINATION ${INCLUDE_INSTALL_DIR}/libkmap COMPONENT Devel
        )

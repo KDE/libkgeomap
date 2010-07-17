@@ -63,7 +63,7 @@
 // local includes
 
 #include "kmap.h"
-#include "markermodel.h"
+#include "itemmarkertiler.h"
 #include "mytreewidget.h"
 #include "dragdrophandler.h"
 #include "myimageitem.h"
@@ -164,8 +164,7 @@ MainWindow::MainWindow(KCmdLineArgs* const cmdLineArgs, QWidget* const parent)
     d->selectionModel = d->treeWidget->selectionModel();
     d->markerModelHelper = new MarkerModelHelper(d->displayMarkersModel, d->selectionModel);
 
-    MarkerModel* const mm = new MarkerModel();
-    mm->setMarkerModelHelper(d->markerModelHelper);
+    ItemMarkerTiler* const mm = new ItemMarkerTiler(d->markerModelHelper, this);
 
     resize(512, 512);
     setWindowTitle(i18n("LibKMap demo"));

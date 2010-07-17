@@ -31,7 +31,7 @@
 
 // local includes
 
-#include "markermodel.h"
+#include "itemmarkertiler.h"
 
 class MarkerModelHelper : public KMapIface::WMWModelHelper
 {

@@ -32,6 +32,8 @@
 namespace KMapIface
 {
 
+class AbstractMarkerTiler;
+
 class WMWSharedData : public QSharedData
 {
 public:
@@ -69,7 +71,7 @@ public:
 
     KMap*                     worldMapWidget;
     QIntList                  visibleMarkers;
-    MarkerModel*              markerModel;
+    AbstractMarkerTiler*      markerModel;
     WMWCluster::List          clusterList;
     QList<WMWModelHelper*>    ungroupedModels;
     bool                      inEditMode;

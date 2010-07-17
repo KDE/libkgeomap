@@ -61,7 +61,7 @@
 #include "backend-marble.h"
 #include "backend-googlemaps.h"
 #include "backend-altitude-geonames.h"
-#include "markermodel.h"
+#include "abstractmarkertiler.h"
 #include "map-backend.h"
 #include "kmap_dragdrophandler.h"
 #include "version.h"
@@ -88,9 +88,9 @@ namespace KMapIface
  * @li First, an instance of @c KMap has to be created.
  * @li Next, @c WMWModelHelper has to be subclassed and at least the pure virtual functions have to be implemented.
  * @li To show the model's data ungrouped, the model helper has to be added to @c KMap instance using addUngroupedModel.
- * @li To show the model's data grouped, an instance of @c MarkerModel has to be created and the model helper has to be
- *     set to it using setMarkerModelHelper. The @c MarkerModel has then to be given to KMap using setGroupedModel. If
- *     the items to be displayed do not reside in a model, a subclass of @c MarkerModel can be created which returns
+ * @li To show the model's data grouped, an instance of @c AbstractMarkerTiler has to be created and the model helper has to be
+ *     set to it using setMarkerModelHelper. The @c AbstractMarkerTiler has then to be given to KMap using setGroupedModel. If
+ *     the items to be displayed do not reside in a model, a subclass of @c AbstractMarkerTiler can be created which returns
  *     just the number of items in a particular area, and picks representative items for thumbnails.
  * @li To handle dropping of items from the host applications UI onto the map, @c DragDropHandler has to be subclassed
  *     as well and added to the model using setDragDropHandler.
@@ -762,16 +762,16 @@ void KMap::updateClusters()
     const QSize mapSize  = d->currentBackend->mapSize();
     const int gridWidth  = mapSize.width();
     const int gridHeight = mapSize.height();
-    QVector<QList<MarkerModel::TileIndex> > pixelNonEmptyTileIndexGrid(gridWidth*gridHeight, QList<MarkerModel::TileIndex>());
+    QVector<QList<AbstractMarkerTiler::TileIndex> > pixelNonEmptyTileIndexGrid(gridWidth*gridHeight, QList<AbstractMarkerTiler::TileIndex>());
     QVector<int> pixelCountGrid(gridWidth*gridHeight, 0);
-    QList<QPair<QPoint, QPair<int, QList<MarkerModel::TileIndex> > > > leftOverList;
+    QList<QPair<QPoint, QPair<int, QList<AbstractMarkerTiler::TileIndex> > > > leftOverList;
 
     // TODO: iterate only over the visible part of the map
     int debugCountNonEmptyTiles = 0;
     int debugTilesSearched = 0;
-    for (MarkerModel::NonEmptyIterator tileIterator(s->markerModel, markerLevel, mapBounds); !tileIterator.atEnd(); tileIterator.nextIndex())
+    for (AbstractMarkerTiler::NonEmptyIterator tileIterator(s->markerModel, markerLevel, mapBounds); !tileIterator.atEnd(); tileIterator.nextIndex())
     {
-        const MarkerModel::TileIndex tileIndex = tileIterator.currentIndex();
+        const AbstractMarkerTiler::TileIndex tileIndex = tileIterator.currentIndex();
 
         // find out where the tile is on the map:
         const WMWGeoCoordinate tileCoordinate = tileIndex.toCoordinates();
@@ -856,7 +856,7 @@ void KMap::updateClusters()
                 if (tooClose)
                 {
                     // move markers into leftover list
-                    leftOverList << QPair<QPoint, QPair<int, QList<MarkerModel::TileIndex> > >(QPoint(x,y), QPair<int, QList<MarkerModel::TileIndex> >(pixelCountGrid.at(index), pixelNonEmptyTileIndexGrid.at(index)));
+                    leftOverList << QPair<QPoint, QPair<int, QList<AbstractMarkerTiler::TileIndex> > >(QPoint(x,y), QPair<int, QList<AbstractMarkerTiler::TileIndex> >(pixelCountGrid.at(index), pixelNonEmptyTileIndexGrid.at(index)));
                     pixelCountGrid[index] = 0;
                     pixelNonEmptyTileIndexGrid[index].clear();
                     nonEmptyPixelIndices[pixelGridMetaIndex] = -1;
@@ -878,7 +878,7 @@ void KMap::updateClusters()
         WMWCluster cluster;
         cluster.coordinates = clusterCoordinates;
         cluster.pixelPos = QPoint(markerX, markerY);
-        cluster.tileIndicesList = MarkerModel::TileIndex::listToIntListList(pixelNonEmptyTileIndexGrid.at(markerX+markerY*gridWidth));
+        cluster.tileIndicesList = AbstractMarkerTiler::TileIndex::listToIntListList(pixelNonEmptyTileIndexGrid.at(markerX+markerY*gridWidth));
         cluster.markerCount = pixelCountGrid.at(markerX+markerY*gridWidth);
 
         // mark the pixel as done:
@@ -900,7 +900,7 @@ void KMap::updateClusters()
             for (int indexY = yStart; indexY <= yEnd; ++indexY)
             {
                 const int index = indexX + indexY*gridWidth;
-                cluster.tileIndicesList << MarkerModel::TileIndex::listToIntListList(pixelNonEmptyTileIndexGrid.at(index));
+                cluster.tileIndicesList << AbstractMarkerTiler::TileIndex::listToIntListList(pixelNonEmptyTileIndexGrid.at(index));
                 pixelNonEmptyTileIndexGrid[index].clear();
                 cluster.markerCount+= pixelCountGrid.at(index);
                 pixelCountGrid[index] = 0;
@@ -913,7 +913,7 @@ void KMap::updateClusters()
     }
 
     // now move all leftover markers into clusters:
-    for (QList<QPair<QPoint, QPair<int, QList<MarkerModel::TileIndex> > > >::const_iterator it = leftOverList.constBegin();
+    for (QList<QPair<QPoint, QPair<int, QList<AbstractMarkerTiler::TileIndex> > > >::const_iterator it = leftOverList.constBegin();
          it!=leftOverList.constEnd(); ++it)
     {
         const QPoint markerPosition = it->first;
@@ -934,7 +934,7 @@ void KMap::updateClusters()
         if (closestIndex>=0)
         {
             s->clusterList[closestIndex].markerCount+= it->second.first;
-            s->clusterList[closestIndex].tileIndicesList << MarkerModel::TileIndex::listToIntListList(it->second.second);
+            s->clusterList[closestIndex].tileIndicesList << AbstractMarkerTiler::TileIndex::listToIntListList(it->second.second);
         }
     }
 
@@ -948,7 +948,7 @@ void KMap::updateClusters()
                 (iTile<cluster.tileIndicesList.count());
                 ++iTile)
         {
-            clusterSelectedCount+= s->markerModel->getTileSelectedCount(MarkerModel::TileIndex::fromIntList(cluster.tileIndicesList.at(iTile)));
+            clusterSelectedCount+= s->markerModel->getTileSelectedCount(AbstractMarkerTiler::TileIndex::fromIntList(cluster.tileIndicesList.at(iTile)));
         }
         cluster.markerSelectedCount = clusterSelectedCount;
         if (cluster.markerSelectedCount==0)
@@ -1225,7 +1225,7 @@ void KMap::slotClustersMoved(const QIntList& clusterIndices, const QPair<int, QM
         const WMWCluster& cluster = s->clusterList.at(clusterIndex);
         for (int i=0; i<cluster.tileIndicesList.count(); ++i)
         {
-            const MarkerModel::TileIndex tileIndex = MarkerModel::TileIndex::fromIntList(cluster.tileIndicesList.at(i));
+            const AbstractMarkerTiler::TileIndex tileIndex = AbstractMarkerTiler::TileIndex::fromIntList(cluster.tileIndicesList.at(i));
             movedMarkers << s->markerModel->getTileMarkerIndices(tileIndex);
         }
     }
@@ -1304,7 +1304,7 @@ void KMap::addUngroupedModel(WMWModelHelper* const modelHelper)
     emit(signalUngroupedModelChanged(s->ungroupedModels.count() - 1));
 }
 
-void KMap::setGroupedModel(MarkerModel* const markerModel)
+void KMap::setGroupedModel(AbstractMarkerTiler* const markerModel)
 {
     s->markerModel = markerModel;
 
@@ -1373,7 +1373,7 @@ void KMap::slotClustersClicked(const QIntList& clusterIndices)
         kDebug()<<doSelect;
         for (int j=0; j<currentCluster.tileIndicesList.count(); ++j)
         {
-            const MarkerModel::TileIndex& currentTileIndex = MarkerModel::TileIndex::fromIntList(currentCluster.tileIndicesList.at(j));
+            const AbstractMarkerTiler::TileIndex& currentTileIndex = AbstractMarkerTiler::TileIndex::fromIntList(currentCluster.tileIndicesList.at(j));
 
             const QList<QPersistentModelIndex> currentMarkers = s->markerModel->getTileMarkerIndices(currentTileIndex);
             kDebug()<<currentTileIndex<<currentMarkers;
@@ -1494,7 +1494,7 @@ QVariant KMap::getClusterRepresentativeMarker(const int clusterIndex, const int 
     QList<QVariant> repIndices;
     for (int i=0; i<cluster.tileIndicesList.count(); ++i)
     {
-        repIndices <<  s->markerModel->getTileRepresentativeMarker(MarkerModel::TileIndex::fromIntList(cluster.tileIndicesList.at(i)), sortKey);
+        repIndices <<  s->markerModel->getTileRepresentativeMarker(AbstractMarkerTiler::TileIndex::fromIntList(cluster.tileIndicesList.at(i)), sortKey);
     }
 
     const QVariant clusterRepresentative = s->markerModel->bestRepresentativeIndexFromList(repIndices, sortKey);

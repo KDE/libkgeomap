@@ -55,7 +55,7 @@
 #include "backend-marble-subwidget.h"
 #endif // KMAP_MARBLE_ADD_LAYER
 
-#include "markermodel.h"
+#include "abstractmarkertiler.h"
 #include "kmap.h"
 
 using namespace Marble;
@@ -726,7 +726,7 @@ QString BackendMarble::getZoom() const
 
 int BackendMarble::getMarkerModelLevel()
 {
-    return MarkerModel::TileIndex::MaxLevel-1;
+    return AbstractMarkerTiler::TileIndex::MaxLevel-1;
 }
 
 WMWGeoCoordinate::PairList BackendMarble::getNormalizedBounds()

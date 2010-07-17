@@ -46,6 +46,7 @@ class QMenu;
 namespace KMapIface
 {
 
+class AbstractMarkerTiler;
 class KMapPrivate;
 class DragDropHandler;
 class WMWSharedData;
@@ -93,7 +94,7 @@ public:
     bool queryAltitudes(const WMWAltitudeLookup::List& queryItems, const QString& backendName = "");
 
     void addUngroupedModel(WMWModelHelper* const modelHelper);
-    void setGroupedModel(MarkerModel* const markerModel);
+    void setGroupedModel(AbstractMarkerTiler* const markerModel);
 
     void setEditModeAvailable(const bool state);
     void setDragDropHandler(DragDropHandler* const dragDropHandler);

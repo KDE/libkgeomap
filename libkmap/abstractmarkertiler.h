@@ -22,8 +22,8 @@
  *
  * ============================================================ */
 
-#ifndef MARKERMODEL_H
-#define MARKERMODEL_H
+#ifndef ABSTRACTMARKERTILER_H
+#define ABSTRACTMARKERTILER_H
 
 // Qt includes
 
@@ -39,10 +39,10 @@
 namespace KMapIface
 {
 
-class MarkerModelPrivate;
-class MarkerModelNonEmptyIteratorPrivate;
+class AbstractMarkerTilerPrivate;
+class AbstractMarkerTilerNonEmptyIteratorPrivate;
 
-class KMAP_EXPORT MarkerModel : public QObject
+class KMAP_EXPORT AbstractMarkerTiler : public QObject
 {
 Q_OBJECT
 
@@ -285,8 +285,8 @@ public:
         int                          selectedCount;
     };
 
-    MarkerModel(QObject* const parent = 0);
-    ~MarkerModel();
+    AbstractMarkerTiler(QObject* const parent = 0);
+    ~AbstractMarkerTiler();
 
     void setMarkerModelHelper(WMWModelHelper* const modelHelper);
     QItemSelectionModel* getSelectionModel() const;
@@ -321,20 +321,20 @@ public:
     {
     public:
 
-        NonEmptyIterator(MarkerModel* const model, const int level);
-        NonEmptyIterator(MarkerModel* const model, const int level, const TileIndex& startIndex, const TileIndex& endIndex);
-        NonEmptyIterator(MarkerModel* const model, const int level, const WMWGeoCoordinate::PairList& normalizedMapBounds);
+        NonEmptyIterator(AbstractMarkerTiler* const model, const int level);
+        NonEmptyIterator(AbstractMarkerTiler* const model, const int level, const TileIndex& startIndex, const TileIndex& endIndex);
+        NonEmptyIterator(AbstractMarkerTiler* const model, const int level, const WMWGeoCoordinate::PairList& normalizedMapBounds);
         ~NonEmptyIterator();
 
         bool atEnd() const;
         TileIndex nextIndex();
         TileIndex currentIndex() const;
-        MarkerModel* model() const;
+        AbstractMarkerTiler* model() const;
 
     private:
 
         bool initializeNextBounds();
-        MarkerModelNonEmptyIteratorPrivate* const d;
+        AbstractMarkerTilerNonEmptyIteratorPrivate* const d;
     };
 
 private Q_SLOTS:
@@ -353,15 +353,15 @@ Q_SIGNALS:
 
 private:
 
-    MarkerModelPrivate* const d;
+    AbstractMarkerTilerPrivate* const d;
 };
 
 } /* namespace KMapIface */
 
-inline QDebug operator<<(QDebug debugOut, const KMapIface::MarkerModel::TileIndex& tileIndex)
+inline QDebug operator<<(QDebug debugOut, const KMapIface::AbstractMarkerTiler::TileIndex& tileIndex)
 {
     debugOut << tileIndex.toIntList();
     return debugOut;
 }
 
-#endif /* MARKERMODEL_H */
+#endif /* ABSTRACTMARKERTILER_H */

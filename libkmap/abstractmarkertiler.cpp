@@ -22,40 +22,40 @@
  *
  * ============================================================ */
 
-#include "markermodel.moc"
+#include "abstractmarkertiler.moc"
 
 namespace KMapIface
 {
 
 typedef QPair<int, int> QIntPair;
 
-class MarkerModelPrivate
+class AbstractMarkerTilerPrivate
 {
 public:
 
-    MarkerModelPrivate()
-        : rootTile(new MarkerModel::Tile()),
+    AbstractMarkerTilerPrivate()
+        : rootTile(new AbstractMarkerTiler::Tile()),
         isDirty(true),
         markerModel(0),
         modelHelper(0),
         selectionModel(0)
     {
-        rootTile->prepareForChildren(QIntPair(MarkerModel::TileIndex::Tiling, MarkerModel::TileIndex::Tiling));
+        rootTile->prepareForChildren(QIntPair(AbstractMarkerTiler::TileIndex::Tiling, AbstractMarkerTiler::TileIndex::Tiling));
     }
 
-    MarkerModel::Tile*   rootTile;
+    AbstractMarkerTiler::Tile*   rootTile;
     bool                 isDirty;
     QAbstractItemModel*  markerModel;
     WMWModelHelper*      modelHelper;
     QItemSelectionModel* selectionModel;
 };
 
-MarkerModel::MarkerModel(QObject* const parent)
-           : QObject(parent), d(new MarkerModelPrivate())
+AbstractMarkerTiler::AbstractMarkerTiler(QObject* const parent)
+           : QObject(parent), d(new AbstractMarkerTilerPrivate())
 {
 }
 
-void MarkerModel::setMarkerModelHelper(WMWModelHelper* const modelHelper)
+void AbstractMarkerTiler::setMarkerModelHelper(WMWModelHelper* const modelHelper)
 {
     d->isDirty     = true;
     d->modelHelper = modelHelper;
@@ -92,7 +92,7 @@ void MarkerModel::setMarkerModelHelper(WMWModelHelper* const modelHelper)
     emit(signalTilesOrSelectionChanged());
 }
 
-MarkerModel::~MarkerModel()
+AbstractMarkerTiler::~AbstractMarkerTiler()
 {
     // delete all tiles
     delete d->rootTile;
@@ -100,7 +100,7 @@ MarkerModel::~MarkerModel()
     delete d;
 }
 
-void MarkerModel::addMarkerIndexToGrid(const QPersistentModelIndex& markerIndex)
+void AbstractMarkerTiler::addMarkerIndexToGrid(const QPersistentModelIndex& markerIndex)
 {
     if (d->isDirty)
     {
@@ -158,7 +158,7 @@ void MarkerModel::addMarkerIndexToGrid(const QPersistentModelIndex& markerIndex)
     }
 }
 
-int MarkerModel::getTileMarkerCount(const MarkerModel::TileIndex& tileIndex)
+int AbstractMarkerTiler::getTileMarkerCount(const AbstractMarkerTiler::TileIndex& tileIndex)
 {
     if (d->isDirty)
     {
@@ -177,7 +177,7 @@ int MarkerModel::getTileMarkerCount(const MarkerModel::TileIndex& tileIndex)
     return myTile->markerIndices.count();
 }
 
-int MarkerModel::getTileSelectedCount(const MarkerModel::TileIndex& tileIndex)
+int AbstractMarkerTiler::getTileSelectedCount(const AbstractMarkerTiler::TileIndex& tileIndex)
 {
     if (d->isDirty)
     {
@@ -196,7 +196,7 @@ int MarkerModel::getTileSelectedCount(const MarkerModel::TileIndex& tileIndex)
     return myTile->selectedCount;
 }
 
-QList<QPersistentModelIndex> MarkerModel::getTileMarkerIndices(const MarkerModel::TileIndex& tileIndex)
+QList<QPersistentModelIndex> AbstractMarkerTiler::getTileMarkerIndices(const AbstractMarkerTiler::TileIndex& tileIndex)
 {
     if (d->isDirty)
     {
@@ -215,7 +215,7 @@ QList<QPersistentModelIndex> MarkerModel::getTileMarkerIndices(const MarkerModel
     return myTile->markerIndices;
 }
 
-WMWSelectionState MarkerModel::getTileSelectedState(const MarkerModel::TileIndex& tileIndex)
+WMWSelectionState AbstractMarkerTiler::getTileSelectedState(const AbstractMarkerTiler::TileIndex& tileIndex)
 {
     if (d->isDirty)
     {
@@ -244,7 +244,7 @@ WMWSelectionState MarkerModel::getTileSelectedState(const MarkerModel::TileIndex
     return WMWSelectedSome;
 }
 
-MarkerModel::Tile* MarkerModel::getTile(const MarkerModel::TileIndex& tileIndex, const bool stopIfEmpty)
+AbstractMarkerTiler::Tile* AbstractMarkerTiler::getTile(const AbstractMarkerTiler::TileIndex& tileIndex, const bool stopIfEmpty)
 {
     if (d->isDirty)
     {
@@ -316,7 +316,7 @@ MarkerModel::Tile* MarkerModel::getTile(const MarkerModel::TileIndex& tileIndex,
     return tile;
 }
 
-MarkerModel::Tile* MarkerModel::rootTile()
+AbstractMarkerTiler::Tile* AbstractMarkerTiler::rootTile()
 {
     if (d->isDirty)
     {
@@ -326,10 +326,10 @@ MarkerModel::Tile* MarkerModel::rootTile()
     return d->rootTile;
 }
 
-class MarkerModelNonEmptyIteratorPrivate
+class AbstractMarkerTilerNonEmptyIteratorPrivate
 {
 public:
-    MarkerModelNonEmptyIteratorPrivate()
+    AbstractMarkerTilerNonEmptyIteratorPrivate()
         : model(0),
           level(0),
           startIndex(),
@@ -339,26 +339,26 @@ public:
     {
     }
 
-    MarkerModel*                                                  model;
+    AbstractMarkerTiler*                                          model;
     int                                                           level;
 
-    QList<QPair<MarkerModel::TileIndex, MarkerModel::TileIndex> > boundsList;
+    QList<QPair<AbstractMarkerTiler::TileIndex, AbstractMarkerTiler::TileIndex> > boundsList;
 
-    MarkerModel::TileIndex                                        startIndex;
-    MarkerModel::TileIndex                                        endIndex;
-    MarkerModel::TileIndex                                        currentIndex;
+    AbstractMarkerTiler::TileIndex                                startIndex;
+    AbstractMarkerTiler::TileIndex                                endIndex;
+    AbstractMarkerTiler::TileIndex                                currentIndex;
 
     bool                                                          atEnd;
     bool                                                          atStartOfLevel;
 };
 
-MarkerModel::NonEmptyIterator::~NonEmptyIterator()
+AbstractMarkerTiler::NonEmptyIterator::~NonEmptyIterator()
 {
     delete d;
 }
 
-MarkerModel::NonEmptyIterator::NonEmptyIterator(MarkerModel* const model, const int level)
-           : d(new MarkerModelNonEmptyIteratorPrivate())
+AbstractMarkerTiler::NonEmptyIterator::NonEmptyIterator(AbstractMarkerTiler* const model, const int level)
+           : d(new AbstractMarkerTilerNonEmptyIteratorPrivate())
 {
     d->model = model;
     KMAP_ASSERT(level<=TileIndex::MaxLevel);
@@ -378,8 +378,8 @@ MarkerModel::NonEmptyIterator::NonEmptyIterator(MarkerModel* const model, const 
     initializeNextBounds();
 }
 
-MarkerModel::NonEmptyIterator::NonEmptyIterator(MarkerModel* const model, const int level, const TileIndex& startIndex, const TileIndex& endIndex)
-                             : d(new MarkerModelNonEmptyIteratorPrivate())
+AbstractMarkerTiler::NonEmptyIterator::NonEmptyIterator(AbstractMarkerTiler* const model, const int level, const TileIndex& startIndex, const TileIndex& endIndex)
+                             : d(new AbstractMarkerTilerNonEmptyIteratorPrivate())
 {
     d->model = model;
     KMAP_ASSERT(level<=TileIndex::MaxLevel);
@@ -392,8 +392,8 @@ MarkerModel::NonEmptyIterator::NonEmptyIterator(MarkerModel* const model, const 
     initializeNextBounds();
 }
 
-MarkerModel::NonEmptyIterator::NonEmptyIterator(MarkerModel* const model, const int level, const WMWGeoCoordinate::PairList& normalizedMapBounds)
-                             : d(new MarkerModelNonEmptyIteratorPrivate())
+AbstractMarkerTiler::NonEmptyIterator::NonEmptyIterator(AbstractMarkerTiler* const model, const int level, const WMWGeoCoordinate::PairList& normalizedMapBounds)
+                             : d(new AbstractMarkerTilerNonEmptyIteratorPrivate())
 {
     d->model = model;
     KMAP_ASSERT(level<=TileIndex::MaxLevel);
@@ -416,7 +416,7 @@ MarkerModel::NonEmptyIterator::NonEmptyIterator(MarkerModel* const model, const 
     initializeNextBounds();
 }
 
-bool MarkerModel::NonEmptyIterator::initializeNextBounds()
+bool AbstractMarkerTiler::NonEmptyIterator::initializeNextBounds()
 {
     if (d->boundsList.isEmpty())
     {
@@ -439,7 +439,7 @@ bool MarkerModel::NonEmptyIterator::initializeNextBounds()
     return d->atEnd;
 }
 
-MarkerModel::TileIndex MarkerModel::NonEmptyIterator::nextIndex()
+AbstractMarkerTiler::TileIndex AbstractMarkerTiler::NonEmptyIterator::nextIndex()
 {
     if (d->atEnd)
     {
@@ -622,17 +622,17 @@ MarkerModel::TileIndex MarkerModel::NonEmptyIterator::nextIndex()
     }
 }
 
-MarkerModel::TileIndex MarkerModel::NonEmptyIterator::currentIndex() const
+AbstractMarkerTiler::TileIndex AbstractMarkerTiler::NonEmptyIterator::currentIndex() const
 {
     return d->currentIndex;
 }
 
-bool MarkerModel::NonEmptyIterator::atEnd() const
+bool AbstractMarkerTiler::NonEmptyIterator::atEnd() const
 {
     return d->atEnd;
 }
 
-MarkerModel* MarkerModel::NonEmptyIterator::model() const
+AbstractMarkerTiler* AbstractMarkerTiler::NonEmptyIterator::model() const
 {
     return d->model;
 }
@@ -643,7 +643,7 @@ MarkerModel* MarkerModel::NonEmptyIterator::model() const
  *                        This is only used by slotSourceModelRowsAboutToBeRemoved internally,
  *                        because the selection model sends us an extra signal about the deselection.
  */
-void MarkerModel::removeMarkerIndexFromGrid(const QModelIndex& markerIndex, const bool ignoreSelection)
+void AbstractMarkerTiler::removeMarkerIndexFromGrid(const QModelIndex& markerIndex, const bool ignoreSelection)
 {
     if (d->isDirty)
     {
@@ -700,7 +700,7 @@ void MarkerModel::removeMarkerIndexFromGrid(const QModelIndex& markerIndex, cons
 
 }
 
-void MarkerModel::slotSourceModelDataChanged(const QModelIndex& /*topLeft*/, const QModelIndex& /*bottomRight*/)
+void AbstractMarkerTiler::slotSourceModelDataChanged(const QModelIndex& /*topLeft*/, const QModelIndex& /*bottomRight*/)
 {
     d->isDirty = true;
     emit(signalTilesOrSelectionChanged());
@@ -708,7 +708,7 @@ void MarkerModel::slotSourceModelDataChanged(const QModelIndex& /*topLeft*/, con
     // TODO: if only a few items were changed, try to see whether they are still in the right tiles
 }
 
-void MarkerModel::slotSourceModelRowsInserted(const QModelIndex& parentIndex, int start, int end)
+void AbstractMarkerTiler::slotSourceModelRowsInserted(const QModelIndex& parentIndex, int start, int end)
 {
     if (d->isDirty)
     {
@@ -725,7 +725,7 @@ void MarkerModel::slotSourceModelRowsInserted(const QModelIndex& parentIndex, in
     emit(signalTilesOrSelectionChanged());
 }
 
-void MarkerModel::slotSourceModelRowsAboutToBeRemoved(const QModelIndex& parentIndex, int start, int end)
+void AbstractMarkerTiler::slotSourceModelRowsAboutToBeRemoved(const QModelIndex& parentIndex, int start, int end)
 {
     // TODO: emit(signalTilesOrSelectionChanged()); in rowsWereRemoved
 #if QT_VERSION < 0x040600
@@ -751,7 +751,7 @@ void MarkerModel::slotSourceModelRowsAboutToBeRemoved(const QModelIndex& parentI
 #endif
 }
 
-void MarkerModel::slotSelectionChanged(const QItemSelection& selected, const QItemSelection& deselected)
+void AbstractMarkerTiler::slotSelectionChanged(const QItemSelection& selected, const QItemSelection& deselected)
 {
 //     kDebug()<<selected<<deselected;
     if (d->isDirty)
@@ -775,7 +775,7 @@ void MarkerModel::slotSelectionChanged(const QItemSelection& selected, const QIt
             for (int l=0; l<=TileIndex::MaxLevel; ++l)
             {
                 const TileIndex tileIndex = TileIndex::fromCoordinates(coordinates, l);
-                MarkerModel::Tile* const myTile = getTile(tileIndex, true);
+                Tile* const myTile = getTile(tileIndex, true);
                 if (!myTile)
                     break;
 
@@ -802,7 +802,7 @@ void MarkerModel::slotSelectionChanged(const QItemSelection& selected, const QIt
             for (int l=0; l<=TileIndex::MaxLevel; ++l)
             {
                 const TileIndex tileIndex = TileIndex::fromCoordinates(coordinates, l);
-                MarkerModel::Tile* const myTile = getTile(tileIndex, true);
+                Tile* const myTile = getTile(tileIndex, true);
                 if (!myTile)
                     break;
 
@@ -818,7 +818,7 @@ void MarkerModel::slotSelectionChanged(const QItemSelection& selected, const QIt
     emit(signalTilesOrSelectionChanged());
 }
 
-void MarkerModel::regenerateTiles()
+void AbstractMarkerTiler::regenerateTiles()
 {
     delete d->rootTile;
     d->rootTile = new Tile();
@@ -836,12 +836,12 @@ void MarkerModel::regenerateTiles()
     }
 }
 
-QItemSelectionModel* MarkerModel::getSelectionModel() const
+QItemSelectionModel* AbstractMarkerTiler::getSelectionModel() const
 {
     return d->selectionModel;
 }
 
-QVariant MarkerModel::getTileRepresentativeMarker(const MarkerModel::TileIndex& tileIndex, const int sortKey)
+QVariant AbstractMarkerTiler::getTileRepresentativeMarker(const AbstractMarkerTiler::TileIndex& tileIndex, const int sortKey)
 {
     const QList<QPersistentModelIndex> modelIndices = getTileMarkerIndices(tileIndex);
     if (modelIndices.isEmpty())
@@ -850,12 +850,12 @@ QVariant MarkerModel::getTileRepresentativeMarker(const MarkerModel::TileIndex& 
     return QVariant::fromValue(d->modelHelper->bestRepresentativeIndexFromList(modelIndices, sortKey));
 }
 
-QPixmap MarkerModel::pixmapFromRepresentativeIndex(const QVariant& index, const QSize& size)
+QPixmap AbstractMarkerTiler::pixmapFromRepresentativeIndex(const QVariant& index, const QSize& size)
 {
     return d->modelHelper->pixmapFromRepresentativeIndex(index.value<QPersistentModelIndex>(), size);
 }
 
-QVariant MarkerModel::bestRepresentativeIndexFromList(const QList<QVariant>& indices, const int sortKey)
+QVariant AbstractMarkerTiler::bestRepresentativeIndexFromList(const QList<QVariant>& indices, const int sortKey)
 {
     QList<QPersistentModelIndex> indexList;
     for (int i=0; i<indices.count(); ++i)
@@ -865,7 +865,7 @@ QVariant MarkerModel::bestRepresentativeIndexFromList(const QList<QVariant>& ind
     return QVariant::fromValue(d->modelHelper->bestRepresentativeIndexFromList(indexList, sortKey));
 }
 
-MarkerModel::TileIndex MarkerModel::TileIndex::fromCoordinates(const KMapIface::WMWGeoCoordinate& coordinate, const int getLevel)
+AbstractMarkerTiler::TileIndex AbstractMarkerTiler::TileIndex::fromCoordinates(const KMapIface::WMWGeoCoordinate& coordinate, const int getLevel)
 {
     KMAP_ASSERT(getLevel<=MaxLevel);
 
@@ -930,7 +930,7 @@ MarkerModel::TileIndex MarkerModel::TileIndex::fromCoordinates(const KMapIface::
     return resultIndex;
 }
 
-WMWGeoCoordinate MarkerModel::TileIndex::toCoordinates() const
+WMWGeoCoordinate AbstractMarkerTiler::TileIndex::toCoordinates() const
 {
     // TODO: safeguards against rounding errors!
     qreal tileLatBL = -90.0;
@@ -960,17 +960,17 @@ WMWGeoCoordinate MarkerModel::TileIndex::toCoordinates() const
     return WMWGeoCoordinate(tileLatBL, tileLonBL);
 }
 
-bool MarkerModel::indicesEqual(const QVariant& a, const QVariant& b) const
+bool AbstractMarkerTiler::indicesEqual(const QVariant& a, const QVariant& b) const
 {
     return a.value<QPersistentModelIndex>()==b.value<QPersistentModelIndex>();
 }
 
-void MarkerModel::slotThumbnailAvailableForIndex(const QPersistentModelIndex& index, const QPixmap& pixmap)
+void AbstractMarkerTiler::slotThumbnailAvailableForIndex(const QPersistentModelIndex& index, const QPixmap& pixmap)
 {
     emit(signalThumbnailAvailableForIndex(QVariant::fromValue(index), pixmap));
 }
 
-void MarkerModel::slotSourceModelReset()
+void AbstractMarkerTiler::slotSourceModelReset()
 {
     d->isDirty = true;
     emit(signalTilesOrSelectionChanged());

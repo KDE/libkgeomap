@@ -43,7 +43,7 @@
 
 #include "html_widget.h"
 #include "kmap.h"
-#include "markermodel.h"
+#include "abstractmarkertiler.h"
 
 namespace KMapIface
 {
@@ -791,10 +791,10 @@ int BackendGoogleMaps::getMarkerModelLevel()
     else if (currentZoom==22) { tileLevel = 7; }
     else
     {
-        tileLevel = MarkerModel::TileIndex::MaxLevel-1;
+        tileLevel = AbstractMarkerTiler::TileIndex::MaxLevel-1;
     }
 
-    KMAP_ASSERT(tileLevel <= MarkerModel::TileIndex::MaxLevel-1);
+    KMAP_ASSERT(tileLevel <= AbstractMarkerTiler::TileIndex::MaxLevel-1);
 
     return tileLevel;
 }
