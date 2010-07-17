@@ -313,9 +313,7 @@ void BackendMarble::setMapTheme(const QString& newMapTheme)
     {
         if (newMapTheme == QString("atlas"))
         {
-#if MARBLE_VERSION > 0x000903
             d->marbleWidget->setMapThemeId("earth/srtm/srtm.dgml");
-#endif
         }
         else if (newMapTheme == QString("openstreetmap"))
         {
