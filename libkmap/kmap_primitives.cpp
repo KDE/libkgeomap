@@ -104,4 +104,13 @@ QPixmap WMWModelHelper::pixmapFromRepresentativeIndex(const QPersistentModelInde
     return QPixmap();
 }
 
+void WMWModelHelper::onIndicesClicked(const QList<QPersistentModelIndex>& clickedIndices)
+{
+    Q_UNUSED(clickedIndices);
+}
+
+void WMWModelHelper::onIndicesMoved(const QList<QPersistentModelIndex>& movedIndices, const WMWGeoCoordinate& targetCoordinates, const QPersistentModelIndex& targetSnapIndex)
+{
+}
+
 } /* namespace KMapIface */

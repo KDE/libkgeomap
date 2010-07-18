@@ -187,6 +187,8 @@ public:
             return result;
         }
 
+        typedef QList<TileIndex> List;
+
     private:
         int m_indicesCount;
         int m_indices[MaxIndexCount];
@@ -310,6 +312,10 @@ public:
     virtual QPixmap pixmapFromRepresentativeIndex(const QVariant& index, const QSize& size) = 0;
     virtual bool indicesEqual(const QVariant& a, const QVariant& b) const = 0;
     virtual WMWSelectionState getTileSelectedState(const TileIndex& tileIndex) = 0;
+
+    // these can be implemented if you want to react to actions in kmap
+    virtual void onIndicesClicked(const TileIndex::List& tileIndicesList);
+    virtual void onIndicesMoved(const TileIndex::List& tileIndicesList, const WMWGeoCoordinate& targetCoordinates, const QPersistentModelIndex& targetSnapIndex);
 
     Tile* rootTile();
     bool indicesEqual(const QIntList& a, const QIntList& b, const int upToLevel) const;

@@ -500,4 +500,16 @@ AbstractMarkerTiler::Tile* AbstractMarkerTiler::resetRootTile()
     return d->rootTile;
 }
 
+void AbstractMarkerTiler::onIndicesClicked(const TileIndex::List& tileIndicesList)
+{
+    Q_UNUSED(tileIndicesList);
+}
+
+void AbstractMarkerTiler::onIndicesMoved(const TileIndex::List& tileIndicesList, const WMWGeoCoordinate& targetCoordinates, const QPersistentModelIndex& targetSnapIndex)
+{
+    Q_UNUSED(tileIndicesList);
+    Q_UNUSED(targetCoordinates);
+    Q_UNUSED(targetSnapIndex);
+}
+
 } /* namespace KMapIface */

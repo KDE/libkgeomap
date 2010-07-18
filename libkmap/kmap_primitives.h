@@ -340,6 +340,9 @@ public:
     virtual QPixmap pixmapFromRepresentativeIndex(const QPersistentModelIndex& index, const QSize& size);
     virtual QPersistentModelIndex bestRepresentativeIndexFromList(const QList<QPersistentModelIndex>& list, const int sortKey);
 
+    virtual void onIndicesClicked(const QList<QPersistentModelIndex>& clickedIndices);
+    virtual void onIndicesMoved(const QList<QPersistentModelIndex>& movedIndices, const WMWGeoCoordinate& targetCoordinates, const QPersistentModelIndex& targetSnapIndex);
+
 Q_SIGNALS:
 
     void signalVisibilityChanged();

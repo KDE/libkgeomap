@@ -122,7 +122,7 @@ public Q_SLOTS:
 Q_SIGNALS:
 
     void signalAltitudeLookupReady(const KMapIface::WMWAltitudeLookup::List& altitudes);
-    void signalDisplayMarkersMoved(const QList<QPersistentModelIndex>& indices, const KMapIface::WMWGeoCoordinate& coordinates);
+//     void signalDisplayMarkersMoved(const QList<QPersistentModelIndex>& indices, const KMapIface::WMWGeoCoordinate& coordinates);
     void signalSpecialMarkersMoved(const QList<QPersistentModelIndex>& indices);
     void signalUngroupedModelChanged(const int index);
 

@@ -554,5 +554,41 @@ bool ItemMarkerTiler::isItemModelBased() const
     return true;
 }
 
+void ItemMarkerTiler::onIndicesClicked(const TileIndex::List& tileIndicesList)
+{
+    Q_UNUSED(tileIndicesList);
+}
+
+void ItemMarkerTiler::onIndicesMoved(const TileIndex::List& tileIndicesList, const WMWGeoCoordinate& targetCoordinates, const QPersistentModelIndex& targetSnapIndex)
+{
+    QList<QPersistentModelIndex> movedMarkers;
+    if (tileIndicesList.isEmpty())
+    {
+        // complicated case: all selected markers were moved
+        QModelIndexList selectedIndices = d->selectionModel->selectedIndexes();
+        for (int i=0; i<selectedIndices.count(); ++i)
+        {
+            // TODO: correctly handle items with multiple columns
+            QModelIndex movedMarker = selectedIndices.at(i);
+            if (movedMarker.column()==0)
+            {
+                movedMarkers << movedMarker;
+            }
+        }
+    }
+    else
+    {
+        // only the tiles in tileIndicesList were moved
+        for (int i=0; i<tileIndicesList.count(); ++i)
+        {
+            const AbstractMarkerTiler::TileIndex tileIndex = tileIndicesList.at(i);
+
+            movedMarkers << getTileMarkerIndices(tileIndex);
+        }
+    }
+
+    d->modelHelper->onIndicesMoved(movedMarkers, targetCoordinates, targetSnapIndex);
+}
+
 } // KMapIface
 

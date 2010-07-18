@@ -1218,7 +1218,7 @@ void KMap::slotClustersMoved(const QIntList& clusterIndices, const QPair<int, QM
     int clusterIndex = clusterIndices.first();
     WMWGeoCoordinate targetCoordinates = s->clusterList.at(clusterIndex).coordinates;
 
-    QList<QPersistentModelIndex> movedMarkers;
+    AbstractMarkerTiler::TileIndex::List movedTileIndices;
     if (s->clusterList.at(clusterIndex).selectedState==WMWSelectedNone)
     {
         // a not-selected marker was moved. update all of its items:
@@ -1226,42 +1226,17 @@ void KMap::slotClustersMoved(const QIntList& clusterIndices, const QPair<int, QM
         for (int i=0; i<cluster.tileIndicesList.count(); ++i)
         {
             const AbstractMarkerTiler::TileIndex tileIndex = AbstractMarkerTiler::TileIndex::fromIntList(cluster.tileIndicesList.at(i));
-            movedMarkers << s->markerModel->getTileMarkerIndices(tileIndex);
+
+            movedTileIndices <<tileIndex;
         }
     }
     else
     {
-        // selected items were moved. Get their indices from the selection model:
-        QItemSelectionModel* const selectionModel = s->markerModel->getSelectionModel();
-        KMAP_ASSERT(selectionModel!=0);
-        if (!selectionModel)
-            return;
-
-        QModelIndexList selectedIndices = selectionModel->selectedIndexes();
-        for (int i=0; i<selectedIndices.count(); ++i)
-        {
-            // TODO: correctly handle items with multiple columns
-            QModelIndex movedMarker = selectedIndices.at(i);
-            if (movedMarker.column()==0)
-            {
-                movedMarkers << movedMarker;
-            }
-        }
+        // selected items were moved. The model helper should know which tiles are selected,
+        // therefore we give him an empty list
     }
 
-    if (snapTarget.first>=0)
-    {
-        kDebug()<<snapTarget.first<<movedMarkers.count()<<s->ungroupedModels.at(snapTarget.first);
-        s->ungroupedModels.at(snapTarget.first)->snapItemsTo(snapTarget.second, movedMarkers);
-        kDebug()<<snapTarget.first;
-        return;
-    }
-
-//     kDebug()<<markerIndices;
-    if (!movedMarkers.isEmpty())
-    {
-        emit(signalDisplayMarkersMoved(movedMarkers, targetCoordinates));
-    }
+    s->markerModel->onIndicesMoved(movedTileIndices, targetCoordinates, snapTarget.second);
 
     // TODO: clusters are marked as dirty by slotClustersNeedUpdating which is called
     // while we update the model
@@ -1432,22 +1407,11 @@ void KMap::dropEvent(QDropEvent* event)
     if (!d->currentBackend->geoCoordinates(event->pos(), &dropCoordinates))
         return;
 
-    QList<QPersistentModelIndex> droppedIndices;
-    if (d->dragDropHandler->dropEvent(event, dropCoordinates, &droppedIndices))
+    // the drag and drop handler handled the drop if it returned true here
+    if (d->dragDropHandler->dropEvent(event, dropCoordinates))
     {
         event->acceptProposedAction();
-
-        if (!droppedIndices.isEmpty())
-        {
-            emit(signalDisplayMarkersMoved(droppedIndices, dropCoordinates));
-        }
     }
-    // TODO: the drag-and-drop handler should do this now!
-//     for (int i=0; i<dragData->itemIndices.count(); ++i)
-//     {
-//         s->markerModel->moveMarker(dragData->itemIndices.at(i), dropCoordinates);
-//     }
-
 }
 
 void KMap::dragLeaveEvent(QDragLeaveEvent* event)

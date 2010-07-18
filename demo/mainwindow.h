@@ -51,10 +51,14 @@ public:
     virtual QAbstractItemModel* model() const;
     virtual QItemSelectionModel* selectionModel() const;
     virtual bool itemCoordinates(const QModelIndex& index, KMapIface::WMWGeoCoordinate* const coordinates) const;
+    virtual void onIndicesMoved(const QList<QPersistentModelIndex>& movedIndices, const KMapIface::WMWGeoCoordinate& targetCoordinates, const QPersistentModelIndex& targetSnapIndex);
 
 private:
     QAbstractItemModel* const m_itemModel;
     QItemSelectionModel* const m_itemSelectionModel;
+
+Q_SIGNALS:
+    void signalMarkersMoved(const QList<QPersistentModelIndex>& movedIndices);
 };
 
 class MainWindowPrivate;
@@ -83,7 +87,7 @@ private Q_SLOTS:
 
     void slotFutureResultsReadyAt(int startIndex, int endIndex);
     void slotImageLoadingBunchReady();
-    void slotMarkersMoved(const QList<QPersistentModelIndex>& markerIndices, const KMapIface::WMWGeoCoordinate& coordinates);
+    void slotMarkersMoved(const QList<QPersistentModelIndex>& markerIndices);
     void slotAltitudeLookupReady(const KMapIface::WMWAltitudeLookup::List& altitudes);
     void slotAddImages();
 

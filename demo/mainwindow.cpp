@@ -102,6 +102,18 @@ bool MarkerModelHelper::itemCoordinates(const QModelIndex& index, WMWGeoCoordina
     return true;
 }
 
+void MarkerModelHelper::onIndicesMoved(const QList<QPersistentModelIndex>& movedIndices, const WMWGeoCoordinate& targetCoordinates, const QPersistentModelIndex& targetSnapIndex)
+{
+    Q_UNUSED(targetSnapIndex);
+
+    for (int i=0; i<movedIndices.count(); ++i)
+    {
+        m_itemModel->setData(movedIndices.at(i), QVariant::fromValue(targetCoordinates), RoleCoordinates);
+    }
+
+    emit(signalMarkersMoved(movedIndices));
+}
+
 class MyImageData
 {
 public:
@@ -193,8 +205,8 @@ MainWindow::MainWindow(KCmdLineArgs* const cmdLineArgs, QWidget* const parent)
     connect(d->mapWidget, SIGNAL(signalAltitudeLookupReady(const KMapIface::WMWAltitudeLookup::List&)),
             this, SLOT(slotAltitudeLookupReady(const KMapIface::WMWAltitudeLookup::List&)));
 
-    connect(d->mapWidget, SIGNAL(signalDisplayMarkersMoved(const QList<QPersistentModelIndex>&)),
-            this, SLOT(slotMarkersMoved(const QList<QPersistentModelIndex>&, const KMapIface::WMWGeoCoordinate&)));
+    connect(d->markerModelHelper, SIGNAL(signalMarkersMoved(const QList<QPersistentModelIndex>&)),
+            this, SLOT(slotMarkersMoved(const QList<QPersistentModelIndex>&)));
 
 //     d->mapWidget->resize(d->mapWidget->width(), 200);
     d->splitter->addWidget(d->mapWidget);
@@ -419,7 +431,7 @@ void MainWindow::slotImageLoadingBunchReady()
     d->imageLoadingBuncher.clear();
 }
 
-void MainWindow::slotMarkersMoved(const QList<QPersistentModelIndex>& markerIndices, const KMapIface::WMWGeoCoordinate& /*coordinates*/)
+void MainWindow::slotMarkersMoved(const QList<QPersistentModelIndex>& markerIndices)
 {
     // prepare altitude lookups
     WMWAltitudeLookup::List altitudeQueries;

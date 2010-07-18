@@ -46,7 +46,7 @@ Qt::DropAction DemoDragDropHandler::accepts(const QDropEvent* /*e*/)
     return Qt::CopyAction;
 }
 
-bool DemoDragDropHandler::dropEvent(const QDropEvent* e, const KMapIface::WMWGeoCoordinate& dropCoordinates, QList<QPersistentModelIndex>* const droppedIndices)
+bool DemoDragDropHandler::dropEvent(const QDropEvent* e, const KMapIface::WMWGeoCoordinate& dropCoordinates)
 {
     const MyDragData* const mimeData = qobject_cast<const MyDragData*>(e->mimeData());
     if (!mimeData)
@@ -63,11 +63,7 @@ bool DemoDragDropHandler::dropEvent(const QDropEvent* e, const KMapIface::WMWGeo
         model->setData(itemIndex, QVariant::fromValue(dropCoordinates), RoleCoordinates);
     }
 
-    // let KMap know which markers were dropped:
-    if (droppedIndices)
-    {
-        *droppedIndices = mimeData->draggedIndices;
-    }
+    // TODO: tell the main window about this so it can start an altitude lookup
 
     return true;
 }

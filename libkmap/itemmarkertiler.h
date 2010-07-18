@@ -59,6 +59,9 @@ public:
     virtual bool indicesEqual(const QVariant& a, const QVariant& b) const;
     virtual WMWSelectionState getTileSelectedState(const TileIndex& tileIndex);
 
+    virtual void onIndicesClicked(const TileIndex::List& tileIndicesList);
+    virtual void onIndicesMoved(const TileIndex::List& tileIndicesList, const WMWGeoCoordinate& targetCoordinates, const QPersistentModelIndex& targetSnapIndex);
+
     void setMarkerModelHelper(WMWModelHelper* const modelHelper);
     void removeMarkerIndexFromGrid(const QModelIndex& markerIndex, const bool ignoreSelection = false);
     void addMarkerIndexToGrid(const QPersistentModelIndex& markerIndex);
