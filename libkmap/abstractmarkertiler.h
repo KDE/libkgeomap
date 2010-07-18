@@ -200,7 +200,8 @@ public:
             : children(),
               childrenMask(),
               markerIndices(),
-              selectedCount(0)
+              selectedCount(0),
+              markerCount(0)
         {
         }
 
@@ -266,12 +267,14 @@ public:
                 if ( !currentIndex.isValid() )
                 {
                     markerIndices.takeAt(i);
+                    markerCount = markerIndices.count();
                     continue;
                 }
 
                 if ( currentIndex == indexToRemove )
                 {
                     markerIndices.takeAt(i);
+                    markerCount = markerIndices.count();
                     return;
                 }
 
@@ -283,39 +286,36 @@ public:
         QBitArray                    childrenMask;
         QList<QPersistentModelIndex> markerIndices;
         int                          selectedCount;
+        int                          markerCount;
     };
 
     AbstractMarkerTiler(QObject* const parent = 0);
     ~AbstractMarkerTiler();
 
-    void setMarkerModelHelper(WMWModelHelper* const modelHelper);
-    QItemSelectionModel* getSelectionModel() const;
+    // these should actually be removed later, after some refactoring
+    virtual bool isItemModelBased() const = 0;
+    virtual QItemSelectionModel* getSelectionModel() const = 0;
+    virtual QAbstractItemModel* getModel() const = 0;
+    virtual QList<QPersistentModelIndex> getTileMarkerIndices(const TileIndex& tileIndex) = 0;
 
-    int getTileMarkerCount(const TileIndex& tileIndex);
+    // these have to be implemented
+    virtual void regenerateTiles() = 0;
+    virtual Tile* getTile(const TileIndex& tileIndex, const bool stopIfEmpty = false) = 0;
+    virtual int getTileMarkerCount(const TileIndex& tileIndex) = 0;
+    virtual int getTileSelectedCount(const TileIndex& tileIndex) = 0;
 
-    int getTileSelectedCount(const TileIndex& tileIndex);
-
-    QList<QPersistentModelIndex> getTileMarkerIndices(const TileIndex& tileIndex);
-
-    QVariant getTileRepresentativeMarker(const TileIndex& tileIndex, const int sortKey);
-    QVariant bestRepresentativeIndexFromList(const QList<QVariant>& indices, const int sortKey);
-    QPixmap pixmapFromRepresentativeIndex(const QVariant& index, const QSize& size);
-    bool indicesEqual(const QVariant& a, const QVariant& b) const;
-
-    WMWSelectionState getTileSelectedState(const TileIndex& tileIndex);
-
-    // to be made protected:
-// protected:
-    void removeMarkerIndexFromGrid(const QModelIndex& markerIndex, const bool ignoreSelection = false);
-    void addMarkerIndexToGrid(const QPersistentModelIndex& markerIndex);
-    void regenerateTiles();
-
-    Tile* getTile(const TileIndex& tileIndex, const bool stopIfEmpty = false);
+    // these should be implemented for thumbnail handling
+    virtual QVariant getTileRepresentativeMarker(const TileIndex& tileIndex, const int sortKey) = 0;
+    virtual QVariant bestRepresentativeIndexFromList(const QList<QVariant>& indices, const int sortKey) = 0;
+    virtual QPixmap pixmapFromRepresentativeIndex(const QVariant& index, const QSize& size) = 0;
+    virtual bool indicesEqual(const QVariant& a, const QVariant& b) const = 0;
+    virtual WMWSelectionState getTileSelectedState(const TileIndex& tileIndex) = 0;
 
     Tile* rootTile();
     bool indicesEqual(const QIntList& a, const QIntList& b, const int upToLevel) const;
     bool isDirty() const;
-    void setDirty();
+    void setDirty(const bool state = true);
+    Tile* resetRootTile();
 
 public:
 
@@ -339,14 +339,6 @@ public:
         AbstractMarkerTilerNonEmptyIteratorPrivate* const d;
     };
 
-private Q_SLOTS:
-
-    void slotSourceModelRowsInserted(const QModelIndex& parentIndex, int start, int end);
-    void slotSourceModelRowsAboutToBeRemoved(const QModelIndex& parentIndex, int start, int end);
-    void slotSourceModelDataChanged(const QModelIndex& topLeft, const QModelIndex& bottomRight);
-    void slotSourceModelReset();
-    void slotSelectionChanged(const QItemSelection& selected, const QItemSelection& deselected);
-    void slotThumbnailAvailableForIndex(const QPersistentModelIndex& index, const QPixmap& pixmap);
 
 Q_SIGNALS:
 
