@@ -111,6 +111,9 @@ void WMWModelHelper::onIndicesClicked(const QList<QPersistentModelIndex>& clicke
 
 void WMWModelHelper::onIndicesMoved(const QList<QPersistentModelIndex>& movedIndices, const WMWGeoCoordinate& targetCoordinates, const QPersistentModelIndex& targetSnapIndex)
 {
+    Q_UNUSED(movedIndices);
+    Q_UNUSED(targetCoordinates);
+    Q_UNUSED(targetSnapIndex);
 }
 
 } /* namespace KMapIface */
