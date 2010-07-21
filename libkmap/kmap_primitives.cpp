@@ -8,6 +8,8 @@
  *
  * @author Copyright (C) 2009-2010 by Michael G. Hansen
  *         <a href="mailto:mike at mghansen dot de">mike at mghansen dot de</a>
+ * @author Copyright (C) 2010 by Gilles Caulier
+ *         <a href="mailto:caulier dot gilles at gmail dot com">caulier dot gilles at gmail dot com</a>
  *
  * This program is free software; you can redistribute it
  * and/or modify it under the terms of the GNU General
@@ -51,7 +53,6 @@ namespace KMapIface
  * @li pixmapFromRepresentativeIndex(): Find a thumbnail for an item.
  */
 
-
 WMWModelHelper::WMWModelHelper(QObject* const parent)
               : QObject(parent)
 {
@@ -71,7 +72,8 @@ void WMWModelHelper::snapItemsTo(const QModelIndex& targetIndex, const QList<QPe
     snapItemsTo(targetIndex, result);
 }
 
-QPersistentModelIndex WMWModelHelper::bestRepresentativeIndexFromList(const QList<QPersistentModelIndex>& list, const int /*sortKey*/)
+QPersistentModelIndex WMWModelHelper::bestRepresentativeIndexFromList(const QList<QPersistentModelIndex>& list, 
+                                                                      const int /*sortKey*/)
 {
     // this is only a stub to provide some default implementation
     if (list.isEmpty())

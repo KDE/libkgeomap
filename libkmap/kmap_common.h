@@ -8,6 +8,8 @@
  *
  * @author Copyright (C) 2010 by Michael G. Hansen
  *         <a href="mailto:mike at mghansen dot de">mike at mghansen dot de</a>
+ * @author Copyright (C) 2010 by Gilles Caulier
+ *         <a href="mailto:caulier dot gilles at gmail dot com">caulier dot gilles at gmail dot com</a>
  *
  * This program is free software; you can redistribute it
  * and/or modify it under the terms of the GNU General
@@ -37,6 +39,7 @@ class AbstractMarkerTiler;
 class WMWSharedData : public QSharedData
 {
 public:
+
     WMWSharedData()
         : QSharedData(),
           worldMapWidget(0),
@@ -92,6 +95,6 @@ KMAP_EXPORT bool WMWHelperParseXYStringToPoint(const QString& xyString, QPoint* 
 KMAP_EXPORT bool WMWHelperParseBoundsString(const QString& boundsString, QPair<WMWGeoCoordinate, WMWGeoCoordinate>* const boundsCoordinates);
 KMAP_EXPORT WMWGeoCoordinate::PairList WMWHelperNormalizeBounds(const WMWGeoCoordinate::Pair& boundsPair);
 
-} /* KMapIface */
+} /* namespace KMapIface */
 
 #endif /* KMAP_COMMON_H */

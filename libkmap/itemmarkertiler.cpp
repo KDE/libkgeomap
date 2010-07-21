@@ -8,6 +8,8 @@
  *
  * @author Copyright (C) 2010 by Michael G. Hansen
  *         <a href="mailto:mike at mghansen dot de">mike at mghansen dot de</a>
+ * @author Copyright (C) 2010 by Gilles Caulier
+ *         <a href="mailto:caulier dot gilles at gmail dot com">caulier dot gilles at gmail dot com</a>
  *
  * This program is free software; you can redistribute it
  * and/or modify it under the terms of the GNU General
@@ -27,24 +29,23 @@
 namespace KMapIface
 {
 
-class ItemMarkerTilerPrivate
+class ItemMarkerTiler::ItemMarkerTilerPrivate
 {
 public:
     ItemMarkerTilerPrivate()
-    : modelHelper(0),
-      selectionModel(0),
-      markerModel(0)
+      : modelHelper(0),
+        selectionModel(0),
+        markerModel(0)
     {
     }
 
-    WMWModelHelper* modelHelper;
+    WMWModelHelper*      modelHelper;
     QItemSelectionModel* selectionModel;
-    QAbstractItemModel* markerModel;
+    QAbstractItemModel*  markerModel;
 };
 
-
 ItemMarkerTiler::ItemMarkerTiler(WMWModelHelper* const modelHelper, QObject* const parent)
-: AbstractMarkerTiler(parent), d(new ItemMarkerTilerPrivate())
+               : AbstractMarkerTiler(parent), d(new ItemMarkerTilerPrivate())
 {
     setMarkerModelHelper(modelHelper);
 }
@@ -308,7 +309,6 @@ void ItemMarkerTiler::removeMarkerIndexFromGrid(const QModelIndex& markerIndex, 
         Tile* const parentTile = tiles.at(l-1);
         parentTile->deleteChild(currentTile);
     }
-
 }
 
 int ItemMarkerTiler::getTileMarkerCount(const AbstractMarkerTiler::TileIndex& tileIndex)
@@ -570,7 +570,7 @@ void ItemMarkerTiler::onIndicesMoved(const TileIndex::List& tileIndicesList, con
         {
             // TODO: correctly handle items with multiple columns
             QModelIndex movedMarker = selectedIndices.at(i);
-            if (movedMarker.column()==0)
+            if (movedMarker.column() == 0)
             {
                 movedMarkers << movedMarker;
             }
@@ -590,5 +590,4 @@ void ItemMarkerTiler::onIndicesMoved(const TileIndex::List& tileIndicesList, con
     d->modelHelper->onIndicesMoved(movedMarkers, targetCoordinates, targetSnapIndex);
 }
 
-} // KMapIface
-
+} // namespace KMapIface

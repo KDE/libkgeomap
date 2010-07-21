@@ -8,6 +8,8 @@
  *
  * @author Copyright (C) 2009-2010 by Michael G. Hansen
  *         <a href="mailto:mike at mghansen dot de">mike at mghansen dot de</a>
+ * @author Copyright (C) 2010 by Gilles Caulier
+ *         <a href="mailto:caulier dot gilles at gmail dot com">caulier dot gilles at gmail dot com</a>
  *
  * This program is free software; you can redistribute it
  * and/or modify it under the terms of the GNU General
@@ -32,13 +34,12 @@
 namespace KMapIface
 {
 
-class BackendOSMPrivate;
-
 class BackendOSM : public MapBackend
 {
-Q_OBJECT
+    Q_OBJECT
 
 public:
+
     BackendOSM(const QExplicitlySharedDataPointer<WMWSharedData>& sharedData, QObject* const parent = 0);
     virtual ~BackendOSM();
 
@@ -73,16 +74,23 @@ public:
     virtual WMWGeoCoordinate::PairList getNormalizedBounds();
 
 public Q_SLOTS:
+
     virtual void slotClustersNeedUpdating();
 
 private Q_SLOTS:
+
     void slotHTMLInitialized();
     void updateActionsEnabled();
     void slotHTMLEvents(const QStringList& eventStrings);
 
 private:
-    BackendOSMPrivate* const d;
+
     void loadInitialHTML();
+
+private:
+
+    class BackendOSMPrivate;
+    BackendOSMPrivate* const d;
 };
 
 } /* KMapIface */

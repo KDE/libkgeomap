@@ -8,6 +8,8 @@
  *
  * @author Copyright (C) 2009-2010 by Michael G. Hansen
  *         <a href="mailto:mike at mghansen dot de">mike at mghansen dot de</a>
+ * @author Copyright (C) 2010 by Gilles Caulier
+ *         <a href="mailto:caulier dot gilles at gmail dot com">caulier dot gilles at gmail dot com</a>
  *
  * This program is free software; you can redistribute it
  * and/or modify it under the terms of the GNU General
@@ -63,34 +65,34 @@ using namespace Marble;
 namespace KMapIface
 {
 
-class BackendMarblePrivate
+class BackendMarble::BackendMarblePrivate
 {
 public:
     BackendMarblePrivate()
-    : marbleWidget(0),
-      actionGroupMapTheme(0),
-      actionGroupProjection(0),
-      actionGroupFloatItems(0),
-      actionShowCompass(0),
-      actionShowOverviewMap(0),
-      actionShowScaleBar(0),
-      cacheMapTheme("atlas"),
-      cacheProjection("spherical"),
-      cacheShowCompass(false),
-      cacheShowScaleBar(false),
-      cacheShowOverviewMap(false),
-      cacheZoom(900),
-      havePotentiallyMouseMovingObject(false),
-      haveMouseMovingObject(false),
-      mouseMoveClusterIndex(-1),
-      mouseMoveMarkerIndex(),
-      mouseMoveObjectCoordinates(),
-      mouseMoveCenterOffset(0,0),
-      dragDropMarkerCount(0),
-      dragDropMarkerPos(),
-      clustersDirtyCacheProjection(),
-      clustersDirtyCacheLat(),
-      clustersDirtyCacheLon()
+      : marbleWidget(0),
+        actionGroupMapTheme(0),
+        actionGroupProjection(0),
+        actionGroupFloatItems(0),
+        actionShowCompass(0),
+        actionShowOverviewMap(0),
+        actionShowScaleBar(0),
+        cacheMapTheme("atlas"),
+        cacheProjection("spherical"),
+        cacheShowCompass(false),
+        cacheShowScaleBar(false),
+        cacheShowOverviewMap(false),
+        cacheZoom(900),
+        havePotentiallyMouseMovingObject(false),
+        haveMouseMovingObject(false),
+        mouseMoveClusterIndex(-1),
+        mouseMoveMarkerIndex(),
+        mouseMoveObjectCoordinates(),
+        mouseMoveCenterOffset(0,0),
+        dragDropMarkerCount(0),
+        dragDropMarkerPos(),
+        clustersDirtyCacheProjection(),
+        clustersDirtyCacheLat(),
+        clustersDirtyCacheLon()
     {
     }
 

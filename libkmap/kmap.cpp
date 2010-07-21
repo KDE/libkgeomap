@@ -8,6 +8,8 @@
  *
  * @author Copyright (C) 2009-2010 by Michael G. Hansen
  *         <a href="mailto:mike at mghansen dot de">mike at mghansen dot de</a>
+ * @author Copyright (C) 2010 by Gilles Caulier
+ *         <a href="mailto:caulier dot gilles at gmail dot com">caulier dot gilles at gmail dot com</a>
  *
  * This program is free software; you can redistribute it
  * and/or modify it under the terms of the GNU General
@@ -112,37 +114,38 @@ inline int QPointSquareDistance(const QPoint& a, const QPoint& b)
     return (a.x()-b.x())*(a.x()-b.x()) + (a.y()-b.y())*(a.y()-b.y());
 }
 
-class KMapPrivate
+class KMap::KMapPrivate
 {
 public:
+
     KMapPrivate()
-    : loadedAltitudeBackends(),
-      loadedBackends(),
-      currentBackend(0),
-      currentBackendReady(false),
-      currentBackendName(),
-      stackedLayout(0),
-      cacheCenterCoordinate(52.0,6.0),
-      cacheZoom("marble:900"),
-      configurationMenu(0),
-      actionGroupBackendSelection(0),
-      actionZoomIn(0),
-      actionZoomOut(0),
-      actionBrowseMode(0),
-      actionEditMode(0),
-      actionGroupMode(0),
-      browseModeControlsHolder(0),
-      controlWidget(0),
-      lazyReclusteringRequested(false),
-      clustersDirty(false),
-      editModeAvailable(false),
-      dragDropHandler(0),
-      sortMenu(0),
-      thumbnailSize(KMapIfaceMinThumbnailSize),
-      groupingRadius(KMapIfaceMinGroupingRadius),
-      editGroupingRadius(KMapIfaceMinEditGroupingRadius),
-      actionIncreaseThumbnailSize(0),
-      actionDecreaseThumbnailSize(0)
+      : loadedAltitudeBackends(),
+        loadedBackends(),
+        currentBackend(0),
+        currentBackendReady(false),
+        currentBackendName(),
+        stackedLayout(0),
+        cacheCenterCoordinate(52.0,6.0),
+        cacheZoom("marble:900"),
+        configurationMenu(0),
+        actionGroupBackendSelection(0),
+        actionZoomIn(0),
+        actionZoomOut(0),
+        actionBrowseMode(0),
+        actionEditMode(0),
+        actionGroupMode(0),
+        browseModeControlsHolder(0),
+        controlWidget(0),
+        lazyReclusteringRequested(false),
+        clustersDirty(false),
+        editModeAvailable(false),
+        dragDropHandler(0),
+        sortMenu(0),
+        thumbnailSize(KMapIfaceMinThumbnailSize),
+        groupingRadius(KMapIfaceMinGroupingRadius),
+        editGroupingRadius(KMapIfaceMinEditGroupingRadius),
+        actionIncreaseThumbnailSize(0),
+        actionDecreaseThumbnailSize(0)
     {
     }
 

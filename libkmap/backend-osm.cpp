@@ -8,6 +8,8 @@
  *
  * @author Copyright (C) 2009-2010 by Michael G. Hansen
  *         <a href="mailto:mike at mghansen dot de">mike at mghansen dot de</a>
+ * @author Copyright (C) 2010 by Gilles Caulier
+ *         <a href="mailto:caulier dot gilles at gmail dot com">caulier dot gilles at gmail dot com</a>
  *
  * This program is free software; you can redistribute it
  * and/or modify it under the terms of the GNU General
@@ -46,16 +48,17 @@
 namespace KMapIface
 {
 
-class BackendOSMPrivate
+class BackendOSM::BackendOSMPrivate
 {
 public:
+
     BackendOSMPrivate()
-    : htmlWidget(0),
-      htmlWidgetWrapper(0),
-      isReady(false),
-      cacheZoom(1),
-      cacheCenter(0.0,0.0),
-      cacheBounds()
+      : htmlWidget(0),
+        htmlWidgetWrapper(0),
+        isReady(false),
+        cacheZoom(1),
+        cacheCenter(0.0,0.0),
+        cacheBounds()
     {
     }
 
@@ -127,7 +130,8 @@ void BackendOSM::setCenter(const WMWGeoCoordinate& coordinate)
 
     if (isReady())
     {
-        d->htmlWidget->runScript(QString("wmwSetCenter(%1, %2);").arg(d->cacheCenter.latString()).arg(d->cacheCenter.lonString()));
+        d->htmlWidget->runScript(QString("wmwSetCenter(%1, %2);").arg(d->cacheCenter.latString())
+                                                                 .arg(d->cacheCenter.lonString()));
     }
 }
 
@@ -140,7 +144,8 @@ void BackendOSM::slotHTMLInitialized()
 {
     kDebug()<<1;
     d->isReady = true;
-    d->htmlWidget->runScript(QString("document.getElementById(\"map_canvas\").style.height=\"%1px\"").arg(d->htmlWidgetWrapper->height()));
+    d->htmlWidget->runScript(QString("document.getElementById(\"map_canvas\").style.height=\"%1px\"")
+                             .arg(d->htmlWidgetWrapper->height()));
 
     // TODO: call javascript directly here and update action availability in one shot
     setCenter(d->cacheCenter);
