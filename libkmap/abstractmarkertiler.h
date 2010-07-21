@@ -39,9 +39,6 @@
 namespace KMapIface
 {
 
-class AbstractMarkerTilerPrivate;
-class AbstractMarkerTilerNonEmptyIteratorPrivate;
-
 class KMAP_EXPORT AbstractMarkerTiler : public QObject
 {
 Q_OBJECT
@@ -190,6 +187,7 @@ public:
         typedef QList<TileIndex> List;
 
     private:
+
         int m_indicesCount;
         int m_indices[MaxIndexCount];
     };
@@ -342,9 +340,12 @@ public:
     private:
 
         bool initializeNextBounds();
+
+    private:
+
+        class AbstractMarkerTilerNonEmptyIteratorPrivate;
         AbstractMarkerTilerNonEmptyIteratorPrivate* const d;
     };
-
 
 Q_SIGNALS:
 
@@ -353,6 +354,7 @@ Q_SIGNALS:
 
 private:
 
+    class AbstractMarkerTilerPrivate;
     AbstractMarkerTilerPrivate* const d;
 };
 

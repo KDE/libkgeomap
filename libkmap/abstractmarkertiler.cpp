@@ -29,23 +29,23 @@ namespace KMapIface
 
 typedef QPair<int, int> QIntPair;
 
-class AbstractMarkerTilerPrivate
+class AbstractMarkerTiler::AbstractMarkerTilerPrivate
 {
 public:
 
     AbstractMarkerTilerPrivate()
         : rootTile(new AbstractMarkerTiler::Tile()),
-        isDirty(true)
+                   isDirty(true)
     {
         rootTile->prepareForChildren(QIntPair(AbstractMarkerTiler::TileIndex::Tiling, AbstractMarkerTiler::TileIndex::Tiling));
     }
 
-    AbstractMarkerTiler::Tile*   rootTile;
-    bool                 isDirty;
+    AbstractMarkerTiler::Tile* rootTile;
+    bool                       isDirty;
 };
 
 AbstractMarkerTiler::AbstractMarkerTiler(QObject* const parent)
-           : QObject(parent), d(new AbstractMarkerTilerPrivate())
+                   : QObject(parent), d(new AbstractMarkerTilerPrivate())
 {
 }
 
@@ -67,7 +67,7 @@ AbstractMarkerTiler::Tile* AbstractMarkerTiler::rootTile()
     return d->rootTile;
 }
 
-class AbstractMarkerTilerNonEmptyIteratorPrivate
+class AbstractMarkerTiler::NonEmptyIterator::AbstractMarkerTilerNonEmptyIteratorPrivate
 {
 public:
     AbstractMarkerTilerNonEmptyIteratorPrivate()
@@ -80,17 +80,17 @@ public:
     {
     }
 
-    AbstractMarkerTiler*                                          model;
-    int                                                           level;
+    AbstractMarkerTiler*                                                          model;
+    int                                                                           level;
 
     QList<QPair<AbstractMarkerTiler::TileIndex, AbstractMarkerTiler::TileIndex> > boundsList;
 
-    AbstractMarkerTiler::TileIndex                                startIndex;
-    AbstractMarkerTiler::TileIndex                                endIndex;
-    AbstractMarkerTiler::TileIndex                                currentIndex;
+    AbstractMarkerTiler::TileIndex                                                startIndex;
+    AbstractMarkerTiler::TileIndex                                                endIndex;
+    AbstractMarkerTiler::TileIndex                                                currentIndex;
 
-    bool                                                          atEnd;
-    bool                                                          atStartOfLevel;
+    bool                                                                          atEnd;
+    bool                                                                          atStartOfLevel;
 };
 
 AbstractMarkerTiler::NonEmptyIterator::~NonEmptyIterator()
@@ -99,7 +99,7 @@ AbstractMarkerTiler::NonEmptyIterator::~NonEmptyIterator()
 }
 
 AbstractMarkerTiler::NonEmptyIterator::NonEmptyIterator(AbstractMarkerTiler* const model, const int level)
-           : d(new AbstractMarkerTilerNonEmptyIteratorPrivate())
+                   : d(new AbstractMarkerTilerNonEmptyIteratorPrivate())
 {
     d->model = model;
     KMAP_ASSERT(level<=TileIndex::MaxLevel);
@@ -119,8 +119,9 @@ AbstractMarkerTiler::NonEmptyIterator::NonEmptyIterator(AbstractMarkerTiler* con
     initializeNextBounds();
 }
 
-AbstractMarkerTiler::NonEmptyIterator::NonEmptyIterator(AbstractMarkerTiler* const model, const int level, const TileIndex& startIndex, const TileIndex& endIndex)
-                             : d(new AbstractMarkerTilerNonEmptyIteratorPrivate())
+AbstractMarkerTiler::NonEmptyIterator::NonEmptyIterator(AbstractMarkerTiler* const model, const int level, 
+                                                        const TileIndex& startIndex, const TileIndex& endIndex)
+                                     : d(new AbstractMarkerTilerNonEmptyIteratorPrivate())
 {
     d->model = model;
     KMAP_ASSERT(level<=TileIndex::MaxLevel);
@@ -133,8 +134,9 @@ AbstractMarkerTiler::NonEmptyIterator::NonEmptyIterator(AbstractMarkerTiler* con
     initializeNextBounds();
 }
 
-AbstractMarkerTiler::NonEmptyIterator::NonEmptyIterator(AbstractMarkerTiler* const model, const int level, const WMWGeoCoordinate::PairList& normalizedMapBounds)
-                             : d(new AbstractMarkerTilerNonEmptyIteratorPrivate())
+AbstractMarkerTiler::NonEmptyIterator::NonEmptyIterator(AbstractMarkerTiler* const model, const int level, 
+                                                        const WMWGeoCoordinate::PairList& normalizedMapBounds)
+                                     : d(new AbstractMarkerTilerNonEmptyIteratorPrivate())
 {
     d->model = model;
     KMAP_ASSERT(level<=TileIndex::MaxLevel);
@@ -378,7 +380,8 @@ AbstractMarkerTiler* AbstractMarkerTiler::NonEmptyIterator::model() const
     return d->model;
 }
 
-AbstractMarkerTiler::TileIndex AbstractMarkerTiler::TileIndex::fromCoordinates(const KMapIface::WMWGeoCoordinate& coordinate, const int getLevel)
+AbstractMarkerTiler::TileIndex AbstractMarkerTiler::TileIndex::fromCoordinates(const KMapIface::WMWGeoCoordinate& coordinate,
+                                                                               const int getLevel)
 {
     KMAP_ASSERT(getLevel<=MaxLevel);
 
@@ -434,10 +437,10 @@ AbstractMarkerTiler::TileIndex AbstractMarkerTiler::TileIndex::fromCoordinates(c
 
         // update the start position for the next tile:
         // TODO: rounding errors
-        tileLatBL+=latIndex*dLat;
-        tileLonBL+=lonIndex*dLon;
-        tileLatHeight/=latDivisor;
-        tileLonWidth/=lonDivisor;
+        tileLatBL     += latIndex*dLat;
+        tileLonBL     += lonIndex*dLon;
+        tileLatHeight /= latDivisor;
+        tileLonWidth  /= lonDivisor;
     }
 
     return resultIndex;
@@ -446,10 +449,10 @@ AbstractMarkerTiler::TileIndex AbstractMarkerTiler::TileIndex::fromCoordinates(c
 WMWGeoCoordinate AbstractMarkerTiler::TileIndex::toCoordinates() const
 {
     // TODO: safeguards against rounding errors!
-    qreal tileLatBL = -90.0;
-    qreal tileLonBL = -180.0;
+    qreal tileLatBL     = -90.0;
+    qreal tileLonBL     = -180.0;
     qreal tileLatHeight = 180.0;
-    qreal tileLonWidth = 360.0;
+    qreal tileLonWidth  = 360.0;
 
     for (int l = 0; l < m_indicesCount; ++l)
     {
@@ -457,17 +460,17 @@ WMWGeoCoordinate AbstractMarkerTiler::TileIndex::toCoordinates() const
         const qreal latDivisor = TileIndex::Tiling;
         const qreal lonDivisor = TileIndex::Tiling;
 
-        const qreal dLat = tileLatHeight / latDivisor;
-        const qreal dLon = tileLonWidth / lonDivisor;
+        const qreal dLat       = tileLatHeight / latDivisor;
+        const qreal dLon       = tileLonWidth / lonDivisor;
 
-        int latIndex = indexLat(l);
-        int lonIndex = indexLon(l);
+        int latIndex           = indexLat(l);
+        int lonIndex           = indexLon(l);
 
         // update the start position for the next tile:
-        tileLatBL+=latIndex*dLat;
-        tileLonBL+=lonIndex*dLon;
-        tileLatHeight/=latDivisor;
-        tileLonWidth/=lonDivisor;
+        tileLatBL     += latIndex*dLat;
+        tileLonBL     += lonIndex*dLon;
+        tileLatHeight /= latDivisor;
+        tileLonWidth  /= lonDivisor;
     }
 
     return WMWGeoCoordinate(tileLatBL, tileLonBL);
@@ -505,7 +508,8 @@ void AbstractMarkerTiler::onIndicesClicked(const TileIndex::List& tileIndicesLis
     Q_UNUSED(tileIndicesList);
 }
 
-void AbstractMarkerTiler::onIndicesMoved(const TileIndex::List& tileIndicesList, const WMWGeoCoordinate& targetCoordinates, const QPersistentModelIndex& targetSnapIndex)
+void AbstractMarkerTiler::onIndicesMoved(const TileIndex::List& tileIndicesList, const WMWGeoCoordinate& targetCoordinates,
+                                         const QPersistentModelIndex& targetSnapIndex)
 {
     Q_UNUSED(tileIndicesList);
     Q_UNUSED(targetCoordinates);
