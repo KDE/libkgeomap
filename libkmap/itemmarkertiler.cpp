@@ -528,6 +528,12 @@ void ItemMarkerTiler::addMarkerIndexToGrid(const QPersistentModelIndex& markerIn
     }
 }
 
+void ItemMarkerTiler::prepareTiles(const WMWGeoCoordinate& upperLeft, const WMWGeoCoordinate&, int level)
+{
+
+
+}
+
 void ItemMarkerTiler::regenerateTiles()
 {
     resetRootTile();

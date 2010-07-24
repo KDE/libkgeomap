@@ -48,6 +48,7 @@ public:
     virtual QAbstractItemModel* getModel() const;
     virtual QList<QPersistentModelIndex> getTileMarkerIndices(const TileIndex& tileIndex);
 
+    virtual void prepareTiles(const WMWGeoCoordinate& upperLeft, const WMWGeoCoordinate& lowerRight, int level);
     virtual void regenerateTiles();
     virtual Tile* getTile(const TileIndex& tileIndex, const bool stopIfEmpty = false);
     virtual int getTileMarkerCount(const TileIndex& tileIndex);

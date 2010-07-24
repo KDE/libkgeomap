@@ -723,8 +723,8 @@ void KMap::updateClusters()
         return;
     }
 
-    if (!d->clustersDirty)
-        return;
+    //if (!d->clustersDirty)
+    //    return;
 
     d->clustersDirty = false;
 
@@ -772,6 +772,11 @@ void KMap::updateClusters()
     // TODO: iterate only over the visible part of the map
     int debugCountNonEmptyTiles = 0;
     int debugTilesSearched = 0;
+  
+    //TODO: this is good here? 
+    for(int i = 0; i < mapBounds.count(); ++i)
+        s->markerModel->prepareTiles(mapBounds.at(i).first, mapBounds.at(i).second, markerLevel);
+ 
     for (AbstractMarkerTiler::NonEmptyIterator tileIterator(s->markerModel, markerLevel, mapBounds); !tileIterator.atEnd(); tileIterator.nextIndex())
     {
         const AbstractMarkerTiler::TileIndex tileIndex = tileIterator.currentIndex();

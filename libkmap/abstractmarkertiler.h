@@ -32,6 +32,7 @@
 #include <QBitArray>
 #include <QItemSelectionModel>
 #include <QObject>
+#include <QMetaType>
 
 // local includes
 
@@ -284,11 +285,36 @@ public:
             }
         }
 
+        class ImageFromTileInfo
+        {
+        public:
+            ImageFromTileInfo()
+            : coordinate()
+            {
+                id           = 0;
+                url          = 0;
+                rating       = 0;
+                //creationDate = 0;
+            }
+            
+            ~ImageFromTileInfo()
+            {
+            }
+
+            int                 id;
+            KUrl                url;
+            WMWGeoCoordinate    coordinate;
+            int                 rating;
+            //QDateTime           creationDate;
+        };
+
+
         QVector<Tile*>               children;
         QBitArray                    childrenMask;
         QList<QPersistentModelIndex> markerIndices;
         int                          selectedCount;
         int                          markerCount;
+        QList<ImageFromTileInfo>     imagesFromTileInfo;
     };
 
     AbstractMarkerTiler(QObject* const parent = 0);
@@ -301,6 +327,7 @@ public:
     virtual QList<QPersistentModelIndex> getTileMarkerIndices(const TileIndex& tileIndex) = 0;
 
     // these have to be implemented
+    virtual void prepareTiles(const WMWGeoCoordinate& upperLeft, const WMWGeoCoordinate& lowerRight, int level) = 0;
     virtual void regenerateTiles() = 0;
     virtual Tile* getTile(const TileIndex& tileIndex, const bool stopIfEmpty = false) = 0;
     virtual int getTileMarkerCount(const TileIndex& tileIndex) = 0;
@@ -360,12 +387,15 @@ private:
     AbstractMarkerTilerPrivate* const d;
 };
 
+
 } /* namespace KMapIface */
+
 
 inline QDebug operator<<(QDebug debugOut, const KMapIface::AbstractMarkerTiler::TileIndex& tileIndex)
 {
     debugOut << tileIndex.toIntList();
     return debugOut;
 }
+
 
 #endif /* ABSTRACTMARKERTILER_H */
