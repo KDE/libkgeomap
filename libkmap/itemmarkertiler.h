@@ -36,7 +36,7 @@ namespace KMapIface
 
 class KMAP_EXPORT ItemMarkerTiler : public AbstractMarkerTiler
 {
-Q_OBJECT
+    Q_OBJECT
 
 public:
 
@@ -61,7 +61,7 @@ public:
     virtual WMWSelectionState getTileSelectedState(const TileIndex& tileIndex);
 
     virtual void onIndicesClicked(const TileIndex::List& tileIndicesList);
-    virtual void onIndicesMoved(const TileIndex::List& tileIndicesList, const WMWGeoCoordinate& targetCoordinates, 
+    virtual void onIndicesMoved(const TileIndex::List& tileIndicesList, const WMWGeoCoordinate& targetCoordinates,
                                 const QPersistentModelIndex& targetSnapIndex);
 
     void setMarkerModelHelper(WMWModelHelper* const modelHelper);

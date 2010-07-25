@@ -67,8 +67,8 @@ QAbstractItemModel* ItemMarkerTiler::getModel() const
 
 void ItemMarkerTiler::setMarkerModelHelper(WMWModelHelper* const modelHelper)
 {
-    d->modelHelper = modelHelper;
-    d->markerModel = modelHelper->model();
+    d->modelHelper    = modelHelper;
+    d->markerModel    = modelHelper->model();
     d->selectionModel = modelHelper->selectionModel();
 
     if (d->markerModel!=0)
@@ -528,10 +528,8 @@ void ItemMarkerTiler::addMarkerIndexToGrid(const QPersistentModelIndex& markerIn
     }
 }
 
-void ItemMarkerTiler::prepareTiles(const WMWGeoCoordinate& upperLeft, const WMWGeoCoordinate&, int level)
+void ItemMarkerTiler::prepareTiles(const WMWGeoCoordinate& /*upperLeft*/, const WMWGeoCoordinate&, int /*level*/)
 {
-
-
 }
 
 void ItemMarkerTiler::regenerateTiles()
