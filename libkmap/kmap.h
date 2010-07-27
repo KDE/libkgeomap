@@ -110,6 +110,9 @@ public:
     int getThumbnailSize() const;
     int getUndecoratedThumbnailSize() const;
     void setEditEnabled(const bool state);
+    QList<double> selectionCoordinates() const;
+    void setSelectionCoordinates(QList<double>& sel);
+    bool hasSelection() const; 
 
 public Q_SLOTS:
 
@@ -119,6 +122,7 @@ public Q_SLOTS:
     void slotClustersNeedUpdating();
     void slotDecreaseThumbnailSize();
     void slotIncreaseThumbnailSize();
+    void slotNewSelectionFromMap(const QList<double>& sel);
 
 Q_SIGNALS:
 
@@ -127,6 +131,7 @@ Q_SIGNALS:
                                    const KMapIface::WMWGeoCoordinate& coordinates); */
     void signalSpecialMarkersMoved(const QList<QPersistentModelIndex>& indices);
     void signalUngroupedModelChanged(const int index);
+    void signalNewSelectionFromMap();
 
 public:
 

@@ -187,6 +187,8 @@ public:
     KAction*                actionIncreaseThumbnailSize;
     KAction*                actionDecreaseThumbnailSize;
     KHBox*                  hBoxForAdditionalControlWidgetItems;
+
+    QList<double>           selectionRectangle;
 };
 
 KMap::KMap(QWidget* const parent)
@@ -403,6 +405,13 @@ bool KMap::setBackend(const QString& backendName)
             {
                 connect(s->markerModel, SIGNAL(signalThumbnailAvailableForIndex(const QVariant&, const QPixmap&)),
                         d->currentBackend, SLOT(slotThumbnailAvailableForIndex(const QVariant&, const QPixmap&)));
+            }
+
+            if (backendName == QString("marble"))
+            {
+                kDebug()<<"MARBLE AREA SIGNAL CONNECTED.";
+               connect(d->currentBackend->mapWidget(), SIGNAL(regionSelected(const QList<double>&)),
+                       this, SLOT(slotNewSelectionFromMap(const QList<double>&))); 
             }
 
             // call this slot manually in case the backend was ready right away:
@@ -1747,6 +1756,27 @@ int KMap::getThumbnailSize() const
 int KMap::getUndecoratedThumbnailSize() const
 {
     return d->thumbnailSize-2;
+}
+
+bool KMap::hasSelection() const
+{
+    return !d->selectionRectangle.isEmpty();
+}
+
+QList<double> KMap::selectionCoordinates() const
+{
+    return d->selectionRectangle;
+}
+
+void KMap::setSelectionCoordinates(QList<double>& sel)
+{
+    d->selectionRectangle = sel;
+}
+
+void KMap::slotNewSelectionFromMap(const QList<double>& sel)
+{
+    d->selectionRectangle = sel;
+    emit signalNewSelectionFromMap();
 }
 
 void KMap::slotUngroupedModelChanged()

@@ -141,6 +141,9 @@ BackendMarble::BackendMarble(const QExplicitlySharedDataPointer<WMWSharedData>& 
     connect(d->marbleWidget, SIGNAL(zoomChanged(int)),
             this, SLOT(slotMarbleZoomChanged(int)));
 
+   // connect(d->marbleWidget, SIGNAL(regionSelected(const QList<double>&)),
+   //         this, SLOT(slotNewSelectionFromMap(const QList<double>&)));
+
     // set a backend first
     setMapTheme(d->cacheMapTheme);
 
@@ -1083,5 +1086,10 @@ bool BackendMarble::findSnapPoint(const QPoint& actualPoint, QPoint* const snapP
 
     return foundSnapPoint;
 }
+/*
+void BackendMarble::slotNewSelectionFromMap(QList<double>& sel)
+{
 
+} 
+*/
 } /* namespace KMapIface */
