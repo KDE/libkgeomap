@@ -84,6 +84,10 @@ public:
     void setShowScaleControl(const bool state);
     void setShowNavigationControl(const bool state);
 
+    virtual void setSearchRectangle(const QList<double>& searchCoordinates);
+    virtual void setPaintSearchRectangleState(const bool state);
+    virtual void mouseModeChanged(MouseMode mouseMode);
+
 public Q_SLOTS:
 
     virtual void slotClustersNeedUpdating();

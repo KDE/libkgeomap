@@ -123,6 +123,7 @@ public Q_SLOTS:
     void slotDecreaseThumbnailSize();
     void slotIncreaseThumbnailSize();
     void slotNewSelectionFromMap(const QList<double>& sel);
+    void slotSetSelectionMode();
 
 Q_SIGNALS:
 

@@ -93,6 +93,8 @@ public:
     int                                       cacheMinZoom;
     WMWGeoCoordinate                          cacheCenter;
     QPair<WMWGeoCoordinate, WMWGeoCoordinate> cacheBounds;
+
+
 };
 
 BackendGoogleMaps::BackendGoogleMaps(const QExplicitlySharedDataPointer<WMWSharedData>& sharedData, QObject* const parent)
@@ -954,6 +956,23 @@ bool BackendGoogleMaps::eventFilter(QObject* object, QEvent* event)
         }
     }
     return false;
+}
+
+void BackendGoogleMaps::setSearchRectangle(const QList<double>& searchCoordinates)
+{
+
+}
+
+void BackendGoogleMaps::setPaintSearchRectangleState(const bool state)
+{
+
+
+}
+
+void BackendGoogleMaps::mouseModeChanged(MouseMode mouseMode)
+{
+
+
 }
 
 } /* namespace KMapIface */

@@ -145,7 +145,8 @@ public:
         groupingRadius(KMapIfaceMinGroupingRadius),
         editGroupingRadius(KMapIfaceMinEditGroupingRadius),
         actionIncreaseThumbnailSize(0),
-        actionDecreaseThumbnailSize(0)
+        actionDecreaseThumbnailSize(0),
+        actionSetSelectionMode(0)
     {
     }
 
@@ -189,6 +190,8 @@ public:
     KHBox*                  hBoxForAdditionalControlWidgetItems;
 
     QList<double>           selectionRectangle;
+
+    KAction*                actionSetSelectionMode;
 };
 
 KMap::KMap(QWidget* const parent)
@@ -273,6 +276,10 @@ void KMap::createActions()
     d->actionDecreaseThumbnailSize = new KAction(i18n("T-"), this);
     d->actionDecreaseThumbnailSize->setToolTip(i18n("Decrease the thumbnail size on the map"));
 
+    d->actionSetSelectionMode = new KAction(i18n("S"), this);
+    d->actionSetSelectionMode->setCheckable(true);
+    d->actionSetSelectionMode->setToolTip(i18n("Switch between pan mode and selection mode."));
+
     connect(d->actionIncreaseThumbnailSize, SIGNAL(triggered(bool)),
             this, SLOT(slotIncreaseThumbnailSize()));
 
@@ -287,6 +294,9 @@ void KMap::createActions()
 
     connect(d->actionShowNumbersOnItems, SIGNAL(changed()),
             this, SLOT(slotItemDisplaySettingsChanged()));
+
+    connect(d->actionSetSelectionMode, SIGNAL(changed()),
+            this, SLOT(slotSetSelectionMode()));
 }
 
 void KMap::createActionsForBackendSelection()
@@ -659,6 +669,9 @@ QWidget* KMap::getControlWidget()
 
         QToolButton* const decreaseThumbnailSizeButton = new QToolButton(d->controlWidget);
         decreaseThumbnailSizeButton->setDefaultAction(d->actionDecreaseThumbnailSize);
+
+        QToolButton* const setSelectionModeButton = new QToolButton(d->controlWidget);
+        setSelectionModeButton->setDefaultAction(d->actionSetSelectionMode);
 
         d->hBoxForAdditionalControlWidgetItems = new KHBox(d->controlWidget);
 
@@ -1777,6 +1790,22 @@ void KMap::slotNewSelectionFromMap(const QList<double>& sel)
 {
     d->selectionRectangle = sel;
     emit signalNewSelectionFromMap();
+}
+
+void KMap::slotSetSelectionMode()
+{
+   //TODO:Add here the code that changes the selection mode 
+    if(d->currentBackend->backendName() == QString("marble"))
+    {
+        if(d->actionSetSelectionMode->isChecked())
+        {
+            d->currentBackend->mouseModeChanged(MouseSelection);
+        }
+        else
+        {
+            d->currentBackend->mouseModeChanged(MousePan);
+        }
+    }    
 }
 
 void KMap::slotUngroupedModelChanged()

@@ -41,6 +41,13 @@ class KConfigGroup;
 namespace KMapIface
 {
 
+enum MouseMode
+{
+    MousePan = 1,
+    MouseSelection = 2
+};
+
+
 class WMWSharedData;
 
 class MapBackend : public QObject
@@ -87,6 +94,10 @@ public:
 //     virtual void updateDragDropMarkerPosition(const QPoint& pos) = 0;
 
     virtual void updateActionAvailability() = 0;
+
+    virtual void setSearchRectangle(const QList<double>& searchCorrdinates) = 0;
+    virtual void setPaintSearchRectangleState(const bool state) = 0;
+    virtual void mouseModeChanged(MouseMode mouseMode) = 0;
 
     const QExplicitlySharedDataPointer<WMWSharedData> s;
 
