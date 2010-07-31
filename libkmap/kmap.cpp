@@ -278,14 +278,24 @@ void KMap::createActions()
     d->actionDecreaseThumbnailSize = new KAction(i18n("T-"), this);
     d->actionDecreaseThumbnailSize->setToolTip(i18n("Decrease the thumbnail size on the map"));
 
-    d->actionSetSelectionMode = new KAction(i18n("S"), this);
+    d->actionSetSelectionMode = new KAction(this);
     d->actionSetSelectionMode->setCheckable(true);
-    d->actionSetSelectionMode->setToolTip(i18n("Selection mode."));
+    d->actionSetSelectionMode->setIcon(SmallIcon("select-rectangular"));
+    d->actionSetSelectionMode->setToolTip(i18n("Set a search rectangle mode."));
 
-    d->actionSetPanMode = new KAction(i18n("P"), this);
+    d->actionSetPanMode = new KAction(this);
     d->actionSetPanMode->setCheckable(true);
     d->actionSetPanMode->setToolTip(i18n("Pan mode."));
+    d->actionSetPanMode->setIcon(SmallIcon("transform-move"));
     d->actionSetPanMode->setChecked(true);
+
+    // TODO: for later actions
+//     action->setToolTip(i18n("Zoom into a group"));
+//     action->setIcon(SmallIcon("page-zoom"));
+//     action->setToolTip(i18n("Filter images"));
+//     action->setIcon(SmallIcon("view-filter"));
+//     action->setToolTip(i18n("Select images"));
+//     action->setIcon(SmallIcon("edit-select"));
 
     connect(d->actionIncreaseThumbnailSize, SIGNAL(triggered(bool)),
             this, SLOT(slotIncreaseThumbnailSize()));
@@ -394,10 +404,9 @@ bool KMap::setBackend(const QString& backendName)
             disconnect(d->currentBackend->mapWidget(), SIGNAL(regionSelected(const QList<double>&)),
                     this, SLOT(slotNewSelectionFromMap(const QList<double>&)));
         }
-            disconnect(d->currentBackend, SIGNAL(signalSelectionHasBeenMade(const QList<double>&)),
-                    this, SLOT(slotNewSelectionFromMap(const QList<double>&))); 
 
-       
+        disconnect(d->currentBackend, SIGNAL(signalSelectionHasBeenMade(const QList<double>&)),
+                this, SLOT(slotNewSelectionFromMap(const QList<double>&)));
 
     }
 
@@ -442,9 +451,9 @@ bool KMap::setBackend(const QString& backendName)
                connect(d->currentBackend->mapWidget(), SIGNAL(regionSelected(const QList<double>&)),
                        this, SLOT(slotNewSelectionFromMap(const QList<double>&)));
             }
-               connect(d->currentBackend, SIGNAL(signalSelectionHasBeenMade(const QList<double>&)),
-                       this, SLOT(slotNewSelectionFromMap(const QList<double>&))); 
-            
+
+            connect(d->currentBackend, SIGNAL(signalSelectionHasBeenMade(const QList<double>&)),
+                    this, SLOT(slotNewSelectionFromMap(const QList<double>&)));
 
             // call this slot manually in case the backend was ready right away:
             if (d->currentBackend->isReady())
@@ -692,11 +701,13 @@ QWidget* KMap::getControlWidget()
         QToolButton* const decreaseThumbnailSizeButton = new QToolButton(d->controlWidget);
         decreaseThumbnailSizeButton->setDefaultAction(d->actionDecreaseThumbnailSize);
 
-        QToolButton* const setSelectionModeButton = new QToolButton(d->controlWidget);
-        setSelectionModeButton->setDefaultAction(d->actionSetSelectionMode);
+        new KSeparator(Qt::Vertical, d->controlWidget);
 
         QToolButton* const setPanModeButton = new QToolButton(d->controlWidget);
         setPanModeButton->setDefaultAction(d->actionSetPanMode);
+
+        QToolButton* const setSelectionModeButton = new QToolButton(d->controlWidget);
+        setSelectionModeButton->setDefaultAction(d->actionSetSelectionMode);
 
         d->hBoxForAdditionalControlWidgetItems = new KHBox(d->controlWidget);
 
@@ -1393,10 +1404,7 @@ void KMap::slotClustersClicked(const QIntList& clusterIndices)
     for (int i=0; i<clusterIndices.count(); ++i)
     {
         const int clusterIndex = clusterIndices.at(i);
-        kDebug()<<clusterIndex;
         const WMWCluster currentCluster = s->clusterList.at(clusterIndex);
-
-        const bool doSelect = (currentCluster.selectedState!=WMWSelectedAll);
 
         // TODO: use a consistent format for tile indices
         AbstractMarkerTiler::TileIndex::List tileIndices;
