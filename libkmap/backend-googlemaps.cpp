@@ -981,7 +981,7 @@ void BackendGoogleMaps::setSearchRectangle(const QList<double>& searchCoordinate
 void BackendGoogleMaps::mouseModeChanged(MouseMode mouseMode)
 {
 
-    if(mouseMode == MouseSelection)
+    if(mouseMode == MouseModeSelection)
     {
        // d->htmlWidget->runScript(QString("selectionModeStatus(true)"));
         d->htmlWidget->mouseModeChanged(true);

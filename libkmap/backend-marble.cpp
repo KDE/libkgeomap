@@ -159,7 +159,7 @@ BackendMarble::BackendMarble(const QExplicitlySharedDataPointer<WMWSharedData>& 
 
     emit(signalBackendReady(backendName()));
 
-    d->currentMouseMode     = MousePan;
+    d->currentMouseMode = MouseModePan;
 }
 
 BackendMarble::~BackendMarble()
@@ -441,7 +441,7 @@ void BackendMarble::marbleCustomPaint(Marble::GeoPainter* painter)
     painter->autoMapQuality();
 
     //here we draw the selection rectangle
-    if(!d->searchRectangleCoordinates.isEmpty() && d->currentMouseMode == MouseSelection)
+    if(!d->searchRectangleCoordinates.isEmpty() && d->currentMouseMode == MouseModeSelection)
     {
         const qreal lonWest  = d->searchRectangleCoordinates.at(0);
         const qreal latNorth = d->searchRectangleCoordinates.at(1);
@@ -822,7 +822,7 @@ bool BackendMarble::eventFilter(QObject *object, QEvent *event)
     QMouseEvent* const mouseEvent = static_cast<QMouseEvent*>(event);
     bool doFilterEvent = false;
 
-    if(d->currentMouseMode == MouseSelection)
+    if(d->currentMouseMode == MouseModeSelection)
     {
         
         /*
@@ -1257,7 +1257,7 @@ void BackendMarble::mouseModeChanged(MouseMode mouseMode)
    
     kDebug()<<"Mouse mode changed.";
 
-    if(d->currentMouseMode == MousePan)
+    if(d->currentMouseMode == MouseModePan)
     {
         d->searchRectangleCoordinates.clear();
         d->firstSelectionPoint.clear();

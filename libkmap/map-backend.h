@@ -41,13 +41,6 @@ class KConfigGroup;
 namespace KMapIface
 {
 
-enum MouseMode
-{
-    MousePan = 1,
-    MouseSelection = 2
-};
-
-
 class WMWSharedData;
 
 class MapBackend : public QObject

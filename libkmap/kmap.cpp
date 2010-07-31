@@ -1819,7 +1819,7 @@ void KMap::slotSetPanMode()
 {
     if(d->actionSetPanMode->isChecked())
     {
-        d->currentBackend->mouseModeChanged(MousePan);
+        d->currentBackend->mouseModeChanged(MouseModePan);
         emit signalRemoveCurrentSelection();
         d->actionSetSelectionMode->setChecked(false);
     }
@@ -1832,7 +1832,7 @@ void KMap::slotSetSelectionMode()
    // {
         if(d->actionSetSelectionMode->isChecked())
         {
-            d->currentBackend->mouseModeChanged(MouseSelection);
+            d->currentBackend->mouseModeChanged(MouseModeSelection);
             d->actionSetPanMode->setChecked(false);
         }
         else
