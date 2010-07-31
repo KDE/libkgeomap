@@ -320,12 +320,6 @@ public:
     AbstractMarkerTiler(QObject* const parent = 0);
     ~AbstractMarkerTiler();
 
-    // these should actually be removed later, after some refactoring
-    virtual bool isItemModelBased() const = 0;
-    virtual QItemSelectionModel* getSelectionModel() const = 0;
-    virtual QAbstractItemModel* getModel() const = 0;
-    virtual QList<QPersistentModelIndex> getTileMarkerIndices(const TileIndex& tileIndex) = 0;
-
     // these have to be implemented
     virtual void prepareTiles(const WMWGeoCoordinate& upperLeft, const WMWGeoCoordinate& lowerRight, int level) = 0;
     virtual void regenerateTiles() = 0;
@@ -341,7 +335,7 @@ public:
     virtual WMWSelectionState getTileSelectedState(const TileIndex& tileIndex) = 0;
 
     // these can be implemented if you want to react to actions in kmap
-    virtual void onIndicesClicked(const TileIndex::List& tileIndicesList);
+    virtual void onIndicesClicked(const TileIndex::List& tileIndicesList, const WMWSelectionState& groupSelectionState);
     virtual void onIndicesMoved(const TileIndex::List& tileIndicesList, const WMWGeoCoordinate& targetCoordinates, const QPersistentModelIndex& targetSnapIndex);
 
     Tile* rootTile();

@@ -43,11 +43,6 @@ public:
     ItemMarkerTiler(WMWModelHelper* const modelHelper, QObject* const parent = 0);
     ~ItemMarkerTiler();
 
-    virtual bool isItemModelBased() const;
-    virtual QItemSelectionModel* getSelectionModel() const;
-    virtual QAbstractItemModel* getModel() const;
-    virtual QList<QPersistentModelIndex> getTileMarkerIndices(const TileIndex& tileIndex);
-
     virtual void prepareTiles(const WMWGeoCoordinate& upperLeft, const WMWGeoCoordinate& lowerRight, int level);
     virtual void regenerateTiles();
     virtual Tile* getTile(const TileIndex& tileIndex, const bool stopIfEmpty = false);
@@ -60,7 +55,7 @@ public:
     virtual bool indicesEqual(const QVariant& a, const QVariant& b) const;
     virtual WMWSelectionState getTileSelectedState(const TileIndex& tileIndex);
 
-    virtual void onIndicesClicked(const TileIndex::List& tileIndicesList);
+    virtual void onIndicesClicked(const TileIndex::List& tileIndicesList, const WMWSelectionState& groupSelectionState);
     virtual void onIndicesMoved(const TileIndex::List& tileIndicesList, const WMWGeoCoordinate& targetCoordinates,
                                 const QPersistentModelIndex& targetSnapIndex);
 
@@ -78,6 +73,8 @@ private Q_SLOTS:
     void slotThumbnailAvailableForIndex(const QPersistentModelIndex& index, const QPixmap& pixmap);
 
 private:
+
+    QList<QPersistentModelIndex> getTileMarkerIndices(const TileIndex& tileIndex);
 
     class ItemMarkerTilerPrivate;
     ItemMarkerTilerPrivate* const d;

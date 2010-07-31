@@ -505,9 +505,10 @@ AbstractMarkerTiler::Tile* AbstractMarkerTiler::resetRootTile()
     return d->rootTile;
 }
 
-void AbstractMarkerTiler::onIndicesClicked(const TileIndex::List& tileIndicesList)
+void AbstractMarkerTiler::onIndicesClicked(const TileIndex::List& tileIndicesList, const WMWSelectionState& groupSelectionState)
 {
     Q_UNUSED(tileIndicesList);
+    Q_UNUSED(groupSelectionState);
 }
 
 void AbstractMarkerTiler::onIndicesMoved(const TileIndex::List& tileIndicesList, const WMWGeoCoordinate& targetCoordinates,

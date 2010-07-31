@@ -55,16 +55,6 @@ ItemMarkerTiler::~ItemMarkerTiler()
     delete d;
 }
 
-QItemSelectionModel* ItemMarkerTiler::getSelectionModel() const
-{
-    return d->selectionModel;
-}
-
-QAbstractItemModel* ItemMarkerTiler::getModel() const
-{
-    return d->markerModel;
-}
-
 void ItemMarkerTiler::setMarkerModelHelper(WMWModelHelper* const modelHelper)
 {
     d->modelHelper    = modelHelper;
@@ -553,14 +543,30 @@ bool ItemMarkerTiler::indicesEqual(const QVariant& a, const QVariant& b) const
     return a.value<QPersistentModelIndex>()==b.value<QPersistentModelIndex>();
 }
 
-bool ItemMarkerTiler::isItemModelBased() const
+void ItemMarkerTiler::onIndicesClicked(const TileIndex::List& tileIndicesList, const WMWSelectionState& groupSelectionState)
 {
-    return true;
-}
+    QList<QPersistentModelIndex> clickedMarkers;
+    for (int i=0; i<tileIndicesList.count(); ++i)
+    {
+        const AbstractMarkerTiler::TileIndex tileIndex = tileIndicesList.at(i);
 
-void ItemMarkerTiler::onIndicesClicked(const TileIndex::List& tileIndicesList)
-{
-    Q_UNUSED(tileIndicesList);
+        clickedMarkers << getTileMarkerIndices(tileIndex);
+    }
+
+    const bool doSelect = groupSelectionState!=WMWSelectedAll;
+    if (d->selectionModel)
+    {
+        for (int i=0; i<clickedMarkers.count(); ++i)
+        {
+            if (d->selectionModel->isSelected(clickedMarkers.at(i))!=doSelect)
+            {
+                d->selectionModel->select(clickedMarkers.at(i), (doSelect ? QItemSelectionModel::Select : QItemSelectionModel::Deselect) | QItemSelectionModel::Rows);
+            }
+        }
+    }
+
+    // TODO: when do we report the clicks to the modelHelper?
+    d->modelHelper->onIndicesClicked(clickedMarkers);
 }
 
 void ItemMarkerTiler::onIndicesMoved(const TileIndex::List& tileIndicesList, const WMWGeoCoordinate& targetCoordinates, const QPersistentModelIndex& targetSnapIndex)
