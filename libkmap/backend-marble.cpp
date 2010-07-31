@@ -816,7 +816,7 @@ bool BackendMarble::eventFilter(QObject *object, QEvent *event)
         && (event->type() != QEvent::MouseMove)
         && (event->type() != QEvent::MouseButtonRelease) )
     {
-        return false;
+        return QObject::eventFilter(object, event);
     }
 
     QMouseEvent* const mouseEvent = static_cast<QMouseEvent*>(event);
@@ -824,40 +824,32 @@ bool BackendMarble::eventFilter(QObject *object, QEvent *event)
 
     if(d->currentMouseMode == MouseModeSelection)
     {
-        
-        /*
         if (   ( event->type() == QEvent::MouseButtonPress )
             && ( mouseEvent->button()==Qt::LeftButton ) )
         {
-            //TODO: mouseEvent->pos() is enough?
-            //if(!d->firstSelectionPoint.hasCoordinates())
-            //{
-            //    geoCoordinates(mouseEvent->pos(), &d->firstSelectionPoint);
-            //    kDebug()<<"First selection point:"<<d->firstSelectionPoint.lat()<<" "<<d->firstSelectionPoint.lon(); 
-            //}                                                            
+            // we need to filter this event because otherwise Marble displays
+            // a left click context menu
             doFilterEvent = true;     
         }
-        else*/ if (event->type() == QEvent::MouseMove)
+        else if (event->type() == QEvent::MouseMove)
         {
             if(d->firstSelectionPoint.hasCoordinates() && !d->secondSelectionPoint.hasCoordinates())
-            {     
-                
+            {
                 d->intermediateSelectionPoint.clear();
                 geoCoordinates(mouseEvent->pos(), &d->intermediateSelectionPoint);   
-            
+
                 qreal lonWest  = d->firstSelectionPoint.lon();
                 qreal latNorth = d->firstSelectionPoint.lat();
                 qreal lonEast  = d->intermediateSelectionPoint.lon();
                 qreal latSouth = d->intermediateSelectionPoint.lat();
 
-                
                 if(lonWest > lonEast)
                 {
                     const qreal auxCoord = lonWest;
                     lonWest              = lonEast;
                     lonEast              = auxCoord;
                 }
-        
+
                 if(latNorth < latSouth)
                 {
                     const qreal auxCoord = latNorth;
@@ -876,11 +868,10 @@ bool BackendMarble::eventFilter(QObject *object, QEvent *event)
         else if (   (event->type() == QEvent::MouseButtonRelease)
              && ( mouseEvent->button() == Qt::LeftButton ) )
         {
-            
             if(!d->firstSelectionPoint.hasCoordinates())
             {
                 geoCoordinates(mouseEvent->pos(), &d->firstSelectionPoint);
-            }                                                            
+            }
             else
             {
                 d->intermediateSelectionPoint.clear();
@@ -919,189 +910,186 @@ bool BackendMarble::eventFilter(QObject *object, QEvent *event)
 
             doFilterEvent = true;
         }
-        
     }
     else
     {
-
-    if (   ( event->type() == QEvent::MouseButtonPress )
-        && ( mouseEvent->button()==Qt::LeftButton ) )
-    {
-        // check whether the user clicked on one of our items:
-        // scan in reverse order, because the user would expect
-        // the topmost marker to be picked up and not the
-        // one below
-//         if (s->specialMarkersModel)
-//         {
-//             for (int row = s->specialMarkersModel->rowCount()-1; row>=0; --row)
-//             {
-//                 const QModelIndex currentIndex = s->specialMarkersModel->index(row, 0);
-//                 const WMWGeoCoordinate currentCoordinates = s->specialMarkersModel->data(currentIndex, s->specialMarkersCoordinatesRole).value<WMWGeoCoordinate>();
-//
-//                 QPoint markerPoint;
-//                 if (!screenCoordinates(currentCoordinates, &markerPoint))
-//                 {
-//                     continue;
-//                 }
-//
-//                 const int markerPixmapHeight = s->markerPixmap.height();
-//                 const int markerPixmapWidth = s->markerPixmap.width();
-//                 const QRect markerRect(markerPoint.x()-markerPixmapWidth/2, markerPoint.y()-markerPixmapHeight, markerPixmapWidth, markerPixmapHeight);
-//                 if (!markerRect.contains(mouseEvent->pos()))
-//                 {
-//                     continue;
-//                 }
-//
-//                 // the user clicked on a marker:
-//                 d->mouseMoveMarkerIndex = QPersistentModelIndex(currentIndex);
-//                 d->mouseMoveCenterOffset = mouseEvent->pos() - markerPoint;
-//                 d->mouseMoveObjectCoordinates = currentCoordinates;
-//                 doFilterEvent = true;
-//                 d->havePotentiallyMouseMovingObject = true;
-//
-//                 break;
-//             }
-//         }
-
-        if (/*s->inEditMode&&*/!doFilterEvent)
+        if (   ( event->type() == QEvent::MouseButtonPress )
+            && ( mouseEvent->button()==Qt::LeftButton ) )
         {
-            // scan in reverse order of painting!
-            for (int clusterIndex = s->clusterList.count()-1; clusterIndex>=0; --clusterIndex)
+            // check whether the user clicked on one of our items:
+            // scan in reverse order, because the user would expect
+            // the topmost marker to be picked up and not the
+            // one below
+    //         if (s->specialMarkersModel)
+    //         {
+    //             for (int row = s->specialMarkersModel->rowCount()-1; row>=0; --row)
+    //             {
+    //                 const QModelIndex currentIndex = s->specialMarkersModel->index(row, 0);
+    //                 const WMWGeoCoordinate currentCoordinates = s->specialMarkersModel->data(currentIndex, s->specialMarkersCoordinatesRole).value<WMWGeoCoordinate>();
+    //
+    //                 QPoint markerPoint;
+    //                 if (!screenCoordinates(currentCoordinates, &markerPoint))
+    //                 {
+    //                     continue;
+    //                 }
+    //
+    //                 const int markerPixmapHeight = s->markerPixmap.height();
+    //                 const int markerPixmapWidth = s->markerPixmap.width();
+    //                 const QRect markerRect(markerPoint.x()-markerPixmapWidth/2, markerPoint.y()-markerPixmapHeight, markerPixmapWidth, markerPixmapHeight);
+    //                 if (!markerRect.contains(mouseEvent->pos()))
+    //                 {
+    //                     continue;
+    //                 }
+    //
+    //                 // the user clicked on a marker:
+    //                 d->mouseMoveMarkerIndex = QPersistentModelIndex(currentIndex);
+    //                 d->mouseMoveCenterOffset = mouseEvent->pos() - markerPoint;
+    //                 d->mouseMoveObjectCoordinates = currentCoordinates;
+    //                 doFilterEvent = true;
+    //                 d->havePotentiallyMouseMovingObject = true;
+    //
+    //                 break;
+    //             }
+    //         }
+
+            if (/*s->inEditMode&&*/!doFilterEvent)
             {
-                const WMWCluster& cluster = s->clusterList.at(clusterIndex);
-                const WMWGeoCoordinate currentCoordinates = cluster.coordinates;
-
-                QPoint clusterPoint;
-                if (!screenCoordinates(currentCoordinates, &clusterPoint))
+                // scan in reverse order of painting!
+                for (int clusterIndex = s->clusterList.count()-1; clusterIndex>=0; --clusterIndex)
                 {
-                    continue;
+                    const WMWCluster& cluster = s->clusterList.at(clusterIndex);
+                    const WMWGeoCoordinate currentCoordinates = cluster.coordinates;
+
+                    QPoint clusterPoint;
+                    if (!screenCoordinates(currentCoordinates, &clusterPoint))
+                    {
+                        continue;
+                    }
+
+                    QRect markerRect;
+                    markerRect.setSize(cluster.pixmapSize);
+                    markerRect.moveBottomLeft(clusterPoint);
+                    markerRect.translate(-QPoint(cluster.pixmapOffset.x(), -cluster.pixmapOffset.y()));
+
+                    if (!markerRect.contains(mouseEvent->pos()))
+                    {
+                        continue;
+                    }
+
+                    // TODO: for circles, make sure the mouse is really above the circle and not just in the rectangle!
+
+                    // the user clicked on a cluster:
+                    d->mouseMoveClusterIndex = clusterIndex;
+                    d->mouseMoveCenterOffset = mouseEvent->pos() - clusterPoint;
+                    d->mouseMoveObjectCoordinates = currentCoordinates;
+                    doFilterEvent = true;
+                    d->havePotentiallyMouseMovingObject = true;
+                    s->haveMovingCluster = true;
+
+                    break;
                 }
-
-                QRect markerRect;
-                markerRect.setSize(cluster.pixmapSize);
-                markerRect.moveBottomLeft(clusterPoint);
-                markerRect.translate(-QPoint(cluster.pixmapOffset.x(), -cluster.pixmapOffset.y()));
-
-                if (!markerRect.contains(mouseEvent->pos()))
-                {
-                    continue;
-                }
-
-                // TODO: for circles, make sure the mouse is really above the circle and not just in the rectangle!
-
-                // the user clicked on a cluster:
-                d->mouseMoveClusterIndex = clusterIndex;
-                d->mouseMoveCenterOffset = mouseEvent->pos() - clusterPoint;
-                d->mouseMoveObjectCoordinates = currentCoordinates;
-                doFilterEvent = true;
-                d->havePotentiallyMouseMovingObject = true;
-                s->haveMovingCluster = true;
-
-                break;
             }
         }
-    }
-    else if (   (event->type() == QEvent::MouseMove)
-             && (d->havePotentiallyMouseMovingObject || d->haveMouseMovingObject) )
-    {
-        if ( (!s->editEnabled) || ((d->mouseMoveClusterIndex>=0)&&!s->inEditMode) )
+        else if (   (event->type() == QEvent::MouseMove)
+                && (d->havePotentiallyMouseMovingObject || d->haveMouseMovingObject) )
         {
-            // clusters only move in edit mode and when edit mode is enabled
-            // TODO: this blocks moving of the map in non-edit mode
-            d->havePotentiallyMouseMovingObject = false;
-            d->mouseMoveClusterIndex = -1;
-            d->mouseMoveMarkerIndex = QPersistentModelIndex();
-            s->haveMovingCluster = false;
-        }
-        else
-        {
-
-            // mark the object as really moving:
-            d->havePotentiallyMouseMovingObject = false;
-            d->haveMouseMovingObject = true;
-
-            // a cluster or marker is being moved. update its position:
-            QPoint newMarkerPoint = mouseEvent->pos() - d->mouseMoveCenterOffset;
-            QPoint snapPoint;
-            if (findSnapPoint(newMarkerPoint, &snapPoint, 0, 0))
-                newMarkerPoint = snapPoint;
-
-            WMWGeoCoordinate newCoordinates;
-            if (geoCoordinates(newMarkerPoint, &newCoordinates))
+            if ( (!s->editEnabled) || ((d->mouseMoveClusterIndex>=0)&&!s->inEditMode) )
             {
-                d->mouseMoveObjectCoordinates = newCoordinates;
-                d->marbleWidget->update();
-            }
-        }
-    }
-    else if (   (event->type() == QEvent::MouseButtonRelease)
-             && (d->havePotentiallyMouseMovingObject) )
-    {
-        // the object was not moved, but just clicked once
-        if (d->mouseMoveClusterIndex>=0)
-        {
-            const int mouseMoveClusterIndex = d->mouseMoveClusterIndex;
-
-            // we are done with the clicked object
-            // reset these before sending the signal
-            d->havePotentiallyMouseMovingObject = false;
-            d->mouseMoveClusterIndex = -1;
-            d->mouseMoveMarkerIndex = QPersistentModelIndex();
-            s->haveMovingCluster = false;
-
-            emit(signalClustersClicked(QIntList()<<mouseMoveClusterIndex));
-        }
-        else
-        {
-            // we are done with the clicked object:
-            d->havePotentiallyMouseMovingObject = false;
-            d->mouseMoveClusterIndex = -1;
-            d->mouseMoveMarkerIndex = QPersistentModelIndex();
-            s->haveMovingCluster = false;
-        }
-    }
-    else if (   (event->type() == QEvent::MouseButtonRelease)
-             && (d->haveMouseMovingObject) )
-    {
-        // the object was dropped, apply the coordinates if it is on screen:
-        const QPoint dropMarkerPoint = mouseEvent->pos() - d->mouseMoveCenterOffset;
-
-        QPair<int, QModelIndex> snapTargetIndex(-1, QModelIndex());
-        WMWGeoCoordinate newCoordinates;
-        bool haveValidPoint = findSnapPoint(dropMarkerPoint, 0, &newCoordinates, &snapTargetIndex);
-        if (!haveValidPoint)
-        {
-            haveValidPoint = geoCoordinates(dropMarkerPoint, &newCoordinates);
-        }
-
-        if (haveValidPoint)
-        {
-            if (d->mouseMoveMarkerIndex.isValid())
-            {
-/*                // the marker was dropped to valid coordinates
-                s->specialMarkersModel->setData(d->mouseMoveMarkerIndex, QVariant::fromValue(newCoordinates), s->specialMarkersCoordinatesRole);
-
-                QList<QPersistentModelIndex> markerIndices;
-                markerIndices << d->mouseMoveMarkerIndex;
-
-                // also emit a signal that the marker was moved:
-                emit(signalSpecialMarkersMoved(markerIndices));*/
+                // clusters only move in edit mode and when edit mode is enabled
+                // TODO: this blocks moving of the map in non-edit mode
+                d->havePotentiallyMouseMovingObject = false;
+                d->mouseMoveClusterIndex = -1;
+                d->mouseMoveMarkerIndex = QPersistentModelIndex();
+                s->haveMovingCluster = false;
             }
             else
             {
-                // a cluster is being moved
-                s->clusterList[d->mouseMoveClusterIndex].coordinates = newCoordinates;
-                emit(signalClustersMoved(QIntList()<<d->mouseMoveClusterIndex, snapTargetIndex));
+
+                // mark the object as really moving:
+                d->havePotentiallyMouseMovingObject = false;
+                d->haveMouseMovingObject = true;
+
+                // a cluster or marker is being moved. update its position:
+                QPoint newMarkerPoint = mouseEvent->pos() - d->mouseMoveCenterOffset;
+                QPoint snapPoint;
+                if (findSnapPoint(newMarkerPoint, &snapPoint, 0, 0))
+                    newMarkerPoint = snapPoint;
+
+                WMWGeoCoordinate newCoordinates;
+                if (geoCoordinates(newMarkerPoint, &newCoordinates))
+                {
+                    d->mouseMoveObjectCoordinates = newCoordinates;
+                    d->marbleWidget->update();
+                }
             }
         }
+        else if (   (event->type() == QEvent::MouseButtonRelease)
+                && (d->havePotentiallyMouseMovingObject) )
+        {
+            // the object was not moved, but just clicked once
+            if (d->mouseMoveClusterIndex>=0)
+            {
+                const int mouseMoveClusterIndex = d->mouseMoveClusterIndex;
 
-        d->haveMouseMovingObject = false;
-        d->mouseMoveClusterIndex = -1;
-        d->mouseMoveMarkerIndex = QPersistentModelIndex();
-        d->marbleWidget->update();
-        s->haveMovingCluster = false;
-    }
-    
+                // we are done with the clicked object
+                // reset these before sending the signal
+                d->havePotentiallyMouseMovingObject = false;
+                d->mouseMoveClusterIndex = -1;
+                d->mouseMoveMarkerIndex = QPersistentModelIndex();
+                s->haveMovingCluster = false;
+
+                emit(signalClustersClicked(QIntList()<<mouseMoveClusterIndex));
+            }
+            else
+            {
+                // we are done with the clicked object:
+                d->havePotentiallyMouseMovingObject = false;
+                d->mouseMoveClusterIndex = -1;
+                d->mouseMoveMarkerIndex = QPersistentModelIndex();
+                s->haveMovingCluster = false;
+            }
+        }
+        else if (   (event->type() == QEvent::MouseButtonRelease)
+                && (d->haveMouseMovingObject) )
+        {
+            // the object was dropped, apply the coordinates if it is on screen:
+            const QPoint dropMarkerPoint = mouseEvent->pos() - d->mouseMoveCenterOffset;
+
+            QPair<int, QModelIndex> snapTargetIndex(-1, QModelIndex());
+            WMWGeoCoordinate newCoordinates;
+            bool haveValidPoint = findSnapPoint(dropMarkerPoint, 0, &newCoordinates, &snapTargetIndex);
+            if (!haveValidPoint)
+            {
+                haveValidPoint = geoCoordinates(dropMarkerPoint, &newCoordinates);
+            }
+
+            if (haveValidPoint)
+            {
+                if (d->mouseMoveMarkerIndex.isValid())
+                {
+    /*                // the marker was dropped to valid coordinates
+                    s->specialMarkersModel->setData(d->mouseMoveMarkerIndex, QVariant::fromValue(newCoordinates), s->specialMarkersCoordinatesRole);
+
+                    QList<QPersistentModelIndex> markerIndices;
+                    markerIndices << d->mouseMoveMarkerIndex;
+
+                    // also emit a signal that the marker was moved:
+                    emit(signalSpecialMarkersMoved(markerIndices));*/
+                }
+                else
+                {
+                    // a cluster is being moved
+                    s->clusterList[d->mouseMoveClusterIndex].coordinates = newCoordinates;
+                    emit(signalClustersMoved(QIntList()<<d->mouseMoveClusterIndex, snapTargetIndex));
+                }
+            }
+
+            d->haveMouseMovingObject = false;
+            d->mouseMoveClusterIndex = -1;
+            d->mouseMoveMarkerIndex = QPersistentModelIndex();
+            d->marbleWidget->update();
+            s->haveMovingCluster = false;
+        }
     }
 
     if (doFilterEvent)
