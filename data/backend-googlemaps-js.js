@@ -27,6 +27,9 @@ var isInEditMode = false;
 var dragMarker;
 var dragSnappingToMid = -1;
 var dragSnappingToId = -1;
+var firstSelectionPoint;
+var secondSelectionPoint;
+var selectionRectangle;
 
 // ProjectionHelp: http://taapps-javalibs.blogspot.com/2009/10/google-map-v3how-to-use-overlayviews.html
 function ProjectionHelper(overlayMap) {
@@ -379,6 +382,111 @@ function wmwSetDragMarker(x, y, markerCount, markerSelectedCount) {
         icon: clusterIcon
     });
 }
+
+
+function addSelectionPoint(lng, lat, color)
+{
+        var currentColor = color;
+
+        if (firstSelectionPoint==null){
+            firstSelectionPoint = new google.maps.LatLng(lat, lng, true);
+        }
+        else{
+            if(secondSelectionPoint==null){
+                secondSelectionPoint = new google.maps.LatLng(lat, lng, true);
+
+                if(firstSelectionPoint.lng() > secondSelectionPoint.lng()){
+                    var latLngBounds = new google.maps.LatLngBounds(
+                                           secondSelectionPoint,
+                                           firstSelectionPoint
+                                           );
+                }
+                else{
+                    var latLngBounds = new google.maps.LatLngBounds(
+                                           firstSelectionPoint,
+                                           secondSelectionPoint
+                                           );
+                }
+
+                if(currentColor == "red"){
+                    selectionRectangle.setOptions({ 
+                                                  fillOpacity : 0.0,
+                                                  strokeColor : "#FF0000",
+                                                  strokeWeight: 1
+                                                  });
+                }
+                else{
+                    selectionRectangle.setOptions({ 
+                                                  fillOpacity : 0.0,
+                                                  strokeColor : "#0000FF",
+                                                  strokeWeight: 1
+                                                  });
+                }
+                
+                selectionRectangle.setBounds(latLngBounds);
+            }
+            else
+            {
+                secondSelectionPoint = new google.maps.LatLng(lat,lng, true);
+                var latLngBounds;  
+
+                if(firstSelectionPoint.lng() > secondSelectionPoint.lng())
+                {
+                    latLngBounds = new google.maps.LatLngBounds(
+                                       secondSelectionPoint,
+                                       firstSelectionPoint
+                                       );    
+                }
+                else
+                {
+                    var latLngBounds = new google.maps.LatLngBounds(
+                                           firstSelectionPoint,
+                                           secondSelectionPoint
+                                           );
+                }
+                
+                if(currentColor == "red"){
+                    selectionRectangle.setOptions({ 
+                                                  fillOpacity : 0.0,
+                                                  strokeColor : "#FF0000",
+                                                  strokeWeight: 1
+                                                  });
+                }
+                else{
+                    selectionRectangle.setOptions({
+                                                  fillOpacity : 0.0,       
+                                                  strokeColor : "#0000FF",
+                                                  strokeWeight: 1
+                                                  });
+                }
+
+                selectionRectangle.setBounds(latLngBounds);
+            }
+        }
+
+}
+
+
+function selectionModeStatus(state){
+
+    if(state == false){
+        map.draggable = true;
+
+        selectionRectangle.setMap(null);
+        selectionRectangle   = null;
+        firstSelectionPoint = null;
+        secondSelectionPoint = null;
+    }
+    else{
+        map.draggable = false; 
+        selectionRectangle = new google.maps.Rectangle({
+                                 map:map
+                                 });
+    }
+
+}
+
+
 function initialize() {
     var latlng = new google.maps.LatLng(52.0, 6.0);
     var myOptions = {
@@ -392,6 +500,46 @@ function initialize() {
     google.maps.event.addListener(map, 'maptypeid_changed', function() {
         wmwPostEventString('MT'+wmwGetMapType());
     });
+
+
+    //google.maps.event.clearListeners(map, 'dragstart');
+    //google.maps.event.clearListeners(map, 'drag');
+    //google.maps.event.clearListeners(map, 'dragend');
+    //google.maps.event.clearInstanceListeners(map);
+
+    //rectangle = new google.maps.Rectangle({
+    //            map:map
+    //            });
+
+/*    google.maps.event.addListener(map, 'click', function(event) {
+
+        if (firstSelectionPoint==null)
+        {
+         firstSelectionPoint= new google.maps.Marker({
+                              map:map,
+                              position: event.latLng,
+                              draggable: false
+                              });       
+        }
+        else
+        {
+            if(secondSelectionPoint==null)
+            {
+                secondSelectionPoint = new google.maps.Marker({
+                                           map:map,
+                                           position: event.latLng,
+                                           draggable:false
+                                           });
+                var latLngBounds = new google.maps.LatLngBounds(
+                                       firstSelectionPoint.getPosition(),
+                                       secondSelectionPoint.getPosition()
+                                       );
+                rectangle.setBounds(latLngBounds);
+            }
+        }
+    });
+*/
+
     //  these are too heavy on the performance. monitor 'idle' event only for now:
     //       google.maps.event.addListener(map, 'bounds_changed', function() {
     //           wmwPostEventString('MB');

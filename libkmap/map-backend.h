@@ -96,7 +96,6 @@ public:
     virtual void updateActionAvailability() = 0;
 
     virtual void setSearchRectangle(const QList<double>& searchCorrdinates) = 0;
-    virtual void setPaintSearchRectangleState(const bool state) = 0;
     virtual void mouseModeChanged(MouseMode mouseMode) = 0;
 
     const QExplicitlySharedDataPointer<WMWSharedData> s;
@@ -114,6 +113,7 @@ Q_SIGNALS:
     void signalMarkersMoved(const QIntList& markerIndices);
     void signalZoomChanged(const QString& newZoom);
     void signalSpecialMarkersMoved(const QList<QPersistentModelIndex>& indices);
+    void signalSelectionHasBeenMade(const QList<double>&);
 
 private:
 

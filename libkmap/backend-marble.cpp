@@ -94,7 +94,6 @@ public:
         clustersDirtyCacheProjection(),
         clustersDirtyCacheLat(),
         clustersDirtyCacheLon(),
-        paintSearchRectangle(false),
         searchRectangleCoordinates(),
         firstSelectionPoint(),
         secondSelectionPoint()
@@ -128,7 +127,6 @@ public:
     qreal                  clustersDirtyCacheLat;
     qreal                  clustersDirtyCacheLon;
 
-    bool                   paintSearchRectangle;
     QList<double>          searchRectangleCoordinates;
     MouseMode              currentMouseMode;
     WMWGeoCoordinate       firstSelectionPoint;
@@ -161,7 +159,6 @@ BackendMarble::BackendMarble(const QExplicitlySharedDataPointer<WMWSharedData>& 
 
     emit(signalBackendReady(backendName()));
 
-    d->paintSearchRectangle = false;
     d->currentMouseMode     = MousePan;
 }
 
@@ -428,8 +425,6 @@ bool BackendMarble::geoCoordinates(const QPoint& point, WMWGeoCoordinate* const 
 void BackendMarble::marbleCustomPaint(Marble::GeoPainter* painter)
 {
 
-//TODO:==================== This function needs changes for MouseModes ===========================================
-
     // check whether the parameters of the map changed and we may have to update the clusters:
     if ( (d->clustersDirtyCacheLat != d->marbleWidget->centerLatitude()) ||
          (d->clustersDirtyCacheLon != d->marbleWidget->centerLongitude()) ||
@@ -446,7 +441,7 @@ void BackendMarble::marbleCustomPaint(Marble::GeoPainter* painter)
     painter->autoMapQuality();
 
     //here we draw the selection rectangle
-    if(d->paintSearchRectangle && !d->searchRectangleCoordinates.isEmpty() && d->currentMouseMode == MouseSelection)
+    if(!d->searchRectangleCoordinates.isEmpty() && d->currentMouseMode == MouseSelection)
     {
         const qreal lonWest  = d->searchRectangleCoordinates.at(0);
         const qreal latNorth = d->searchRectangleCoordinates.at(1);
@@ -470,7 +465,11 @@ void BackendMarble::marbleCustomPaint(Marble::GeoPainter* painter)
 #endif // MARBLE_VERSION < 0x000800
 
         QPen selectionPen;
-        selectionPen.setColor(Qt::blue);
+        if(d->intermediateSelectionPoint.hasCoordinates())
+            selectionPen.setColor(Qt::red);
+        else
+            selectionPen.setColor(Qt::blue);
+
         selectionPen.setStyle(Qt::SolidLine);
         selectionPen.setWidth(1);
         painter->setPen(selectionPen);
@@ -805,7 +804,6 @@ WMWGeoCoordinate::PairList BackendMarble::getNormalizedBounds()
 
 bool BackendMarble::eventFilter(QObject *object, QEvent *event)
 {
-//TODO: ===================== This function needs changes with MouseModes ============================
 
     if (object!=d->marbleWidget)
     {
@@ -826,21 +824,20 @@ bool BackendMarble::eventFilter(QObject *object, QEvent *event)
 
     if(d->currentMouseMode == MouseSelection)
     {
-        kDebug()<<"Recognized mouse selection.";
-
-        //TODO: check if pointes returned from geoCoordinates are good
+        
+        /*
         if (   ( event->type() == QEvent::MouseButtonPress )
             && ( mouseEvent->button()==Qt::LeftButton ) )
         {
             //TODO: mouseEvent->pos() is enough?
-            if(!d->firstSelectionPoint.hasCoordinates())
-            {
-                geoCoordinates(mouseEvent->pos(), &d->firstSelectionPoint);
-                kDebug()<<"First selection point:"<<d->firstSelectionPoint.lat()<<" "<<d->firstSelectionPoint.lon(); 
-            }                                                              
+            //if(!d->firstSelectionPoint.hasCoordinates())
+            //{
+            //    geoCoordinates(mouseEvent->pos(), &d->firstSelectionPoint);
+            //    kDebug()<<"First selection point:"<<d->firstSelectionPoint.lat()<<" "<<d->firstSelectionPoint.lon(); 
+            //}                                                            
+            doFilterEvent = true;     
         }
-        else if (   (event->type() == QEvent::MouseMove)
-             && (d->havePotentiallyMouseMovingObject || d->haveMouseMovingObject) )
+        else*/ if (event->type() == QEvent::MouseMove)
         {
             if(d->firstSelectionPoint.hasCoordinates() && !d->secondSelectionPoint.hasCoordinates())
             {     
@@ -848,37 +845,81 @@ bool BackendMarble::eventFilter(QObject *object, QEvent *event)
                 d->intermediateSelectionPoint.clear();
                 geoCoordinates(mouseEvent->pos(), &d->intermediateSelectionPoint);   
             
-                //TODO: the positions will not be always the same. If the rectangle will be draw from right to left, lonWest, latNorth.. will be different
-                const qreal lonWest  = d->firstSelectionPoint.lon();
-                const qreal latNorth = d->firstSelectionPoint.lat();
-                const qreal lonEast  = d->intermediateSelectionPoint.lon();
-                const qreal latSouth = d->intermediateSelectionPoint.lat();
+                qreal lonWest  = d->firstSelectionPoint.lon();
+                qreal latNorth = d->firstSelectionPoint.lat();
+                qreal lonEast  = d->intermediateSelectionPoint.lon();
+                qreal latSouth = d->intermediateSelectionPoint.lat();
+
+                
+                if(lonWest > lonEast)
+                {
+                    const qreal auxCoord = lonWest;
+                    lonWest              = lonEast;
+                    lonEast              = auxCoord;
+                }
+        
+                if(latNorth < latSouth)
+                {
+                    const qreal auxCoord = latNorth;
+                    latNorth             = latSouth;
+                    latSouth             = auxCoord;
+                }
 
                 QList<qreal> selectionCoordinates;
                 selectionCoordinates << lonWest << latNorth << lonEast << latSouth;
 
                 setSearchRectangle(selectionCoordinates);
+                d->marbleWidget->update(); 
             }
+            doFilterEvent = true;
         }
         else if (   (event->type() == QEvent::MouseButtonRelease)
              && ( mouseEvent->button() == Qt::LeftButton ) )
         {
-             d->intermediateSelectionPoint.clear();
+            
+            if(!d->firstSelectionPoint.hasCoordinates())
+            {
+                geoCoordinates(mouseEvent->pos(), &d->firstSelectionPoint);
+            }                                                            
+            else
+            {
+                d->intermediateSelectionPoint.clear();
              
-             geoCoordinates(mouseEvent->pos(), &d->secondSelectionPoint);    
+                geoCoordinates(mouseEvent->pos(), &d->secondSelectionPoint);    
 
-             //TODO: the positions will not be always the same. If the rectangle will be draw from right to left, lonWest, latNorth.. will be different
-             const qreal lonWest  = d->firstSelectionPoint.lon();
-             const qreal latNorth = d->firstSelectionPoint.lat();
-             const qreal lonEast  = d->secondSelectionPoint.lon();
-             const qreal latSouth = d->secondSelectionPoint.lat();
+                qreal lonWest  = d->firstSelectionPoint.lon();
+                qreal latNorth = d->firstSelectionPoint.lat();
+                qreal lonEast  = d->secondSelectionPoint.lon();
+                qreal latSouth = d->secondSelectionPoint.lat();
 
-             QList<qreal> selectionCoordinates;
-             selectionCoordinates << lonWest << latNorth << lonEast << latSouth;
+                if(lonWest > lonEast)
+                {
+                    const qreal auxCoord = lonWest;
+                   lonWest              = lonEast;
+                    lonEast              = auxCoord;
+                }
+        
+               if(latNorth < latSouth)
+               {
+                    const qreal auxCoord = latNorth;
+                    latNorth             = latSouth;
+                    latSouth             = auxCoord;
+               }
 
-             setSearchRectangle(selectionCoordinates);
+               QList<qreal> selectionCoordinates;
+               selectionCoordinates << lonWest << latNorth << lonEast << latSouth;
 
+               setSearchRectangle(selectionCoordinates);
+    
+               emit signalSelectionHasBeenMade(selectionCoordinates);
+
+               d->marbleWidget->update();
+
+            }
+
+            doFilterEvent = true;
         }
+        
     }
     else
     {
@@ -1060,11 +1101,11 @@ bool BackendMarble::eventFilter(QObject *object, QEvent *event)
         d->marbleWidget->update();
         s->haveMovingCluster = false;
     }
+    
+    }
 
     if (doFilterEvent)
         return true;
-    
-    }
 
     return QObject::eventFilter(object, event);
 }
@@ -1210,27 +1251,19 @@ void BackendMarble::setSearchRectangle(const QList<double>& searchCoordinates)
     
 }
 
-void BackendMarble::setPaintSearchRectangleState(const bool state)
-{
-    d->paintSearchRectangle = state; 
-    
-    if(!d->paintSearchRectangle)
-    {
-        d->searchRectangleCoordinates.clear();
-        d->firstSelectionPoint.clear();
-        d->secondSelectionPoint.clear();
-    }
-}
-
 void BackendMarble::mouseModeChanged(MouseMode mouseMode)
 {
     d->currentMouseMode = mouseMode;
    
     kDebug()<<"Mouse mode changed.";
 
-    if(d->currentMouseMode == MousePan && d->paintSearchRectangle)
-        setPaintSearchRectangleState(false);
-        
+    if(d->currentMouseMode == MousePan)
+    {
+        d->searchRectangleCoordinates.clear();
+        d->firstSelectionPoint.clear();
+        d->secondSelectionPoint.clear();
+        d->marbleWidget->update();
+    }    
 }
 
 } /* namespace KMapIface */

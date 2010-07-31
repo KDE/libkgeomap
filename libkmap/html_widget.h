@@ -51,6 +51,8 @@ public:
     void loadInitialHTML(const QString& initialHTML);
     QVariant runScript(const QString& scriptCode);
     bool runScript2Coordinates(const QString& scriptCode, WMWGeoCoordinate* const coordinates);
+    void mouseModeChanged(bool state);
+    void setSearchRectangle(const QList<qreal>& searchCoordinates);
 
 protected:
 
@@ -68,6 +70,7 @@ Q_SIGNALS:
 
     void signalHTMLEvents(const QStringList& events);
     void signalJavaScriptReady();
+    void selectionHasBeenMade(const QList<qreal>& coordinatesRect);
 
 private:
 

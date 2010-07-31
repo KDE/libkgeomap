@@ -113,6 +113,9 @@ BackendGoogleMaps::BackendGoogleMaps(const QExplicitlySharedDataPointer<WMWShare
     connect(d->htmlWidget, SIGNAL(signalHTMLEvents(const QStringList&)),
             this, SLOT(slotHTMLEvents(const QStringList&)));
 
+    connect(d->htmlWidget, SIGNAL(selectionHasBeenMade(const QList<qreal>&)),
+            this, SLOT(slotSelectionHasBeenMade(const QList<qreal>&)));
+
     loadInitialHTML();
 
     d->htmlWidgetWrapper->installEventFilter(this);
@@ -939,6 +942,18 @@ void BackendGoogleMaps::setMarkerPixmap(const int modelId, const int markerId, c
 
 bool BackendGoogleMaps::eventFilter(QObject* object, QEvent* event)
 {
+        
+
+/*        if ( event->type()==QEvent::MouseButtonPress )
+        {
+            QMouseEvent* const mouseEvent = static_cast<QMouseEvent*>(event);
+            QPainter p;
+            p.begin(d->htmlWidgetWrapper);
+            p.drawLine(mouseEvent->pos(), QPoint(0,0));
+            p.end();
+
+        }
+*/
     if (object==d->htmlWidgetWrapper)
     {
         if (event->type()==QEvent::Resize)
@@ -963,16 +978,26 @@ void BackendGoogleMaps::setSearchRectangle(const QList<double>& searchCoordinate
 
 }
 
-void BackendGoogleMaps::setPaintSearchRectangleState(const bool state)
+void BackendGoogleMaps::mouseModeChanged(MouseMode mouseMode)
 {
+
+    if(mouseMode == MouseSelection)
+    {
+       // d->htmlWidget->runScript(QString("selectionModeStatus(true)"));
+        d->htmlWidget->mouseModeChanged(true);
+    }
+    else //MousePan
+    {
+       // d->htmlWidget->runScript(QString("selectionModeStatus(false)"));
+        d->htmlWidget->mouseModeChanged(false);
+    }
 
 
 }
 
-void BackendGoogleMaps::mouseModeChanged(MouseMode mouseMode)
-{
-
-
+void BackendGoogleMaps::slotSelectionHasBeenMade(const QList<double>& searchCoordinates)
+{   
+    emit signalSelectionHasBeenMade(searchCoordinates);
 }
 
 } /* namespace KMapIface */

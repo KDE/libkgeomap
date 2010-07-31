@@ -29,14 +29,17 @@
 // Qt includes
 
 #include <QTimer>
+#include <QPainter>
 
 // KDE includes
 
 #include <khtmlview.h>
+#include <khtml_events.h>
 
 // local includes
 
 #include "kmap_common.h"
+#include "kmap_primitives.h"
 
 namespace KMapIface
 {
@@ -48,13 +51,22 @@ public:
     HTMLWidgetPrivate()
       : parent(0),
         isReady(false),
-        javascriptScanTimer(0)
+        javascriptScanTimer(0),
+        selectionStatus(false),
+        firstSelectionPoint(),
+        secondSelectionPoint()
     {
     }
 
-    QWidget* parent;
-    bool     isReady;
-    QTimer*  javascriptScanTimer;
+    QWidget*            parent;
+    bool                isReady;
+    QTimer*             javascriptScanTimer;
+
+    bool                selectionStatus;
+    WMWGeoCoordinate    firstSelectionPoint;
+    WMWGeoCoordinate    intermediateSelectionPoint;
+    WMWGeoCoordinate    secondSelectionPoint;
+    QList<qreal>        selectionRectangle;
 };
 
 HTMLWidget::HTMLWidget(QWidget* const parent)
@@ -105,18 +117,82 @@ void HTMLWidget::slotHTMLCompleted()
 
 void HTMLWidget::khtmlMousePressEvent(khtml::MousePressEvent* e)
 {
+
     slotScanForJSMessages();
     KHTMLPart::khtmlMousePressEvent(e);
 }
 
 void HTMLWidget::khtmlMouseReleaseEvent(khtml::MouseReleaseEvent* e)
 {
+
+    if(d->selectionStatus)
+    {
+        if(!d->firstSelectionPoint.hasCoordinates())
+        {
+            runScript2Coordinates( QString("wmwPixelToLatLng(%1, %2);")
+                                    .arg(e->x())
+                                    .arg(e->y()),
+                                   &d->firstSelectionPoint);
+
+            runScript(QString("addSelectionPoint(%1, %2, 'red');").arg(d->firstSelectionPoint.lon()).arg(d->firstSelectionPoint.lat()));//.arg("red"));
+        }
+        else
+        {
+
+            if(!d->secondSelectionPoint.hasCoordinates())
+            {
+
+                runScript2Coordinates( QString("wmwPixelToLatLng(%1, %2);")
+                                        .arg(e->x())
+                                        .arg(e->y()),
+                                        &d->secondSelectionPoint);
+
+                qreal lonWest  = d->firstSelectionPoint.lon();
+                qreal latNorth = d->firstSelectionPoint.lat();
+                qreal lonEast  = d->secondSelectionPoint.lon();
+                qreal latSouth = d->secondSelectionPoint.lat();
+
+                if(lonWest > lonEast)
+                {
+                    const qreal auxCoord = lonWest;
+                    lonWest              = lonEast;
+                    lonEast              = auxCoord;
+                }
+
+                if(latNorth < latSouth)
+                {
+                    const qreal auxCoord = latNorth;
+                    latNorth             = latSouth;
+                    latSouth             = auxCoord;
+                }
+
+                runScript(QString("addSelectionPoint(%1, %2, 'blue');").arg(d->secondSelectionPoint.lon()).arg(d->secondSelectionPoint.lat())); //.arg("blue"));
+
+                QList<qreal> selectionCoordinates;
+                selectionCoordinates << lonWest << latNorth << lonEast << latSouth;
+
+                emit selectionHasBeenMade(selectionCoordinates); 
+            }
+        }
+    }
+
     slotScanForJSMessages();
     KHTMLPart::khtmlMouseReleaseEvent(e);
 }
 
 void HTMLWidget::khtmlMouseMoveEvent(khtml::MouseMoveEvent *e)
 {
+
+    if(d->selectionStatus && d->firstSelectionPoint.hasCoordinates() && !d->secondSelectionPoint.hasCoordinates())
+    {
+        runScript2Coordinates( QString("wmwPixelToLatLng(%1, %2);")
+                                    .arg(e->x())
+                                    .arg(e->y()),
+                                   &d->intermediateSelectionPoint);
+
+        runScript(QString("addSelectionPoint(%1, %2, 'red');").arg(d->intermediateSelectionPoint.lon()).arg(d->intermediateSelectionPoint.lat()));  //.arg("red"));
+    }
+
     slotScanForJSMessages();
     KHTMLPart::khtmlMouseMoveEvent(e);
 }
@@ -166,6 +242,7 @@ bool HTMLWidget::eventFilter(QObject* object, QEvent* event)
 {
     if (d->parent && object==d->parent)
     {
+
         if (event->type()==QEvent::Resize)
         {
             QResizeEvent* const resizeEvent = dynamic_cast<QResizeEvent*>(event);
@@ -177,6 +254,22 @@ bool HTMLWidget::eventFilter(QObject* object, QEvent* event)
         }
     }
     return false;
+}
+
+void HTMLWidget::setSearchRectangle(const QList<qreal>& searchCoordinates)
+{
+    
+}
+
+void HTMLWidget::mouseModeChanged(bool state)
+{
+    d->selectionStatus = state;
+    if(d->selectionStatus == false)
+    {
+        d->firstSelectionPoint.clear();
+        d->secondSelectionPoint.clear();
+    }
+    runScript(QString("selectionModeStatus(%1);").arg(state)); 
 }
 
 } /* namespace KMapIface */

@@ -124,6 +124,7 @@ public Q_SLOTS:
     void slotIncreaseThumbnailSize();
     void slotNewSelectionFromMap(const QList<double>& sel);
     void slotSetSelectionMode();
+    void slotSetPanMode();
 
 Q_SIGNALS:
 
@@ -133,6 +134,7 @@ Q_SIGNALS:
     void signalSpecialMarkersMoved(const QList<QPersistentModelIndex>& indices);
     void signalUngroupedModelChanged(const int index);
     void signalNewSelectionFromMap();
+    void signalRemoveCurrentSelection();
 
 public:
 

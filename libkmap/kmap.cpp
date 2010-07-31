@@ -146,7 +146,8 @@ public:
         editGroupingRadius(KMapIfaceMinEditGroupingRadius),
         actionIncreaseThumbnailSize(0),
         actionDecreaseThumbnailSize(0),
-        actionSetSelectionMode(0)
+        actionSetSelectionMode(0),
+        actionSetPanMode(0)
     {
     }
 
@@ -192,6 +193,7 @@ public:
     QList<double>           selectionRectangle;
 
     KAction*                actionSetSelectionMode;
+    KAction*                actionSetPanMode;
 };
 
 KMap::KMap(QWidget* const parent)
@@ -278,7 +280,12 @@ void KMap::createActions()
 
     d->actionSetSelectionMode = new KAction(i18n("S"), this);
     d->actionSetSelectionMode->setCheckable(true);
-    d->actionSetSelectionMode->setToolTip(i18n("Switch between pan mode and selection mode."));
+    d->actionSetSelectionMode->setToolTip(i18n("Selection mode."));
+
+    d->actionSetPanMode = new KAction(i18n("P"), this);
+    d->actionSetPanMode->setCheckable(true);
+    d->actionSetPanMode->setToolTip(i18n("Pan mode."));
+    d->actionSetPanMode->setChecked(true);
 
     connect(d->actionIncreaseThumbnailSize, SIGNAL(triggered(bool)),
             this, SLOT(slotIncreaseThumbnailSize()));
@@ -297,6 +304,9 @@ void KMap::createActions()
 
     connect(d->actionSetSelectionMode, SIGNAL(changed()),
             this, SLOT(slotSetSelectionMode()));
+
+    connect(d->actionSetPanMode, SIGNAL(changed()),
+            this, SLOT(slotSetPanMode()));
 }
 
 void KMap::createActionsForBackendSelection()
@@ -379,6 +389,16 @@ bool KMap::setBackend(const QString& backendName)
                         d->currentBackend, SLOT(slotThumbnailAvailableForIndex(const QVariant&, const QPixmap&)));
         }
 
+        if (d->currentBackend->backendName() == QString("marble"))
+        {
+            disconnect(d->currentBackend->mapWidget(), SIGNAL(regionSelected(const QList<double>&)),
+                    this, SLOT(slotNewSelectionFromMap(const QList<double>&)));
+        }
+            disconnect(d->currentBackend, SIGNAL(signalSelectionHasBeenMade(const QList<double>&)),
+                    this, SLOT(slotNewSelectionFromMap(const QList<double>&))); 
+
+       
+
     }
 
     MapBackend* backend;
@@ -419,10 +439,12 @@ bool KMap::setBackend(const QString& backendName)
 
             if (backendName == QString("marble"))
             {
-                kDebug()<<"MARBLE AREA SIGNAL CONNECTED.";
                connect(d->currentBackend->mapWidget(), SIGNAL(regionSelected(const QList<double>&)),
-                       this, SLOT(slotNewSelectionFromMap(const QList<double>&))); 
+                       this, SLOT(slotNewSelectionFromMap(const QList<double>&)));
             }
+               connect(d->currentBackend, SIGNAL(signalSelectionHasBeenMade(const QList<double>&)),
+                       this, SLOT(slotNewSelectionFromMap(const QList<double>&))); 
+            
 
             // call this slot manually in case the backend was ready right away:
             if (d->currentBackend->isReady())
@@ -672,6 +694,9 @@ QWidget* KMap::getControlWidget()
 
         QToolButton* const setSelectionModeButton = new QToolButton(d->controlWidget);
         setSelectionModeButton->setDefaultAction(d->actionSetSelectionMode);
+
+        QToolButton* const setPanModeButton = new QToolButton(d->controlWidget);
+        setPanModeButton->setDefaultAction(d->actionSetPanMode);
 
         d->hBoxForAdditionalControlWidgetItems = new KHBox(d->controlWidget);
 
@@ -1782,20 +1807,34 @@ void KMap::slotNewSelectionFromMap(const QList<double>& sel)
     emit signalNewSelectionFromMap();
 }
 
+void KMap::slotSetPanMode()
+{
+    if(d->actionSetPanMode->isChecked())
+    {
+        d->currentBackend->mouseModeChanged(MousePan);
+        emit signalRemoveCurrentSelection();
+        d->actionSetSelectionMode->setChecked(false);
+    }
+}
+
 void KMap::slotSetSelectionMode()
 {
    //TODO:Add here the code that changes the selection mode 
-    if(d->currentBackend->backendName() == QString("marble"))
-    {
+   // if(d->currentBackend->backendName() == QString("marble"))
+   // {
         if(d->actionSetSelectionMode->isChecked())
         {
             d->currentBackend->mouseModeChanged(MouseSelection);
+            d->actionSetPanMode->setChecked(false);
         }
         else
         {
-            d->currentBackend->mouseModeChanged(MousePan);
+            //d->currentBackend->mouseModeChanged(MousePan);
+            //emit signalRemoveCurrentSelection();
+
+              
         }
-    }    
+   // }    
 }
 
 void KMap::slotUngroupedModelChanged()
