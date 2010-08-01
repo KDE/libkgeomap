@@ -108,10 +108,6 @@ Q_SIGNALS:
     void signalSpecialMarkersMoved(const QList<QPersistentModelIndex>& indices);
     void signalSelectionHasBeenMade(const QList<double>&);
 
-private:
-
-    class MapBackendPrivate;
-    MapBackendPrivate* const d;
 };
 
 } /* namespace KMapIface */
