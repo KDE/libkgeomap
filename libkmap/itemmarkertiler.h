@@ -71,6 +71,7 @@ private Q_SLOTS:
     void slotSourceModelReset();
     void slotSelectionChanged(const QItemSelection& selected, const QItemSelection& deselected);
     void slotThumbnailAvailableForIndex(const QPersistentModelIndex& index, const QPixmap& pixmap);
+    void slotSourceModelLayoutChanged();
 
 private:
 

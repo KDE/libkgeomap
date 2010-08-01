@@ -76,6 +76,9 @@ void ItemMarkerTiler::setMarkerModelHelper(WMWModelHelper* const modelHelper)
         connect(d->markerModel, SIGNAL(modelReset()),
                 this, SLOT(slotSourceModelReset()));
 
+        connect(d->markerModel, SIGNAL(layoutChanged()),
+                this, SLOT(slotSourceModelLayoutChanged()));
+
         connect(d->modelHelper, SIGNAL(signalThumbnailAvailableForIndex(const QPersistentModelIndex&, const QPixmap&)),
                 this, SLOT(slotThumbnailAvailableForIndex(const QPersistentModelIndex&, const QPixmap&)));
 
@@ -598,6 +601,11 @@ void ItemMarkerTiler::onIndicesMoved(const TileIndex::List& tileIndicesList, con
     }
 
     d->modelHelper->onIndicesMoved(movedMarkers, targetCoordinates, targetSnapIndex);
+}
+
+void ItemMarkerTiler::slotSourceModelLayoutChanged()
+{
+    setDirty();
 }
 
 } // namespace KMapIface
