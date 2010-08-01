@@ -132,6 +132,10 @@ public:
     WMWGeoCoordinate       firstSelectionPoint;
     WMWGeoCoordinate       intermediateSelectionPoint;
     WMWGeoCoordinate       secondSelectionPoint;
+
+#ifdef KMAP_MARBLE_ADD_LAYER
+    BMLayer*               bmLayer;
+#endif
 };
 
 BackendMarble::BackendMarble(const QExplicitlySharedDataPointer<WMWSharedData>& sharedData, QObject* const parent)
@@ -141,7 +145,8 @@ BackendMarble::BackendMarble(const QExplicitlySharedDataPointer<WMWSharedData>& 
 
 #ifdef KMAP_MARBLE_ADD_LAYER
     d->marbleWidget = new MarbleWidget();
-    d->marbleWidget->model()->addLayer(new BMLayer(this));
+    d->bmLayer = new BMLayer(this);
+    d->marbleWidget->model()->addLayer(d->bmLayer);
 #else
     d->marbleWidget = new BMWidget(this);
 #endif
@@ -165,7 +170,13 @@ BackendMarble::BackendMarble(const QExplicitlySharedDataPointer<WMWSharedData>& 
 BackendMarble::~BackendMarble()
 {
     if (d->marbleWidget)
+    {
+#ifdef KMAP_MARBLE_ADD_LAYER
+        d->marbleWidget->model()->removeLayer(d->bmLayer);
+        delete d->bmLayer;
+#endif
         delete d->marbleWidget;
+    }
 
     delete d;
 }

@@ -74,6 +74,7 @@ BackendAltitudeGeonames::BackendAltitudeGeonames(const QExplicitlySharedDataPoin
 
 BackendAltitudeGeonames::~BackendAltitudeGeonames()
 {
+    delete d;
 }
 
 QString BackendAltitudeGeonames::backendName() const
