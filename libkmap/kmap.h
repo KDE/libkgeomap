@@ -125,6 +125,7 @@ public Q_SLOTS:
     void slotNewSelectionFromMap(const QList<double>& sel);
     void slotSetSelectionMode();
     void slotSetPanMode();
+    void slotRemoveCurrentSelection();
 
 Q_SIGNALS:
 

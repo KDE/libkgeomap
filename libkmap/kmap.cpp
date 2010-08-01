@@ -192,6 +192,7 @@ public:
 
     QList<double>           selectionRectangle;
 
+    KAction*                actionRemoveCurrentSelection;
     KAction*                actionSetSelectionMode;
     KAction*                actionSetPanMode;
 };
@@ -278,6 +279,11 @@ void KMap::createActions()
     d->actionDecreaseThumbnailSize = new KAction(i18n("T-"), this);
     d->actionDecreaseThumbnailSize->setToolTip(i18n("Decrease the thumbnail size on the map"));
 
+    d->actionRemoveCurrentSelection = new KAction(this);
+    d->actionRemoveCurrentSelection->setEnabled(false);
+    d->actionRemoveCurrentSelection->setIcon(SmallIcon("edit-clear"));
+    d->actionRemoveCurrentSelection->setToolTip("Removes current selection.");
+
     d->actionSetSelectionMode = new KAction(this);
     d->actionSetSelectionMode->setCheckable(true);
     d->actionSetSelectionMode->setIcon(SmallIcon("select-rectangular"));
@@ -317,6 +323,9 @@ void KMap::createActions()
 
     connect(d->actionSetPanMode, SIGNAL(changed()),
             this, SLOT(slotSetPanMode()));
+
+    connect(d->actionRemoveCurrentSelection, SIGNAL(triggered()),
+            this, SLOT(slotRemoveCurrentSelection()));
 }
 
 void KMap::createActionsForBackendSelection()
@@ -708,6 +717,9 @@ QWidget* KMap::getControlWidget()
 
         QToolButton* const setSelectionModeButton = new QToolButton(d->controlWidget);
         setSelectionModeButton->setDefaultAction(d->actionSetSelectionMode);
+
+        QToolButton* const removeCurrentSelectionButton = new QToolButton(d->controlWidget);
+        removeCurrentSelectionButton->setDefaultAction(d->actionRemoveCurrentSelection);
 
         d->hBoxForAdditionalControlWidgetItems = new KHBox(d->controlWidget);
 
@@ -1822,6 +1834,7 @@ void KMap::slotSetPanMode()
         d->currentBackend->mouseModeChanged(MouseModePan);
         emit signalRemoveCurrentSelection();
         d->actionSetSelectionMode->setChecked(false);
+        d->actionRemoveCurrentSelection->setEnabled(false);
     }
 }
 
@@ -1834,6 +1847,7 @@ void KMap::slotSetSelectionMode()
         {
             d->currentBackend->mouseModeChanged(MouseModeSelection);
             d->actionSetPanMode->setChecked(false);
+            d->actionRemoveCurrentSelection->setEnabled(true);
         }
         else
         {
@@ -1843,6 +1857,11 @@ void KMap::slotSetSelectionMode()
               
         }
    // }    
+}
+
+void KMap::slotRemoveCurrentSelection()
+{
+    emit signalRemoveCurrentSelection();
 }
 
 void KMap::slotUngroupedModelChanged()
