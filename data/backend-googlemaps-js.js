@@ -390,6 +390,15 @@ function addSelectionPoint(lng, lat, color)
 
         if (firstSelectionPoint==null){
             firstSelectionPoint = new google.maps.LatLng(lat, lng, true);
+           
+            if(selectionRectangle != null){ 
+                selectionRectangle.setMap(null);
+                selectionRectangle = null;
+            }
+
+            selectionRectangle = new google.maps.Rectangle({
+                                     map:map
+                                     });
         }
         else{
             if(secondSelectionPoint==null){
@@ -466,22 +475,21 @@ function addSelectionPoint(lng, lat, color)
 
 }
 
+function clearSelectionPoints(){
+    firstSelectionPoint = null;
+    secondSelectionPoint = null;
+}
 
 function selectionModeStatus(state){
 
     if(state == false){
         map.draggable = true;
 
-        selectionRectangle.setMap(null);
-        selectionRectangle   = null;
         firstSelectionPoint = null;
         secondSelectionPoint = null;
     }
     else{
         map.draggable = false; 
-        selectionRectangle = new google.maps.Rectangle({
-                                 map:map
-                                 });
     }
 
 }

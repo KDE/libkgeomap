@@ -452,7 +452,7 @@ void BackendMarble::marbleCustomPaint(Marble::GeoPainter* painter)
     painter->autoMapQuality();
 
     //here we draw the selection rectangle
-    if(!d->searchRectangleCoordinates.isEmpty() && d->currentMouseMode == MouseModeSelection)
+    if(!d->searchRectangleCoordinates.isEmpty()) 
     {
         const qreal lonWest  = d->searchRectangleCoordinates.at(0);
         const qreal latNorth = d->searchRectangleCoordinates.at(1);
@@ -916,6 +916,9 @@ bool BackendMarble::eventFilter(QObject *object, QEvent *event)
                emit signalSelectionHasBeenMade(selectionCoordinates);
 
                d->marbleWidget->update();
+        
+               d->firstSelectionPoint.clear();
+               d->secondSelectionPoint.clear();
 
             }
 
@@ -1258,7 +1261,7 @@ void BackendMarble::mouseModeChanged(MouseMode mouseMode)
 
     if(d->currentMouseMode == MouseModePan)
     {
-        d->searchRectangleCoordinates.clear();
+        //d->searchRectangleCoordinates.clear();
         d->firstSelectionPoint.clear();
         d->secondSelectionPoint.clear();
         d->marbleWidget->update();

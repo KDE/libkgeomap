@@ -166,12 +166,17 @@ void HTMLWidget::khtmlMouseReleaseEvent(khtml::MouseReleaseEvent* e)
                     latSouth             = auxCoord;
                 }
 
-                runScript(QString("addSelectionPoint(%1, %2, 'blue');").arg(d->secondSelectionPoint.lon()).arg(d->secondSelectionPoint.lat())); //.arg("blue"));
+                runScript(QString("addSelectionPoint(%1, %2, 'blue');").arg(d->secondSelectionPoint.lon()).arg(d->secondSelectionPoint.lat()));
 
                 QList<qreal> selectionCoordinates;
                 selectionCoordinates << lonWest << latNorth << lonEast << latSouth;
 
-                emit selectionHasBeenMade(selectionCoordinates); 
+                emit selectionHasBeenMade(selectionCoordinates);
+
+                d->firstSelectionPoint.clear();
+                d->intermediateSelectionPoint.clear();
+                d->secondSelectionPoint.clear();
+                runScript(QString("clearSelectionPoints();")); 
             }
         }
     }
