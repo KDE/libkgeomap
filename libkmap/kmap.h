@@ -110,8 +110,9 @@ public:
     int getThumbnailSize() const;
     int getUndecoratedThumbnailSize() const;
     void setEditEnabled(const bool state);
-    QList<double> selectionCoordinates() const;
+    QList<qreal> selectionCoordinates() const;
     void setSelectionCoordinates(QList<double>& sel);
+    QList<qreal> getSelectionRectangle();
     bool hasSelection() const; 
 
 public Q_SLOTS:
@@ -125,6 +126,7 @@ public Q_SLOTS:
     void slotNewSelectionFromMap(const QList<double>& sel);
     void slotSetSelectionMode();
     void slotSetPanMode();
+    void slotSetZoomMode();
     void slotRemoveCurrentSelection();
 
 Q_SIGNALS:

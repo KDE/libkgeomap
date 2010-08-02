@@ -83,7 +83,8 @@ inline void KMapIface_assert(const char* const condition, const char* const file
 enum MouseMode
 {
     MouseModePan = 1,
-    MouseModeSelection = 2
+    MouseModeSelection = 2,
+    MouseModeZoom = 3
 };
 
 class KMAP_EXPORT WMWGeoCoordinate

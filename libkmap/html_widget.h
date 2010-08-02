@@ -52,7 +52,8 @@ public:
     QVariant runScript(const QString& scriptCode);
     bool runScript2Coordinates(const QString& scriptCode, WMWGeoCoordinate* const coordinates);
     void mouseModeChanged(bool state);
-    void setSearchRectangle(const QList<qreal>& searchCoordinates);
+    void setSelectionRectangle(const QList<qreal>& searchCoordinates);
+    QList<qreal> getSelectionRectangle();
 
 protected:
 

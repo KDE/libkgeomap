@@ -176,7 +176,9 @@ void HTMLWidget::khtmlMouseReleaseEvent(khtml::MouseReleaseEvent* e)
                 d->firstSelectionPoint.clear();
                 d->intermediateSelectionPoint.clear();
                 d->secondSelectionPoint.clear();
-                runScript(QString("clearSelectionPoints();")); 
+                runScript(QString("clearSelectionPoints();"));
+
+                d->selectionRectangle = selectionCoordinates; 
             }
         }
     }
@@ -195,7 +197,7 @@ void HTMLWidget::khtmlMouseMoveEvent(khtml::MouseMoveEvent *e)
                                     .arg(e->y()),
                                    &d->intermediateSelectionPoint);
 
-        runScript(QString("addSelectionPoint(%1, %2, 'red');").arg(d->intermediateSelectionPoint.lon()).arg(d->intermediateSelectionPoint.lat()));  //.arg("red"));
+        runScript(QString("addSelectionPoint(%1, %2, 'red');").arg(d->intermediateSelectionPoint.lon()).arg(d->intermediateSelectionPoint.lat()));
     }
 
     slotScanForJSMessages();
@@ -261,9 +263,24 @@ bool HTMLWidget::eventFilter(QObject* object, QEvent* event)
     return false;
 }
 
-void HTMLWidget::setSearchRectangle(const QList<qreal>& searchCoordinates)
+void HTMLWidget::setSelectionRectangle(const QList<qreal>& searchCoordinates)
 {
-    
+    WMWGeoCoordinate firstPoint,secondPoint;
+    qreal West  = searchCoordinates.at(0);
+    qreal North = searchCoordinates.at(1);
+    qreal East  = searchCoordinates.at(2);
+    qreal South = searchCoordinates.at(3);
+
+    runScript(QString("addSelectionPoint(%1, %2, 'blue');").arg(West).arg(North)); 
+    runScript(QString("addSelectionPoint(%1, %2, 'blue');").arg(East).arg(South));
+    runScript(QString("clearSelectionPoints();"));
+
+    d->selectionRectangle = searchCoordinates;
+}
+
+QList<qreal> HTMLWidget::getSelectionRectangle()
+{
+    return d->selectionRectangle;
 }
 
 void HTMLWidget::mouseModeChanged(bool state)

@@ -127,7 +127,7 @@ public:
     qreal                  clustersDirtyCacheLat;
     qreal                  clustersDirtyCacheLon;
 
-    QList<double>          searchRectangleCoordinates;
+    QList<qreal>           searchRectangleCoordinates;
     MouseMode              currentMouseMode;
     WMWGeoCoordinate       firstSelectionPoint;
     WMWGeoCoordinate       intermediateSelectionPoint;
@@ -871,8 +871,8 @@ bool BackendMarble::eventFilter(QObject *object, QEvent *event)
                 QList<qreal> selectionCoordinates;
                 selectionCoordinates << lonWest << latNorth << lonEast << latSouth;
 
-                setSearchRectangle(selectionCoordinates);
-                d->marbleWidget->update(); 
+                setSelectionRectangle(selectionCoordinates);
+                //d->marbleWidget->update(); 
             }
             doFilterEvent = true;
         }
@@ -911,11 +911,11 @@ bool BackendMarble::eventFilter(QObject *object, QEvent *event)
                QList<qreal> selectionCoordinates;
                selectionCoordinates << lonWest << latNorth << lonEast << latSouth;
 
-               setSearchRectangle(selectionCoordinates);
+               setSelectionRectangle(selectionCoordinates);
     
                emit signalSelectionHasBeenMade(selectionCoordinates);
 
-               d->marbleWidget->update();
+               //d->marbleWidget->update();
         
                d->firstSelectionPoint.clear();
                d->secondSelectionPoint.clear();
@@ -1244,13 +1244,18 @@ bool BackendMarble::findSnapPoint(const QPoint& actualPoint, QPoint* const snapP
     return foundSnapPoint;
 }
 
-void BackendMarble::setSearchRectangle(const QList<double>& searchCoordinates)
+void BackendMarble::setSelectionRectangle(const QList<double>& searchCoordinates)
 {
     if(searchCoordinates.isEmpty())
         return;
 
     d->searchRectangleCoordinates = searchCoordinates;
-    
+    d->marbleWidget->update();    
+}
+
+QList<qreal> BackendMarble::getSelectionRectangle()
+{
+    return d->searchRectangleCoordinates;
 }
 
 void BackendMarble::mouseModeChanged(MouseMode mouseMode)
@@ -1266,6 +1271,12 @@ void BackendMarble::mouseModeChanged(MouseMode mouseMode)
         d->secondSelectionPoint.clear();
         d->marbleWidget->update();
     }    
+}
+
+void BackendMarble::centerOn(const Marble::GeoDataLatLonBox& box)
+{
+    d->marbleWidget->centerOn(box, false);
+
 }
 
 } /* namespace KMapIface */

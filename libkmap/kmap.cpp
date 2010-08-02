@@ -55,6 +55,7 @@
 // Marbel Widget includes
 
 #include <marble/global.h>
+#include <marble/GeoDataLineString.h>
 
 // local includes
 
@@ -127,6 +128,7 @@ public:
         stackedLayout(0),
         cacheCenterCoordinate(52.0,6.0),
         cacheZoom("marble:900"),
+        cacheSelectionRectangle(),
         configurationMenu(0),
         actionGroupBackendSelection(0),
         actionZoomIn(0),
@@ -147,7 +149,9 @@ public:
         actionIncreaseThumbnailSize(0),
         actionDecreaseThumbnailSize(0),
         actionSetSelectionMode(0),
-        actionSetPanMode(0)
+        actionSetPanMode(0),
+        actionSetZoomMode(0),
+        currentMouseMode(MouseModePan)
     {
     }
 
@@ -161,6 +165,7 @@ public:
     // these values are cached in case the backend is not ready:
     WMWGeoCoordinate        cacheCenterCoordinate;
     QString                 cacheZoom;
+    QList<qreal>            cacheSelectionRectangle;
 
     // actions for controlling the widget
     QMenu*                  configurationMenu;
@@ -195,6 +200,8 @@ public:
     KAction*                actionRemoveCurrentSelection;
     KAction*                actionSetSelectionMode;
     KAction*                actionSetPanMode;
+    KAction*                actionSetZoomMode;
+    MouseMode               currentMouseMode;
 };
 
 KMap::KMap(QWidget* const parent)
@@ -280,7 +287,7 @@ void KMap::createActions()
     d->actionDecreaseThumbnailSize->setToolTip(i18n("Decrease the thumbnail size on the map"));
 
     d->actionRemoveCurrentSelection = new KAction(this);
-    d->actionRemoveCurrentSelection->setEnabled(false);
+    //d->actionRemoveCurrentSelection->setEnabled(false);
     d->actionRemoveCurrentSelection->setIcon(SmallIcon("edit-clear"));
     d->actionRemoveCurrentSelection->setToolTip("Removes current selection.");
 
@@ -294,6 +301,11 @@ void KMap::createActions()
     d->actionSetPanMode->setToolTip(i18n("Pan mode."));
     d->actionSetPanMode->setIcon(SmallIcon("transform-move"));
     d->actionSetPanMode->setChecked(true);
+
+    d->actionSetZoomMode = new KAction(this);
+    d->actionSetZoomMode->setCheckable(true);
+    d->actionSetZoomMode->setToolTip(i18n("Zoom into a group."));
+    d->actionSetZoomMode->setIcon(SmallIcon("page-zoom"));
 
     // TODO: for later actions
 //     action->setToolTip(i18n("Zoom into a group"));
@@ -323,6 +335,9 @@ void KMap::createActions()
 
     connect(d->actionSetPanMode, SIGNAL(changed()),
             this, SLOT(slotSetPanMode()));
+
+    connect(d->actionSetZoomMode, SIGNAL(changed()),
+            this, SLOT(slotSetZoomMode()));
 
     connect(d->actionRemoveCurrentSelection, SIGNAL(triggered()),
             this, SLOT(slotRemoveCurrentSelection()));
@@ -489,6 +504,7 @@ void KMap::applyCacheToBackend()
     setCenter(d->cacheCenterCoordinate);
     // TODO: only do this if the zoom was changed!
     setZoom(d->cacheZoom);
+    setSelectionCoordinates(d->cacheSelectionRectangle);
 }
 
 void KMap::saveBackendToCache()
@@ -498,6 +514,7 @@ void KMap::saveBackendToCache()
 
     d->cacheCenterCoordinate = getCenter();
     d->cacheZoom = getZoom();
+    d->cacheSelectionRectangle = getSelectionRectangle();
 }
 
 WMWGeoCoordinate KMap::getCenter() const
@@ -720,6 +737,9 @@ QWidget* KMap::getControlWidget()
 
         QToolButton* const removeCurrentSelectionButton = new QToolButton(d->controlWidget);
         removeCurrentSelectionButton->setDefaultAction(d->actionRemoveCurrentSelection);
+
+        QToolButton* const setZoomModeButton = new QToolButton(d->controlWidget);
+        setZoomModeButton->setDefaultAction(d->actionSetZoomMode);
 
         d->hBoxForAdditionalControlWidgetItems = new KHBox(d->controlWidget);
 
@@ -1288,6 +1308,17 @@ QString KMap::getZoom()
     return d->cacheZoom;
 }
 
+
+QList<qreal> KMap::getSelectionRectangle()
+{
+    if(d->currentBackendReady)
+    {
+        d->cacheSelectionRectangle = d->currentBackend->getSelectionRectangle();
+    }
+
+    return d->cacheSelectionRectangle;
+}
+
 void KMap::slotClustersMoved(const QIntList& clusterIndices, const QPair<int, QModelIndex>& snapTarget)
 {
     kDebug()<<clusterIndices;
@@ -1412,20 +1443,53 @@ void KMap::slotClustersClicked(const QIntList& clusterIndices)
 {
     kDebug()<<clusterIndices;
 
-    // update the selection state of the clusters
-    for (int i=0; i<clusterIndices.count(); ++i)
+    if(d->currentMouseMode != MouseModeZoom)
     {
-        const int clusterIndex = clusterIndices.at(i);
-        const WMWCluster currentCluster = s->clusterList.at(clusterIndex);
 
-        // TODO: use a consistent format for tile indices
-        AbstractMarkerTiler::TileIndex::List tileIndices;
-        for (int j=0; j<currentCluster.tileIndicesList.count(); ++j)
+    // update the selection state of the clusters
+        for (int i=0; i<clusterIndices.count(); ++i)
         {
-            const AbstractMarkerTiler::TileIndex& currentTileIndex = AbstractMarkerTiler::TileIndex::fromIntList(currentCluster.tileIndicesList.at(j));
-            tileIndices << currentTileIndex;
+            const int clusterIndex = clusterIndices.at(i);
+            const WMWCluster currentCluster = s->clusterList.at(clusterIndex);
+
+            // TODO: use a consistent format for tile indices
+            AbstractMarkerTiler::TileIndex::List tileIndices;
+            for (int j=0; j<currentCluster.tileIndicesList.count(); ++j)
+            {   
+                const AbstractMarkerTiler::TileIndex& currentTileIndex = AbstractMarkerTiler::TileIndex::fromIntList(currentCluster.tileIndicesList.at(j));
+                tileIndices << currentTileIndex;
+            }
+            s->markerModel->onIndicesClicked(tileIndices, currentCluster.selectedState);
         }
-        s->markerModel->onIndicesClicked(tileIndices, currentCluster.selectedState);
+    }
+    else
+    {
+        Marble::GeoDataLineString tileString;
+        
+        for (int i=0; i<clusterIndices.count(); ++i)
+        {
+            const int clusterIndex = clusterIndices.at(i);
+            const WMWCluster currentCluster = s->clusterList.at(clusterIndex);
+
+            
+
+            for (int j=0; j<currentCluster.tileIndicesList.count(); ++j)
+            {
+                const AbstractMarkerTiler::TileIndex& currentTileIndex = AbstractMarkerTiler::TileIndex::fromIntList(currentCluster.tileIndicesList.at(j));
+                WMWGeoCoordinate currentTileCoordinate = currentTileIndex.toCoordinates();
+                
+                const Marble::GeoDataCoordinates tileCoordinate(currentTileCoordinate.lon(), currentTileCoordinate.lat(), Marble::GeoDataCoordinates::Degree);
+                tileString.append(tileCoordinate);
+
+            }
+        }
+
+        Marble::GeoDataLatLonBox latLonBox = Marble::GeoDataLatLonBox::fromLineString(tileString);
+        if(d->currentBackend->backendName() == QString("marble"))
+        {
+            //d->currentBackend->mapWidget()->centerOn(latLonBox, false); 
+            d->currentBackend->centerOn(latLonBox);
+        }
     }
 }
 
@@ -1816,14 +1880,22 @@ QList<double> KMap::selectionCoordinates() const
     return d->selectionRectangle;
 }
 
-void KMap::setSelectionCoordinates(QList<double>& sel)
+void KMap::setSelectionCoordinates(QList<qreal>& sel)
 {
+    //TODO: Add here code that draws the rectangle
+    
+    d->currentBackend->setSelectionRectangle(sel);
+
     d->selectionRectangle = sel;
+    
 }
 
-void KMap::slotNewSelectionFromMap(const QList<double>& sel)
+void KMap::slotNewSelectionFromMap(const QList<qreal>& sel)
 {
     d->selectionRectangle = sel;
+
+    d->cacheSelectionRectangle = sel;
+
     emit signalNewSelectionFromMap();
 }
 
@@ -1832,31 +1904,34 @@ void KMap::slotSetPanMode()
     if(d->actionSetPanMode->isChecked())
     {
         d->currentBackend->mouseModeChanged(MouseModePan);
-        emit signalRemoveCurrentSelection();
+        //emit signalRemoveCurrentSelection();
         d->actionSetSelectionMode->setChecked(false);
-        d->actionRemoveCurrentSelection->setEnabled(false);
+        //d->actionRemoveCurrentSelection->setEnabled(false);
+        d->currentMouseMode = MouseModePan;
     }
 }
 
 void KMap::slotSetSelectionMode()
 {
-   //TODO:Add here the code that changes the selection mode 
-   // if(d->currentBackend->backendName() == QString("marble"))
-   // {
-        if(d->actionSetSelectionMode->isChecked())
-        {
-            d->currentBackend->mouseModeChanged(MouseModeSelection);
-            d->actionSetPanMode->setChecked(false);
-            d->actionRemoveCurrentSelection->setEnabled(true);
-        }
-        else
-        {
-            //d->currentBackend->mouseModeChanged(MousePan);
-            //emit signalRemoveCurrentSelection();
+    if(d->actionSetSelectionMode->isChecked())
+    {
+        d->currentBackend->mouseModeChanged(MouseModeSelection);
+        d->actionSetPanMode->setChecked(false);
+        d->currentMouseMode = MouseModeSelection;
+            //d->actionRemoveCurrentSelection->setEnabled(true);
+    }
+}
 
-              
-        }
-   // }    
+
+void KMap::slotSetZoomMode()
+{
+    if(d->actionSetZoomMode->isChecked())
+    { 
+        if(d->actionSetSelectionMode->isChecked())
+            d->actionSetPanMode->setChecked(true);
+        //TODO: make a better switch between mouse modes
+        d->currentMouseMode = MouseModeZoom;
+    }
 }
 
 void KMap::slotRemoveCurrentSelection()

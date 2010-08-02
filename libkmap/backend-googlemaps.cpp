@@ -973,9 +973,14 @@ bool BackendGoogleMaps::eventFilter(QObject* object, QEvent* event)
     return false;
 }
 
-void BackendGoogleMaps::setSearchRectangle(const QList<double>& searchCoordinates)
+void BackendGoogleMaps::setSelectionRectangle(const QList<double>& searchCoordinates)
 {
+    d->htmlWidget->setSelectionRectangle(searchCoordinates);
+}
 
+QList<qreal> BackendGoogleMaps::getSelectionRectangle()
+{
+    return d->htmlWidget->getSelectionRectangle();
 }
 
 void BackendGoogleMaps::mouseModeChanged(MouseMode mouseMode)
@@ -998,6 +1003,12 @@ void BackendGoogleMaps::mouseModeChanged(MouseMode mouseMode)
 void BackendGoogleMaps::slotSelectionHasBeenMade(const QList<double>& searchCoordinates)
 {   
     emit signalSelectionHasBeenMade(searchCoordinates);
+}
+
+void BackendGoogleMaps::centerOn( const Marble::GeoDataLatLonBox& )
+{
+
+
 }
 
 } /* namespace KMapIface */

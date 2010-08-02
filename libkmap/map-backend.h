@@ -35,6 +35,11 @@
 
 #include "kmap_common.h"
 
+// Marble Widget includes
+
+#include <marble/global.h>
+#include <marble/GeoDataLatLonBox.h>
+
 class QMenu;
 class KConfigGroup;
 
@@ -88,10 +93,13 @@ public:
 
     virtual void updateActionAvailability() = 0;
 
-    virtual void setSearchRectangle(const QList<double>& searchCorrdinates) = 0;
+    virtual void setSelectionRectangle(const QList<double>& searchCorrdinates) = 0;
+    virtual QList<qreal> getSelectionRectangle() = 0;
     virtual void mouseModeChanged(MouseMode mouseMode) = 0;
 
     const QExplicitlySharedDataPointer<WMWSharedData> s;
+
+    virtual void centerOn(const Marble::GeoDataLatLonBox& box) = 0;
 
 public Q_SLOTS:
 

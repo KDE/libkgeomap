@@ -485,12 +485,22 @@ function selectionModeStatus(state){
     if(state == false){
         map.draggable = true;
 
-        firstSelectionPoint = null;
-        secondSelectionPoint = null;
+        //firstSelectionPoint = null;
+        //secondSelectionPoint = null;
     }
     else{
         map.draggable = false; 
     }
+
+}
+
+function setMapBoundaries(west, north, east, south){
+
+    firstPoint = new google.maps.LatLng(south, west, true);
+    secondPoint = new google.maps.LatLng(north, east, true);
+
+    newBounds = new google.maps.LatLngBounds(firstPoint, secondPoint);
+    map.fitBounds(newBounds);
 
 }
 

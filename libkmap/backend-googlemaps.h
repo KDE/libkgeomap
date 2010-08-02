@@ -31,6 +31,11 @@
 
 #include "map-backend.h"
 
+// Marble Widget include
+
+#include <marble/global.h>
+#include <marble/GeoDataLatLonBox.h>
+
 namespace KMapIface
 {
 
@@ -84,8 +89,11 @@ public:
     void setShowScaleControl(const bool state);
     void setShowNavigationControl(const bool state);
 
-    virtual void setSearchRectangle(const QList<double>& searchCoordinates);
+    virtual void setSelectionRectangle(const QList<double>& searchCoordinates);
+    virtual QList<qreal> getSelectionRectangle();
     virtual void mouseModeChanged(MouseMode mouseMode);
+
+    virtual void centerOn(const Marble::GeoDataLatLonBox& box);
 
 public Q_SLOTS:
 

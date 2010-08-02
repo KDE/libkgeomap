@@ -31,6 +31,11 @@
 
 #include "map-backend.h"
 
+// Marble Widget includes
+
+#include <marble/global.h>
+#include <marble/GeoDataLatLonBox.h>
+
 namespace Marble
 {
     class GeoPainter;
@@ -94,8 +99,11 @@ public:
     void setShowOverviewMap(const bool state);
     void setShowScaleBar(const bool state);
 
-    virtual void setSearchRectangle(const QList<double>& searchCoordinates);
-    virtual void mouseModeChanged(MouseMode mouseMode); 
+    virtual void setSelectionRectangle(const QList<double>& searchCoordinates);
+    virtual QList<qreal> getSelectionRectangle();
+    virtual void mouseModeChanged(MouseMode mouseMode);
+
+    virtual void centerOn(const Marble::GeoDataLatLonBox& box); 
 
 public Q_SLOTS:
 
