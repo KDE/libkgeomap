@@ -136,6 +136,8 @@ public:
 
         WMWGeoCoordinate toCoordinates() const;
 
+        WMWGeoCoordinate toCoordinates(int ofCorner) const;
+
         inline static TileIndex fromIntList(const QIntList& intList)
         {
             TileIndex result;
@@ -335,7 +337,7 @@ public:
     virtual WMWSelectionState getTileSelectedState(const TileIndex& tileIndex) = 0;
 
     // these can be implemented if you want to react to actions in kmap
-    virtual void onIndicesClicked(const TileIndex::List& tileIndicesList, const WMWSelectionState& groupSelectionState);
+    virtual void onIndicesClicked(const TileIndex::List& tileIndicesList, const WMWSelectionState& groupSelectionState, MouseMode currentMouseMode);
     virtual void onIndicesMoved(const TileIndex::List& tileIndicesList, const WMWGeoCoordinate& targetCoordinates, const QPersistentModelIndex& targetSnapIndex);
 
     Tile* rootTile();

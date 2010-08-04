@@ -480,6 +480,11 @@ function clearSelectionPoints(){
     secondSelectionPoint = null;
 }
 
+function removeSelectionRectangle(){
+    selectionRectangle.setMap(null);
+    selectionRectangle = null;
+}
+
 function selectionModeStatus(state){
 
     if(state == false){

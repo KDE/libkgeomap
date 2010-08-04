@@ -914,8 +914,6 @@ bool BackendMarble::eventFilter(QObject *object, QEvent *event)
                setSelectionRectangle(selectionCoordinates);
     
                emit signalSelectionHasBeenMade(selectionCoordinates);
-
-               //d->marbleWidget->update();
         
                d->firstSelectionPoint.clear();
                d->secondSelectionPoint.clear();
@@ -1258,15 +1256,18 @@ QList<qreal> BackendMarble::getSelectionRectangle()
     return d->searchRectangleCoordinates;
 }
 
+void BackendMarble::removeSelectionRectangle()
+{
+    d->searchRectangleCoordinates.clear();
+    d->marbleWidget->update();
+}
+
 void BackendMarble::mouseModeChanged(MouseMode mouseMode)
 {
     d->currentMouseMode = mouseMode;
-   
-    kDebug()<<"Mouse mode changed.";
 
-    if(d->currentMouseMode == MouseModePan)
+    if(d->currentMouseMode != MouseModeSelection)
     {
-        //d->searchRectangleCoordinates.clear();
         d->firstSelectionPoint.clear();
         d->secondSelectionPoint.clear();
         d->marbleWidget->update();

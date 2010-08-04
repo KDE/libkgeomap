@@ -54,7 +54,9 @@ public:
     void mouseModeChanged(bool state);
     void setSelectionRectangle(const QList<qreal>& searchCoordinates);
     QList<qreal> getSelectionRectangle();
-
+    void centerOn(const qreal west, const qreal north, const qreal east, const qreal south);
+    void removeSelectionRectangle();
+    
 protected:
 
     bool eventFilter(QObject* object, QEvent* event);

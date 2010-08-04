@@ -84,7 +84,9 @@ enum MouseMode
 {
     MouseModePan = 1,
     MouseModeSelection = 2,
-    MouseModeZoom = 3
+    MouseModeZoom = 3,
+    MouseModeFilter = 4,
+    MouseModeSelectThumbnail = 5
 };
 
 class KMAP_EXPORT WMWGeoCoordinate

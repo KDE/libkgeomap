@@ -55,7 +55,7 @@ public:
     virtual bool indicesEqual(const QVariant& a, const QVariant& b) const;
     virtual WMWSelectionState getTileSelectedState(const TileIndex& tileIndex);
 
-    virtual void onIndicesClicked(const TileIndex::List& tileIndicesList, const WMWSelectionState& groupSelectionState);
+    virtual void onIndicesClicked(const TileIndex::List& tileIndicesList, const WMWSelectionState& groupSelectionState, MouseMode currentMouseMode);
     virtual void onIndicesMoved(const TileIndex::List& tileIndicesList, const WMWGeoCoordinate& targetCoordinates,
                                 const QPersistentModelIndex& targetSnapIndex);
 

@@ -942,18 +942,6 @@ void BackendGoogleMaps::setMarkerPixmap(const int modelId, const int markerId, c
 
 bool BackendGoogleMaps::eventFilter(QObject* object, QEvent* event)
 {
-        
-
-/*        if ( event->type()==QEvent::MouseButtonPress )
-        {
-            QMouseEvent* const mouseEvent = static_cast<QMouseEvent*>(event);
-            QPainter p;
-            p.begin(d->htmlWidgetWrapper);
-            p.drawLine(mouseEvent->pos(), QPoint(0,0));
-            p.end();
-
-        }
-*/
     if (object==d->htmlWidgetWrapper)
     {
         if (event->type()==QEvent::Resize)
@@ -983,6 +971,11 @@ QList<qreal> BackendGoogleMaps::getSelectionRectangle()
     return d->htmlWidget->getSelectionRectangle();
 }
 
+void BackendGoogleMaps::removeSelectionRectangle()
+{
+    d->htmlWidget->removeSelectionRectangle();
+}
+
 void BackendGoogleMaps::mouseModeChanged(MouseMode mouseMode)
 {
 
@@ -1005,10 +998,14 @@ void BackendGoogleMaps::slotSelectionHasBeenMade(const QList<double>& searchCoor
     emit signalSelectionHasBeenMade(searchCoordinates);
 }
 
-void BackendGoogleMaps::centerOn( const Marble::GeoDataLatLonBox& )
+void BackendGoogleMaps::centerOn( const Marble::GeoDataLatLonBox& latLonBox)
 {
+    const qreal boxWest  = latLonBox.west(Marble::GeoDataCoordinates::Degree);
+    const qreal boxNorth = latLonBox.north(Marble::GeoDataCoordinates::Degree);
+    const qreal boxEast  = latLonBox.east(Marble::GeoDataCoordinates::Degree);
+    const qreal boxSouth = latLonBox.south(Marble::GeoDataCoordinates::Degree);
 
-
+    d->htmlWidget->centerOn(boxWest, boxNorth, boxEast, boxSouth);
 }
 
 } /* namespace KMapIface */

@@ -265,6 +265,12 @@ bool HTMLWidget::eventFilter(QObject* object, QEvent* event)
 
 void HTMLWidget::setSelectionRectangle(const QList<qreal>& searchCoordinates)
 {
+    if(searchCoordinates.isEmpty())
+    {
+        d->selectionRectangle.clear();
+        return;
+    }    
+
     WMWGeoCoordinate firstPoint,secondPoint;
     qreal West  = searchCoordinates.at(0);
     qreal North = searchCoordinates.at(1);
@@ -283,6 +289,12 @@ QList<qreal> HTMLWidget::getSelectionRectangle()
     return d->selectionRectangle;
 }
 
+void HTMLWidget::removeSelectionRectangle()
+{
+    d->selectionRectangle.clear();
+    runScript(QString("removeSelectionRectangle();"));
+}
+
 void HTMLWidget::mouseModeChanged(bool state)
 {
     d->selectionStatus = state;
@@ -292,6 +304,13 @@ void HTMLWidget::mouseModeChanged(bool state)
         d->secondSelectionPoint.clear();
     }
     runScript(QString("selectionModeStatus(%1);").arg(state)); 
+}
+
+void HTMLWidget::centerOn(const qreal west, const qreal north, const qreal east, const qreal south)
+{
+//    kDebug()<<"West:"<<west<<" North:"<<north<<" East:"<<east<<" South:"<<south;
+
+    runScript(QString("setMapBoundaries(%1, %2, %3, %4);").arg(west).arg(north).arg(east).arg(south));
 }
 
 } /* namespace KMapIface */

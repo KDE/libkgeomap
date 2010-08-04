@@ -151,6 +151,8 @@ public:
         actionSetSelectionMode(0),
         actionSetPanMode(0),
         actionSetZoomMode(0),
+        actionSetFilterMode(0),
+        actionSetSelectThumbnailMode(0),
         currentMouseMode(MouseModePan)
     {
     }
@@ -201,7 +203,10 @@ public:
     KAction*                actionSetSelectionMode;
     KAction*                actionSetPanMode;
     KAction*                actionSetZoomMode;
+    KAction*                actionSetFilterMode;
+    KAction*                actionSetSelectThumbnailMode;
     MouseMode               currentMouseMode;
+    
 };
 
 KMap::KMap(QWidget* const parent)
@@ -294,7 +299,7 @@ void KMap::createActions()
     d->actionSetSelectionMode = new KAction(this);
     d->actionSetSelectionMode->setCheckable(true);
     d->actionSetSelectionMode->setIcon(SmallIcon("select-rectangular"));
-    d->actionSetSelectionMode->setToolTip(i18n("Set a search rectangle mode."));
+    d->actionSetSelectionMode->setToolTip(i18n("Select images by drawing a rectangle."));
 
     d->actionSetPanMode = new KAction(this);
     d->actionSetPanMode->setCheckable(true);
@@ -306,6 +311,16 @@ void KMap::createActions()
     d->actionSetZoomMode->setCheckable(true);
     d->actionSetZoomMode->setToolTip(i18n("Zoom into a group."));
     d->actionSetZoomMode->setIcon(SmallIcon("page-zoom"));
+
+    d->actionSetFilterMode = new KAction(this);
+    d->actionSetFilterMode->setCheckable(true);
+    d->actionSetFilterMode->setToolTip(i18n("Filter images"));
+    d->actionSetFilterMode->setIcon(SmallIcon("view-filter"));
+
+    d->actionSetSelectThumbnailMode = new KAction(this);
+    d->actionSetSelectThumbnailMode->setCheckable(true);
+    d->actionSetSelectThumbnailMode->setToolTip(i18n("Select images"));
+    d->actionSetSelectThumbnailMode->setIcon(SmallIcon("edit-select"));
 
     // TODO: for later actions
 //     action->setToolTip(i18n("Zoom into a group"));
@@ -338,6 +353,12 @@ void KMap::createActions()
 
     connect(d->actionSetZoomMode, SIGNAL(changed()),
             this, SLOT(slotSetZoomMode()));
+
+    connect(d->actionSetFilterMode, SIGNAL(changed()),
+            this, SLOT(slotSetFilterMode()));
+
+    connect(d->actionSetSelectThumbnailMode, SIGNAL(changed()),
+            this, SLOT(slotSetSelectThumbnailMode()));
 
     connect(d->actionRemoveCurrentSelection, SIGNAL(triggered()),
             this, SLOT(slotRemoveCurrentSelection()));
@@ -740,6 +761,12 @@ QWidget* KMap::getControlWidget()
 
         QToolButton* const setZoomModeButton = new QToolButton(d->controlWidget);
         setZoomModeButton->setDefaultAction(d->actionSetZoomMode);
+
+        QToolButton* const setFilterModeButton = new QToolButton(d->controlWidget);
+        setFilterModeButton->setDefaultAction(d->actionSetFilterMode);
+
+        QToolButton* const setSelectThumbnailMode = new QToolButton(d->controlWidget);
+        setSelectThumbnailMode->setDefaultAction(d->actionSetSelectThumbnailMode);
 
         d->hBoxForAdditionalControlWidgetItems = new KHBox(d->controlWidget);
 
@@ -1443,9 +1470,60 @@ void KMap::slotClustersClicked(const QIntList& clusterIndices)
 {
     kDebug()<<clusterIndices;
 
-    if(d->currentMouseMode != MouseModeZoom)
+    if((d->currentMouseMode == MouseModeZoom) || (d->currentMouseMode == MouseModeFilter && d->selectionRectangle.isEmpty()))
     {
+        Marble::GeoDataLineString tileString;
 
+        for (int i=0; i<clusterIndices.count(); ++i)
+        {
+            const int clusterIndex = clusterIndices.at(i);
+            const WMWCluster currentCluster = s->clusterList.at(clusterIndex);
+
+            for (int j=0; j<currentCluster.tileIndicesList.count(); ++j)
+            {
+                const AbstractMarkerTiler::TileIndex& currentTileIndex = 
+                    AbstractMarkerTiler::TileIndex::fromIntList(currentCluster.tileIndicesList.at(j));
+                for(int corner=1; corner<=4; corner++)
+                {
+                    WMWGeoCoordinate currentTileCoordinate = currentTileIndex.toCoordinates();
+
+                    const Marble::GeoDataCoordinates tileCoordinate(currentTileCoordinate.lon(), 
+                                                                    currentTileCoordinate.lat(),
+                                                                                              0, 
+                                                                    Marble::GeoDataCoordinates::Degree);
+                    tileString.append(tileCoordinate);
+                }
+            }
+        }
+
+        Marble::GeoDataLatLonBox latLonBox = Marble::GeoDataLatLonBox::fromLineString(tileString);
+       
+        //increase the selection boundaries with 0.1 degrees because some thumbnails aren't catched by selection
+        latLonBox.setWest((latLonBox.west(Marble::GeoDataCoordinates::Degree)-0.1), Marble::GeoDataCoordinates::Degree);
+        latLonBox.setNorth((latLonBox.north(Marble::GeoDataCoordinates::Degree)+0.1), Marble::GeoDataCoordinates::Degree);
+        latLonBox.setEast((latLonBox.east(Marble::GeoDataCoordinates::Degree)+0.1), Marble::GeoDataCoordinates::Degree);
+        latLonBox.setSouth((latLonBox.south(Marble::GeoDataCoordinates::Degree)-0.1), Marble::GeoDataCoordinates::Degree);
+        
+        if(d->currentMouseMode == MouseModeZoom)
+        {
+            d->currentBackend->centerOn(latLonBox);
+        }
+        else
+        {
+            QList<qreal> newSelection;
+            const qreal boxWest  = latLonBox.west(Marble::GeoDataCoordinates::Degree);
+            const qreal boxNorth = latLonBox.north(Marble::GeoDataCoordinates::Degree);
+            const qreal boxEast  = latLonBox.east(Marble::GeoDataCoordinates::Degree);
+            const qreal boxSouth = latLonBox.south(Marble::GeoDataCoordinates::Degree);
+            newSelection<<boxWest<<boxNorth<<boxEast<<boxSouth;
+ 
+            d->selectionRectangle = newSelection;
+            d->cacheSelectionRectangle = newSelection;
+            emit signalNewSelectionFromMap();
+        }
+    }
+    else if((d->currentMouseMode == MouseModeFilter && !d->selectionRectangle.isEmpty()) || (d->currentMouseMode == MouseModeSelectThumbnail))
+    {
     // update the selection state of the clusters
         for (int i=0; i<clusterIndices.count(); ++i)
         {
@@ -1459,36 +1537,10 @@ void KMap::slotClustersClicked(const QIntList& clusterIndices)
                 const AbstractMarkerTiler::TileIndex& currentTileIndex = AbstractMarkerTiler::TileIndex::fromIntList(currentCluster.tileIndicesList.at(j));
                 tileIndices << currentTileIndex;
             }
-            s->markerModel->onIndicesClicked(tileIndices, currentCluster.selectedState);
-        }
-    }
-    else
-    {
-        Marble::GeoDataLineString tileString;
-        
-        for (int i=0; i<clusterIndices.count(); ++i)
-        {
-            const int clusterIndex = clusterIndices.at(i);
-            const WMWCluster currentCluster = s->clusterList.at(clusterIndex);
-
-            
-
-            for (int j=0; j<currentCluster.tileIndicesList.count(); ++j)
-            {
-                const AbstractMarkerTiler::TileIndex& currentTileIndex = AbstractMarkerTiler::TileIndex::fromIntList(currentCluster.tileIndicesList.at(j));
-                WMWGeoCoordinate currentTileCoordinate = currentTileIndex.toCoordinates();
-                
-                const Marble::GeoDataCoordinates tileCoordinate(currentTileCoordinate.lon(), currentTileCoordinate.lat(), Marble::GeoDataCoordinates::Degree);
-                tileString.append(tileCoordinate);
-
-            }
-        }
-
-        Marble::GeoDataLatLonBox latLonBox = Marble::GeoDataLatLonBox::fromLineString(tileString);
-        if(d->currentBackend->backendName() == QString("marble"))
-        {
-            //d->currentBackend->mapWidget()->centerOn(latLonBox, false); 
-            d->currentBackend->centerOn(latLonBox);
+            if(d->currentMouseMode == MouseModeFilter)
+                s->markerModel->onIndicesClicked(tileIndices, currentCluster.selectedState, MouseModeFilter);
+            else
+                s->markerModel->onIndicesClicked(tileIndices, currentCluster.selectedState, MouseModeSelectThumbnail);
         }
     }
 }
@@ -1882,20 +1934,19 @@ QList<double> KMap::selectionCoordinates() const
 
 void KMap::setSelectionCoordinates(QList<qreal>& sel)
 {
-    //TODO: Add here code that draws the rectangle
-    
     d->currentBackend->setSelectionRectangle(sel);
-
     d->selectionRectangle = sel;
-    
+}
+
+void KMap::clearSelectionRectangle()
+{
+    d->selectionRectangle.clear();
 }
 
 void KMap::slotNewSelectionFromMap(const QList<qreal>& sel)
 {
     d->selectionRectangle = sel;
-
     d->cacheSelectionRectangle = sel;
-
     emit signalNewSelectionFromMap();
 }
 
@@ -1903,10 +1954,12 @@ void KMap::slotSetPanMode()
 {
     if(d->actionSetPanMode->isChecked())
     {
-        d->currentBackend->mouseModeChanged(MouseModePan);
-        //emit signalRemoveCurrentSelection();
         d->actionSetSelectionMode->setChecked(false);
-        //d->actionRemoveCurrentSelection->setEnabled(false);
+        d->actionSetZoomMode->setChecked(false);
+        d->actionSetFilterMode->setChecked(false);
+        d->actionSetSelectThumbnailMode->setChecked(false);
+
+        d->currentBackend->mouseModeChanged(MouseModePan);
         d->currentMouseMode = MouseModePan;
     }
 }
@@ -1915,10 +1968,13 @@ void KMap::slotSetSelectionMode()
 {
     if(d->actionSetSelectionMode->isChecked())
     {
-        d->currentBackend->mouseModeChanged(MouseModeSelection);
         d->actionSetPanMode->setChecked(false);
+        d->actionSetZoomMode->setChecked(false);
+        d->actionSetFilterMode->setChecked(false);
+        d->actionSetSelectThumbnailMode->setChecked(false);
+
+        d->currentBackend->mouseModeChanged(MouseModeSelection);
         d->currentMouseMode = MouseModeSelection;
-            //d->actionRemoveCurrentSelection->setEnabled(true);
     }
 }
 
@@ -1927,16 +1983,49 @@ void KMap::slotSetZoomMode()
 {
     if(d->actionSetZoomMode->isChecked())
     { 
-        if(d->actionSetSelectionMode->isChecked())
-            d->actionSetPanMode->setChecked(true);
-        //TODO: make a better switch between mouse modes
+        d->actionSetPanMode->setChecked(false);
+        d->actionSetSelectionMode->setChecked(false);
+        d->actionSetFilterMode->setChecked(false);
+        d->actionSetSelectThumbnailMode->setChecked(false);        
+
+        d->currentBackend->mouseModeChanged(MouseModeZoom);
         d->currentMouseMode = MouseModeZoom;
+    }
+}
+
+void KMap::slotSetFilterMode()
+{
+    if(d->actionSetFilterMode->isChecked())
+    {
+        d->actionSetPanMode->setChecked(false);
+        d->actionSetSelectionMode->setChecked(false);
+        d->actionSetZoomMode->setChecked(false);
+        d->actionSetSelectThumbnailMode->setChecked(false);
+    
+        d->currentBackend->mouseModeChanged(MouseModeFilter);
+        d->currentMouseMode = MouseModeFilter;
+    }
+}
+
+void KMap::slotSetSelectThumbnailMode()
+{
+    if(d->actionSetSelectThumbnailMode->isChecked())
+    {
+        d->actionSetPanMode->setChecked(false);
+        d->actionSetSelectionMode->setChecked(false);
+        d->actionSetZoomMode->setChecked(false);
+        d->actionSetFilterMode->setChecked(false);
+    
+        d->currentBackend->mouseModeChanged(MouseModeSelectThumbnail);
+        d->currentMouseMode = MouseModeSelectThumbnail;
     }
 }
 
 void KMap::slotRemoveCurrentSelection()
 {
     emit signalRemoveCurrentSelection();
+    clearSelectionRectangle();
+    d->currentBackend->removeSelectionRectangle();
 }
 
 void KMap::slotUngroupedModelChanged()

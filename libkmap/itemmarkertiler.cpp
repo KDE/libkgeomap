@@ -546,7 +546,7 @@ bool ItemMarkerTiler::indicesEqual(const QVariant& a, const QVariant& b) const
     return a.value<QPersistentModelIndex>()==b.value<QPersistentModelIndex>();
 }
 
-void ItemMarkerTiler::onIndicesClicked(const TileIndex::List& tileIndicesList, const WMWSelectionState& groupSelectionState)
+void ItemMarkerTiler::onIndicesClicked(const TileIndex::List& tileIndicesList, const WMWSelectionState& groupSelectionState, MouseMode currentMouseMode)
 {
     QList<QPersistentModelIndex> clickedMarkers;
     for (int i=0; i<tileIndicesList.count(); ++i)
@@ -555,21 +555,27 @@ void ItemMarkerTiler::onIndicesClicked(const TileIndex::List& tileIndicesList, c
 
         clickedMarkers << getTileMarkerIndices(tileIndex);
     }
-
-    const bool doSelect = groupSelectionState!=WMWSelectedAll;
-    if (d->selectionModel)
+    if(currentMouseMode == MouseModeSelectThumbnail)
     {
-        for (int i=0; i<clickedMarkers.count(); ++i)
+        const bool doSelect = groupSelectionState!=WMWSelectedAll;
+        if (d->selectionModel)
         {
-            if (d->selectionModel->isSelected(clickedMarkers.at(i))!=doSelect)
+            for (int i=0; i<clickedMarkers.count(); ++i)
             {
-                d->selectionModel->select(clickedMarkers.at(i), (doSelect ? QItemSelectionModel::Select : QItemSelectionModel::Deselect) | QItemSelectionModel::Rows);
+                if (d->selectionModel->isSelected(clickedMarkers.at(i))!=doSelect)
+                {
+                    d->selectionModel->select(clickedMarkers.at(i), (doSelect ? QItemSelectionModel::Select : QItemSelectionModel::Deselect) | QItemSelectionModel::Rows);
+                }
             }
         }
-    }
 
     // TODO: when do we report the clicks to the modelHelper?
-    d->modelHelper->onIndicesClicked(clickedMarkers);
+    //d->modelHelper->onIndicesClicked(clickedMarkers);
+    }
+    else if(currentMouseMode == MouseModeFilter)
+    {
+        d->modelHelper->onIndicesClicked(clickedMarkers);
+    }
 }
 
 void ItemMarkerTiler::onIndicesMoved(const TileIndex::List& tileIndicesList, const WMWGeoCoordinate& targetCoordinates, const QPersistentModelIndex& targetSnapIndex)

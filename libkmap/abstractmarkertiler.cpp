@@ -478,6 +478,63 @@ WMWGeoCoordinate AbstractMarkerTiler::TileIndex::toCoordinates() const
     return WMWGeoCoordinate(tileLatBL, tileLonBL);
 }
 
+
+WMWGeoCoordinate AbstractMarkerTiler::TileIndex::toCoordinates(int ofCorner) const
+{
+    //corners:
+    //1-NW; 2-SW; 3-NE; 4-SE
+
+    // TODO: safeguards against rounding errors!
+    qreal tileLatBL     = -90.0;
+    qreal tileLonBL     = -180.0;
+    qreal tileLatHeight = 180.0;
+    qreal tileLonWidth  = 360.0;
+
+    for (int l = 0; l < m_indicesCount; ++l)
+    {
+        // how many tiles are at this level?
+        const qreal latDivisor = TileIndex::Tiling;
+        const qreal lonDivisor = TileIndex::Tiling;
+
+        const qreal dLat       = tileLatHeight / latDivisor;
+        const qreal dLon       = tileLonWidth / lonDivisor;
+
+        int latIndex           = indexLat(l);
+        int lonIndex           = indexLon(l);
+
+        // update the start position for the next tile:
+        if(l+1 >= m_indicesCount)
+        {
+            if(ofCorner == 1)
+            {
+                tileLatBL     += latIndex*dLat;
+                tileLonBL     += lonIndex*dLon;
+            }
+            else if(ofCorner == 2)
+            {
+                tileLatBL     += (latIndex+1)*dLat;
+                tileLonBL     += lonIndex*dLon;
+            }
+            else if(ofCorner == 3)
+            {
+                tileLatBL     += latIndex*dLat;
+                tileLonBL     += (lonIndex+1)*dLon;
+            }
+            else if(ofCorner == 4)
+            {
+                tileLatBL     += (latIndex+1)*dLat;
+                tileLonBL     += (lonIndex+1)*dLon;
+            }
+        }
+
+        tileLatHeight /= latDivisor;
+        tileLonWidth  /= lonDivisor;
+    }
+
+    return WMWGeoCoordinate(tileLatBL, tileLonBL);
+}
+
+
 bool AbstractMarkerTiler::isDirty() const
 {
     return d->isDirty;
@@ -505,10 +562,11 @@ AbstractMarkerTiler::Tile* AbstractMarkerTiler::resetRootTile()
     return d->rootTile;
 }
 
-void AbstractMarkerTiler::onIndicesClicked(const TileIndex::List& tileIndicesList, const WMWSelectionState& groupSelectionState)
+void AbstractMarkerTiler::onIndicesClicked(const TileIndex::List& tileIndicesList, const WMWSelectionState& groupSelectionState, MouseMode currentMouseMode)
 {
     Q_UNUSED(tileIndicesList);
     Q_UNUSED(groupSelectionState);
+    Q_UNUSED(currentMouseMode);
 }
 
 void AbstractMarkerTiler::onIndicesMoved(const TileIndex::List& tileIndicesList, const WMWGeoCoordinate& targetCoordinates,
