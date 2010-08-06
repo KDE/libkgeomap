@@ -137,10 +137,12 @@ public:
         actionEditMode(0),
         actionGroupMode(0),
         browseModeControlsHolder(0),
+        mouseModesHolder(0),
         controlWidget(0),
         lazyReclusteringRequested(false),
         clustersDirty(false),
         editModeAvailable(false),
+        mouseModesAvailable(false),
         dragDropHandler(0),
         sortMenu(0),
         thumbnailSize(KMapIfaceMinThumbnailSize),
@@ -178,6 +180,7 @@ public:
     KAction*                actionEditMode;
     QActionGroup*           actionGroupMode;
     QWidget*                browseModeControlsHolder;
+    QWidget*                mouseModesHolder;
     QPointer<KHBox>         controlWidget;
     KAction*                actionPreviewSingleItems;
     KAction*                actionPreviewGroupedItems;
@@ -186,6 +189,7 @@ public:
     bool                    lazyReclusteringRequested;
     bool                    clustersDirty;
     bool                    editModeAvailable;
+    bool                    mouseModesAvailable;
 
     DragDropHandler*        dragDropHandler;
 
@@ -206,7 +210,6 @@ public:
     KAction*                actionSetFilterMode;
     KAction*                actionSetSelectThumbnailMode;
     MouseMode               currentMouseMode;
-    
 };
 
 KMap::KMap(QWidget* const parent)
@@ -750,22 +753,25 @@ QWidget* KMap::getControlWidget()
 
         new KSeparator(Qt::Vertical, d->controlWidget);
 
-        QToolButton* const setPanModeButton = new QToolButton(d->controlWidget);
+        d->mouseModesHolder = new KHBox(d->controlWidget);
+        d->mouseModesHolder->setVisible(d->mouseModesAvailable); 
+
+        QToolButton* const setPanModeButton = new QToolButton(d->mouseModesHolder);
         setPanModeButton->setDefaultAction(d->actionSetPanMode);
 
-        QToolButton* const setSelectionModeButton = new QToolButton(d->controlWidget);
+        QToolButton* const setSelectionModeButton = new QToolButton(d->mouseModesHolder);
         setSelectionModeButton->setDefaultAction(d->actionSetSelectionMode);
 
-        QToolButton* const removeCurrentSelectionButton = new QToolButton(d->controlWidget);
+        QToolButton* const removeCurrentSelectionButton = new QToolButton(d->mouseModesHolder);
         removeCurrentSelectionButton->setDefaultAction(d->actionRemoveCurrentSelection);
 
-        QToolButton* const setZoomModeButton = new QToolButton(d->controlWidget);
+        QToolButton* const setZoomModeButton = new QToolButton(d->mouseModesHolder);
         setZoomModeButton->setDefaultAction(d->actionSetZoomMode);
 
-        QToolButton* const setFilterModeButton = new QToolButton(d->controlWidget);
+        QToolButton* const setFilterModeButton = new QToolButton(d->mouseModesHolder);
         setFilterModeButton->setDefaultAction(d->actionSetFilterMode);
 
-        QToolButton* const setSelectThumbnailMode = new QToolButton(d->controlWidget);
+        QToolButton* const setSelectThumbnailMode = new QToolButton(d->mouseModesHolder);
         setSelectThumbnailMode->setDefaultAction(d->actionSetSelectThumbnailMode);
 
         d->hBoxForAdditionalControlWidgetItems = new KHBox(d->controlWidget);
@@ -1618,6 +1624,16 @@ void KMap::setEditModeAvailable(const bool state)
     if (d->browseModeControlsHolder)
     {
         d->browseModeControlsHolder->setVisible(d->editModeAvailable);
+    }
+}
+
+void KMap::setMouseModesVisibility(const bool state)
+{
+    d->mouseModesAvailable = state;
+
+    if(d->mouseModesAvailable)
+    {
+        d->mouseModesHolder->setVisible(d->mouseModesAvailable);
     }
 }
 
