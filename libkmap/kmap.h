@@ -133,6 +133,7 @@ public Q_SLOTS:
     void slotSetFilterMode();
     void slotSetSelectThumbnailMode();
     void slotRemoveCurrentSelection();
+    void stopThumbnailTimer();
 
 Q_SIGNALS:
 
@@ -143,6 +144,7 @@ Q_SIGNALS:
     void signalUngroupedModelChanged(const int index);
     void signalNewSelectionFromMap();
     void signalRemoveCurrentSelection();
+    void signalRemoveCurrentFilter();
 
 public:
 

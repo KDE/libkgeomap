@@ -154,8 +154,12 @@ public:
         actionSetPanMode(0),
         actionSetZoomMode(0),
         actionSetFilterMode(0),
+        actionRemoveFilterMode(0),
         actionSetSelectThumbnailMode(0),
-        currentMouseMode(MouseModePan)
+        currentMouseMode(MouseModePan),
+        thumbnailTimer(0),
+        thumbnailTimerCount(0),
+        thumbnailsHaveBeenLoaded(false)
     {
     }
 
@@ -201,15 +205,21 @@ public:
     KAction*                actionDecreaseThumbnailSize;
     KHBox*                  hBoxForAdditionalControlWidgetItems;
 
-    QList<double>           selectionRectangle;
+    QList<qreal>            selectionRectangle;
+    QList<qreal>            oldSelectionRectangle;
 
     KAction*                actionRemoveCurrentSelection;
     KAction*                actionSetSelectionMode;
     KAction*                actionSetPanMode;
     KAction*                actionSetZoomMode;
     KAction*                actionSetFilterMode;
+    KAction*                actionRemoveFilterMode;
     KAction*                actionSetSelectThumbnailMode;
     MouseMode               currentMouseMode;
+
+    QTimer*                 thumbnailTimer;
+    int                     thumbnailTimerCount;
+    bool                    thumbnailsHaveBeenLoaded;
 };
 
 KMap::KMap(QWidget* const parent)
@@ -320,6 +330,9 @@ void KMap::createActions()
     d->actionSetFilterMode->setToolTip(i18n("Filter images"));
     d->actionSetFilterMode->setIcon(SmallIcon("view-filter"));
 
+    d->actionRemoveFilterMode = new KAction(i18n("R"), this);
+    d->actionRemoveFilterMode->setToolTip(i18n("Remove the filtered images"));
+
     d->actionSetSelectThumbnailMode = new KAction(this);
     d->actionSetSelectThumbnailMode->setCheckable(true);
     d->actionSetSelectThumbnailMode->setToolTip(i18n("Select images"));
@@ -360,11 +373,16 @@ void KMap::createActions()
     connect(d->actionSetFilterMode, SIGNAL(changed()),
             this, SLOT(slotSetFilterMode()));
 
+    connect(d->actionRemoveFilterMode, SIGNAL(triggered()),
+            this, SIGNAL(signalRemoveCurrentFilter()));
+
     connect(d->actionSetSelectThumbnailMode, SIGNAL(changed()),
             this, SLOT(slotSetSelectThumbnailMode()));
 
     connect(d->actionRemoveCurrentSelection, SIGNAL(triggered()),
             this, SLOT(slotRemoveCurrentSelection()));
+
+        
 }
 
 void KMap::createActionsForBackendSelection()
@@ -583,12 +601,32 @@ void KMap::slotBackendReady(const QString& backendName)
         d->stackedLayout->setCurrentIndex(newIndex);
     }
 
+
+    if(!d->thumbnailsHaveBeenLoaded)
+    {
+        d->thumbnailTimer      = new QTimer(this);
+        d->thumbnailTimerCount = 0;
+        connect(d->thumbnailTimer, SIGNAL(timeout()), this, SLOT(stopThumbnailTimer()));
+        d->thumbnailTimer->start(2000);
+    }
+
     applyCacheToBackend();
 
     updateMarkers();
     markClustersAsDirty();
 
     rebuildConfigurationMenu();
+}
+
+void KMap::stopThumbnailTimer()
+{
+    d->currentBackend->updateMarkers();
+    d->thumbnailTimerCount++;
+    if(d->thumbnailTimerCount == 10)
+    {
+        d->thumbnailTimer->stop();
+        d->thumbnailsHaveBeenLoaded = true;
+    }
 }
 
 void KMap::saveSettingsToGroup(KConfigGroup* const group)
@@ -770,6 +808,9 @@ QWidget* KMap::getControlWidget()
 
         QToolButton* const setFilterModeButton = new QToolButton(d->mouseModesHolder);
         setFilterModeButton->setDefaultAction(d->actionSetFilterMode);
+
+        QToolButton* const removeFilterModeButton = new QToolButton(d->mouseModesHolder);
+        removeFilterModeButton->setDefaultAction(d->actionRemoveFilterMode);
 
         QToolButton* const setSelectThumbnailMode = new QToolButton(d->mouseModesHolder);
         setSelectThumbnailMode->setDefaultAction(d->actionSetSelectThumbnailMode);
@@ -1952,6 +1993,7 @@ void KMap::setSelectionCoordinates(QList<qreal>& sel)
 {
     d->currentBackend->setSelectionRectangle(sel);
     d->selectionRectangle = sel;
+    d->oldSelectionRectangle = sel;
 }
 
 void KMap::clearSelectionRectangle()
@@ -1961,8 +2003,9 @@ void KMap::clearSelectionRectangle()
 
 void KMap::slotNewSelectionFromMap(const QList<qreal>& sel)
 {
-    d->selectionRectangle = sel;
+    d->selectionRectangle      = sel;
     d->cacheSelectionRectangle = sel;
+    d->oldSelectionRectangle   = sel;
     emit signalNewSelectionFromMap();
 }
 
@@ -1970,13 +2013,20 @@ void KMap::slotSetPanMode()
 {
     if(d->actionSetPanMode->isChecked())
     {
+        d->currentMouseMode = MouseModePan;
         d->actionSetSelectionMode->setChecked(false);
         d->actionSetZoomMode->setChecked(false);
         d->actionSetFilterMode->setChecked(false);
         d->actionSetSelectThumbnailMode->setChecked(false);
 
         d->currentBackend->mouseModeChanged(MouseModePan);
-        d->currentMouseMode = MouseModePan;
+        if(d->selectionRectangle.isEmpty())
+           d->currentBackend->removeSelectionRectangle(); 
+    }
+    else
+    {
+        if(d->currentMouseMode == MouseModePan)
+            d->actionSetPanMode->setChecked(true);
     }
 }
 
@@ -1984,13 +2034,20 @@ void KMap::slotSetSelectionMode()
 {
     if(d->actionSetSelectionMode->isChecked())
     {
+        d->currentMouseMode = MouseModeSelection;
         d->actionSetPanMode->setChecked(false);
         d->actionSetZoomMode->setChecked(false);
         d->actionSetFilterMode->setChecked(false);
         d->actionSetSelectThumbnailMode->setChecked(false);
 
+        d->currentBackend->setSelectionRectangle(d->oldSelectionRectangle);
+
         d->currentBackend->mouseModeChanged(MouseModeSelection);
-        d->currentMouseMode = MouseModeSelection;
+    }
+    else
+    {
+        if(d->currentMouseMode == MouseModeSelection)
+            d->actionSetSelectionMode->setChecked(true);
     }
 }
 
@@ -1999,13 +2056,18 @@ void KMap::slotSetZoomMode()
 {
     if(d->actionSetZoomMode->isChecked())
     { 
+        d->currentMouseMode = MouseModeZoom;
         d->actionSetPanMode->setChecked(false);
         d->actionSetSelectionMode->setChecked(false);
         d->actionSetFilterMode->setChecked(false);
         d->actionSetSelectThumbnailMode->setChecked(false);        
 
         d->currentBackend->mouseModeChanged(MouseModeZoom);
-        d->currentMouseMode = MouseModeZoom;
+    }
+    else
+    {
+        if(d->currentMouseMode == MouseModeZoom)
+            d->actionSetZoomMode->setChecked(true);
     }
 }
 
@@ -2013,13 +2075,18 @@ void KMap::slotSetFilterMode()
 {
     if(d->actionSetFilterMode->isChecked())
     {
+        d->currentMouseMode = MouseModeFilter;
         d->actionSetPanMode->setChecked(false);
         d->actionSetSelectionMode->setChecked(false);
         d->actionSetZoomMode->setChecked(false);
         d->actionSetSelectThumbnailMode->setChecked(false);
     
         d->currentBackend->mouseModeChanged(MouseModeFilter);
-        d->currentMouseMode = MouseModeFilter;
+    }
+    else
+    {
+        if(d->currentMouseMode == MouseModeFilter)
+            d->actionSetFilterMode->setChecked(true);
     }
 }
 
@@ -2027,13 +2094,18 @@ void KMap::slotSetSelectThumbnailMode()
 {
     if(d->actionSetSelectThumbnailMode->isChecked())
     {
+        d->currentMouseMode = MouseModeSelectThumbnail;
         d->actionSetPanMode->setChecked(false);
         d->actionSetSelectionMode->setChecked(false);
         d->actionSetZoomMode->setChecked(false);
         d->actionSetFilterMode->setChecked(false);
     
         d->currentBackend->mouseModeChanged(MouseModeSelectThumbnail);
-        d->currentMouseMode = MouseModeSelectThumbnail;
+    }
+    else
+    {
+        if(d->currentMouseMode == MouseModeSelectThumbnail)
+            d->actionSetSelectThumbnailMode->setChecked(true);
     }
 }
 
@@ -2042,6 +2114,8 @@ void KMap::slotRemoveCurrentSelection()
     emit signalRemoveCurrentSelection();
     clearSelectionRectangle();
     d->currentBackend->removeSelectionRectangle();
+    if(d->currentMouseMode == MouseModeSelection)
+        d->currentBackend->setSelectionRectangle(d->oldSelectionRectangle);
 }
 
 void KMap::slotUngroupedModelChanged()
