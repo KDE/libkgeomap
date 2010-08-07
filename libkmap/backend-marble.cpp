@@ -377,7 +377,7 @@ void BackendMarble::readSettingsFromGroup(const KConfigGroup* const group)
         return;
 
     setMapTheme(group->readEntry("Marble Map Theme", "atlas"));
-    setProjection(group->readEntry("Marble Projection", "spherical"));
+    setProjection(group->readEntry("Marble Projection", "mercator"));
     setShowScaleBar(group->readEntry("Marble Show Scale Bar", d->cacheShowScaleBar));
     setShowCompass(group->readEntry("Marble Show Compass", d->cacheShowCompass));
     setShowOverviewMap(group->readEntry("Marble Show Overview Map", d->cacheShowOverviewMap));

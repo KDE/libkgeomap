@@ -661,8 +661,7 @@ void KMap::readSettingsFromGroup(const KConfigGroup* const group)
     if (!group)
         return;
 
-    const QString alternativeBackendName = d->loadedBackends.isEmpty() ? "" : d->loadedBackends.first()->backendName();
-    setBackend(group->readEntry("Backend", alternativeBackendName));
+    setBackend(group->readEntry("Backend", "marble"));
 
     const WMWGeoCoordinate centerDefault = WMWGeoCoordinate(52.0, 6.0);
     const QString centerGeoUrl = group->readEntry("Center", centerDefault.geoUrl());
