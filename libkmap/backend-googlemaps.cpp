@@ -979,6 +979,8 @@ void BackendGoogleMaps::removeSelectionRectangle()
 void BackendGoogleMaps::mouseModeChanged(MouseMode mouseMode)
 {
 
+    d->htmlWidget->mouseModeChanged(mouseMode);
+/*
     if(mouseMode == MouseModeSelection)
     {
        // d->htmlWidget->runScript(QString("selectionModeStatus(true)"));
@@ -989,7 +991,7 @@ void BackendGoogleMaps::mouseModeChanged(MouseMode mouseMode)
        // d->htmlWidget->runScript(QString("selectionModeStatus(false)"));
         d->htmlWidget->mouseModeChanged(false);
     }
-
+*/
 
 }
 

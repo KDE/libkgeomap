@@ -46,6 +46,18 @@ class KConfigGroup;
 namespace KMapIface
 {
 
+enum SelRectangleHDirection 
+{ 
+    Left = 0,
+    Right
+};
+
+enum SelRectangleVDirection
+{
+    Up = 0,
+    Down
+};
+
 class WMWSharedData;
 
 class MapBackend : public QObject

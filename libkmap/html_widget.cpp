@@ -54,7 +54,10 @@ public:
         javascriptScanTimer(0),
         selectionStatus(false),
         firstSelectionPoint(),
-        secondSelectionPoint()
+        secondSelectionPoint(),
+        currentMouseMode(MouseModePan),
+        firstSelectionScreenPoint(),
+        secondSelectionScreenPoint()
     {
     }
 
@@ -67,6 +70,9 @@ public:
     WMWGeoCoordinate    intermediateSelectionPoint;
     WMWGeoCoordinate    secondSelectionPoint;
     QList<qreal>        selectionRectangle;
+    MouseMode           currentMouseMode;
+    QPoint              firstSelectionScreenPoint;
+    QPoint              secondSelectionScreenPoint;
 };
 
 HTMLWidget::HTMLWidget(QWidget* const parent)
@@ -117,7 +123,6 @@ void HTMLWidget::slotHTMLCompleted()
 
 void HTMLWidget::khtmlMousePressEvent(khtml::MousePressEvent* e)
 {
-
     slotScanForJSMessages();
     KHTMLPart::khtmlMousePressEvent(e);
 }
@@ -125,7 +130,7 @@ void HTMLWidget::khtmlMousePressEvent(khtml::MousePressEvent* e)
 void HTMLWidget::khtmlMouseReleaseEvent(khtml::MouseReleaseEvent* e)
 {
 
-    if(d->selectionStatus)
+    if(d->currentMouseMode == MouseModeSelection)
     {
         if(!d->firstSelectionPoint.hasCoordinates())
         {
@@ -134,7 +139,8 @@ void HTMLWidget::khtmlMouseReleaseEvent(khtml::MouseReleaseEvent* e)
                                     .arg(e->y()),
                                    &d->firstSelectionPoint);
 
-            runScript(QString("addSelectionPoint(%1, %2, 'red');").arg(d->firstSelectionPoint.lon()).arg(d->firstSelectionPoint.lat()));//.arg("red"));
+            d->firstSelectionScreenPoint = QPoint(e->x(), e->y());
+
         }
         else
         {
@@ -147,27 +153,33 @@ void HTMLWidget::khtmlMouseReleaseEvent(khtml::MouseReleaseEvent* e)
                                         .arg(e->y()),
                                         &d->secondSelectionPoint);
 
-                qreal lonWest  = d->firstSelectionPoint.lon();
-                qreal latNorth = d->firstSelectionPoint.lat();
-                qreal lonEast  = d->secondSelectionPoint.lon();
-                qreal latSouth = d->secondSelectionPoint.lat();
+                d->secondSelectionScreenPoint = QPoint(e->x(), e->y());
 
-                if(lonWest > lonEast)
+                qreal lonWest, latNorth, lonEast, latSouth;
+                if(d->firstSelectionScreenPoint.x() < d->secondSelectionScreenPoint.x())
                 {
-                    const qreal auxCoord = lonWest;
-                    lonWest              = lonEast;
-                    lonEast              = auxCoord;
+                    lonWest  = d->firstSelectionPoint.lon();
+                    lonEast  = d->secondSelectionPoint.lon();
+                }
+                else
+                {
+                    lonEast  = d->firstSelectionPoint.lon();
+                    lonWest  = d->secondSelectionPoint.lon(); 
                 }
 
-                if(latNorth < latSouth)
+                if(d->firstSelectionScreenPoint.y() < d->secondSelectionScreenPoint.y())
                 {
-                    const qreal auxCoord = latNorth;
-                    latNorth             = latSouth;
-                    latSouth             = auxCoord;
+                    latNorth = d->firstSelectionPoint.lat();
+                    latSouth = d->secondSelectionPoint.lat();
+                }
+                else
+                {
+                    latNorth = d->secondSelectionPoint.lat();
+                    latSouth = d->firstSelectionPoint.lat();
                 }
 
-                runScript(QString("addSelectionPoint(%1, %2, 'blue');").arg(d->secondSelectionPoint.lon()).arg(d->secondSelectionPoint.lat()));
-
+                runScript(QString("setSelectionRectangle(%1, %2, %3, %4, 'blue');").arg(lonWest).arg(latNorth).arg(lonEast).arg(latSouth));
+               
                 QList<qreal> selectionCoordinates;
                 selectionCoordinates << lonWest << latNorth << lonEast << latSouth;
 
@@ -190,14 +202,41 @@ void HTMLWidget::khtmlMouseReleaseEvent(khtml::MouseReleaseEvent* e)
 void HTMLWidget::khtmlMouseMoveEvent(khtml::MouseMoveEvent *e)
 {
 
-    if(d->selectionStatus && d->firstSelectionPoint.hasCoordinates() && !d->secondSelectionPoint.hasCoordinates())
+    if(d->currentMouseMode == MouseModeSelection && d->firstSelectionPoint.hasCoordinates() && !d->secondSelectionPoint.hasCoordinates())
     {
         runScript2Coordinates( QString("wmwPixelToLatLng(%1, %2);")
                                     .arg(e->x())
                                     .arg(e->y()),
                                    &d->intermediateSelectionPoint);
 
-        runScript(QString("addSelectionPoint(%1, %2, 'red');").arg(d->intermediateSelectionPoint.lon()).arg(d->intermediateSelectionPoint.lat()));
+        d->secondSelectionScreenPoint = QPoint(e->x(), e->y());
+
+        kDebug()<<d->firstSelectionScreenPoint<<" "<<d->secondSelectionScreenPoint;
+
+        qreal lonWest, latNorth, lonEast, latSouth;
+        if(d->firstSelectionScreenPoint.x() < d->secondSelectionScreenPoint.x())
+        {
+            lonWest  = d->firstSelectionPoint.lon();
+            lonEast  = d->intermediateSelectionPoint.lon();
+        }
+        else
+        {
+            lonEast  = d->firstSelectionPoint.lon();
+            lonWest  = d->intermediateSelectionPoint.lon(); 
+        }
+
+        if(d->firstSelectionScreenPoint.y() < d->secondSelectionScreenPoint.y())
+        {
+            latNorth = d->firstSelectionPoint.lat();
+            latSouth = d->intermediateSelectionPoint.lat();
+        }
+        else
+        {
+            latNorth = d->intermediateSelectionPoint.lat();
+            latSouth = d->firstSelectionPoint.lat();
+        }
+                
+        runScript(QString("setSelectionRectangle(%1, %2, %3, %4, 'red');").arg(lonWest).arg(latNorth).arg(lonEast).arg(latSouth));
     }
 
     slotScanForJSMessages();
@@ -276,9 +315,8 @@ void HTMLWidget::setSelectionRectangle(const QList<qreal>& searchCoordinates)
     qreal North = searchCoordinates.at(1);
     qreal East  = searchCoordinates.at(2);
     qreal South = searchCoordinates.at(3);
-
-    runScript(QString("addSelectionPoint(%1, %2, 'blue');").arg(West).arg(North)); 
-    runScript(QString("addSelectionPoint(%1, %2, 'blue');").arg(East).arg(South));
+    
+    runScript(QString("setSelectionRectangle(%1, %2, %3, %4, 'blue');").arg(West).arg(North).arg(East).arg(South));
     runScript(QString("clearSelectionPoints();"));
 
     d->selectionRectangle = searchCoordinates;
@@ -295,15 +333,23 @@ void HTMLWidget::removeSelectionRectangle()
     runScript(QString("removeSelectionRectangle();"));
 }
 
-void HTMLWidget::mouseModeChanged(bool state)
+void HTMLWidget::mouseModeChanged(MouseMode mouseMode)
 {
-    d->selectionStatus = state;
-    if(d->selectionStatus == false)
+    bool state;
+    d->currentMouseMode = mouseMode;
+
+    if(d->currentMouseMode != MouseModeSelection)
     {
         d->firstSelectionPoint.clear();
         d->secondSelectionPoint.clear();
+        state = false;
+        runScript(QString("selectionModeStatus(%1);").arg(state)); 
     }
-    runScript(QString("selectionModeStatus(%1);").arg(state)); 
+    else
+    {
+        state = true;
+        runScript(QString("selectionModeStatus(%1);").arg(state)); 
+    }
 }
 
 void HTMLWidget::centerOn(const qreal west, const qreal north, const qreal east, const qreal south)
