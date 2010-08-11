@@ -117,7 +117,7 @@ public:
     QList<qreal> getSelectionRectangle();
     void clearSelectionRectangle();
     bool hasSelection() const; 
-
+    
 public Q_SLOTS:
 
     void slotZoomIn();
@@ -133,6 +133,7 @@ public Q_SLOTS:
     void slotSetFilterMode();
     void slotSetSelectThumbnailMode();
     void slotRemoveCurrentSelection();
+    void slotRemoveCurrentFilter();
     void stopThumbnailTimer();
 
 Q_SIGNALS:

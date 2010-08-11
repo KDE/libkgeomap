@@ -157,6 +157,7 @@ public:
         actionRemoveFilterMode(0),
         actionSetSelectThumbnailMode(0),
         currentMouseMode(MouseModePan),
+        modelBasedFilter(false),
         thumbnailTimer(0),
         thumbnailTimerCount(0),
         thumbnailsHaveBeenLoaded(false)
@@ -216,6 +217,7 @@ public:
     KAction*                actionRemoveFilterMode;
     KAction*                actionSetSelectThumbnailMode;
     MouseMode               currentMouseMode;
+    bool                    modelBasedFilter;
 
     QTimer*                 thumbnailTimer;
     int                     thumbnailTimerCount;
@@ -374,8 +376,10 @@ void KMap::createActions()
     connect(d->actionSetFilterMode, SIGNAL(changed()),
             this, SLOT(slotSetFilterMode()));
 
+   // connect(d->actionRemoveFilterMode, SIGNAL(triggered()),
+   //         this, SIGNAL(signalRemoveCurrentFilter()));
     connect(d->actionRemoveFilterMode, SIGNAL(triggered()),
-            this, SIGNAL(signalRemoveCurrentFilter()));
+            this, SLOT(slotRemoveCurrentFilter()));        
 
     connect(d->actionSetSelectThumbnailMode, SIGNAL(changed()),
             this, SLOT(slotSetSelectThumbnailMode()));
@@ -1572,6 +1576,7 @@ void KMap::slotClustersClicked(const QIntList& clusterIndices)
         }
         else
         {
+            d->modelBasedFilter = false;
             QList<qreal> newSelection;
             const qreal boxWest  = latLonBox.west(Marble::GeoDataCoordinates::Degree);
             const qreal boxNorth = latLonBox.north(Marble::GeoDataCoordinates::Degree);
@@ -1600,7 +1605,10 @@ void KMap::slotClustersClicked(const QIntList& clusterIndices)
                 tileIndices << currentTileIndex;
             }
             if(d->currentMouseMode == MouseModeFilter)
+            {
+                d->modelBasedFilter = true;
                 s->markerModel->onIndicesClicked(tileIndices, currentCluster.selectedState, MouseModeFilter);
+            }
             else
                 s->markerModel->onIndicesClicked(tileIndices, currentCluster.selectedState, MouseModeSelectThumbnail);
         }
@@ -2131,6 +2139,16 @@ void KMap::slotRemoveCurrentSelection()
     d->currentBackend->removeSelectionRectangle();
     if(d->currentMouseMode == MouseModeSelection)
         d->currentBackend->setSelectionRectangle(d->oldSelectionRectangle);
+}
+
+void KMap::slotRemoveCurrentFilter()
+{
+   if(d->modelBasedFilter)
+        emit signalRemoveCurrentFilter();
+   else
+   {
+        slotRemoveCurrentSelection();
+   }
 }
 
 void KMap::slotUngroupedModelChanged()
