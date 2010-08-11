@@ -330,8 +330,9 @@ void KMap::createActions()
     d->actionSetFilterMode->setToolTip(i18n("Filter images"));
     d->actionSetFilterMode->setIcon(SmallIcon("view-filter"));
 
-    d->actionRemoveFilterMode = new KAction(i18n("R"), this);
+    d->actionRemoveFilterMode = new KAction(this);
     d->actionRemoveFilterMode->setToolTip(i18n("Remove the filtered images"));
+    d->actionRemoveFilterMode->setIcon(SmallIcon("window-close"));
 
     d->actionSetSelectThumbnailMode = new KAction(this);
     d->actionSetSelectThumbnailMode->setCheckable(true);
@@ -1516,6 +1517,8 @@ void KMap::slotClustersClicked(const QIntList& clusterIndices)
 {
     kDebug()<<clusterIndices;
 
+    int maxTileLevel = 0;
+
     if((d->currentMouseMode == MouseModeZoom) || (d->currentMouseMode == MouseModeFilter && d->selectionRectangle.isEmpty()))
     {
         Marble::GeoDataLineString tileString;
@@ -1537,19 +1540,32 @@ void KMap::slotClustersClicked(const QIntList& clusterIndices)
                                                                     currentTileCoordinate.lat(),
                                                                                               0, 
                                                                     Marble::GeoDataCoordinates::Degree);
+
+                    if(maxTileLevel < currentTileIndex.level())
+                        maxTileLevel = currentTileIndex.level();                        
+
                     tileString.append(tileCoordinate);
                 }
             }
         }
 
         Marble::GeoDataLatLonBox latLonBox = Marble::GeoDataLatLonBox::fromLineString(tileString);
-       
-        //increase the selection boundaries with 0.1 degrees because some thumbnails aren't catched by selection
-        latLonBox.setWest((latLonBox.west(Marble::GeoDataCoordinates::Degree)-0.1), Marble::GeoDataCoordinates::Degree);
-        latLonBox.setNorth((latLonBox.north(Marble::GeoDataCoordinates::Degree)+0.1), Marble::GeoDataCoordinates::Degree);
-        latLonBox.setEast((latLonBox.east(Marble::GeoDataCoordinates::Degree)+0.1), Marble::GeoDataCoordinates::Degree);
-        latLonBox.setSouth((latLonBox.south(Marble::GeoDataCoordinates::Degree)-0.1), Marble::GeoDataCoordinates::Degree);
-        
+      
+/*        if(maxTileLevel != 0)
+        {
+            //increase the selection boundaries with 0.1 degrees because some thumbnails aren't catched by selection
+            latLonBox.setWest((latLonBox.west(Marble::GeoDataCoordinates::Degree)-(0.1/maxTileLevel)), Marble::GeoDataCoordinates::Degree);
+            latLonBox.setNorth((latLonBox.north(Marble::GeoDataCoordinates::Degree)+(0.1/maxTileLevel)), Marble::GeoDataCoordinates::Degree);
+            latLonBox.setEast((latLonBox.east(Marble::GeoDataCoordinates::Degree)+(0.1/maxTileLevel)), Marble::GeoDataCoordinates::Degree);
+            latLonBox.setSouth((latLonBox.south(Marble::GeoDataCoordinates::Degree)-(0.1/maxTileLevel)), Marble::GeoDataCoordinates::Degree);
+        }
+        else
+        {*/
+            latLonBox.setWest((latLonBox.west(Marble::GeoDataCoordinates::Degree)-0.0001), Marble::GeoDataCoordinates::Degree);
+            latLonBox.setNorth((latLonBox.north(Marble::GeoDataCoordinates::Degree)+0.0001), Marble::GeoDataCoordinates::Degree);
+            latLonBox.setEast((latLonBox.east(Marble::GeoDataCoordinates::Degree)+0.0001), Marble::GeoDataCoordinates::Degree);
+            latLonBox.setSouth((latLonBox.south(Marble::GeoDataCoordinates::Degree)-0.0001), Marble::GeoDataCoordinates::Degree);
+      //  }
         if(d->currentMouseMode == MouseModeZoom)
         {
             d->currentBackend->centerOn(latLonBox);
