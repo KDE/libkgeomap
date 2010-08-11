@@ -89,6 +89,13 @@ enum MouseMode
     MouseModeSelectThumbnail = 5
 };
 
+enum DisplayedRectangles
+{
+    SelectionRectangle = 0,
+    DisplayedRectangle,
+    Both
+};
+
 class KMAP_EXPORT WMWGeoCoordinate
 {
 public:

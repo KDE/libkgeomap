@@ -30,6 +30,7 @@ var dragSnappingToId = -1;
 var firstSelectionPoint;
 var secondSelectionPoint;
 var selectionRectangle;
+var displayedRectangle;
 var markers = new Array();
 var markerCount = 0;
 
@@ -448,11 +449,40 @@ function setSelectionRectangle(west, north, east, south, color){
                                           fillOpacity : 0.0,       
                                           strokeColor : "#0000FF",
                                           strokeWeight: 1
-                                          });
-                                          
+                                          });                                     
         }
     }
+}
 
+
+function setDisplayedRectangle(west, north, east, south){
+
+    var firstPoint = new google.maps.LatLng(south,west,true);
+    var secondPoint = new google.maps.LatLng(north,east,true);
+
+    latLngBounds = new google.maps.LatLngBounds(
+                              firstPoint,
+                              secondPoint
+                              );
+
+    if(displayedRectangle == null){
+        displayedRectangle = new google.maps.Rectangle({
+                                             bounds: latLngBounds,
+                                             clickable: false,
+                                             fillOpacity: 0.0,
+                                             map: map,
+                                             strokeColor: "#0000FF",
+                                             strokeWeight: 1,
+                                             zIndex: 100
+                                             });
+    }
+    else{
+       displayedRectangle.setOptions({
+                                     bounds: latLngBounds,
+                                     fillOpacity : 0.0,
+                                     strokeColor : "#0000FF",
+                                     strokeWeight: 1});
+    }
 }
 
 function clearSelectionPoints(){
@@ -465,13 +495,15 @@ function removeSelectionRectangle(){
     selectionRectangle = null;
 }
 
+function removeDisplayedRectangle(){
+    displayedRectangle.setMap(null);
+    displayedRectangle = null;
+}
+
 function selectionModeStatus(state){
 
     if(state == false){
         map.draggable = true;
-
-        //firstSelectionPoint = null;
-        //secondSelectionPoint = null;
     }
     else{
         map.draggable = false; 

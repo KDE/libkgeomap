@@ -95,6 +95,7 @@ public:
         clustersDirtyCacheLat(),
         clustersDirtyCacheLon(),
         searchRectangleCoordinates(),
+        displayedRectangle(),
         searchRectangleScreenCoordinates(),
         firstSelectionScreenPoint(),
         secondSelectionScreenPoint(),
@@ -132,6 +133,7 @@ public:
     qreal                  clustersDirtyCacheLon;
 
     QList<qreal>           searchRectangleCoordinates;
+    QList<qreal>           displayedRectangle;
     QList<int>             searchRectangleScreenCoordinates;
     QPoint                 firstSelectionScreenPoint;
     QPoint                 secondSelectionScreenPoint;
@@ -608,6 +610,39 @@ void BackendMarble::marbleCustomPaint(Marble::GeoPainter* painter)
     }
 
     //here we drawe the selection rectangle
+    if(!d->displayedRectangle.isEmpty())
+    {
+        const qreal lonWest  = d->displayedRectangle.at(0);
+        const qreal latNorth = d->displayedRectangle.at(1);
+        const qreal lonEast  = d->displayedRectangle.at(2);
+        const qreal latSouth = d->displayedRectangle.at(3);
+
+
+        Marble::GeoDataCoordinates coordTopLeft(lonWest, latNorth, 0, Marble::GeoDataCoordinates::Degree);
+        Marble::GeoDataCoordinates coordTopRight(lonEast, latNorth, 0, Marble::GeoDataCoordinates::Degree);
+        Marble::GeoDataCoordinates coordBottomLeft(lonWest, latSouth, 0, Marble::GeoDataCoordinates::Degree);
+        Marble::GeoDataCoordinates coordBottomRight(lonEast, latSouth, 0, Marble::GeoDataCoordinates::Degree);
+        Marble::GeoDataLinearRing polyRing;
+
+#if MARBLE_VERSION < 0x000800
+        polyRing.append(&coordTopLeft);
+        polyRing.append(&coordTopRight);
+        polyRing.append(&coordBottomRight);
+        polyRing.append(&coordBottomLeft);
+#else // MARBLE_VERSION < 0x000800
+        polyRing << coordTopLeft << coordTopRight << coordBottomRight << coordBottomLeft;
+#endif // MARBLE_VERSION < 0x000800
+
+        QPen selectionPen;
+        selectionPen.setColor(Qt::blue);
+
+        selectionPen.setStyle(Qt::SolidLine);
+        selectionPen.setWidth(1);
+        painter->setPen(selectionPen);
+        painter->setBrush(Qt::NoBrush);
+        painter->drawPolygon(polyRing);
+    }
+
     if(!d->searchRectangleCoordinates.isEmpty())
     {
         const qreal lonWest  = d->searchRectangleCoordinates.at(0);
@@ -890,7 +925,9 @@ bool BackendMarble::eventFilter(QObject *object, QEvent *event)
                 QList<qreal> selectionCoordinates;
                 selectionCoordinates << lonWest << latNorth << lonEast << latSouth;
 
-                setSelectionRectangle(selectionCoordinates);
+                //setSelectionRectangle(selectionCoordinates, SelectionRectangle);
+                d->searchRectangleCoordinates = selectionCoordinates;
+                d->marbleWidget->update();
             }
             doFilterEvent = true;
         }
@@ -937,7 +974,8 @@ bool BackendMarble::eventFilter(QObject *object, QEvent *event)
                 selectionCoordinates << lonWest << latNorth << lonEast << latSouth;
 
                 setSelectionRectangle(selectionCoordinates);
-    
+                d->searchRectangleCoordinates.clear();                
+ 
                 emit signalSelectionHasBeenMade(selectionCoordinates);
         
                 d->firstSelectionPoint.clear();
@@ -1271,18 +1309,18 @@ void BackendMarble::setSelectionRectangle(const QList<qreal>& searchCoordinates)
     if(searchCoordinates.isEmpty())
         return;
 
-    d->searchRectangleCoordinates = searchCoordinates;
+    d->displayedRectangle = searchCoordinates;
     d->marbleWidget->update();    
 }
 
 QList<qreal> BackendMarble::getSelectionRectangle()
 {
-    return d->searchRectangleCoordinates;
+    return d->displayedRectangle;
 }
 
 void BackendMarble::removeSelectionRectangle()
 {
-    d->searchRectangleCoordinates.clear();
+    d->displayedRectangle.clear();
     d->marbleWidget->update();
 }
 
