@@ -1336,6 +1336,12 @@ void BackendMarble::mouseModeChanged(MouseMode mouseMode)
     }    
 }
 
+void BackendMarble::setSelectionStatus(const bool status)
+{
+
+
+}
+
 void BackendMarble::centerOn(const Marble::GeoDataLatLonBox& box)
 {
     d->marbleWidget->centerOn(box, false);

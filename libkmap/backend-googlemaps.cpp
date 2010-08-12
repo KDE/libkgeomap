@@ -1000,6 +1000,11 @@ void BackendGoogleMaps::slotSelectionHasBeenMade(const QList<double>& searchCoor
     emit signalSelectionHasBeenMade(searchCoordinates);
 }
 
+void BackendGoogleMaps::setSelectionStatus(const bool status)
+{
+
+}
+
 void BackendGoogleMaps::centerOn( const Marble::GeoDataLatLonBox& latLonBox)
 {
     const qreal boxWest  = latLonBox.west(Marble::GeoDataCoordinates::Degree);

@@ -112,6 +112,8 @@ public:
 
     const QExplicitlySharedDataPointer<WMWSharedData> s;
 
+    virtual void setSelectionStatus(const bool status) = 0;
+    //virtual bool getSelectionStatus(
     virtual void centerOn(const Marble::GeoDataLatLonBox& box) = 0;
 
 public Q_SLOTS:

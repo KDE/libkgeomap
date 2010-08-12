@@ -160,7 +160,9 @@ public:
         modelBasedFilter(false),
         thumbnailTimer(0),
         thumbnailTimerCount(0),
-        thumbnailsHaveBeenLoaded(false)
+        thumbnailsHaveBeenLoaded(false),
+        activeState(true),
+        hasSelection(false)
     {
     }
 
@@ -222,6 +224,9 @@ public:
     QTimer*                 thumbnailTimer;
     int                     thumbnailTimerCount;
     bool                    thumbnailsHaveBeenLoaded;
+
+    bool                    activeState;
+    bool                    hasSelection;
 };
 
 KMap::KMap(QWidget* const parent)
@@ -333,7 +338,7 @@ void KMap::createActions()
     d->actionSetFilterMode->setIcon(SmallIcon("view-filter"));
 
     d->actionRemoveFilterMode = new KAction(this);
-    d->actionRemoveFilterMode->setToolTip(i18n("Remove the filtered images"));
+    d->actionRemoveFilterMode->setToolTip(i18n("Remove the current filter"));
     d->actionRemoveFilterMode->setIcon(SmallIcon("window-close"));
 
     d->actionSetSelectThumbnailMode = new KAction(this);
@@ -443,6 +448,7 @@ bool KMap::setBackend(const QString& backendName)
     // disconnect signals from old backend:
     if (d->currentBackend)
     {
+
         disconnect(d->currentBackend, SIGNAL(signalBackendReady(const QString&)),
                 this, SLOT(slotBackendReady(const QString&)));
 
@@ -551,6 +557,7 @@ void KMap::applyCacheToBackend()
     setCenter(d->cacheCenterCoordinate);
     // TODO: only do this if the zoom was changed!
     setZoom(d->cacheZoom);
+    d->currentBackend->mouseModeChanged(d->currentMouseMode);
     setSelectionCoordinates(d->cacheSelectionRectangle);
 }
 
@@ -559,9 +566,11 @@ void KMap::saveBackendToCache()
     if (!d->currentBackendReady)
         return;
 
-    d->cacheCenterCoordinate = getCenter();
-    d->cacheZoom = getZoom();
+    d->cacheCenterCoordinate   = getCenter();
+    d->cacheZoom               = getZoom();
     d->cacheSelectionRectangle = getSelectionRectangle();
+    if(!d->cacheSelectionRectangle.isEmpty())
+        d->oldSelectionRectangle   = d->cacheSelectionRectangle;
 }
 
 WMWGeoCoordinate KMap::getCenter() const
@@ -793,10 +802,11 @@ QWidget* KMap::getControlWidget()
         QToolButton* const decreaseThumbnailSizeButton = new QToolButton(d->controlWidget);
         decreaseThumbnailSizeButton->setDefaultAction(d->actionDecreaseThumbnailSize);
 
-        new KSeparator(Qt::Vertical, d->controlWidget);
 
         d->mouseModesHolder = new KHBox(d->controlWidget);
         d->mouseModesHolder->setVisible(d->mouseModesAvailable); 
+
+        new KSeparator(Qt::Vertical, d->mouseModesHolder);
 
         QToolButton* const setPanModeButton = new QToolButton(d->mouseModesHolder);
         setPanModeButton->setDefaultAction(d->actionSetPanMode);
@@ -1586,6 +1596,7 @@ void KMap::slotClustersClicked(const QIntList& clusterIndices)
  
             d->selectionRectangle = newSelection;
             d->cacheSelectionRectangle = newSelection;
+            d->oldSelectionRectangle = newSelection;
             emit signalNewSelectionFromMap();
         }
     }
@@ -2002,9 +2013,16 @@ int KMap::getUndecoratedThumbnailSize() const
     return d->thumbnailSize-2;
 }
 
-bool KMap::hasSelection() const
+void KMap::setSelectionStatus(const bool status)
 {
-    return !d->selectionRectangle.isEmpty();
+    d->hasSelection = status;
+    d->currentBackend->setSelectionStatus(d->hasSelection);
+}
+
+bool KMap::getSelectionStatus() const
+{
+    //return !d->selectionRectangle.isEmpty();
+    return d->hasSelection;
 }
 
 QList<double> KMap::selectionCoordinates() const
@@ -2014,9 +2032,14 @@ QList<double> KMap::selectionCoordinates() const
 
 void KMap::setSelectionCoordinates(QList<qreal>& sel)
 {
-    d->currentBackend->setSelectionRectangle(sel);
+    if(d->currentMouseMode == MouseModeSelection || d->hasSelection)  
+        d->currentBackend->setSelectionRectangle(sel);
+    else
+        d->currentBackend->removeSelectionRectangle();
+    d->cacheSelectionRectangle = sel;
     d->selectionRectangle = sel;
-    d->oldSelectionRectangle = sel;
+    if(!sel.isEmpty())
+        d->oldSelectionRectangle = sel;
 }
 
 void KMap::clearSelectionRectangle()
@@ -2026,6 +2049,7 @@ void KMap::clearSelectionRectangle()
 
 void KMap::slotNewSelectionFromMap(const QList<qreal>& sel)
 {
+
     d->selectionRectangle      = sel;
     d->cacheSelectionRectangle = sel;
     d->oldSelectionRectangle   = sel;
@@ -2043,7 +2067,7 @@ void KMap::slotSetPanMode()
         d->actionSetSelectThumbnailMode->setChecked(false);
 
         d->currentBackend->mouseModeChanged(MouseModePan);
-        if(d->selectionRectangle.isEmpty())
+        if(!d->hasSelection)
            d->currentBackend->removeSelectionRectangle(); 
     }
     else
@@ -2229,6 +2253,16 @@ QString KMap::LibMarbleWidget()
 QString KMap::version()
 {
     return QString(kmap_version);
+}
+
+void KMap::setActive(const bool state)
+{
+    d->activeState = state;
+}
+
+bool KMap::getActiveState()
+{
+    return d->activeState;
 }
 
 } /* namespace KMapIface */

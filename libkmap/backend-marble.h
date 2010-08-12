@@ -104,6 +104,7 @@ public:
     virtual void removeSelectionRectangle(/*DisplayedRectangles whatToChange*/);
     virtual void mouseModeChanged(MouseMode mouseMode);
 
+    virtual void setSelectionStatus(const bool status);
     virtual void centerOn(const Marble::GeoDataLatLonBox& box); 
 
 public Q_SLOTS:

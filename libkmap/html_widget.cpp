@@ -330,6 +330,8 @@ QList<qreal> HTMLWidget::getSelectionRectangle()
 
 void HTMLWidget::removeSelectionRectangle()
 {
+    if(d->displayedRectangle.isEmpty())
+        return;
     d->displayedRectangle.clear();
     runScript(QString("removeDisplayedRectangle();"));
 }

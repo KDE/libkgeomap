@@ -116,8 +116,11 @@ public:
     void setSelectionCoordinates(QList<double>& sel);
     QList<qreal> getSelectionRectangle();
     void clearSelectionRectangle();
-    bool hasSelection() const; 
-    
+    void setSelectionStatus(const bool status);
+    bool getSelectionStatus() const;
+    void setActive(const bool state);
+    bool getActiveState();
+ 
 public Q_SLOTS:
 
     void slotZoomIn();
