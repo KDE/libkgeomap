@@ -96,6 +96,7 @@ public:
 
     virtual void setSelectionStatus(const bool status);
     virtual void centerOn(const Marble::GeoDataLatLonBox& latLonBox);
+    virtual void setActive(const bool state);
 
 public Q_SLOTS:
 

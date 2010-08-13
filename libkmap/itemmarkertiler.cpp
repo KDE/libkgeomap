@@ -35,13 +35,15 @@ public:
     ItemMarkerTilerPrivate()
       : modelHelper(0),
         selectionModel(0),
-        markerModel(0)
+        markerModel(0),
+        activeState(true)
     {
     }
 
     WMWModelHelper*      modelHelper;
     QItemSelectionModel* selectionModel;
     QAbstractItemModel*  markerModel;
+    bool                 activeState;
 };
 
 ItemMarkerTiler::ItemMarkerTiler(WMWModelHelper* const modelHelper, QObject* const parent)
@@ -186,6 +188,8 @@ void ItemMarkerTiler::slotSelectionChanged(const QItemSelection& selected, const
 void ItemMarkerTiler::slotSourceModelDataChanged(const QModelIndex& /*topLeft*/, const QModelIndex& /*bottomRight*/)
 {
     setDirty();
+    if(!d->activeState)
+        emit signalTilesOrSelectionChanged();
 
     // TODO: if only a few items were changed, try to see whether they are still in the right tiles
 }
@@ -612,6 +616,11 @@ void ItemMarkerTiler::onIndicesMoved(const TileIndex::List& tileIndicesList, con
 void ItemMarkerTiler::slotSourceModelLayoutChanged()
 {
     setDirty();
+}
+
+void ItemMarkerTiler::setActive(const bool state)
+{
+    d->activeState = state;
 }
 
 } // namespace KMapIface

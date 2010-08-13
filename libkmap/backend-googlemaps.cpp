@@ -93,7 +93,7 @@ public:
     int                                       cacheMinZoom;
     WMWGeoCoordinate                          cacheCenter;
     QPair<WMWGeoCoordinate, WMWGeoCoordinate> cacheBounds;
-
+    bool                                      activeState;
 
 };
 
@@ -1013,6 +1013,11 @@ void BackendGoogleMaps::centerOn( const Marble::GeoDataLatLonBox& latLonBox)
     const qreal boxSouth = latLonBox.south(Marble::GeoDataCoordinates::Degree);
 
     d->htmlWidget->centerOn(boxWest, boxNorth, boxEast, boxSouth);
+}
+
+void BackendGoogleMaps::setActive(const bool state)
+{
+    d->activeState = state;
 }
 
 } /* namespace KMapIface */

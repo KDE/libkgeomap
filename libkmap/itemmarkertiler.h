@@ -63,6 +63,8 @@ public:
     void removeMarkerIndexFromGrid(const QModelIndex& markerIndex, const bool ignoreSelection = false);
     void addMarkerIndexToGrid(const QPersistentModelIndex& markerIndex);
 
+    void setActive(const bool state);
+
 private Q_SLOTS:
 
     void slotSourceModelRowsInserted(const QModelIndex& parentIndex, int start, int end);

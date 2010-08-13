@@ -340,11 +340,13 @@ public:
     virtual void onIndicesClicked(const TileIndex::List& tileIndicesList, const WMWSelectionState& groupSelectionState, MouseMode currentMouseMode);
     virtual void onIndicesMoved(const TileIndex::List& tileIndicesList, const WMWGeoCoordinate& targetCoordinates, const QPersistentModelIndex& targetSnapIndex);
 
+    virtual void setActive(const bool state) = 0;
     Tile* rootTile();
     bool indicesEqual(const QIntList& a, const QIntList& b, const int upToLevel) const;
     bool isDirty() const;
     void setDirty(const bool state = true);
     Tile* resetRootTile();
+    
 
 public:
 

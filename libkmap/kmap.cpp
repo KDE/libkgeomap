@@ -1511,8 +1511,11 @@ void KMap::slotRequestLazyReclustering()
         return;
 
     d->clustersDirty = true;
-    d->lazyReclusteringRequested = true;
-    QTimer::singleShot(0, this, SLOT(slotLazyReclusteringRequestCallBack()));
+    if(d->activeState)
+    {
+        d->lazyReclusteringRequested = true;
+        QTimer::singleShot(0, this, SLOT(slotLazyReclusteringRequestCallBack()));
+    }
 }
 
 /**
@@ -2258,6 +2261,10 @@ QString KMap::version()
 void KMap::setActive(const bool state)
 {
     d->activeState = state;
+    d->currentBackend->setActive(state);
+    s->markerModel->setActive(state);     
+    if(state && d->clustersDirty)
+        slotRequestLazyReclustering();
 }
 
 bool KMap::getActiveState()

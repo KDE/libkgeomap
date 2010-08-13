@@ -101,7 +101,8 @@ public:
         secondSelectionScreenPoint(),
         currentRectDrawingDirection(Right),
         firstSelectionPoint(),
-        secondSelectionPoint()
+        secondSelectionPoint(),
+        activeState(true)
     {
     }
 
@@ -142,6 +143,7 @@ public:
     WMWGeoCoordinate       firstSelectionPoint;
     WMWGeoCoordinate       intermediateSelectionPoint;
     WMWGeoCoordinate       secondSelectionPoint;
+    bool                   activeState;
 
 #ifdef KMAP_MARBLE_ADD_LAYER
     BMLayer*               bmLayer;
@@ -445,6 +447,8 @@ bool BackendMarble::geoCoordinates(const QPoint& point, WMWGeoCoordinate* const 
 
 void BackendMarble::marbleCustomPaint(Marble::GeoPainter* painter)
 {
+    if(!d->activeState)
+        return;
 
     // check whether the parameters of the map changed and we may have to update the clusters:
     if ( (d->clustersDirtyCacheLat != d->marbleWidget->centerLatitude()) ||
@@ -1346,6 +1350,11 @@ void BackendMarble::centerOn(const Marble::GeoDataLatLonBox& box)
 {
     d->marbleWidget->centerOn(box, false);
 
+}
+
+void BackendMarble::setActive(const bool state)
+{
+    d->activeState = state;
 }
 
 } /* namespace KMapIface */
