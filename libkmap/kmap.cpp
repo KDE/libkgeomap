@@ -890,19 +890,17 @@ void KMap::updateMarkers()
 
 void KMap::updateClusters()
 {
-    kDebug()<<s->markerModel;
     if (!s->markerModel)
         return;
 
-    kDebug()<<s->haveMovingCluster;
     if (s->haveMovingCluster)
     {
         // do not re-cluster while a cluster is being moved
         return;
     }
 
-    //if (!d->clustersDirty)
-    //    return;
+    if (!d->clustersDirty)
+       return;
 
     d->clustersDirty = false;
 
