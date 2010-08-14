@@ -62,7 +62,7 @@
 
 // local includes
 
-#include "kmap.h"
+#include "kmapwidget.h"
 #include "itemmarkertiler.h"
 #include "mytreewidget.h"
 #include "dragdrophandler.h"
@@ -144,7 +144,7 @@ public:
     }
 
     QSplitter*                          splitter;
-    KMap*                               mapWidget;
+    KMapWidget*                         mapWidget;
     MyTreeWidget*                       treeWidget;
     QPointer<QProgressBar>              progressBar;
     QList<QFuture<MyImageData> >        imageLoadingRunningFutures;
@@ -197,7 +197,7 @@ MainWindow::MainWindow(KCmdLineArgs* const cmdLineArgs, QWidget* const parent)
     d->splitter = new QSplitter(Qt::Vertical, this);
     setCentralWidget(d->splitter);
 
-    d->mapWidget = new KMap(d->splitter);
+    d->mapWidget = new KMapWidget(d->splitter);
     d->mapWidget->setEditModeAvailable(true);
     d->mapWidget->setGroupedModel(mm);
     d->mapWidget->setDragDropHandler(new DemoDragDropHandler(d->displayMarkersModel, d->mapWidget));

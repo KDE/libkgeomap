@@ -39,7 +39,7 @@ ADD_DEFINITIONS(${KEXIV2_DEFINITIONS})
 CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/version.h.cmake ${CMAKE_CURRENT_BINARY_DIR}/version.h)
 
 SET(widget_sources
-    kmap.cpp
+    kmapwidget.cpp
     kmap_common.cpp
     kmap_dragdrophandler.cpp
     kmap_primitives.cpp
@@ -91,7 +91,7 @@ SET_TARGET_PROPERTIES(kmap PROPERTIES VERSION ${KMAP_LIB_SO_VERSION_STRING}
 INSTALL(TARGETS kmap ${INSTALL_TARGETS_DEFAULT_ARGS})
 
 INSTALL(FILES libkmap_export.h
-              kmap.h
+              kmapwidget.h
               kmap_dragdrophandler.h
               kmap_primitives.h
               altitude-backend.h

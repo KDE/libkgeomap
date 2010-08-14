@@ -59,6 +59,14 @@ public:
             MaxLinearIndex = Tiling*Tiling
         };
 
+        enum CornerPosition
+        {
+            CornerNW = 1,
+            CornerSW = 2,
+            CornerNE = 3,
+            CornerSE = 4
+        };
+
         inline TileIndex()
             : m_indicesCount(0),
               m_indices()
@@ -136,7 +144,7 @@ public:
 
         WMWGeoCoordinate toCoordinates() const;
 
-        WMWGeoCoordinate toCoordinates(int ofCorner) const;
+        WMWGeoCoordinate toCoordinates(const CornerPosition ofCorner) const;
 
         inline static TileIndex fromIntList(const QIntList& intList)
         {

@@ -44,7 +44,7 @@
 // local includes
 
 #include "html_widget.h"
-#include "kmap.h"
+#include "kmapwidget.h"
 #include "abstractmarkertiler.h"
 
 namespace KMapIface

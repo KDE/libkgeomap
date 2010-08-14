@@ -465,8 +465,8 @@ WMWGeoCoordinate AbstractMarkerTiler::TileIndex::toCoordinates() const
         const qreal dLat       = tileLatHeight / latDivisor;
         const qreal dLon       = tileLonWidth / lonDivisor;
 
-        int latIndex           = indexLat(l);
-        int lonIndex           = indexLon(l);
+        const int latIndex           = indexLat(l);
+        const int lonIndex           = indexLon(l);
 
         // update the start position for the next tile:
         tileLatBL     += latIndex*dLat;
@@ -479,11 +479,8 @@ WMWGeoCoordinate AbstractMarkerTiler::TileIndex::toCoordinates() const
 }
 
 
-WMWGeoCoordinate AbstractMarkerTiler::TileIndex::toCoordinates(int ofCorner) const
+WMWGeoCoordinate AbstractMarkerTiler::TileIndex::toCoordinates(const CornerPosition ofCorner) const
 {
-    //corners:
-    //1-NW; 2-SW; 3-NE; 4-SE
-
     // TODO: safeguards against rounding errors!
     qreal tileLatBL     = -90.0;
     qreal tileLonBL     = -180.0;
@@ -499,28 +496,28 @@ WMWGeoCoordinate AbstractMarkerTiler::TileIndex::toCoordinates(int ofCorner) con
         const qreal dLat       = tileLatHeight / latDivisor;
         const qreal dLon       = tileLonWidth / lonDivisor;
 
-        int latIndex           = indexLat(l);
-        int lonIndex           = indexLon(l);
+        const int latIndex           = indexLat(l);
+        const int lonIndex           = indexLon(l);
 
         // update the start position for the next tile:
         if(l+1 >= m_indicesCount)
         {
-            if(ofCorner == 1)
+            if(ofCorner == CornerNW)
             {
                 tileLatBL     += latIndex*dLat;
                 tileLonBL     += lonIndex*dLon;
             }
-            else if(ofCorner == 2)
+            else if(ofCorner == CornerSW)
             {
                 tileLatBL     += (latIndex+1)*dLat;
                 tileLonBL     += lonIndex*dLon;
             }
-            else if(ofCorner == 3)
+            else if(ofCorner == CornerNE)
             {
                 tileLatBL     += latIndex*dLat;
                 tileLonBL     += (lonIndex+1)*dLon;
             }
-            else if(ofCorner == 4)
+            else if(ofCorner == CornerSE)
             {
                 tileLatBL     += (latIndex+1)*dLat;
                 tileLonBL     += (lonIndex+1)*dLon;

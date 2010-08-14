@@ -185,8 +185,9 @@ void ItemMarkerTiler::slotSelectionChanged(const QItemSelection& selected, const
     emit(signalTilesOrSelectionChanged());
 }
 
-void ItemMarkerTiler::slotSourceModelDataChanged(const QModelIndex& /*topLeft*/, const QModelIndex& /*bottomRight*/)
+void ItemMarkerTiler::slotSourceModelDataChanged(const QModelIndex& topLeft, const QModelIndex& bottomRight)
 {
+    kDebug()<<topLeft<<bottomRight;
     setDirty();
     if(d->activeState)
         emit signalTilesOrSelectionChanged();

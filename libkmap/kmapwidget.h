@@ -24,8 +24,8 @@
  *
  * ============================================================ */
 
-#ifndef KMAP_H
-#define KMAP_H
+#ifndef KMAPWIDGET_H
+#define KMAPWIDGET_H
 
 // Qt includes
 
@@ -52,14 +52,14 @@ class AbstractMarkerTiler;
 class DragDropHandler;
 class WMWSharedData;
 
-class KMAP_EXPORT KMap : public QWidget
+class KMAP_EXPORT KMapWidget : public QWidget
 {
   Q_OBJECT
 
 public:
 
-    KMap(QWidget* const parent = 0);
-    ~KMap();
+    KMapWidget(QWidget* const parent = 0);
+    ~KMapWidget();
 
     QStringList availableBackends() const;
     bool setBackend(const QString& backendName);
@@ -142,8 +142,6 @@ public Q_SLOTS:
 Q_SIGNALS:
 
     void signalAltitudeLookupReady(const KMapIface::WMWAltitudeLookup::List& altitudes);
-/*  void signalDisplayMarkersMoved(const QList<QPersistentModelIndex>& indices, 
-                                   const KMapIface::WMWGeoCoordinate& coordinates); */
     void signalSpecialMarkersMoved(const QList<QPersistentModelIndex>& indices);
     void signalUngroupedModelChanged(const int index);
     void signalNewSelectionFromMap();
@@ -189,10 +187,10 @@ private:
 
     const QExplicitlySharedDataPointer<WMWSharedData> s;
 
-    class KMapPrivate;
-    KMapPrivate* const d;
+    class KMapWidgetPrivate;
+    KMapWidgetPrivate* const d;
 };
 
 } /* namespace KMapIface */
 
-#endif /* KMAP_H */
+#endif /* KMAPWIDGET_H */

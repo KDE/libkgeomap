@@ -72,7 +72,7 @@ public:
         markerPixmap = markerPixmaps["00ff00"];
     }
 
-    KMap*                     worldMapWidget;
+    KMapWidget*               worldMapWidget;
     QIntList                  visibleMarkers;
     AbstractMarkerTiler*      markerModel;
     WMWCluster::List          clusterList;

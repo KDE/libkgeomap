@@ -319,8 +319,7 @@ public:
     QPoint pixmapOffset;
 };
 
-class MarkerModel;
-class KMap;
+class KMapWidget;
 
 class KMAP_EXPORT WMWModelHelper : public QObject
 {

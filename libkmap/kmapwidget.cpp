@@ -24,7 +24,7 @@
  *
  * ============================================================ */
 
-#include "kmap.moc"
+#include "kmapwidget.moc"
 
 // C++ includes
 
@@ -75,10 +75,10 @@ namespace KMapIface
 {
 
 /**
- * @class KMap
+ * @class KMapWidget
  * @brief The central map view class of libkmap
  *
- * The KMap class is the central widget of libkmap. It provides a widget which can display maps using
+ * The KMapWidget class is the central widget of libkmap. It provides a widget which can display maps using
  * either the Marble or Google Maps backend. Using a model, items can be displayed on the map. For
  * models containing only a small number of items, the items can be shown directly, but for models with
  * a larger number of items, the items can also be grouped. Currently, any number of ungrouped models
@@ -88,11 +88,11 @@ namespace KMapIface
  * of a model's API.
  * 
  * Now, a brief introduction on how to get libkmap working is provided:
- * @li First, an instance of @c KMap has to be created.
+ * @li First, an instance of @c KMapWidget has to be created.
  * @li Next, @c WMWModelHelper has to be subclassed and at least the pure virtual functions have to be implemented.
- * @li To show the model's data ungrouped, the model helper has to be added to @c KMap instance using addUngroupedModel.
+ * @li To show the model's data ungrouped, the model helper has to be added to @c KMapWidget instance using addUngroupedModel.
  * @li To show the model's data grouped, an instance of @c AbstractMarkerTiler has to be created and the model helper has to be
- *     set to it using setMarkerModelHelper. The @c AbstractMarkerTiler has then to be given to KMap using setGroupedModel. If
+ *     set to it using setMarkerModelHelper. The @c AbstractMarkerTiler has then to be given to KMapWidget using setGroupedModel. If
  *     the items to be displayed do not reside in a model, a subclass of @c AbstractMarkerTiler can be created which returns
  *     just the number of items in a particular area, and picks representative items for thumbnails.
  * @li To handle dropping of items from the host applications UI onto the map, @c DragDropHandler has to be subclassed
@@ -115,11 +115,11 @@ inline int QPointSquareDistance(const QPoint& a, const QPoint& b)
     return (a.x()-b.x())*(a.x()-b.x()) + (a.y()-b.y())*(a.y()-b.y());
 }
 
-class KMap::KMapPrivate
+class KMapWidget::KMapWidgetPrivate
 {
 public:
 
-    KMapPrivate()
+    KMapWidgetPrivate()
       : loadedAltitudeBackends(),
         loadedBackends(),
         currentBackend(0),
@@ -229,8 +229,8 @@ public:
     bool                    hasSelection;
 };
 
-KMap::KMap(QWidget* const parent)
-    : QWidget(parent), s(new WMWSharedData), d(new KMapPrivate)
+KMapWidget::KMapWidget(QWidget* const parent)
+    : QWidget(parent), s(new WMWSharedData), d(new KMapWidgetPrivate)
 {
     createActions();
 
@@ -252,7 +252,7 @@ KMap::KMap(QWidget* const parent)
     setAcceptDrops(true);
 }
 
-void KMap::createActions()
+void KMapWidget::createActions()
 {
     d->actionZoomIn = new KAction(this);
     d->actionZoomIn->setIcon(SmallIcon("zoom-in"));
@@ -395,7 +395,7 @@ void KMap::createActions()
         
 }
 
-void KMap::createActionsForBackendSelection()
+void KMapWidget::createActionsForBackendSelection()
 {
     // delete the existing actions:
     qDeleteAll(d->actionGroupBackendSelection->actions());
@@ -411,7 +411,7 @@ void KMap::createActionsForBackendSelection()
     }
 }
 
-KMap::~KMap()
+KMapWidget::~KMapWidget()
 {
     // release all widgets:
     for (int i = 0; i<d->stackedLayout->count(); ++i)
@@ -425,7 +425,7 @@ KMap::~KMap()
     // TODO: delete s, but make sure it is not accessed by any other objects any more!
 }
 
-QStringList KMap::availableBackends() const
+QStringList KMapWidget::availableBackends() const
 {
     QStringList result;
 
@@ -438,7 +438,7 @@ QStringList KMap::availableBackends() const
     return result;
 }
 
-bool KMap::setBackend(const QString& backendName)
+bool KMapWidget::setBackend(const QString& backendName)
 {
     if (backendName == d->currentBackendName)
         return true;
@@ -549,7 +549,7 @@ bool KMap::setBackend(const QString& backendName)
     return false;
 }
 
-void KMap::applyCacheToBackend()
+void KMapWidget::applyCacheToBackend()
 {
     if (!d->currentBackendReady)
         return;
@@ -561,7 +561,7 @@ void KMap::applyCacheToBackend()
     setSelectionCoordinates(d->cacheSelectionRectangle);
 }
 
-void KMap::saveBackendToCache()
+void KMapWidget::saveBackendToCache()
 {
     if (!d->currentBackendReady)
         return;
@@ -573,7 +573,7 @@ void KMap::saveBackendToCache()
         d->oldSelectionRectangle   = d->cacheSelectionRectangle;
 }
 
-WMWGeoCoordinate KMap::getCenter() const
+WMWGeoCoordinate KMapWidget::getCenter() const
 {
     if (!d->currentBackendReady)
         return WMWGeoCoordinate();
@@ -581,7 +581,7 @@ WMWGeoCoordinate KMap::getCenter() const
     return d->currentBackend->getCenter();
 }
 
-void KMap::setCenter(const WMWGeoCoordinate& coordinate)
+void KMapWidget::setCenter(const WMWGeoCoordinate& coordinate)
 {
     d->cacheCenterCoordinate = coordinate;
 
@@ -591,7 +591,7 @@ void KMap::setCenter(const WMWGeoCoordinate& coordinate)
     d->currentBackend->setCenter(coordinate);
 }
 
-void KMap::slotBackendReady(const QString& backendName)
+void KMapWidget::slotBackendReady(const QString& backendName)
 {
     kDebug()<<QString("backend %1 is ready!").arg(backendName);
     if (backendName != d->currentBackendName)
@@ -632,7 +632,7 @@ void KMap::slotBackendReady(const QString& backendName)
     rebuildConfigurationMenu();
 }
 
-void KMap::stopThumbnailTimer()
+void KMapWidget::stopThumbnailTimer()
 {
     d->currentBackend->updateMarkers();
     d->thumbnailTimerCount++;
@@ -643,7 +643,7 @@ void KMap::stopThumbnailTimer()
     }
 }
 
-void KMap::saveSettingsToGroup(KConfigGroup* const group)
+void KMapWidget::saveSettingsToGroup(KConfigGroup* const group)
 {
     KMAP_ASSERT(group != 0);
     if (!group)
@@ -669,7 +669,7 @@ void KMap::saveSettingsToGroup(KConfigGroup* const group)
     }
 }
 
-void KMap::readSettingsFromGroup(const KConfigGroup* const group)
+void KMapWidget::readSettingsFromGroup(const KConfigGroup* const group)
 {
     KMAP_ASSERT(group != 0);
     if (!group)
@@ -709,7 +709,7 @@ void KMap::readSettingsFromGroup(const KConfigGroup* const group)
     slotUpdateActionsEnabled();
 }
 
-void KMap::rebuildConfigurationMenu()
+void KMapWidget::rebuildConfigurationMenu()
 {
     d->configurationMenu->clear();
 
@@ -746,7 +746,7 @@ void KMap::rebuildConfigurationMenu()
     }
 }
 
-KAction* KMap::getControlAction(const QString& actionName)
+KAction* KMapWidget::getControlAction(const QString& actionName)
 {
     kDebug()<<actionName;
     if (actionName=="zoomin")
@@ -764,7 +764,7 @@ KAction* KMap::getControlAction(const QString& actionName)
 /**
  * @brief Returns the control widget.
  */
-QWidget* KMap::getControlWidget()
+QWidget* KMapWidget::getControlWidget()
 {
     if (!d->controlWidget)
     {
@@ -845,7 +845,7 @@ QWidget* KMap::getControlWidget()
     return d->controlWidget;
 }
 
-void KMap::slotZoomIn()
+void KMapWidget::slotZoomIn()
 {
     if (!d->currentBackendReady)
         return;
@@ -853,7 +853,7 @@ void KMap::slotZoomIn()
     d->currentBackend->zoomIn();
 }
 
-void KMap::slotZoomOut()
+void KMapWidget::slotZoomOut()
 {
     if (!d->currentBackendReady)
         return;
@@ -861,14 +861,14 @@ void KMap::slotZoomOut()
     d->currentBackend->zoomOut();
 }
 
-void KMap::slotUpdateActionsEnabled()
+void KMapWidget::slotUpdateActionsEnabled()
 {
     d->actionDecreaseThumbnailSize->setEnabled((!s->inEditMode)&&(d->thumbnailSize>KMapIfaceMinThumbnailSize));
     // TODO: define an upper limit!
     d->actionIncreaseThumbnailSize->setEnabled(!s->inEditMode);
 }
 
-void KMap::slotChangeBackend(QAction* action)
+void KMapWidget::slotChangeBackend(QAction* action)
 {
     KMAP_ASSERT(action!=0);
 
@@ -879,7 +879,7 @@ void KMap::slotChangeBackend(QAction* action)
     setBackend(newBackendName);
 }
 
-void KMap::updateMarkers()
+void KMapWidget::updateMarkers()
 {
     if (!d->currentBackendReady)
         return;
@@ -888,7 +888,7 @@ void KMap::updateMarkers()
     d->currentBackend->updateMarkers();
 }
 
-void KMap::updateClusters()
+void KMapWidget::updateClusters()
 {
     if (!s->markerModel)
         return;
@@ -1155,7 +1155,7 @@ void KMap::updateClusters()
     d->currentBackend->updateClusters();
 }
 
-void KMap::slotClustersNeedUpdating()
+void KMapWidget::slotClustersNeedUpdating()
 {
     if (d->currentBackendReady)
     {
@@ -1174,7 +1174,7 @@ void KMap::slotClustersNeedUpdating()
  * @param overrideSelection Get the colors for a different selection state
  * @param overrideCount Get the colors for a different amount of markers
  */
-void KMap::getColorInfos(const int clusterIndex, QColor *fillColor, QColor *strokeColor,
+void KMapWidget::getColorInfos(const int clusterIndex, QColor *fillColor, QColor *strokeColor,
                                     Qt::PenStyle *strokeStyle, QString *labelText, QColor *labelColor,
                                     const WMWSelectionState* const overrideSelection,
                                     const int* const overrideCount) const
@@ -1190,7 +1190,7 @@ void KMap::getColorInfos(const int clusterIndex, QColor *fillColor, QColor *stro
                   fillColor, strokeColor, strokeStyle, labelText, labelColor);
 }
 
-void KMap::getColorInfos(const WMWSelectionState selectionState,
+void KMapWidget::getColorInfos(const WMWSelectionState selectionState,
                        const int nMarkers,
                        QColor *fillColor, QColor *strokeColor,
                        Qt::PenStyle *strokeStyle, QString *labelText, QColor *labelColor) const
@@ -1297,7 +1297,7 @@ void KMap::getColorInfos(const WMWSelectionState selectionState,
 }
 
 
-QString KMap::convertZoomToBackendZoom(const QString& someZoom, const QString& targetBackend) const
+QString KMapWidget::convertZoomToBackendZoom(const QString& someZoom, const QString& targetBackend) const
 {
     const QStringList zoomParts = someZoom.split(':');
     KMAP_ASSERT(zoomParts.count()==2);
@@ -1368,13 +1368,13 @@ QString KMap::convertZoomToBackendZoom(const QString& someZoom, const QString& t
     return QString("%1:%2").arg(targetBackend).arg(targetZoom);
 }
 
-void KMap::slotBackendZoomChanged(const QString& newZoom)
+void KMapWidget::slotBackendZoomChanged(const QString& newZoom)
 {
     kDebug()<<newZoom;
     d->cacheZoom = newZoom;
 }
 
-void KMap::setZoom(const QString& newZoom)
+void KMapWidget::setZoom(const QString& newZoom)
 {
     d->cacheZoom = newZoom;
 
@@ -1384,7 +1384,7 @@ void KMap::setZoom(const QString& newZoom)
     }
 }
 
-QString KMap::getZoom()
+QString KMapWidget::getZoom()
 {
     if (d->currentBackendReady)
     {
@@ -1395,7 +1395,7 @@ QString KMap::getZoom()
 }
 
 
-QList<qreal> KMap::getSelectionRectangle()
+QList<qreal> KMapWidget::getSelectionRectangle()
 {
     if(d->currentBackendReady)
     {
@@ -1405,7 +1405,7 @@ QList<qreal> KMap::getSelectionRectangle()
     return d->cacheSelectionRectangle;
 }
 
-void KMap::slotClustersMoved(const QIntList& clusterIndices, const QPair<int, QModelIndex>& snapTarget)
+void KMapWidget::slotClustersMoved(const QIntList& clusterIndices, const QPair<int, QModelIndex>& snapTarget)
 {
     kDebug()<<clusterIndices;
 
@@ -1437,7 +1437,7 @@ void KMap::slotClustersMoved(const QIntList& clusterIndices, const QPair<int, QM
     // while we update the model
 }
 
-bool KMap::queryAltitudes(const WMWAltitudeLookup::List& queryItems, const QString& backendName)
+bool KMapWidget::queryAltitudes(const WMWAltitudeLookup::List& queryItems, const QString& backendName)
 {
     for (int i=0; i<d->loadedAltitudeBackends.count(); ++i)
     {
@@ -1451,7 +1451,7 @@ bool KMap::queryAltitudes(const WMWAltitudeLookup::List& queryItems, const QStri
     return false;
 }
 
-void KMap::addUngroupedModel(WMWModelHelper* const modelHelper)
+void KMapWidget::addUngroupedModel(WMWModelHelper* const modelHelper)
 {
     s->ungroupedModels << modelHelper;
 
@@ -1474,7 +1474,7 @@ void KMap::addUngroupedModel(WMWModelHelper* const modelHelper)
     emit(signalUngroupedModelChanged(s->ungroupedModels.count() - 1));
 }
 
-void KMap::setGroupedModel(AbstractMarkerTiler* const markerModel)
+void KMapWidget::setGroupedModel(AbstractMarkerTiler* const markerModel)
 {
     s->markerModel = markerModel;
 
@@ -1491,7 +1491,7 @@ void KMap::setGroupedModel(AbstractMarkerTiler* const markerModel)
     slotRequestLazyReclustering();
 }
 
-void KMap::slotGroupModeChanged(QAction* triggeredAction)
+void KMapWidget::slotGroupModeChanged(QAction* triggeredAction)
 {
     Q_UNUSED(triggeredAction);
     s->inEditMode = d->actionEditMode->isChecked();
@@ -1503,7 +1503,7 @@ void KMap::slotGroupModeChanged(QAction* triggeredAction)
 /**
  * @brief Request reclustering, repeated calls should generate only one actual update of the clusters
  */
-void KMap::slotRequestLazyReclustering()
+void KMapWidget::slotRequestLazyReclustering()
 {
     if (d->lazyReclusteringRequested)
         return;
@@ -1519,7 +1519,7 @@ void KMap::slotRequestLazyReclustering()
 /**
  * @brief Helper function to buffer reclustering
  */
-void KMap::slotLazyReclusteringRequestCallBack()
+void KMapWidget::slotLazyReclusteringRequestCallBack()
 {
     if (!d->lazyReclusteringRequested)
         return;
@@ -1528,7 +1528,7 @@ void KMap::slotLazyReclusteringRequestCallBack()
     slotClustersNeedUpdating();
 }
 
-void KMap::slotClustersClicked(const QIntList& clusterIndices)
+void KMapWidget::slotClustersClicked(const QIntList& clusterIndices)
 {
     kDebug()<<clusterIndices;
 
@@ -1627,7 +1627,7 @@ void KMap::slotClustersClicked(const QIntList& clusterIndices)
     }
 }
 
-void KMap::dragEnterEvent(QDragEnterEvent* event)
+void KMapWidget::dragEnterEvent(QDragEnterEvent* event)
 {
     if ( (!s->editEnabled) || (!d->dragDropHandler) )
     {
@@ -1648,14 +1648,14 @@ void KMap::dragEnterEvent(QDragEnterEvent* event)
 //         d->currentBackend->updateDragDropMarker(event->pos(), dragData);
 }
 
-void KMap::dragMoveEvent(QDragMoveEvent* /*event*/)
+void KMapWidget::dragMoveEvent(QDragMoveEvent* /*event*/)
 {
     // TODO: update the position of the drag marker if it is to be shown
 //     if (!dragData->haveDragPixmap)
 //         d->currentBackend->updateDragDropMarkerPosition(event->pos());
 }
 
-void KMap::dropEvent(QDropEvent* event)
+void KMapWidget::dropEvent(QDropEvent* event)
 {
     // remove the drag marker:
 //     d->currentBackend->updateDragDropMarker(QPoint(), 0);
@@ -1677,7 +1677,7 @@ void KMap::dropEvent(QDropEvent* event)
     }
 }
 
-void KMap::dragLeaveEvent(QDragLeaveEvent* event)
+void KMapWidget::dragLeaveEvent(QDragLeaveEvent* event)
 {
     Q_UNUSED(event);
 
@@ -1685,7 +1685,7 @@ void KMap::dragLeaveEvent(QDragLeaveEvent* event)
 //     d->currentBackend->updateDragDropMarker(QPoint(), 0);
 }
 
-void KMap::markClustersAsDirty()
+void KMapWidget::markClustersAsDirty()
 {
     d->clustersDirty = true;
 }
@@ -1693,7 +1693,7 @@ void KMap::markClustersAsDirty()
 /**
  * @brief Controls whether the user can switch from browse to edit mode.
  */
-void KMap::setEditModeAvailable(const bool state)
+void KMapWidget::setEditModeAvailable(const bool state)
 {
     d->editModeAvailable = state;
 
@@ -1703,7 +1703,7 @@ void KMap::setEditModeAvailable(const bool state)
     }
 }
 
-void KMap::setMouseModesVisibility(const bool state)
+void KMapWidget::setMouseModesVisibility(const bool state)
 {
     d->mouseModesAvailable = state;
 
@@ -1713,12 +1713,12 @@ void KMap::setMouseModesVisibility(const bool state)
     }
 }
 
-void KMap::setDragDropHandler(DragDropHandler* const dragDropHandler)
+void KMapWidget::setDragDropHandler(DragDropHandler* const dragDropHandler)
 {
     d->dragDropHandler = dragDropHandler;
 }
 
-QVariant KMap::getClusterRepresentativeMarker(const int clusterIndex, const int sortKey)
+QVariant KMapWidget::getClusterRepresentativeMarker(const int clusterIndex, const int sortKey)
 {
     if (!s->markerModel)
         return QVariant();
@@ -1741,7 +1741,7 @@ QVariant KMap::getClusterRepresentativeMarker(const int clusterIndex, const int 
     return clusterRepresentative;
 }
 
-void KMap::slotItemDisplaySettingsChanged()
+void KMapWidget::slotItemDisplaySettingsChanged()
 {
     s->previewSingleItems = d->actionPreviewSingleItems->isChecked();
     s->previewGroupedItems = d->actionPreviewGroupedItems->isChecked();
@@ -1753,14 +1753,14 @@ void KMap::slotItemDisplaySettingsChanged()
     slotRequestLazyReclustering();
 }
 
-void KMap::setSortOptionsMenu(QMenu* const sortMenu)
+void KMapWidget::setSortOptionsMenu(QMenu* const sortMenu)
 {
     d->sortMenu = sortMenu;
 
     rebuildConfigurationMenu();
 }
 
-void KMap::setSortKey(const int sortKey)
+void KMapWidget::setSortKey(const int sortKey)
 {
     s->sortKey = sortKey;
 
@@ -1768,7 +1768,7 @@ void KMap::setSortKey(const int sortKey)
     slotRequestLazyReclustering();
 }
 
-QPixmap KMap::getDecoratedPixmapForCluster(const int clusterId, const WMWSelectionState* const selectedStateOverride, const int* const countOverride, QPoint* const centerPoint)
+QPixmap KMapWidget::getDecoratedPixmapForCluster(const int clusterId, const WMWSelectionState* const selectedStateOverride, const int* const countOverride, QPoint* const centerPoint)
 {
     const int circleRadius = d->thumbnailSize/2;
     WMWCluster& cluster = s->clusterList[clusterId];
@@ -1935,7 +1935,7 @@ QPixmap KMap::getDecoratedPixmapForCluster(const int clusterId, const WMWSelecti
     return circlePixmap;
 }
 
-void KMap::setThumnailSize(const int newThumbnailSize)
+void KMapWidget::setThumnailSize(const int newThumbnailSize)
 {
     d->thumbnailSize = qMax(KMapIfaceMinThumbnailSize, newThumbnailSize);
 
@@ -1953,7 +1953,7 @@ void KMap::setThumnailSize(const int newThumbnailSize)
     slotUpdateActionsEnabled();
 }
 
-void KMap::setGroupingRadius(const int newGroupingRadius)
+void KMapWidget::setGroupingRadius(const int newGroupingRadius)
 {
     d->groupingRadius = qMax(KMapIfaceMinGroupingRadius, newGroupingRadius);
 
@@ -1970,7 +1970,7 @@ void KMap::setGroupingRadius(const int newGroupingRadius)
     slotUpdateActionsEnabled();
 }
 
-void KMap::setEditGroupingRadius(const int newGroupingRadius)
+void KMapWidget::setEditGroupingRadius(const int newGroupingRadius)
 {
     d->editGroupingRadius = qMax(KMapIfaceMinEditGroupingRadius, newGroupingRadius);
 
@@ -1981,7 +1981,7 @@ void KMap::setEditGroupingRadius(const int newGroupingRadius)
     slotUpdateActionsEnabled();
 }
 
-void KMap::slotDecreaseThumbnailSize()
+void KMapWidget::slotDecreaseThumbnailSize()
 {
     if (s->inEditMode)
         return;
@@ -1996,7 +1996,7 @@ void KMap::slotDecreaseThumbnailSize()
     }
 }
 
-void KMap::slotIncreaseThumbnailSize()
+void KMapWidget::slotIncreaseThumbnailSize()
 {
     if (s->inEditMode)
         return;
@@ -2004,34 +2004,34 @@ void KMap::slotIncreaseThumbnailSize()
     setThumnailSize(d->thumbnailSize+5);
 }
 
-int KMap::getThumbnailSize() const
+int KMapWidget::getThumbnailSize() const
 {
     return d->thumbnailSize;
 }
 
-int KMap::getUndecoratedThumbnailSize() const
+int KMapWidget::getUndecoratedThumbnailSize() const
 {
     return d->thumbnailSize-2;
 }
 
-void KMap::setSelectionStatus(const bool status)
+void KMapWidget::setSelectionStatus(const bool status)
 {
     d->hasSelection = status;
     d->currentBackend->setSelectionStatus(d->hasSelection);
 }
 
-bool KMap::getSelectionStatus() const
+bool KMapWidget::getSelectionStatus() const
 {
     //return !d->selectionRectangle.isEmpty();
     return d->hasSelection;
 }
 
-QList<double> KMap::selectionCoordinates() const
+QList<double> KMapWidget::selectionCoordinates() const
 {
     return d->selectionRectangle;
 }
 
-void KMap::setSelectionCoordinates(QList<qreal>& sel)
+void KMapWidget::setSelectionCoordinates(QList<qreal>& sel)
 {
     if(d->currentMouseMode == MouseModeSelection || d->hasSelection)  
         d->currentBackend->setSelectionRectangle(sel);
@@ -2043,12 +2043,12 @@ void KMap::setSelectionCoordinates(QList<qreal>& sel)
         d->oldSelectionRectangle = sel;
 }
 
-void KMap::clearSelectionRectangle()
+void KMapWidget::clearSelectionRectangle()
 {
     d->selectionRectangle.clear();
 }
 
-void KMap::slotNewSelectionFromMap(const QList<qreal>& sel)
+void KMapWidget::slotNewSelectionFromMap(const QList<qreal>& sel)
 {
 
     d->selectionRectangle      = sel;
@@ -2057,7 +2057,7 @@ void KMap::slotNewSelectionFromMap(const QList<qreal>& sel)
     emit signalNewSelectionFromMap();
 }
 
-void KMap::slotSetPanMode()
+void KMapWidget::slotSetPanMode()
 {
     if(d->actionSetPanMode->isChecked())
     {
@@ -2078,7 +2078,7 @@ void KMap::slotSetPanMode()
     }
 }
 
-void KMap::slotSetSelectionMode()
+void KMapWidget::slotSetSelectionMode()
 {
     if(d->actionSetSelectionMode->isChecked())
     {
@@ -2100,7 +2100,7 @@ void KMap::slotSetSelectionMode()
 }
 
 
-void KMap::slotSetZoomMode()
+void KMapWidget::slotSetZoomMode()
 {
     if(d->actionSetZoomMode->isChecked())
     { 
@@ -2119,7 +2119,7 @@ void KMap::slotSetZoomMode()
     }
 }
 
-void KMap::slotSetFilterMode()
+void KMapWidget::slotSetFilterMode()
 {
     if(d->actionSetFilterMode->isChecked())
     {
@@ -2138,7 +2138,7 @@ void KMap::slotSetFilterMode()
     }
 }
 
-void KMap::slotSetSelectThumbnailMode()
+void KMapWidget::slotSetSelectThumbnailMode()
 {
     if(d->actionSetSelectThumbnailMode->isChecked())
     {
@@ -2157,7 +2157,7 @@ void KMap::slotSetSelectThumbnailMode()
     }
 }
 
-void KMap::slotRemoveCurrentSelection()
+void KMapWidget::slotRemoveCurrentSelection()
 {
     emit signalRemoveCurrentSelection();
     clearSelectionRectangle();
@@ -2166,7 +2166,7 @@ void KMap::slotRemoveCurrentSelection()
         d->currentBackend->setSelectionRectangle(d->oldSelectionRectangle);
 }
 
-void KMap::slotRemoveCurrentFilter()
+void KMapWidget::slotRemoveCurrentFilter()
 {
    if(d->modelBasedFilter)
         emit signalRemoveCurrentFilter();
@@ -2176,7 +2176,7 @@ void KMap::slotRemoveCurrentFilter()
    }
 }
 
-void KMap::slotUngroupedModelChanged()
+void KMapWidget::slotUngroupedModelChanged()
 {
     // determine the index under which we handle this model
     QObject* const senderObject = sender();
@@ -2226,7 +2226,7 @@ void KMap::slotUngroupedModelChanged()
     }
 }
 
-void KMap::addWidgetToControlWidget(QWidget* const newWidget)
+void KMapWidget::addWidgetToControlWidget(QWidget* const newWidget)
 {
     // make sure the control widget exists
     if (!d->controlWidget)
@@ -2239,24 +2239,24 @@ void KMap::addWidgetToControlWidget(QWidget* const newWidget)
     }
 }
 
-void KMap::setEditEnabled(const bool state)
+void KMapWidget::setEditEnabled(const bool state)
 {
     s->editEnabled = state;
 }
 
 // Static methods ---------------------------------------------------------
 
-QString KMap::LibMarbleWidget()
+QString KMapWidget::LibMarbleWidget()
 {
     return QString(MARBLE_VERSION_STRING);
 }
 
-QString KMap::version()
+QString KMapWidget::version()
 {
     return QString(kmap_version);
 }
 
-void KMap::setActive(const bool state)
+void KMapWidget::setActive(const bool state)
 {
     const bool oldState = d->activeState;
     d->activeState = state;
@@ -2268,7 +2268,7 @@ void KMap::setActive(const bool state)
     }
 }
 
-bool KMap::getActiveState()
+bool KMapWidget::getActiveState()
 {
     return d->activeState;
 }
