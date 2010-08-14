@@ -162,6 +162,7 @@ public:
         thumbnailTimerCount(0),
         thumbnailsHaveBeenLoaded(false),
         activeState(false),
+        lastActiveState(false),
         hasSelection(false)
     {
     }
@@ -226,6 +227,7 @@ public:
     bool                    thumbnailsHaveBeenLoaded;
 
     bool                    activeState;
+    bool                    lastActiveState;
     bool                    hasSelection;
 };
 
@@ -2263,8 +2265,11 @@ void KMap::setActive(const bool state)
     d->activeState = state;
     d->currentBackend->setActive(state);
     s->markerModel->setActive(state);     
-    if(state && d->clustersDirty)
+    if(state && !d->lastActiveState && d->clustersDirty)
+    {
+        d->lastActiveState = true;
         slotRequestLazyReclustering();
+    }
 }
 
 bool KMap::getActiveState()
