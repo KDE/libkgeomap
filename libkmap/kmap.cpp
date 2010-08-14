@@ -162,7 +162,6 @@ public:
         thumbnailTimerCount(0),
         thumbnailsHaveBeenLoaded(false),
         activeState(false),
-        lastActiveState(false),
         hasSelection(false)
     {
     }
@@ -227,7 +226,6 @@ public:
     bool                    thumbnailsHaveBeenLoaded;
 
     bool                    activeState;
-    bool                    lastActiveState;
     bool                    hasSelection;
 };
 
@@ -2262,12 +2260,12 @@ QString KMap::version()
 
 void KMap::setActive(const bool state)
 {
+    const bool oldState = d->activeState;
     d->activeState = state;
     d->currentBackend->setActive(state);
     s->markerModel->setActive(state);     
-    if(state && !d->lastActiveState && d->clustersDirty)
+    if(state && !oldState && d->clustersDirty)
     {
-        d->lastActiveState = true;
         slotRequestLazyReclustering();
     }
 }
