@@ -36,7 +36,7 @@ public:
       : modelHelper(0),
         selectionModel(0),
         markerModel(0),
-        activeState(true)
+        activeState(false)
     {
     }
 
@@ -188,7 +188,7 @@ void ItemMarkerTiler::slotSelectionChanged(const QItemSelection& selected, const
 void ItemMarkerTiler::slotSourceModelDataChanged(const QModelIndex& /*topLeft*/, const QModelIndex& /*bottomRight*/)
 {
     setDirty();
-    if(!d->activeState)
+    if(d->activeState)
         emit signalTilesOrSelectionChanged();
 
     // TODO: if only a few items were changed, try to see whether they are still in the right tiles

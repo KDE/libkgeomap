@@ -161,7 +161,7 @@ public:
         thumbnailTimer(0),
         thumbnailTimerCount(0),
         thumbnailsHaveBeenLoaded(false),
-        activeState(true),
+        activeState(false),
         hasSelection(false)
     {
     }

@@ -102,7 +102,7 @@ public:
         currentRectDrawingDirection(Right),
         firstSelectionPoint(),
         secondSelectionPoint(),
-        activeState(true)
+        activeState(false)
     {
     }
 
