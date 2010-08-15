@@ -33,6 +33,7 @@
 #include <QItemSelectionModel>
 #include <QObject>
 #include <QMetaType>
+#include <QDateTime>
 
 // local includes
 
@@ -299,12 +300,12 @@ public:
         {
         public:
             ImageFromTileInfo()
-            : coordinate()
+            :id(-2),
+             url(), 
+             coordinate(),
+             rating(),
+             creationDate()
             {
-                id           = 0;
-                url          = 0;
-                rating       = 0;
-                //creationDate = 0;
             }
             
             ~ImageFromTileInfo()
@@ -315,7 +316,7 @@ public:
             KUrl                url;
             WMWGeoCoordinate    coordinate;
             int                 rating;
-            //QDateTime           creationDate;
+            QDateTime           creationDate;
         };
 
 
