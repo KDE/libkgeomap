@@ -449,6 +449,8 @@ bool KMapWidget::setBackend(const QString& backendName)
     if (d->currentBackend)
     {
 
+        d->currentBackend->setActive(false);
+
         disconnect(d->currentBackend, SIGNAL(signalBackendReady(const QString&)),
                 this, SLOT(slotBackendReady(const QString&)));
 
@@ -541,6 +543,8 @@ bool KMapWidget::setBackend(const QString& backendName)
             {
                 rebuildConfigurationMenu();
             }
+
+            d->currentBackend->setActive(d->activeState);
 
             return true;
         }
@@ -1478,14 +1482,19 @@ void KMapWidget::setGroupedModel(AbstractMarkerTiler* const markerModel)
 {
     s->markerModel = markerModel;
 
-    // TODO: this needs some buffering for the google maps backend
-    connect(s->markerModel, SIGNAL(signalTilesOrSelectionChanged()),
+    if (s->markerModel)
+    {
+        s->markerModel->setActive(d->activeState);
+
+        // TODO: this needs some buffering for the google maps backend
+        connect(s->markerModel, SIGNAL(signalTilesOrSelectionChanged()),
             this, SLOT(slotRequestLazyReclustering()));
 
-    if (d->currentBackend)
-    {
-        connect(s->markerModel, SIGNAL(signalThumbnailAvailableForIndex(const QVariant&, const QPixmap&)),
-            d->currentBackend, SLOT(slotThumbnailAvailableForIndex(const QVariant&, const QPixmap&)));
+        if (d->currentBackend)
+        {
+            connect(s->markerModel, SIGNAL(signalThumbnailAvailableForIndex(const QVariant&, const QPixmap&)),
+                d->currentBackend, SLOT(slotThumbnailAvailableForIndex(const QVariant&, const QPixmap&)));
+        }
     }
  
     slotRequestLazyReclustering();
@@ -2260,8 +2269,14 @@ void KMapWidget::setActive(const bool state)
 {
     const bool oldState = d->activeState;
     d->activeState = state;
-    d->currentBackend->setActive(state);
-    s->markerModel->setActive(state);     
+    if (d->currentBackend)
+    {
+        d->currentBackend->setActive(state);
+    }
+    if (s->markerModel)
+    {
+        s->markerModel->setActive(state);
+    }
     if(state && !oldState && d->clustersDirty)
     {
         slotRequestLazyReclustering();
@@ -2274,3 +2289,4 @@ bool KMapWidget::getActiveState()
 }
 
 } /* namespace KMapIface */
+
