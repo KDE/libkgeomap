@@ -42,7 +42,7 @@ namespace Marble
     class GeoSceneLayer;
 }
 
-namespace KMapIface
+namespace KMap
 {
 
 class BackendMarble;
@@ -63,6 +63,6 @@ private:
     QPointer<BackendMarble> const marbleBackend;
 };
 
-} /* namespace KMapIface */
+} /* namespace KMap */
 
 #endif /* BACKEND_MARBLE_LAYER_H */

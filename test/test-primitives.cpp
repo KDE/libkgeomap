@@ -26,7 +26,7 @@
 
 #include "../libkmap/kmap_common.h"
 
-using namespace KMapIface;
+using namespace KMap;
 
 void TestPrimitives::testNoOp()
 {

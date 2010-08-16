@@ -30,7 +30,7 @@
 
 #include "backend-marble.h"
 
-namespace KMapIface
+namespace KMap
 {
 
 BMWidget::BMWidget(BackendMarble* const pMarbleBackend, QWidget* const parent)
@@ -51,6 +51,6 @@ void BMWidget::customPaint(Marble::GeoPainter* painter)
     }
 }
 
-} /* namespace KMapIface */
+} /* namespace KMap */
 
 

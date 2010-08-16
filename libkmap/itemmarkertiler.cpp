@@ -26,7 +26,7 @@
 
 #include "itemmarkertiler.moc"
 
-namespace KMapIface
+namespace KMap
 {
 
 class ItemMarkerTiler::ItemMarkerTilerPrivate
@@ -629,4 +629,4 @@ void ItemMarkerTiler::setActive(const bool state)
     d->activeState = state;
 }
 
-} // namespace KMapIface
+} // namespace KMap

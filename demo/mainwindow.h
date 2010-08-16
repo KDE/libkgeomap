@@ -40,7 +40,7 @@
 
 class KCmdLineArgs;
 
-class MarkerModelHelper : public KMapIface::WMWModelHelper
+class MarkerModelHelper : public KMap::WMWModelHelper
 {
 Q_OBJECT
 
@@ -50,8 +50,8 @@ public:
 
     virtual QAbstractItemModel* model() const;
     virtual QItemSelectionModel* selectionModel() const;
-    virtual bool itemCoordinates(const QModelIndex& index, KMapIface::WMWGeoCoordinate* const coordinates) const;
-    virtual void onIndicesMoved(const QList<QPersistentModelIndex>& movedIndices, const KMapIface::WMWGeoCoordinate& targetCoordinates, const QPersistentModelIndex& targetSnapIndex);
+    virtual bool itemCoordinates(const QModelIndex& index, KMap::WMWGeoCoordinate* const coordinates) const;
+    virtual void onIndicesMoved(const QList<QPersistentModelIndex>& movedIndices, const KMap::WMWGeoCoordinate& targetCoordinates, const QPersistentModelIndex& targetSnapIndex);
 
 private:
     QAbstractItemModel* const m_itemModel;
@@ -88,7 +88,7 @@ private Q_SLOTS:
     void slotFutureResultsReadyAt(int startIndex, int endIndex);
     void slotImageLoadingBunchReady();
     void slotMarkersMoved(const QList<QPersistentModelIndex>& markerIndices);
-    void slotAltitudeLookupReady(const KMapIface::WMWAltitudeLookup::List& altitudes);
+    void slotAltitudeLookupReady(const KMap::WMWAltitudeLookup::List& altitudes);
     void slotAddImages();
 
 private:

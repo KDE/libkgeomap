@@ -43,7 +43,7 @@
 class QMenu;
 class KConfigGroup;
 
-namespace KMapIface
+namespace KMap
 {
 
 enum SelRectangleHDirection 
@@ -134,6 +134,6 @@ Q_SIGNALS:
 
 };
 
-} /* namespace KMapIface */
+} /* namespace KMap */
 
 #endif /* MAP_BACKEND_H */

@@ -26,7 +26,7 @@
 
 #include "kmap_common.h"
 
-namespace KMapIface
+namespace KMap
 {
 
 /**
@@ -177,4 +177,4 @@ WMWGeoCoordinate::PairList WMWHelperNormalizeBounds(const WMWGeoCoordinate::Pair
     return boundsList;
 }
 
-} /* namespace KMapIface */
+} /* namespace KMap */

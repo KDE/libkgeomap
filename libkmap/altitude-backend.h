@@ -31,7 +31,7 @@
 
 #include "kmap_common.h"
 
-namespace KMapIface
+namespace KMap
 {
 
 class KMAP_EXPORT AltitudeBackend : public QObject
@@ -50,13 +50,13 @@ public:
 
 Q_SIGNALS:
 
-    void signalAltitudes(const KMapIface::WMWAltitudeLookup::List results);
+    void signalAltitudes(const KMap::WMWAltitudeLookup::List results);
 
 public:
 
     const QExplicitlySharedDataPointer<WMWSharedData> s;
 };
 
-} /* namespace KMapIface */
+} /* namespace KMap */
 
 #endif /* ALTITUDE_BACKEND_H */

@@ -33,7 +33,7 @@
 
 #include "itemmarkertiler.h"
 
-class MarkerModelHelper : public KMapIface::WMWModelHelper
+class MarkerModelHelper : public KMap::WMWModelHelper
 {
 Q_OBJECT
 
@@ -43,7 +43,7 @@ public:
 
     virtual QAbstractItemModel* model() const;
     virtual QItemSelectionModel* selectionModel() const;
-    virtual bool itemCoordinates(const QModelIndex& index, KMapIface::WMWGeoCoordinate* const coordinates) const;
+    virtual bool itemCoordinates(const QModelIndex& index, KMap::WMWGeoCoordinate* const coordinates) const;
 
 private:
     QAbstractItemModel* const m_itemModel;

@@ -31,7 +31,7 @@
 #include <kio/job.h>
 #include <klocale.h>
 
-namespace KMapIface
+namespace KMap
 {
 
 class MergedAltitudeQueryJobs
@@ -222,4 +222,4 @@ void BackendAltitudeGeonames::slotResult(KJob* kJob)
     }
 }
 
-} /* namespace KMapIface */
+} /* namespace KMap */

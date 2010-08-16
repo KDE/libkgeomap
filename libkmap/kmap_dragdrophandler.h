@@ -38,7 +38,7 @@
 
 class QDropEvent;
 
-namespace KMapIface
+namespace KMap
 {
 
 class KMAP_EXPORT DragDropHandler : public QObject
@@ -55,6 +55,6 @@ public:
     virtual QMimeData* createMimeData(const QList<QPersistentModelIndex>& modelIndices) = 0;
 };
 
-} /* namespace KMapIface */
+} /* namespace KMap */
 
 #endif /* KMAP_DRAGDROPHANDLER_H */

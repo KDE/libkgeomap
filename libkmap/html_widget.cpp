@@ -41,7 +41,7 @@
 #include "kmap_common.h"
 #include "kmap_primitives.h"
 
-namespace KMapIface
+namespace KMap
 {
 
 class HTMLWidget::HTMLWidgetPrivate
@@ -361,4 +361,4 @@ void HTMLWidget::centerOn(const qreal west, const qreal north, const qreal east,
     runScript(QString("setMapBoundaries(%1, %2, %3, %4);").arg(west).arg(north).arg(east).arg(south));
 }
 
-} /* namespace KMapIface */
+} /* namespace KMap */

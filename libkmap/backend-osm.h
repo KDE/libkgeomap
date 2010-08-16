@@ -31,7 +31,7 @@
 
 #include "map-backend.h"
 
-namespace KMapIface
+namespace KMap
 {
 
 class BackendOSM : public MapBackend
@@ -93,7 +93,7 @@ private:
     BackendOSMPrivate* const d;
 };
 
-} /* KMapIface */
+} /* KMap */
 
 #endif /* BACKEND_OSM_H */
 

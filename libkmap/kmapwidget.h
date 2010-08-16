@@ -45,7 +45,7 @@ class QDragEnterEvent;
 class QDropEvent;
 class QMenu;
 
-namespace KMapIface
+namespace KMap
 {
 
 class AbstractMarkerTiler;
@@ -142,7 +142,7 @@ public Q_SLOTS:
 
 Q_SIGNALS:
 
-    void signalAltitudeLookupReady(const KMapIface::WMWAltitudeLookup::List& altitudes);
+    void signalAltitudeLookupReady(const KMap::WMWAltitudeLookup::List& altitudes);
     void signalSpecialMarkersMoved(const QList<QPersistentModelIndex>& indices);
     void signalUngroupedModelChanged(const int index);
     void signalNewSelectionFromMap();
@@ -192,6 +192,6 @@ private:
     KMapWidgetPrivate* const d;
 };
 
-} /* namespace KMapIface */
+} /* namespace KMap */
 
 #endif /* KMAPWIDGET_H */

@@ -63,7 +63,7 @@
 
 using namespace Marble;
 
-namespace KMapIface
+namespace KMap
 {
 
 class BackendMarble::BackendMarblePrivate
@@ -1357,4 +1357,4 @@ void BackendMarble::setActive(const bool state)
     d->activeState = state;
 }
 
-} /* namespace KMapIface */
+} /* namespace KMap */

@@ -40,7 +40,7 @@
 #include "kmap_primitives.h"
 #include "libkmap_export.h"
 
-namespace KMapIface
+namespace KMap
 {
 
 class KMAP_EXPORT AbstractMarkerTiler : public QObject
@@ -141,7 +141,7 @@ public:
             return result;
         }
 
-        static TileIndex fromCoordinates(const KMapIface::WMWGeoCoordinate& coordinate, const int getLevel);
+        static TileIndex fromCoordinates(const KMap::WMWGeoCoordinate& coordinate, const int getLevel);
 
         WMWGeoCoordinate toCoordinates() const;
 
@@ -395,10 +395,10 @@ private:
 };
 
 
-} /* namespace KMapIface */
+} /* namespace KMap */
 
 
-inline QDebug operator<<(QDebug debugOut, const KMapIface::AbstractMarkerTiler::TileIndex& tileIndex)
+inline QDebug operator<<(QDebug debugOut, const KMap::AbstractMarkerTiler::TileIndex& tileIndex)
 {
     debugOut << tileIndex.toIntList();
     return debugOut;

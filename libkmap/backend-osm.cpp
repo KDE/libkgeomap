@@ -45,7 +45,7 @@
 #include "kmap.h"
 #include "markermodel.h"
 
-namespace KMapIface
+namespace KMap
 {
 
 class BackendOSM::BackendOSMPrivate
@@ -510,4 +510,4 @@ WMWGeoCoordinate::PairList BackendOSM::getNormalizedBounds()
     return WMWHelperNormalizeBounds(d->cacheBounds);
 }
 
-} /* namespace KMapIface */
+} /* namespace KMap */

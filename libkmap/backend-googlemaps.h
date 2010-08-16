@@ -36,7 +36,7 @@
 #include <marble/global.h>
 #include <marble/GeoDataLatLonBox.h>
 
-namespace KMapIface
+namespace KMap
 {
 
 class BackendGoogleMaps : public MapBackend
@@ -130,6 +130,6 @@ private:
     BackendGoogleMapsPrivate* const d;
 };
 
-} /* namespace KMapIface */
+} /* namespace KMap */
 
 #endif /* BACKEND_GOOGLEMAPS_H */

@@ -34,7 +34,7 @@
 
 #include "backend-marble.h"
 
-namespace KMapIface
+namespace KMap
 {
 
 BMLayer::BMLayer(BackendMarble* const pMarbleBackend)
@@ -65,4 +65,4 @@ QStringList BMLayer::renderPosition () const
     return layerNames;
 }
 
-} /* namespace KMapIface */
+} /* namespace KMap */

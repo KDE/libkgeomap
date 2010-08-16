@@ -35,7 +35,7 @@
 
 #include <marble/MarbleWidget.h>
 
-namespace KMapIface
+namespace KMap
 {
 
 class BackendMarble;
@@ -58,6 +58,6 @@ private:
     QPointer<BackendMarble> const marbleBackend;
 };
 
-} /* namespace KMapIface */
+} /* namespace KMap */
 
 #endif /* BACKEND_MARBLE_SUBWIDGET_H */

@@ -26,7 +26,7 @@
 
 #include "abstractmarkertiler.moc"
 
-namespace KMapIface
+namespace KMap
 {
 
 typedef QPair<int, int> QIntPair;
@@ -382,7 +382,7 @@ AbstractMarkerTiler* AbstractMarkerTiler::NonEmptyIterator::model() const
     return d->model;
 }
 
-AbstractMarkerTiler::TileIndex AbstractMarkerTiler::TileIndex::fromCoordinates(const KMapIface::WMWGeoCoordinate& coordinate,
+AbstractMarkerTiler::TileIndex AbstractMarkerTiler::TileIndex::fromCoordinates(const KMap::WMWGeoCoordinate& coordinate,
                                                                                const int getLevel)
 {
     KMAP_ASSERT(getLevel<=MaxLevel);
@@ -574,4 +574,4 @@ void AbstractMarkerTiler::onIndicesMoved(const TileIndex::List& tileIndicesList,
     Q_UNUSED(targetSnapIndex);
 }
 
-} /* namespace KMapIface */
+} /* namespace KMap */

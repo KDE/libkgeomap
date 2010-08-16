@@ -54,14 +54,14 @@
 #include <valgrind/valgrind.h>
 #endif /* KMAP_HAVE_VALGRIND */
 
-#define KMAP_ASSERT(cond) ((!(cond)) ? KMapIface::KMapIface_assert(#cond,__FILE__,__LINE__) : qt_noop())
+#define KMAP_ASSERT(cond) ((!(cond)) ? KMap::KMap_assert(#cond,__FILE__,__LINE__) : qt_noop())
 
 Q_DECLARE_METATYPE(QPersistentModelIndex)
 
-namespace KMapIface
+namespace KMap
 {
 
-inline void KMapIface_assert(const char* const condition, const char* const filename, const int lineNumber)
+inline void KMap_assert(const char* const condition, const char* const filename, const int lineNumber)
 {
     const QString debugString = QString("ASSERT: %1 - %2:%3").arg(condition).arg(filename).arg(lineNumber);
 #ifdef KMAP_HAVE_VALGRIND
@@ -372,12 +372,12 @@ Q_SIGNALS:
 };
 
 
-} /* namespace KMapIface */
+} /* namespace KMap */
 
-Q_DECLARE_OPERATORS_FOR_FLAGS(KMapIface::WMWGeoCoordinate::HasFlags)
-Q_DECLARE_OPERATORS_FOR_FLAGS(KMapIface::WMWModelHelper::Flags)
+Q_DECLARE_OPERATORS_FOR_FLAGS(KMap::WMWGeoCoordinate::HasFlags)
+Q_DECLARE_OPERATORS_FOR_FLAGS(KMap::WMWModelHelper::Flags)
 
-namespace KMapIface
+namespace KMap
 {
 
 // primitives for altitude lookup:
@@ -391,15 +391,15 @@ public:
     typedef QList<WMWAltitudeLookup> List;
 };
 
-} /* namespace KMapIface */
+} /* namespace KMap */
 
-inline QDebug operator<<(QDebug debugOut, const KMapIface::WMWGeoCoordinate& coordinate)
+inline QDebug operator<<(QDebug debugOut, const KMap::WMWGeoCoordinate& coordinate)
 {
     debugOut << coordinate.geoUrl();
     return debugOut;
 }
 
-inline bool operator==(const KMapIface::WMWGeoCoordinate& a, const KMapIface::WMWGeoCoordinate& b)
+inline bool operator==(const KMap::WMWGeoCoordinate& a, const KMap::WMWGeoCoordinate& b)
 {
     return
         ( a.hasCoordinates() == b.hasCoordinates() ) &&
@@ -412,9 +412,9 @@ inline bool operator==(const KMapIface::WMWGeoCoordinate& a, const KMapIface::WM
         ( a.hasAltitude() ? ( a.alt() == b.alt() ) : true );
 }
 
-Q_DECLARE_METATYPE(KMapIface::WMWGeoCoordinate)
-Q_DECLARE_METATYPE(KMapIface::WMWGeoCoordinate::Pair)
-Q_DECLARE_METATYPE(KMapIface::WMWGeoCoordinate::PairList)
-Q_DECLARE_METATYPE(KMapIface::WMWAltitudeLookup)
+Q_DECLARE_METATYPE(KMap::WMWGeoCoordinate)
+Q_DECLARE_METATYPE(KMap::WMWGeoCoordinate::Pair)
+Q_DECLARE_METATYPE(KMap::WMWGeoCoordinate::PairList)
+Q_DECLARE_METATYPE(KMap::WMWAltitudeLookup)
 
 #endif /* KMAP_PRIMITIVES_H */

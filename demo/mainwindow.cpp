@@ -68,7 +68,7 @@
 #include "dragdrophandler.h"
 #include "myimageitem.h"
 
-using namespace KMapIface;
+using namespace KMap;
 
 MarkerModelHelper::MarkerModelHelper(QAbstractItemModel* const itemModel, QItemSelectionModel* const itemSelectionModel)
  : WMWModelHelper(itemModel),
@@ -204,11 +204,11 @@ MainWindow::MainWindow(KCmdLineArgs* const cmdLineArgs, QWidget* const parent)
     d->mapWidget->setGroupedModel(mm);
     d->mapWidget->setActive(true);
     d->mapWidget->setDragDropHandler(new DemoDragDropHandler(d->displayMarkersModel, d->mapWidget));
-    d->mapWidget->setVisibleMouseModes(KMapIface::MouseModePan|KMapIface::MouseModeZoom|KMapIface::MouseModeSelectThumbnail);
-    d->mapWidget->setAvailableMouseModes(KMapIface::MouseModePan|KMapIface::MouseModeZoom|KMapIface::MouseModeSelectThumbnail);
+    d->mapWidget->setVisibleMouseModes(KMap::MouseModePan|KMap::MouseModeZoom|KMap::MouseModeSelectThumbnail);
+    d->mapWidget->setAvailableMouseModes(KMap::MouseModePan|KMap::MouseModeZoom|KMap::MouseModeSelectThumbnail);
 
-    connect(d->mapWidget, SIGNAL(signalAltitudeLookupReady(const KMapIface::WMWAltitudeLookup::List&)),
-            this, SLOT(slotAltitudeLookupReady(const KMapIface::WMWAltitudeLookup::List&)));
+    connect(d->mapWidget, SIGNAL(signalAltitudeLookupReady(const KMap::WMWAltitudeLookup::List&)),
+            this, SLOT(slotAltitudeLookupReady(const KMap::WMWAltitudeLookup::List&)));
 
     connect(d->markerModelHelper, SIGNAL(signalMarkersMoved(const QList<QPersistentModelIndex>&)),
             this, SLOT(slotMarkersMoved(const QList<QPersistentModelIndex>&)));

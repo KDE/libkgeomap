@@ -47,7 +47,7 @@
 #include "kmapwidget.h"
 #include "abstractmarkertiler.h"
 
-namespace KMapIface
+namespace KMap
 {
 
 class BackendGoogleMaps::BackendGoogleMapsPrivate
@@ -1020,4 +1020,4 @@ void BackendGoogleMaps::setActive(const bool state)
     d->activeState = state;
 }
 
-} /* namespace KMapIface */
+} /* namespace KMap */

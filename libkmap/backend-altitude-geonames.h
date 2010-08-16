@@ -38,7 +38,7 @@ namespace KIO
 
 class KJob;
 
-namespace KMapIface
+namespace KMap
 {
 
 class BackendAltitudeGeonames : public AltitudeBackend
@@ -66,6 +66,6 @@ private:
     BackendAltitudeGeonamesPrivate* const d;
 };
 
-} /* namespace KMapIface */
+} /* namespace KMap */
 
 #endif /* BACKEND_ALTITUDE_GEONAMES_H */

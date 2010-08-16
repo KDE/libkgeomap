@@ -31,7 +31,7 @@
 
 #include "kmap_primitives.h"
 
-namespace KMapIface
+namespace KMap
 {
 
 class AbstractMarkerTiler;
@@ -95,6 +95,6 @@ KMAP_EXPORT bool WMWHelperParseXYStringToPoint(const QString& xyString, QPoint* 
 KMAP_EXPORT bool WMWHelperParseBoundsString(const QString& boundsString, QPair<WMWGeoCoordinate, WMWGeoCoordinate>* const boundsCoordinates);
 KMAP_EXPORT WMWGeoCoordinate::PairList WMWHelperNormalizeBounds(const WMWGeoCoordinate::Pair& boundsPair);
 
-} /* namespace KMapIface */
+} /* namespace KMap */
 
 #endif /* KMAP_COMMON_H */

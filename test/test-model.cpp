@@ -28,7 +28,7 @@
 
 #include <QStandardItemModel>
 
-using namespace KMapIface;
+using namespace KMap;
 
 const int CoordinatesRole = Qt::UserRole + 0;
 
@@ -627,7 +627,7 @@ void TestModel::benchmarkIteratorWholeWorld()
         {
             for (qreal y=-50; y<50; y+=1.0)
             {
-                itemModel->appendRow(MakeItemAt(KMapIface::WMWGeoCoordinate(x,y)));
+                itemModel->appendRow(MakeItemAt(KMap::WMWGeoCoordinate(x,y)));
             }
         }
 

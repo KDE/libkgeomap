@@ -31,7 +31,7 @@
 
 #include "abstractmarkertiler.h"
 
-namespace KMapIface
+namespace KMap
 {
 
 class KMAP_EXPORT ItemMarkerTiler : public AbstractMarkerTiler
@@ -83,6 +83,6 @@ private:
     ItemMarkerTilerPrivate* const d;
 };
 
-} // namespace KMapIface
+} // namespace KMap
 
 #endif /* ITEMMARKERTILER_H */

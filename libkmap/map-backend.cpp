@@ -26,7 +26,7 @@
 
 #include "map-backend.moc"
 
-namespace KMapIface
+namespace KMap
 {
 
 MapBackend::MapBackend(const QExplicitlySharedDataPointer<WMWSharedData>& sharedData, QObject* const parent)
@@ -44,4 +44,4 @@ void MapBackend::slotThumbnailAvailableForIndex(const QVariant& index, const QPi
     Q_UNUSED(pixmap)
 }
 
-} /* namespace KMapIface */
+} /* namespace KMap */

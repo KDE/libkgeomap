@@ -26,7 +26,7 @@
 
 #include "kmap_primitives.moc"
 
-namespace KMapIface
+namespace KMap
 {
 
 /**
@@ -118,4 +118,4 @@ void WMWModelHelper::onIndicesMoved(const QList<QPersistentModelIndex>& movedInd
     Q_UNUSED(targetSnapIndex);
 }
 
-} /* namespace KMapIface */
+} /* namespace KMap */

@@ -36,7 +36,7 @@
 #include "kmap_primitives.h"
 #include "libkmap_export.h"
 
-namespace KMapIface
+namespace KMap
 {
 
 class KMAP_EXPORT HTMLWidget : public KHTMLPart
@@ -81,6 +81,6 @@ private:
     HTMLWidgetPrivate* const d;
 };
 
-} /* namespace KMapIface */
+} /* namespace KMap */
 
 #endif /* HTML_WIDGET_H */
