@@ -32,18 +32,18 @@ void TestPrimitives::testNoOp()
 {
 }
 
-void TestPrimitives::testWMWGeoCoordinates()
+void TestPrimitives::testGeoCoordinates()
 {
-    WMWGeoCoordinate coord1(52.0, 6.0);
+    GeoCoordinates coord1(52.0, 6.0);
     QVERIFY(coord1.hasCoordinates());
     QCOMPARE(coord1.geoUrl(), QString("geo:52,6"));
 
-    WMWGeoCoordinate coord2(52.0, 6.0);
-    WMWGeoCoordinate coord3(53.0, 6.0);
+    GeoCoordinates coord2(52.0, 6.0);
+    GeoCoordinates coord3(53.0, 6.0);
     QVERIFY(coord1==coord2);
     QVERIFY(!(coord1==coord3));
 
-    WMWGeoCoordinate coord4 = WMWGeoCoordinate(52.0, 6.0);
+    GeoCoordinates coord4 = GeoCoordinates(52.0, 6.0);
     QVERIFY(coord1==coord4);
 }
 
@@ -52,7 +52,7 @@ void TestPrimitives::testParseLatLonString()
     // make sure there is no crash on null-pointer
     QVERIFY(WMWHelperParseLatLonString("52,6", 0));
 
-    WMWGeoCoordinate coordinate;
+    GeoCoordinates coordinate;
 
     QVERIFY(WMWHelperParseLatLonString("52,6", &coordinate));
     QCOMPARE(coordinate.geoUrl(), QString("geo:52,6"));
@@ -116,7 +116,7 @@ void TestPrimitives::testParseBoundsString()
     // make sure there is no crash on null-pointer
     QVERIFY(WMWHelperParseBoundsString("((-52,-6),(52,6))", 0));
 
-    WMWGeoCoordinate::Pair bounds;
+    GeoCoordinates::Pair bounds;
 
     QVERIFY(WMWHelperParseBoundsString("((-52,-6),(52,6))", &bounds));
     QCOMPARE(bounds.first.geoUrl(), QString("geo:-52,-6"));
@@ -151,49 +151,49 @@ void TestPrimitives::testParseBoundsString()
 
 void TestPrimitives::testNormalizeBounds_data()
 {
-    QTest::addColumn<WMWGeoCoordinate::Pair>("bounds");
-    QTest::addColumn<QList<WMWGeoCoordinate::Pair> >("nbounds");
+    QTest::addColumn<GeoCoordinates::Pair>("bounds");
+    QTest::addColumn<QList<GeoCoordinates::Pair> >("nbounds");
 
     // these ones should not be split:
     QTest::newRow("top-left")
-        << WMWGeoCoordinate::makePair(10, 20, 12, 22)
-        << ( WMWGeoCoordinate::PairList() << WMWGeoCoordinate::makePair(10, 20, 12, 22) );
+        << GeoCoordinates::makePair(10, 20, 12, 22)
+        << ( GeoCoordinates::PairList() << GeoCoordinates::makePair(10, 20, 12, 22) );
 
     QTest::newRow("bottom-left")
-        << WMWGeoCoordinate::makePair(-12, 20, -10, 22)
-        << ( WMWGeoCoordinate::PairList() << WMWGeoCoordinate::makePair(-12, 20, -10, 22) );
+        << GeoCoordinates::makePair(-12, 20, -10, 22)
+        << ( GeoCoordinates::PairList() << GeoCoordinates::makePair(-12, 20, -10, 22) );
 
     QTest::newRow("top-right")
-        << WMWGeoCoordinate::makePair(10, -22, 12, -20)
-        << ( WMWGeoCoordinate::PairList() << WMWGeoCoordinate::makePair(10, -22, 12, -20) );
+        << GeoCoordinates::makePair(10, -22, 12, -20)
+        << ( GeoCoordinates::PairList() << GeoCoordinates::makePair(10, -22, 12, -20) );
 
     QTest::newRow("bottom-right")
-        << WMWGeoCoordinate::makePair(-12, -22, -10, -20)
-        << ( WMWGeoCoordinate::PairList() << WMWGeoCoordinate::makePair(-12, -22, -10, -20) );
+        << GeoCoordinates::makePair(-12, -22, -10, -20)
+        << ( GeoCoordinates::PairList() << GeoCoordinates::makePair(-12, -22, -10, -20) );
 
     QTest::newRow("cross_origin")
-        << WMWGeoCoordinate::makePair(-12, -22, 10, 20)
-        << ( WMWGeoCoordinate::PairList() << WMWGeoCoordinate::makePair(-12, -22, 10, 20) );
+        << GeoCoordinates::makePair(-12, -22, 10, 20)
+        << ( GeoCoordinates::PairList() << GeoCoordinates::makePair(-12, -22, 10, 20) );
 
     // these ones should be split:
     QTest::newRow("cross_date_1")
-    << WMWGeoCoordinate::makePair(10, 20, 15, -170)
-    << ( WMWGeoCoordinate::PairList()
-            << WMWGeoCoordinate::makePair(10, -180, 15, -170)
-            << WMWGeoCoordinate::makePair(10, 20, 15, 180)
+    << GeoCoordinates::makePair(10, 20, 15, -170)
+    << ( GeoCoordinates::PairList()
+            << GeoCoordinates::makePair(10, -180, 15, -170)
+            << GeoCoordinates::makePair(10, 20, 15, 180)
         );
 
     QTest::newRow("cross_date_2")
-        << WMWGeoCoordinate::makePair(-10, 20, 15, -170)
-        << ( WMWGeoCoordinate::PairList()
-                << WMWGeoCoordinate::makePair(-10, -180, 15, -170)
-                << WMWGeoCoordinate::makePair(-10, 20, 15, 180)
+        << GeoCoordinates::makePair(-10, 20, 15, -170)
+        << ( GeoCoordinates::PairList()
+                << GeoCoordinates::makePair(-10, -180, 15, -170)
+                << GeoCoordinates::makePair(-10, 20, 15, 180)
             );
 }
 
 void TestPrimitives::testNormalizeBounds()
 {
-    QFETCH(WMWGeoCoordinate::Pair, bounds);
+    QFETCH(GeoCoordinates::Pair, bounds);
 
     QTEST(WMWHelperNormalizeBounds(bounds), "nbounds");
 }

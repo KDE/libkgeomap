@@ -34,16 +34,18 @@
 namespace KMap
 {
 
+class ModelHelper;
+
 class KMAP_EXPORT ItemMarkerTiler : public AbstractMarkerTiler
 {
     Q_OBJECT
 
 public:
 
-    ItemMarkerTiler(WMWModelHelper* const modelHelper, QObject* const parent = 0);
+    ItemMarkerTiler(ModelHelper* const modelHelper, QObject* const parent = 0);
     ~ItemMarkerTiler();
 
-    virtual void prepareTiles(const WMWGeoCoordinate& upperLeft, const WMWGeoCoordinate& lowerRight, int level);
+    virtual void prepareTiles(const GeoCoordinates& upperLeft, const GeoCoordinates& lowerRight, int level);
     virtual void regenerateTiles();
     virtual Tile* getTile(const TileIndex& tileIndex, const bool stopIfEmpty = false);
     virtual int getTileMarkerCount(const TileIndex& tileIndex);
@@ -56,10 +58,10 @@ public:
     virtual WMWSelectionState getTileSelectedState(const TileIndex& tileIndex);
 
     virtual void onIndicesClicked(const TileIndex::List& tileIndicesList, const WMWSelectionState& groupSelectionState, MouseMode currentMouseMode);
-    virtual void onIndicesMoved(const TileIndex::List& tileIndicesList, const WMWGeoCoordinate& targetCoordinates,
+    virtual void onIndicesMoved(const TileIndex::List& tileIndicesList, const GeoCoordinates& targetCoordinates,
                                 const QPersistentModelIndex& targetSnapIndex);
 
-    void setMarkerModelHelper(WMWModelHelper* const modelHelper);
+    void setMarkerModelHelper(ModelHelper* const modelHelper);
     void removeMarkerIndexFromGrid(const QModelIndex& markerIndex, const bool ignoreSelection = false);
     void addMarkerIndexToGrid(const QPersistentModelIndex& markerIndex);
 

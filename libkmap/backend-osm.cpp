@@ -67,8 +67,8 @@ public:
     bool                                      isReady;
 
     int                                       cacheZoom;
-    WMWGeoCoordinate                          cacheCenter;
-    QPair<WMWGeoCoordinate, WMWGeoCoordinate> cacheBounds;
+    GeoCoordinates                          cacheCenter;
+    QPair<GeoCoordinates, GeoCoordinates> cacheBounds;
 };
 
 BackendOSM::BackendOSM(const QExplicitlySharedDataPointer<WMWSharedData>& sharedData, QObject* const parent)
@@ -118,12 +118,12 @@ QWidget* BackendOSM::mapWidget() const
     return d->htmlWidgetWrapper.data();
 }
 
-WMWGeoCoordinate BackendOSM::getCenter() const
+GeoCoordinates BackendOSM::getCenter() const
 {
     return d->cacheCenter;
 }
 
-void BackendOSM::setCenter(const WMWGeoCoordinate& coordinate)
+void BackendOSM::setCenter(const GeoCoordinates& coordinate)
 {
     kDebug()<<isReady()<<coordinate.geoUrl();
     d->cacheCenter = coordinate;
@@ -208,7 +208,7 @@ void BackendOSM::updateMarkers()
     {
         const QModelIndex currentIndex = s->specialMarkersModel->index(row, 0);
 
-        const WMWGeoCoordinate currentCoordinates = s->specialMarkersModel->data(currentIndex, s->specialMarkersCoordinatesRole).value<WMWGeoCoordinate>();
+        const GeoCoordinates currentCoordinates = s->specialMarkersModel->data(currentIndex, s->specialMarkersCoordinatesRole).value<GeoCoordinates>();
 
         d->htmlWidget->runScript(QString("wmwAddMarker(%1, %2, %3, %4);")
                 .arg(row)
@@ -267,7 +267,7 @@ void BackendOSM::slotHTMLEvents(const QStringList& events)
                 continue;
 
             // re-read the marker position:
-            WMWGeoCoordinate clusterCoordinates;
+            GeoCoordinates clusterCoordinates;
             const bool isValid = d->htmlWidget->runScript2Coordinates(
                     QString("wmwGetClusterPosition(%1);").arg(clusterIndex),
                     &clusterCoordinates);
@@ -293,7 +293,7 @@ void BackendOSM::slotHTMLEvents(const QStringList& events)
                 continue;
 
             // re-read the marker position:
-            WMWGeoCoordinate markerCoordinates;
+            GeoCoordinates markerCoordinates;
             const bool isValid = d->htmlWidget->runScript2Coordinates(
                     QString("wmwGetMarkerPosition(%1);").arg(markerRow),
                     &markerCoordinates
@@ -396,7 +396,7 @@ void BackendOSM::updateClusters()
     kDebug()<<"end updateclusters";
 }
 
-bool BackendOSM::screenCoordinates(const WMWGeoCoordinate& coordinates, QPoint* const point)
+bool BackendOSM::screenCoordinates(const GeoCoordinates& coordinates, QPoint* const point)
 {
     if (!d->isReady)
         return false;
@@ -414,7 +414,7 @@ bool BackendOSM::screenCoordinates(const WMWGeoCoordinate& coordinates, QPoint* 
     return isValid;
 }
 
-bool BackendOSM::geoCoordinates(const QPoint& point, WMWGeoCoordinate* const coordinates) const
+bool BackendOSM::GeoCoordinates(const QPoint& point, GeoCoordinates* const coordinates) const
 {
     if (!d->isReady)
         return false;
@@ -505,7 +505,7 @@ int BackendOSM::getMarkerModelLevel()
     return tileLevel;
 }
 
-WMWGeoCoordinate::PairList BackendOSM::getNormalizedBounds()
+GeoCoordinates::PairList BackendOSM::getNormalizedBounds()
 {
     return WMWHelperNormalizeBounds(d->cacheBounds);
 }

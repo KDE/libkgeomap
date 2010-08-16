@@ -128,7 +128,7 @@ bool BackendAltitudeGeonames::queryAltitudes(const WMWAltitudeLookup::List& quer
             const MergedAltitudeQueryJobs& myQuery = mergedJobs.takeFirst();
             newMergedQuery.lookups << myQuery.lookups;
 
-            WMWGeoCoordinate queryCoordinates = myQuery.lookups.first().coordinates;
+            GeoCoordinates queryCoordinates = myQuery.lookups.first().coordinates;
 
             if (!latString.isEmpty())
             {
@@ -196,7 +196,7 @@ void BackendAltitudeGeonames::slotResult(KJob* kJob)
                     haveAltitude = false;
                 }
 
-                const WMWGeoCoordinate firstJobCoordinates = myJob.lookups.at(jobIndex).coordinates;
+                const GeoCoordinates firstJobCoordinates = myJob.lookups.at(jobIndex).coordinates;
                 kDebug()<<firstJobCoordinates.geoUrl();
                 for (; jobIndex<myJob.lookups.count(); ++jobIndex)
                 {

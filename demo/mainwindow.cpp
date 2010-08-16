@@ -71,12 +71,12 @@
 using namespace KMap;
 
 MarkerModelHelper::MarkerModelHelper(QAbstractItemModel* const itemModel, QItemSelectionModel* const itemSelectionModel)
- : WMWModelHelper(itemModel),
+ : ModelHelper(itemModel),
    m_itemModel(itemModel),
    m_itemSelectionModel(itemSelectionModel)
 {
     connect(itemModel, SIGNAL(dataChanged(const QModelIndex&, const QModelIndex&)),
-            this, SLOT(signalModelChangedDrastically()));
+            this, SIGNAL(signalModelChangedDrastically()));
 }
 
 MarkerModelHelper::~MarkerModelHelper()
@@ -93,18 +93,18 @@ QItemSelectionModel* MarkerModelHelper::selectionModel() const
     return m_itemSelectionModel;
 }
 
-bool MarkerModelHelper::itemCoordinates(const QModelIndex& index, WMWGeoCoordinate* const coordinates) const
+bool MarkerModelHelper::itemCoordinates(const QModelIndex& index, GeoCoordinates* const coordinates) const
 {
-    if (!index.data(RoleCoordinates).canConvert<WMWGeoCoordinate>())
+    if (!index.data(RoleCoordinates).canConvert<GeoCoordinates>())
         return false;
 
     if (coordinates)
-        *coordinates = index.data(RoleCoordinates).value<WMWGeoCoordinate>();
+        *coordinates = index.data(RoleCoordinates).value<GeoCoordinates>();
 
     return true;
 }
 
-void MarkerModelHelper::onIndicesMoved(const QList<QPersistentModelIndex>& movedIndices, const WMWGeoCoordinate& targetCoordinates, const QPersistentModelIndex& targetSnapIndex)
+void MarkerModelHelper::onIndicesMoved(const QList<QPersistentModelIndex>& movedIndices, const GeoCoordinates& targetCoordinates, const QPersistentModelIndex& targetSnapIndex)
 {
     Q_UNUSED(targetSnapIndex);
 
@@ -120,7 +120,7 @@ class MyImageData
 {
 public:
 
-    WMWGeoCoordinate coordinates;
+    GeoCoordinates coordinates;
     KUrl             url;
 };
 
@@ -233,25 +233,25 @@ MainWindow::MainWindow(KCmdLineArgs* const cmdLineArgs, QWidget* const parent)
 
     readSettings();
 
-    WMWGeoCoordinate::List markerList;
+    GeoCoordinates::List markerList;
 
     // ice cafe
-    markerList<<WMWGeoCoordinate::fromGeoUrl("geo:51.0913031421,6.88878178596,44");
+    markerList<<GeoCoordinates::fromGeoUrl("geo:51.0913031421,6.88878178596,44");
 
     // bar
-    markerList<<WMWGeoCoordinate::fromGeoUrl("geo:51.06711205,6.90020261667,43");
+    markerList<<GeoCoordinates::fromGeoUrl("geo:51.06711205,6.90020261667,43");
 
     // Marienburg castle
-    markerList<<WMWGeoCoordinate::fromGeoUrl("geo:51.087647318,6.88282728201,44");
+    markerList<<GeoCoordinates::fromGeoUrl("geo:51.087647318,6.88282728201,44");
 
     // head of monster
-    markerList<<WMWGeoCoordinate::fromGeoUrl("geo:51.0889433167,6.88000331667,39.6");
+    markerList<<GeoCoordinates::fromGeoUrl("geo:51.0889433167,6.88000331667,39.6");
 
     // Langenfeld
-    markerList<<WMWGeoCoordinate::fromGeoUrl("geo:51.1100157609,6.94911003113,51");
+    markerList<<GeoCoordinates::fromGeoUrl("geo:51.1100157609,6.94911003113,51");
 
     // Sagrada Familia in Spain
-    markerList<<WMWGeoCoordinate::fromGeoUrl("geo:41.4036480511,2.1743756533,46");
+    markerList<<GeoCoordinates::fromGeoUrl("geo:41.4036480511,2.1743756533,46");
 
     if (cmdLineArgs->isSet("demopoints_single")||cmdLineArgs->isSet("demopoints_group"))
     {
@@ -443,7 +443,7 @@ void MainWindow::slotMarkersMoved(const QList<QPersistentModelIndex>& markerIndi
     for (int i=0; i<markerIndices.count(); ++i)
     {
         const QPersistentModelIndex currentIndex = markerIndices.at(i);
-        const WMWGeoCoordinate newCoordinates = currentIndex.data(RoleCoordinates).value<WMWGeoCoordinate>();
+        const GeoCoordinates newCoordinates = currentIndex.data(RoleCoordinates).value<GeoCoordinates>();
 
         WMWAltitudeLookup myLookup;
         myLookup.coordinates = newCoordinates;

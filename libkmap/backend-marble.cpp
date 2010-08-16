@@ -60,8 +60,7 @@
 
 #include "abstractmarkertiler.h"
 #include "kmapwidget.h"
-
-using namespace Marble;
+#include "kmap_modelhelper.h"
 
 namespace KMap
 {
@@ -106,7 +105,7 @@ public:
     {
     }
 
-    QPointer<MarbleWidget> marbleWidget;
+    QPointer<Marble::MarbleWidget> marbleWidget;
 
     QActionGroup*          actionGroupMapTheme;
     QActionGroup*          actionGroupProjection;
@@ -125,7 +124,7 @@ public:
     bool                   haveMouseMovingObject;
     int                    mouseMoveClusterIndex;
     QPersistentModelIndex  mouseMoveMarkerIndex;
-    WMWGeoCoordinate       mouseMoveObjectCoordinates;
+    GeoCoordinates         mouseMoveObjectCoordinates;
     QPoint                 mouseMoveCenterOffset;
     int                    dragDropMarkerCount;
     QPoint                 dragDropMarkerPos;
@@ -140,9 +139,9 @@ public:
     QPoint                 secondSelectionScreenPoint;
     SelRectangleHDirection currentRectDrawingDirection;
     MouseModes             currentMouseMode;
-    WMWGeoCoordinate       firstSelectionPoint;
-    WMWGeoCoordinate       intermediateSelectionPoint;
-    WMWGeoCoordinate       secondSelectionPoint;
+    GeoCoordinates         firstSelectionPoint;
+    GeoCoordinates         intermediateSelectionPoint;
+    GeoCoordinates         secondSelectionPoint;
     bool                   activeState;
 
 #ifdef KMAP_MARBLE_ADD_LAYER
@@ -156,7 +155,7 @@ BackendMarble::BackendMarble(const QExplicitlySharedDataPointer<WMWSharedData>& 
     createActions();
 
 #ifdef KMAP_MARBLE_ADD_LAYER
-    d->marbleWidget = new MarbleWidget();
+    d->marbleWidget = new Marble::MarbleWidget();
     d->bmLayer = new BMLayer(this);
     d->marbleWidget->model()->addLayer(d->bmLayer);
 #else
@@ -208,12 +207,12 @@ QWidget* BackendMarble::mapWidget() const
     return d->marbleWidget;
 }
 
-WMWGeoCoordinate BackendMarble::getCenter() const
+GeoCoordinates BackendMarble::getCenter() const
 {
-    return WMWGeoCoordinate(d->marbleWidget->centerLatitude(), d->marbleWidget->centerLongitude());
+    return GeoCoordinates(d->marbleWidget->centerLatitude(), d->marbleWidget->centerLongitude());
 }
 
-void BackendMarble::setCenter(const WMWGeoCoordinate& coordinate)
+void BackendMarble::setCenter(const GeoCoordinates& coordinate)
 {
     d->marbleWidget->setCenterLatitude(coordinate.lat());
     d->marbleWidget->setCenterLongitude(coordinate.lon());
@@ -401,7 +400,7 @@ void BackendMarble::updateMarkers()
     d->marbleWidget->update();
 }
 
-bool BackendMarble::screenCoordinates(const WMWGeoCoordinate& coordinates, QPoint* const point)
+bool BackendMarble::screenCoordinates(const GeoCoordinates& coordinates, QPoint* const point)
 {
     if (!d->marbleWidget)
         return false;
@@ -422,24 +421,24 @@ bool BackendMarble::screenCoordinates(const WMWGeoCoordinate& coordinates, QPoin
     return true;
 }
 
-bool BackendMarble::geoCoordinates(const QPoint& point, WMWGeoCoordinate* const coordinates) const
+bool BackendMarble::geoCoordinates(const QPoint& point, GeoCoordinates* const coordinates) const
 {
     if (!d->marbleWidget)
         return false;
 
-    // apparently, MarbleWidget::geoCoordinates can return true even if the object is not on the screen
+    // apparently, MarbleWidget::GeoCoordinates can return true even if the object is not on the screen
     // check that the point is in the visible range:
     if (!d->marbleWidget->rect().contains(point))
         return false;
 
     qreal lat, lon;
-    const bool isVisible = d->marbleWidget->geoCoordinates(point.x(), point.y(), lon, lat, GeoDataCoordinates::Degree);
+    const bool isVisible = d->marbleWidget->geoCoordinates(point.x(), point.y(), lon, lat, Marble::GeoDataCoordinates::Degree);
     if (!isVisible)
         return false;
 
     if (coordinates)
     {
-        *coordinates = WMWGeoCoordinate(lat, lon);
+        *coordinates = GeoCoordinates(lat, lon);
     }
 
     return true;
@@ -472,8 +471,8 @@ void BackendMarble::marbleCustomPaint(Marble::GeoPainter* painter)
 
     for (int i = 0; i<s->ungroupedModels.count(); ++i)
     {
-        WMWModelHelper* const modelHelper = s->ungroupedModels.at(i);
-        if (!modelHelper->modelFlags().testFlag(WMWModelHelper::FlagVisible))
+        ModelHelper* const modelHelper = s->ungroupedModels.at(i);
+        if (!modelHelper->modelFlags().testFlag(ModelHelper::FlagVisible))
             continue;
 
         QAbstractItemModel* const model = modelHelper->model();
@@ -483,7 +482,7 @@ void BackendMarble::marbleCustomPaint(Marble::GeoPainter* painter)
         {
             const QModelIndex currentIndex = model->index(row, 0);
 
-            WMWGeoCoordinate markerCoordinates;
+            GeoCoordinates markerCoordinates;
             if (!modelHelper->itemCoordinates(currentIndex, &markerCoordinates))
                 continue;
 
@@ -522,7 +521,7 @@ void BackendMarble::marbleCustomPaint(Marble::GeoPainter* painter)
         for (int i = 0; i<s->clusterList.size(); ++i)
         {
             const WMWCluster& cluster = s->clusterList.at(i);
-            WMWGeoCoordinate clusterCoordinates = cluster.coordinates;
+            GeoCoordinates clusterCoordinates = cluster.coordinates;
             int markerCountOverride = cluster.markerCount;
             WMWSelectionState selectionStateOverride = cluster.selectedState;
             if (d->haveMouseMovingObject&&(d->mouseMoveClusterIndex>=0))
@@ -561,7 +560,7 @@ void BackendMarble::marbleCustomPaint(Marble::GeoPainter* painter)
     if (d->haveMouseMovingObject&&(d->mouseMoveClusterIndex>=0))
     {
         const WMWCluster& cluster = s->clusterList.at(d->mouseMoveClusterIndex);
-        WMWGeoCoordinate clusterCoordinates = d->mouseMoveObjectCoordinates;
+        GeoCoordinates clusterCoordinates = d->mouseMoveObjectCoordinates;
         int markerCountOverride = (markersInMovingCluster>0)?markersInMovingCluster:cluster.markerCount;
         WMWSelectionState selectionStateOverride = cluster.selectedState;
 
@@ -690,19 +689,19 @@ QString BackendMarble::getProjection() const
 {
     if (d->marbleWidget)
     {
-        const Projection currentProjection = d->marbleWidget->projection();
+        const Marble::Projection currentProjection = d->marbleWidget->projection();
         switch (currentProjection)
         {
-        case Equirectangular:
+        case Marble::Equirectangular:
             d->cacheProjection = "equirectangular";
             break;
 
-        case Mercator:
+        case Marble::Mercator:
             d->cacheProjection = "mercator";
             break;
 
         default:
-        case Spherical:
+        case Marble::Spherical:
             d->cacheProjection = "spherical";
             break;
         }
@@ -719,15 +718,15 @@ void BackendMarble::setProjection(const QString& newProjection)
     {
         if (newProjection=="equirectangular")
         {
-            d->marbleWidget->setProjection(Equirectangular);
+            d->marbleWidget->setProjection(Marble::Equirectangular);
         }
         else if (newProjection=="mercator")
         {
-            d->marbleWidget->setProjection(Mercator);
+            d->marbleWidget->setProjection(Marble::Mercator);
         }
         else /*if (newProjection=="spherical")*/
         {
-            d->marbleWidget->setProjection(Spherical);
+            d->marbleWidget->setProjection(Marble::Spherical);
         }
     }
 
@@ -842,16 +841,16 @@ int BackendMarble::getMarkerModelLevel()
     return AbstractMarkerTiler::TileIndex::MaxLevel-1;
 }
 
-WMWGeoCoordinate::PairList BackendMarble::getNormalizedBounds()
+GeoCoordinates::PairList BackendMarble::getNormalizedBounds()
 {
-    const GeoDataLatLonAltBox marbleBounds = d->marbleWidget->map()->viewParams()->viewport()->viewLatLonAltBox();
+    const Marble::GeoDataLatLonAltBox marbleBounds = d->marbleWidget->map()->viewParams()->viewport()->viewLatLonAltBox();
 //     kDebug()<<marbleBounds.toString(GeoDataCoordinates::Degree);
 
-    const WMWGeoCoordinate::Pair boundsPair = WMWGeoCoordinate::makePair(
-            marbleBounds.south(GeoDataCoordinates::Degree),
-            marbleBounds.west(GeoDataCoordinates::Degree),
-            marbleBounds.north(GeoDataCoordinates::Degree),
-            marbleBounds.east(GeoDataCoordinates::Degree)
+    const GeoCoordinates::Pair boundsPair = GeoCoordinates::makePair(
+            marbleBounds.south(Marble::GeoDataCoordinates::Degree),
+            marbleBounds.west(Marble::GeoDataCoordinates::Degree),
+            marbleBounds.north(Marble::GeoDataCoordinates::Degree),
+            marbleBounds.east(Marble::GeoDataCoordinates::Degree)
         );
 
 //     kDebug()<<boundsPair.first<<boundsPair.second;
@@ -897,7 +896,7 @@ bool BackendMarble::eventFilter(QObject *object, QEvent *event)
             if(d->firstSelectionPoint.hasCoordinates() && !d->secondSelectionPoint.hasCoordinates())
             {
                 d->intermediateSelectionPoint.clear();
-                geoCoordinates(mouseEvent->pos(), &d->intermediateSelectionPoint);   
+                geoCoordinates(mouseEvent->pos(), &d->intermediateSelectionPoint);
                 d->secondSelectionScreenPoint = mouseEvent->pos();
 
                 kDebug()<<d->firstSelectionScreenPoint<<" "<<d->secondSelectionScreenPoint;
@@ -946,8 +945,8 @@ bool BackendMarble::eventFilter(QObject *object, QEvent *event)
             else
             {
                 d->intermediateSelectionPoint.clear();
-             
-                geoCoordinates(mouseEvent->pos(), &d->secondSelectionPoint);   
+
+                geoCoordinates(mouseEvent->pos(), &d->secondSelectionPoint);
                 d->secondSelectionScreenPoint = mouseEvent->pos(); 
 
                 qreal lonWest, latNorth, lonEast, latSouth;
@@ -1003,7 +1002,7 @@ bool BackendMarble::eventFilter(QObject *object, QEvent *event)
     //             for (int row = s->specialMarkersModel->rowCount()-1; row>=0; --row)
     //             {
     //                 const QModelIndex currentIndex = s->specialMarkersModel->index(row, 0);
-    //                 const WMWGeoCoordinate currentCoordinates = s->specialMarkersModel->data(currentIndex, s->specialMarkersCoordinatesRole).value<WMWGeoCoordinate>();
+    //                 const GeoCoordinates currentCoordinates = s->specialMarkersModel->data(currentIndex, s->specialMarkersCoordinatesRole).value<GeoCoordinates>();
     //
     //                 QPoint markerPoint;
     //                 if (!screenCoordinates(currentCoordinates, &markerPoint))
@@ -1036,7 +1035,7 @@ bool BackendMarble::eventFilter(QObject *object, QEvent *event)
                 for (int clusterIndex = s->clusterList.count()-1; clusterIndex>=0; --clusterIndex)
                 {
                     const WMWCluster& cluster = s->clusterList.at(clusterIndex);
-                    const WMWGeoCoordinate currentCoordinates = cluster.coordinates;
+                    const GeoCoordinates currentCoordinates = cluster.coordinates;
 
                     QPoint clusterPoint;
                     if (!screenCoordinates(currentCoordinates, &clusterPoint))
@@ -1093,7 +1092,7 @@ bool BackendMarble::eventFilter(QObject *object, QEvent *event)
                 if (findSnapPoint(newMarkerPoint, &snapPoint, 0, 0))
                     newMarkerPoint = snapPoint;
 
-                WMWGeoCoordinate newCoordinates;
+                GeoCoordinates newCoordinates;
                 if (geoCoordinates(newMarkerPoint, &newCoordinates))
                 {
                     d->mouseMoveObjectCoordinates = newCoordinates;
@@ -1134,7 +1133,7 @@ bool BackendMarble::eventFilter(QObject *object, QEvent *event)
             const QPoint dropMarkerPoint = mouseEvent->pos() - d->mouseMoveCenterOffset;
 
             QPair<int, QModelIndex> snapTargetIndex(-1, QModelIndex());
-            WMWGeoCoordinate newCoordinates;
+            GeoCoordinates newCoordinates;
             bool haveValidPoint = findSnapPoint(dropMarkerPoint, 0, &newCoordinates, &snapTargetIndex);
             if (!haveValidPoint)
             {
@@ -1241,10 +1240,10 @@ void BackendMarble::slotUngroupedModelChanged(const int /*index*/)
     d->marbleWidget->update();
 }
 
-bool BackendMarble::findSnapPoint(const QPoint& actualPoint, QPoint* const snapPoint, WMWGeoCoordinate* const snapCoordinates, QPair<int, QModelIndex>* const snapTargetIndex)
+bool BackendMarble::findSnapPoint(const QPoint& actualPoint, QPoint* const snapPoint, GeoCoordinates* const snapCoordinates, QPair<int, QModelIndex>* const snapTargetIndex)
 {
     QPoint bestSnapPoint;
-    WMWGeoCoordinate bestSnapCoordinates;
+    GeoCoordinates bestSnapCoordinates;
     int bestSnapDistanceSquared = -1;
     QModelIndex bestSnapIndex;
     int bestSnapUngroupedModel;
@@ -1252,10 +1251,10 @@ bool BackendMarble::findSnapPoint(const QPoint& actualPoint, QPoint* const snapP
     // now handle snapping: is there any object close by?
     for (int im = 0; im<s->ungroupedModels.count(); ++im)
     {
-        WMWModelHelper* const modelHelper = s->ungroupedModels.at(im);
+        ModelHelper* const modelHelper = s->ungroupedModels.at(im);
         // TODO: test for active snapping
-        if (   (!modelHelper->modelFlags().testFlag(WMWModelHelper::FlagVisible))
-            || (!modelHelper->modelFlags().testFlag(WMWModelHelper::FlagSnaps)) )
+        if (   (!modelHelper->modelFlags().testFlag(ModelHelper::FlagVisible))
+            || (!modelHelper->modelFlags().testFlag(ModelHelper::FlagSnaps)) )
             continue;
 
         // TODO: configurable snapping radius
@@ -1265,7 +1264,7 @@ bool BackendMarble::findSnapPoint(const QPoint& actualPoint, QPoint* const snapP
         for (int row=0; row<itemModel->rowCount(); ++row)
         {
             const QModelIndex currentIndex = itemModel->index(row, 0);
-            WMWGeoCoordinate currentCoordinates;
+            GeoCoordinates currentCoordinates;
             if (!modelHelper->itemCoordinates(currentIndex, &currentCoordinates))
                 continue;
 

@@ -26,6 +26,10 @@
 
 #include "itemmarkertiler.moc"
 
+// local includes
+
+#include "kmap_modelhelper.h"
+
 namespace KMap
 {
 
@@ -40,13 +44,13 @@ public:
     {
     }
 
-    WMWModelHelper*      modelHelper;
+    ModelHelper*      modelHelper;
     QItemSelectionModel* selectionModel;
     QAbstractItemModel*  markerModel;
     bool                 activeState;
 };
 
-ItemMarkerTiler::ItemMarkerTiler(WMWModelHelper* const modelHelper, QObject* const parent)
+ItemMarkerTiler::ItemMarkerTiler(ModelHelper* const modelHelper, QObject* const parent)
                : AbstractMarkerTiler(parent), d(new ItemMarkerTilerPrivate())
 {
     setMarkerModelHelper(modelHelper);
@@ -57,7 +61,7 @@ ItemMarkerTiler::~ItemMarkerTiler()
     delete d;
 }
 
-void ItemMarkerTiler::setMarkerModelHelper(WMWModelHelper* const modelHelper)
+void ItemMarkerTiler::setMarkerModelHelper(ModelHelper* const modelHelper)
 {
     d->modelHelper    = modelHelper;
     d->markerModel    = modelHelper->model();
@@ -139,7 +143,7 @@ void ItemMarkerTiler::slotSelectionChanged(const QItemSelection& selected, const
         for (int row = selectionRange.top(); row<=selectionRange.bottom(); ++row)
         {
             // get the coordinates of the item
-            WMWGeoCoordinate coordinates;
+            GeoCoordinates coordinates;
             if (!d->modelHelper->itemCoordinates(d->markerModel->index(row, 0, selectionRange.parent()), &coordinates))
                 continue;
 
@@ -166,7 +170,7 @@ void ItemMarkerTiler::slotSelectionChanged(const QItemSelection& selected, const
         for (int row = selectionRange.top(); row<=selectionRange.bottom(); ++row)
         {
             // get the coordinates of the item
-            WMWGeoCoordinate coordinates;
+            GeoCoordinates coordinates;
             if (!d->modelHelper->itemCoordinates(d->markerModel->index(row, 0, selectionRange.parent()), &coordinates))
                 continue;
 
@@ -277,7 +281,7 @@ void ItemMarkerTiler::removeMarkerIndexFromGrid(const QModelIndex& markerIndex, 
     }
 
     // remove the marker from the grid:
-    WMWGeoCoordinate markerCoordinates;
+    GeoCoordinates markerCoordinates;
     if (!d->modelHelper->itemCoordinates(markerIndex, &markerCoordinates))
         return;
 
@@ -410,7 +414,7 @@ AbstractMarkerTiler::Tile* ItemMarkerTiler::getTile(const AbstractMarkerTiler::T
                     KMAP_ASSERT(currentMarkerIndex.isValid());
 
                     // get the tile index for this marker:
-                    WMWGeoCoordinate currentMarkerCoordinates;
+                    GeoCoordinates currentMarkerCoordinates;
                     if (!d->modelHelper->itemCoordinates(currentMarkerIndex, &currentMarkerCoordinates))
                         continue;
 
@@ -480,7 +484,7 @@ void ItemMarkerTiler::addMarkerIndexToGrid(const QPersistentModelIndex& markerIn
         regenerateTiles();
         return;
     }
-    WMWGeoCoordinate markerCoordinates;
+    GeoCoordinates markerCoordinates;
     if (!d->modelHelper->itemCoordinates(markerIndex, &markerCoordinates))
         return;
 
@@ -531,7 +535,7 @@ void ItemMarkerTiler::addMarkerIndexToGrid(const QPersistentModelIndex& markerIn
     }
 }
 
-void ItemMarkerTiler::prepareTiles(const WMWGeoCoordinate& /*upperLeft*/, const WMWGeoCoordinate&, int /*level*/)
+void ItemMarkerTiler::prepareTiles(const GeoCoordinates& /*upperLeft*/, const GeoCoordinates&, int /*level*/)
 {
 }
 
@@ -588,7 +592,7 @@ void ItemMarkerTiler::onIndicesClicked(const TileIndex::List& tileIndicesList, c
     }
 }
 
-void ItemMarkerTiler::onIndicesMoved(const TileIndex::List& tileIndicesList, const WMWGeoCoordinate& targetCoordinates, const QPersistentModelIndex& targetSnapIndex)
+void ItemMarkerTiler::onIndicesMoved(const TileIndex::List& tileIndicesList, const GeoCoordinates& targetCoordinates, const QPersistentModelIndex& targetSnapIndex)
 {
     QList<QPersistentModelIndex> movedMarkers;
     if (tileIndicesList.isEmpty())

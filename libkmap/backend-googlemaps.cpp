@@ -46,6 +46,7 @@
 #include "html_widget.h"
 #include "kmapwidget.h"
 #include "abstractmarkertiler.h"
+#include "kmap_modelhelper.h"
 
 namespace KMap
 {
@@ -91,8 +92,8 @@ public:
     int                                       cacheZoom;
     int                                       cacheMaxZoom;
     int                                       cacheMinZoom;
-    WMWGeoCoordinate                          cacheCenter;
-    QPair<WMWGeoCoordinate, WMWGeoCoordinate> cacheBounds;
+    GeoCoordinates                          cacheCenter;
+    QPair<GeoCoordinates, GeoCoordinates> cacheBounds;
     bool                                      activeState;
 
 };
@@ -195,12 +196,12 @@ QWidget* BackendGoogleMaps::mapWidget() const
     return d->htmlWidgetWrapper.data();
 }
 
-WMWGeoCoordinate BackendGoogleMaps::getCenter() const
+GeoCoordinates BackendGoogleMaps::getCenter() const
 {
     return d->cacheCenter;
 }
 
-void BackendGoogleMaps::setCenter(const WMWGeoCoordinate& coordinate)
+void BackendGoogleMaps::setCenter(const GeoCoordinates& coordinate)
 {
     d->cacheCenter = coordinate;
 
@@ -333,9 +334,9 @@ void BackendGoogleMaps::slotUngroupedModelChanged(const int mindex)
         return;
 
     d->htmlWidget->runScript(QString("wmwClearMarkers(%1);").arg(mindex));
-    WMWModelHelper* const modelHelper = s->ungroupedModels.at(mindex);
+    ModelHelper* const modelHelper = s->ungroupedModels.at(mindex);
 
-    if (!modelHelper->modelFlags().testFlag(WMWModelHelper::FlagVisible))
+    if (!modelHelper->modelFlags().testFlag(ModelHelper::FlagVisible))
             return;
 
     QAbstractItemModel* const model = modelHelper->model();
@@ -343,13 +344,13 @@ void BackendGoogleMaps::slotUngroupedModelChanged(const int mindex)
     for (int row = 0; row<model->rowCount(); ++row)
     {
         const QModelIndex currentIndex = model->index(row, 0);
-        const WMWModelHelper::Flags itemFlags = modelHelper->itemFlags(currentIndex);
+        const ModelHelper::Flags itemFlags = modelHelper->itemFlags(currentIndex);
 
         // TODO: this is untested! We need to make sure the indices stay correct inside the JavaScript part!
-        if (!itemFlags.testFlag(WMWModelHelper::FlagVisible))
+        if (!itemFlags.testFlag(ModelHelper::FlagVisible))
             continue;
 
-        WMWGeoCoordinate currentCoordinates;
+        GeoCoordinates currentCoordinates;
         if (!modelHelper->itemCoordinates(currentIndex, &currentCoordinates))
             continue;
 
@@ -359,8 +360,8 @@ void BackendGoogleMaps::slotUngroupedModelChanged(const int mindex)
                 .arg(row)
                 .arg(currentCoordinates.latString())
                 .arg(currentCoordinates.lonString())
-                .arg(itemFlags.testFlag(WMWModelHelper::FlagMovable)?"true":"false")
-                .arg(itemFlags.testFlag(WMWModelHelper::FlagSnaps)?"true":"false")
+                .arg(itemFlags.testFlag(ModelHelper::FlagMovable)?"true":"false")
+                .arg(itemFlags.testFlag(ModelHelper::FlagSnaps)?"true":"false")
             );
 
         QPoint markerCenterPoint;
@@ -439,7 +440,7 @@ void BackendGoogleMaps::slotHTMLEvents(const QStringList& events)
                 continue;
 
             // re-read the marker position:
-            WMWGeoCoordinate clusterCoordinates;
+            GeoCoordinates clusterCoordinates;
             const bool isValid = d->htmlWidget->runScript2Coordinates(
                     QString("wmwGetClusterPosition(%1);").arg(clusterIndex),
                     &clusterCoordinates
@@ -483,7 +484,7 @@ void BackendGoogleMaps::slotHTMLEvents(const QStringList& events)
                 continue;
 
             // TODO: emit signal here or later?
-            WMWModelHelper* const modelHelper = s->ungroupedModels.at(snapModelId);
+            ModelHelper* const modelHelper = s->ungroupedModels.at(snapModelId);
             QAbstractItemModel* const model = modelHelper->model();
             QPair<int, QModelIndex> snapTargetIndex(snapModelId, model->index(snapMarkerId, 0));
             emit(signalClustersMoved(QIntList()<<clusterIndex, snapTargetIndex));
@@ -521,7 +522,7 @@ void BackendGoogleMaps::slotHTMLEvents(const QStringList& events)
 //                 continue;
 //
 //             // re-read the marker position:
-//             WMWGeoCoordinate markerCoordinates;
+//             GeoCoordinates markerCoordinates;
 //             const bool isValid = d->htmlWidget->runScript2Coordinates(
 //                     QString("wmwGetMarkerPosition(%1);").arg(markerRow),
 //                     &markerCoordinates
@@ -638,7 +639,7 @@ void BackendGoogleMaps::updateClusters()
     kDebug()<<"end updateclusters";
 }
 
-bool BackendGoogleMaps::screenCoordinates(const WMWGeoCoordinate& coordinates, QPoint* const point)
+bool BackendGoogleMaps::screenCoordinates(const GeoCoordinates& coordinates, QPoint* const point)
 {
     if (!d->isReady)
         return false;
@@ -656,7 +657,7 @@ bool BackendGoogleMaps::screenCoordinates(const WMWGeoCoordinate& coordinates, Q
     return isValid;
 }
 
-bool BackendGoogleMaps::geoCoordinates(const QPoint& point, WMWGeoCoordinate* const coordinates) const
+bool BackendGoogleMaps::geoCoordinates(const QPoint& point, GeoCoordinates* const coordinates) const
 {
     if (!d->isReady)
         return false;
@@ -806,7 +807,7 @@ int BackendGoogleMaps::getMarkerModelLevel()
     return tileLevel;
 }
 
-WMWGeoCoordinate::PairList BackendGoogleMaps::getNormalizedBounds()
+GeoCoordinates::PairList BackendGoogleMaps::getNormalizedBounds()
 {
     return WMWHelperNormalizeBounds(d->cacheBounds);
 }

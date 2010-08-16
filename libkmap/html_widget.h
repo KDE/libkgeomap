@@ -50,7 +50,7 @@ public:
 
     void loadInitialHTML(const QString& initialHTML);
     QVariant runScript(const QString& scriptCode);
-    bool runScript2Coordinates(const QString& scriptCode, WMWGeoCoordinate* const coordinates);
+    bool runScript2Coordinates(const QString& scriptCode, GeoCoordinates* const coordinates);
     void mouseModeChanged(const MouseModes mouseMode);
     void setSelectionRectangle(const QList<qreal>& searchCoordinates);
     QList<qreal> getSelectionRectangle();

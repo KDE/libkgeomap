@@ -24,7 +24,7 @@
 
 #include "myimageitem.h"
 
-MyImageItem::MyImageItem(const KUrl& url, const KMap::WMWGeoCoordinate& itemCoordinates)
+MyImageItem::MyImageItem(const KUrl& url, const KMap::GeoCoordinates& itemCoordinates)
            : QTreeWidgetItem(), coordinates(itemCoordinates), imageUrl(url)
 {
 }
@@ -61,9 +61,9 @@ void MyImageItem::setData(int column, int role, const QVariant& value)
 {
     if (role==RoleCoordinates)
     {
-        if (value.canConvert<KMap::WMWGeoCoordinate>())
+        if (value.canConvert<KMap::GeoCoordinates>())
         {
-            coordinates = value.value<KMap::WMWGeoCoordinate>();
+            coordinates = value.value<KMap::GeoCoordinates>();
             emitDataChanged();
         }
         return;

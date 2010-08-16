@@ -3,8 +3,8 @@
  * This file is a part of digiKam project
  * <a href="http://www.digikam.org">http://www.digikam.org</a>
  *
- * @date   2009-12-01
- * @brief  Primitive datatypes for KMap
+ * @date   2010-08-16
+ * @brief  Helper class to access models
  *
  * @author Copyright (C) 2009-2010 by Michael G. Hansen
  *         <a href="mailto:mike at mghansen dot de">mike at mghansen dot de</a>
@@ -24,16 +24,16 @@
  *
  * ============================================================ */
 
-#include "kmap_primitives.moc"
+#include "kmap_modelhelper.moc"
 
 namespace KMap
 {
 
 /**
- * @class WMWModelHelper
+ * @class ModelHelper
  * @brief Helper class to access data in models.
  *
- * @c WMWModelHelper is used to access data held in models, which is not suitable for transfer using the
+ * @c ModelHelper is used to access data held in models, which is not suitable for transfer using the
  * the Qt-style API, like coordinates or custom sized thumbnails.
  *
  * The basic functions which have to be implemented are:
@@ -53,16 +53,16 @@ namespace KMap
  * @li pixmapFromRepresentativeIndex(): Find a thumbnail for an item.
  */
 
-WMWModelHelper::WMWModelHelper(QObject* const parent)
+ModelHelper::ModelHelper(QObject* const parent)
               : QObject(parent)
 {
 }
 
-WMWModelHelper::~WMWModelHelper()
+ModelHelper::~ModelHelper()
 {
 }
 
-void WMWModelHelper::snapItemsTo(const QModelIndex& targetIndex, const QList<QPersistentModelIndex>& snappedIndices)
+void ModelHelper::snapItemsTo(const QModelIndex& targetIndex, const QList<QPersistentModelIndex>& snappedIndices)
 {
     QList<QModelIndex> result;
     for (int i=0; i<snappedIndices.count(); ++i)
@@ -72,7 +72,7 @@ void WMWModelHelper::snapItemsTo(const QModelIndex& targetIndex, const QList<QPe
     snapItemsTo(targetIndex, result);
 }
 
-QPersistentModelIndex WMWModelHelper::bestRepresentativeIndexFromList(const QList<QPersistentModelIndex>& list, 
+QPersistentModelIndex ModelHelper::bestRepresentativeIndexFromList(const QList<QPersistentModelIndex>& list,
                                                                       const int /*sortKey*/)
 {
     // this is only a stub to provide some default implementation
@@ -82,36 +82,36 @@ QPersistentModelIndex WMWModelHelper::bestRepresentativeIndexFromList(const QLis
     return list.first();
 }
 
-QPixmap WMWModelHelper::itemIcon(const QModelIndex& /*index*/, QPoint* const /*offset*/) const
+QPixmap ModelHelper::itemIcon(const QModelIndex& /*index*/, QPoint* const /*offset*/) const
 {
     return QPixmap();
 }
 
-WMWModelHelper::Flags WMWModelHelper::modelFlags() const
+ModelHelper::Flags ModelHelper::modelFlags() const
 {
     return Flags();
 }
 
-WMWModelHelper::Flags WMWModelHelper::itemFlags(const QModelIndex& /*index*/) const
+ModelHelper::Flags ModelHelper::itemFlags(const QModelIndex& /*index*/) const
 {
     return Flags();
 }
 
-void WMWModelHelper::snapItemsTo(const QModelIndex& /*targetIndex*/, const QList<QModelIndex>& /*snappedIndices*/)
+void ModelHelper::snapItemsTo(const QModelIndex& /*targetIndex*/, const QList<QModelIndex>& /*snappedIndices*/)
 {
 }
 
-QPixmap WMWModelHelper::pixmapFromRepresentativeIndex(const QPersistentModelIndex& /*index*/, const QSize& /*size*/)
+QPixmap ModelHelper::pixmapFromRepresentativeIndex(const QPersistentModelIndex& /*index*/, const QSize& /*size*/)
 {
     return QPixmap();
 }
 
-void WMWModelHelper::onIndicesClicked(const QList<QPersistentModelIndex>& clickedIndices)
+void ModelHelper::onIndicesClicked(const QList<QPersistentModelIndex>& clickedIndices)
 {
     Q_UNUSED(clickedIndices);
 }
 
-void WMWModelHelper::onIndicesMoved(const QList<QPersistentModelIndex>& movedIndices, const WMWGeoCoordinate& targetCoordinates, const QPersistentModelIndex& targetSnapIndex)
+void ModelHelper::onIndicesMoved(const QList<QPersistentModelIndex>& movedIndices, const GeoCoordinates& targetCoordinates, const QPersistentModelIndex& targetSnapIndex)
 {
     Q_UNUSED(movedIndices);
     Q_UNUSED(targetCoordinates);

@@ -52,8 +52,8 @@ public:
     virtual QString backendHumanName() const;
     virtual QWidget* mapWidget() const;
 
-    virtual WMWGeoCoordinate getCenter() const;
-    virtual void setCenter(const WMWGeoCoordinate& coordinate);
+    virtual GeoCoordinates getCenter() const;
+    virtual void setCenter(const GeoCoordinates& coordinate);
 
     virtual bool isReady() const;
 
@@ -68,15 +68,15 @@ public:
     virtual void updateMarkers();
     virtual void updateClusters();
 
-    virtual bool screenCoordinates(const WMWGeoCoordinate& coordinates, QPoint* const point);
-    virtual bool geoCoordinates(const QPoint& point, WMWGeoCoordinate* const coordinates) const;
+    virtual bool screenCoordinates(const GeoCoordinates& coordinates, QPoint* const point);
+    virtual bool geoCoordinates(const QPoint& point, GeoCoordinates* const coordinates) const;
     virtual QSize mapSize() const;
 
     virtual void setZoom(const QString& newZoom);
     virtual QString getZoom() const;
 
     virtual int getMarkerModelLevel();
-    virtual WMWGeoCoordinate::PairList getNormalizedBounds();
+    virtual GeoCoordinates::PairList getNormalizedBounds();
 
 //     virtual void updateDragDropMarker(const QPoint& pos, const WMWDragData* const dragData);
 //     virtual void updateDragDropMarkerPosition(const QPoint& pos);

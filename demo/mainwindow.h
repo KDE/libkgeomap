@@ -37,10 +37,11 @@
 // local includes
 
 #include "kmap_primitives.h"
+#include "kmap_modelhelper.h"
 
 class KCmdLineArgs;
 
-class MarkerModelHelper : public KMap::WMWModelHelper
+class MarkerModelHelper : public KMap::ModelHelper
 {
 Q_OBJECT
 
@@ -50,8 +51,8 @@ public:
 
     virtual QAbstractItemModel* model() const;
     virtual QItemSelectionModel* selectionModel() const;
-    virtual bool itemCoordinates(const QModelIndex& index, KMap::WMWGeoCoordinate* const coordinates) const;
-    virtual void onIndicesMoved(const QList<QPersistentModelIndex>& movedIndices, const KMap::WMWGeoCoordinate& targetCoordinates, const QPersistentModelIndex& targetSnapIndex);
+    virtual bool itemCoordinates(const QModelIndex& index, KMap::GeoCoordinates* const coordinates) const;
+    virtual void onIndicesMoved(const QList<QPersistentModelIndex>& movedIndices, const KMap::GeoCoordinates& targetCoordinates, const QPersistentModelIndex& targetSnapIndex);
 
 private:
     QAbstractItemModel* const m_itemModel;

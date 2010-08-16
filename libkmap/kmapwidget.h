@@ -51,6 +51,7 @@ namespace KMap
 class AbstractMarkerTiler;
 class DragDropHandler;
 class WMWSharedData;
+class ModelHelper;
 
 class KMAP_EXPORT KMapWidget : public QWidget
 {
@@ -64,8 +65,8 @@ public:
     QStringList availableBackends() const;
     bool setBackend(const QString& backendName);
 
-    WMWGeoCoordinate getCenter() const;
-    void setCenter(const WMWGeoCoordinate& coordinate);
+    GeoCoordinates getCenter() const;
+    void setCenter(const GeoCoordinates& coordinate);
 
     void setZoom(const QString& newZoom);
     QString getZoom();
@@ -94,7 +95,7 @@ public:
     QString convertZoomToBackendZoom(const QString& someZoom, const QString& targetBackend) const;
     bool queryAltitudes(const WMWAltitudeLookup::List& queryItems, const QString& backendName = "");
 
-    void addUngroupedModel(WMWModelHelper* const modelHelper);
+    void addUngroupedModel(ModelHelper* const modelHelper);
     void setGroupedModel(AbstractMarkerTiler* const markerModel);
 
     void setEditModeAvailable(const bool state);

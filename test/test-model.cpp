@@ -33,7 +33,7 @@ using namespace KMap;
 const int CoordinatesRole = Qt::UserRole + 0;
 
 MarkerModelHelper::MarkerModelHelper(QAbstractItemModel* const itemModel, QItemSelectionModel* const itemSelectionModel)
- : WMWModelHelper(itemModel),
+ : ModelHelper(itemModel),
    m_itemModel(itemModel),
    m_itemSelectionModel(itemSelectionModel)
 {
@@ -53,22 +53,22 @@ QItemSelectionModel* MarkerModelHelper::selectionModel() const
     return m_itemSelectionModel;
 }
 
-bool MarkerModelHelper::itemCoordinates(const QModelIndex& index, WMWGeoCoordinate* const coordinates) const
+bool MarkerModelHelper::itemCoordinates(const QModelIndex& index, GeoCoordinates* const coordinates) const
 {
-    if (!index.data(CoordinatesRole).canConvert<WMWGeoCoordinate>())
+    if (!index.data(CoordinatesRole).canConvert<GeoCoordinates>())
         return false;
 
     if (coordinates)
-        *coordinates = index.data(CoordinatesRole).value<WMWGeoCoordinate>();
+        *coordinates = index.data(CoordinatesRole).value<GeoCoordinates>();
 
     return true;
 }
 
-const WMWGeoCoordinate coord_1_2 = WMWGeoCoordinate::fromGeoUrl("geo:1,2");
-const WMWGeoCoordinate coord_50_60 = WMWGeoCoordinate::fromGeoUrl("geo:50,60");
-const WMWGeoCoordinate coord_m50_m60 = WMWGeoCoordinate::fromGeoUrl("geo:-50,-60");
+const GeoCoordinates coord_1_2 = GeoCoordinates::fromGeoUrl("geo:1,2");
+const GeoCoordinates coord_50_60 = GeoCoordinates::fromGeoUrl("geo:50,60");
+const GeoCoordinates coord_m50_m60 = GeoCoordinates::fromGeoUrl("geo:-50,-60");
 
-QStandardItem* MakeItemAt(const WMWGeoCoordinate& coordinates)
+QStandardItem* MakeItemAt(const GeoCoordinates& coordinates)
 {
     QStandardItem* const newItem = new QStandardItem(coordinates.geoUrl());
     newItem->setData(QVariant::fromValue(coordinates), CoordinatesRole);
@@ -262,7 +262,7 @@ void TestModel::testMoveMarkers2()
     itemModel->setData(markerIndex1, QVariant::fromValue(coord_50_60), CoordinatesRole);
 
     // make sure the item model was also updated:
-    QVERIFY(item1->data(CoordinatesRole).value<WMWGeoCoordinate>() == coord_50_60);
+    QVERIFY(item1->data(CoordinatesRole).value<GeoCoordinates>() == coord_50_60);
 
     for (int l = 0; l<=fillLevel; ++l)
     {
@@ -331,55 +331,55 @@ void TestModel::testIteratorPartial1()
     {
         {
             // iterate over a part which should be empty:
-            WMWGeoCoordinate::PairList boundsList;
-            boundsList << WMWGeoCoordinate::makePair(-10.0, -10.0, -5.0, -5.0);
+            GeoCoordinates::PairList boundsList;
+            boundsList << GeoCoordinates::makePair(-10.0, -10.0, -5.0, -5.0);
             ItemMarkerTiler::NonEmptyIterator it(&mm, l, boundsList);
             QVERIFY( CountMarkersInIterator(&it) == 0 );
         }
 
         {
             // iterate over a part which should contain one marker:
-            WMWGeoCoordinate::PairList boundsList;
-            boundsList << WMWGeoCoordinate::makePair(-10.0, -10.0, 5.0, 5.0);
+            GeoCoordinates::PairList boundsList;
+            boundsList << GeoCoordinates::makePair(-10.0, -10.0, 5.0, 5.0);
             ItemMarkerTiler::NonEmptyIterator it(&mm, l, boundsList);
             QVERIFY( CountMarkersInIterator(&it) == 1 );
 
             // iterate over a part which should contain one marker:
-            WMWGeoCoordinate::PairList boundsList1;
-            boundsList1 << WMWGeoCoordinate::makePair(1.0, 2.0, 5.0, 5.0);
+            GeoCoordinates::PairList boundsList1;
+            boundsList1 << GeoCoordinates::makePair(1.0, 2.0, 5.0, 5.0);
             ItemMarkerTiler::NonEmptyIterator it1(&mm, l, boundsList1);
             QVERIFY( CountMarkersInIterator(&it1) == 1 );
 
-            WMWGeoCoordinate::PairList boundsList2;
-            boundsList2 << WMWGeoCoordinate::makePair(-1.0, -2.0, 1.0, 2.0);
+            GeoCoordinates::PairList boundsList2;
+            boundsList2 << GeoCoordinates::makePair(-1.0, -2.0, 1.0, 2.0);
             ItemMarkerTiler::NonEmptyIterator it2(&mm, l, boundsList2);
             QVERIFY( CountMarkersInIterator(&it2) == 1 );
         }
 
         {
             // iterate over a part which should contain two markers:
-            WMWGeoCoordinate::PairList boundsList;
-            boundsList << WMWGeoCoordinate::makePair(0.0, 0.0, 60.0, 60.0);
+            GeoCoordinates::PairList boundsList;
+            boundsList << GeoCoordinates::makePair(0.0, 0.0, 60.0, 60.0);
             ItemMarkerTiler::NonEmptyIterator it(&mm, l, boundsList);
             QVERIFY( CountMarkersInIterator(&it) == 2 );
         }
 
         {
             // iterate over two parts which should contain two markers:
-            WMWGeoCoordinate::PairList boundsList;
-            boundsList << WMWGeoCoordinate::makePair(0.0, 0.0, 5.0, 5.0);
-            boundsList << WMWGeoCoordinate::makePair(49.0, 59.0, 51.0, 61.0);
+            GeoCoordinates::PairList boundsList;
+            boundsList << GeoCoordinates::makePair(0.0, 0.0, 5.0, 5.0);
+            boundsList << GeoCoordinates::makePair(49.0, 59.0, 51.0, 61.0);
             ItemMarkerTiler::NonEmptyIterator it(&mm, l, boundsList);
             QVERIFY( CountMarkersInIterator(&it) == 2 );
         }
     }
 
-    const WMWGeoCoordinate coord_2_2 = WMWGeoCoordinate(2.0, 2.0);
+    const GeoCoordinates coord_2_2 = GeoCoordinates(2.0, 2.0);
     itemModel->appendRow(MakeItemAt(coord_2_2));
     {
         // at level 1, the iterator should find only one marker:
-        WMWGeoCoordinate::PairList boundsList;
-        boundsList << WMWGeoCoordinate::makePair(0.0, 0.0, 1.0, 2.0);
+        GeoCoordinates::PairList boundsList;
+        boundsList << GeoCoordinates::makePair(0.0, 0.0, 1.0, 2.0);
         ItemMarkerTiler::NonEmptyIterator it(&mm, 1, boundsList);
         QVERIFY( CountMarkersInIterator(&it) == 1 );
     }
@@ -391,14 +391,14 @@ void TestModel::testIteratorPartial2()
     ItemMarkerTiler mm(new MarkerModelHelper(itemModel.data(), 0));
     const int maxLevel = ItemMarkerTiler::TileIndex::MaxLevel;
 
-    WMWGeoCoordinate::PairList boundsList;
-    boundsList << WMWGeoCoordinate::makePair(0.55, 1.55, 0.56, 1.56);
+    GeoCoordinates::PairList boundsList;
+    boundsList << GeoCoordinates::makePair(0.55, 1.55, 0.56, 1.56);
 
-    const WMWGeoCoordinate coordInBounds1 = WMWGeoCoordinate(0.556, 1.556);
-    const WMWGeoCoordinate coordOutOfBounds1 = WMWGeoCoordinate(0.5, 1.5);
-    const WMWGeoCoordinate coordOutOfBounds2 = WMWGeoCoordinate(0.5, 1.6);
-    const WMWGeoCoordinate coordOutOfBounds3 = WMWGeoCoordinate(0.6, 1.5);
-    const WMWGeoCoordinate coordOutOfBounds4 = WMWGeoCoordinate(0.6, 1.6);
+    const GeoCoordinates coordInBounds1 = GeoCoordinates(0.556, 1.556);
+    const GeoCoordinates coordOutOfBounds1 = GeoCoordinates(0.5, 1.5);
+    const GeoCoordinates coordOutOfBounds2 = GeoCoordinates(0.5, 1.6);
+    const GeoCoordinates coordOutOfBounds3 = GeoCoordinates(0.6, 1.5);
+    const GeoCoordinates coordOutOfBounds4 = GeoCoordinates(0.6, 1.6);
     itemModel->appendRow(MakeItemAt(coordInBounds1));
     itemModel->appendRow(MakeItemAt(coordOutOfBounds1));
     itemModel->appendRow(MakeItemAt(coordOutOfBounds2));
@@ -627,7 +627,7 @@ void TestModel::benchmarkIteratorWholeWorld()
         {
             for (qreal y=-50; y<50; y+=1.0)
             {
-                itemModel->appendRow(MakeItemAt(KMap::WMWGeoCoordinate(x,y)));
+                itemModel->appendRow(MakeItemAt(KMap::GeoCoordinates(x,y)));
             }
         }
 

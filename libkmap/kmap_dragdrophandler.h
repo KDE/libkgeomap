@@ -51,7 +51,7 @@ public:
     virtual ~DragDropHandler();
 
     virtual Qt::DropAction accepts(const QDropEvent* e) = 0;
-    virtual bool dropEvent(const QDropEvent* e, const WMWGeoCoordinate& dropCoordinates) = 0;
+    virtual bool dropEvent(const QDropEvent* e, const GeoCoordinates& dropCoordinates) = 0;
     virtual QMimeData* createMimeData(const QList<QPersistentModelIndex>& modelIndices) = 0;
 };
 

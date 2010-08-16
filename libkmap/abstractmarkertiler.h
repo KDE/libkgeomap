@@ -30,10 +30,11 @@
 // Qt includes
 
 #include <QBitArray>
-#include <QItemSelectionModel>
-#include <QObject>
-#include <QMetaType>
 #include <QDateTime>
+#include <QItemSelectionModel>
+#include <QMetaType>
+#include <QObject>
+#include <QPoint>
 
 // local includes
 
@@ -141,11 +142,11 @@ public:
             return result;
         }
 
-        static TileIndex fromCoordinates(const KMap::WMWGeoCoordinate& coordinate, const int getLevel);
+        static TileIndex fromCoordinates(const KMap::GeoCoordinates& coordinate, const int getLevel);
 
-        WMWGeoCoordinate toCoordinates() const;
+        GeoCoordinates toCoordinates() const;
 
-        WMWGeoCoordinate toCoordinates(const CornerPosition ofCorner) const;
+        GeoCoordinates toCoordinates(const CornerPosition ofCorner) const;
 
         inline static TileIndex fromIntList(const QIntList& intList)
         {
@@ -314,7 +315,7 @@ public:
 
             int                 id;
             KUrl                url;
-            WMWGeoCoordinate    coordinate;
+            GeoCoordinates    coordinate;
             int                 rating;
             QDateTime           creationDate;
         };
@@ -332,7 +333,7 @@ public:
     ~AbstractMarkerTiler();
 
     // these have to be implemented
-    virtual void prepareTiles(const WMWGeoCoordinate& upperLeft, const WMWGeoCoordinate& lowerRight, int level) = 0;
+    virtual void prepareTiles(const GeoCoordinates& upperLeft, const GeoCoordinates& lowerRight, int level) = 0;
     virtual void regenerateTiles() = 0;
     virtual Tile* getTile(const TileIndex& tileIndex, const bool stopIfEmpty = false) = 0;
     virtual int getTileMarkerCount(const TileIndex& tileIndex) = 0;
@@ -347,7 +348,7 @@ public:
 
     // these can be implemented if you want to react to actions in kmap
     virtual void onIndicesClicked(const TileIndex::List& tileIndicesList, const WMWSelectionState& groupSelectionState, MouseMode currentMouseMode);
-    virtual void onIndicesMoved(const TileIndex::List& tileIndicesList, const WMWGeoCoordinate& targetCoordinates, const QPersistentModelIndex& targetSnapIndex);
+    virtual void onIndicesMoved(const TileIndex::List& tileIndicesList, const GeoCoordinates& targetCoordinates, const QPersistentModelIndex& targetSnapIndex);
 
     virtual void setActive(const bool state) = 0;
     Tile* rootTile();
@@ -365,7 +366,7 @@ public:
 
         NonEmptyIterator(AbstractMarkerTiler* const model, const int level);
         NonEmptyIterator(AbstractMarkerTiler* const model, const int level, const TileIndex& startIndex, const TileIndex& endIndex);
-        NonEmptyIterator(AbstractMarkerTiler* const model, const int level, const WMWGeoCoordinate::PairList& normalizedMapBounds);
+        NonEmptyIterator(AbstractMarkerTiler* const model, const int level, const GeoCoordinates::PairList& normalizedMapBounds);
         ~NonEmptyIterator();
 
         bool atEnd() const;

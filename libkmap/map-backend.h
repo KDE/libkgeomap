@@ -29,6 +29,7 @@
 
 // Qt includes
 
+#include <QModelIndex>
 #include <QWidget>
 
 // local includes
@@ -41,6 +42,7 @@
 #include <marble/GeoDataLatLonBox.h>
 
 class QMenu;
+class QPersistentModelIndex;
 class KConfigGroup;
 
 namespace KMap
@@ -74,8 +76,8 @@ public:
     virtual QString backendHumanName() const = 0;
     virtual QWidget* mapWidget() const = 0;
 
-    virtual WMWGeoCoordinate getCenter() const = 0;
-    virtual void setCenter(const WMWGeoCoordinate& coordinate) = 0;
+    virtual GeoCoordinates getCenter() const = 0;
+    virtual void setCenter(const GeoCoordinates& coordinate) = 0;
 
     virtual bool isReady() const = 0;
 
@@ -90,15 +92,15 @@ public:
     virtual void updateMarkers() = 0;
     virtual void updateClusters() = 0;
 
-    virtual bool screenCoordinates(const WMWGeoCoordinate& coordinates, QPoint* const point) = 0;
-    virtual bool geoCoordinates(const QPoint& point, WMWGeoCoordinate* const coordinates) const = 0;
+    virtual bool screenCoordinates(const GeoCoordinates& coordinates, QPoint* const point) = 0;
+    virtual bool geoCoordinates(const QPoint& point, GeoCoordinates* const coordinates) const = 0;
     virtual QSize mapSize() const = 0;
 
     virtual void setZoom(const QString& newZoom) = 0;
     virtual QString getZoom() const = 0;
 
     virtual int getMarkerModelLevel() = 0;
-    virtual WMWGeoCoordinate::PairList getNormalizedBounds() = 0;
+    virtual GeoCoordinates::PairList getNormalizedBounds() = 0;
 
 //     virtual void updateDragDropMarker(const QPoint& pos, const WMWDragData* const dragData) = 0;
 //     virtual void updateDragDropMarkerPosition(const QPoint& pos) = 0;

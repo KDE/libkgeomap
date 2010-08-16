@@ -42,7 +42,7 @@ SET(widget_sources
     kmapwidget.cpp
     kmap_common.cpp
     kmap_dragdrophandler.cpp
-    kmap_primitives.cpp
+    kmap_modelhelper.cpp
     map-backend.cpp
     html_widget.cpp
     abstractmarkertiler.cpp
@@ -94,6 +94,8 @@ INSTALL(FILES libkmap_export.h
               kmapwidget.h
               kmap_dragdrophandler.h
               kmap_primitives.h
+              kmap_modelhelper.h
+              kmap_geocoordinates.h
               altitude-backend.h
               html_widget.h
               abstractmarkertiler.h

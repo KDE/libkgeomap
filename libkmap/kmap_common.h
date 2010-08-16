@@ -27,6 +27,17 @@
 #ifndef KMAP_COMMON_H
 #define KMAP_COMMON_H
 
+// Qt includes
+
+#include <QPixmap>
+#include <QPoint>
+#include <QSharedData>
+#include <QSize>
+
+// KDE includes
+
+#include <kstandarddirs.h>
+
 // libkmap includes
 
 #include "kmap_primitives.h"
@@ -35,6 +46,47 @@ namespace KMap
 {
 
 class AbstractMarkerTiler;
+class KMapWidget;
+class ModelHelper;
+
+class WMWCluster
+{
+public:
+
+    typedef QList<WMWCluster> List;
+
+    WMWCluster()
+        : tileIndicesList(),
+        markerCount(0),
+        markerSelectedCount(0),
+        coordinates(),
+        pixelPos(),
+        selectedState(WMWSelectedNone),
+        representativeMarkers(),
+        pixmapSize(),
+        pixmapOffset()
+    {
+    }
+
+    QList<QIntList>     tileIndicesList;
+    int                 markerCount;
+    int                 markerSelectedCount;
+    GeoCoordinates    coordinates;
+    QPoint              pixelPos;
+    WMWSelectionState   selectedState;
+    QMap<int, QVariant> representativeMarkers;
+
+    enum PixmapType
+    {
+        PixmapMarker,
+        PixmapCircle,
+        PixmapImage
+    } pixmapType;
+    QSize pixmapSize;
+
+    //! anchor point of the image, measured from bottom-left
+    QPoint pixmapOffset;
+};
 
 class WMWSharedData : public QSharedData
 {
@@ -76,7 +128,7 @@ public:
     QIntList                  visibleMarkers;
     AbstractMarkerTiler*      markerModel;
     WMWCluster::List          clusterList;
-    QList<WMWModelHelper*>    ungroupedModels;
+    QList<ModelHelper*>    ungroupedModels;
     bool                      inEditMode;
     bool                      editEnabled;
     bool                      haveMovingCluster;
@@ -90,10 +142,10 @@ public:
 
 // helper functions:
 
-KMAP_EXPORT bool WMWHelperParseLatLonString(const QString& latLonString, WMWGeoCoordinate* const coordinates);
+KMAP_EXPORT bool WMWHelperParseLatLonString(const QString& latLonString, GeoCoordinates* const coordinates);
 KMAP_EXPORT bool WMWHelperParseXYStringToPoint(const QString& xyString, QPoint* const point);
-KMAP_EXPORT bool WMWHelperParseBoundsString(const QString& boundsString, QPair<WMWGeoCoordinate, WMWGeoCoordinate>* const boundsCoordinates);
-KMAP_EXPORT WMWGeoCoordinate::PairList WMWHelperNormalizeBounds(const WMWGeoCoordinate::Pair& boundsPair);
+KMAP_EXPORT bool WMWHelperParseBoundsString(const QString& boundsString, QPair<GeoCoordinates, GeoCoordinates>* const boundsCoordinates);
+KMAP_EXPORT GeoCoordinates::PairList WMWHelperNormalizeBounds(const GeoCoordinates::Pair& boundsPair);
 
 } /* namespace KMap */
 

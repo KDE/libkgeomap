@@ -66,9 +66,9 @@ public:
     QTimer*             javascriptScanTimer;
 
     bool                selectionStatus;
-    WMWGeoCoordinate    firstSelectionPoint;
-    WMWGeoCoordinate    intermediateSelectionPoint;
-    WMWGeoCoordinate    secondSelectionPoint;
+    GeoCoordinates    firstSelectionPoint;
+    GeoCoordinates    intermediateSelectionPoint;
+    GeoCoordinates    secondSelectionPoint;
     QList<qreal>        displayedRectangle;
     MouseModes          currentMouseMode;
     QPoint              firstSelectionScreenPoint;
@@ -278,7 +278,7 @@ QVariant HTMLWidget::runScript(const QString& scriptCode)
 /**
  * @brief Execute a script which returns coordinates and parse these
  */
-bool HTMLWidget::runScript2Coordinates(const QString& scriptCode, WMWGeoCoordinate* const coordinates)
+bool HTMLWidget::runScript2Coordinates(const QString& scriptCode, GeoCoordinates* const coordinates)
 {
     const QVariant scriptResult = runScript(scriptCode);
 
@@ -311,7 +311,7 @@ void HTMLWidget::setSelectionRectangle(const QList<qreal>& searchCoordinates)
         return;
     }    
 
-    WMWGeoCoordinate firstPoint,secondPoint;
+    GeoCoordinates firstPoint,secondPoint;
     qreal West  = searchCoordinates.at(0);
     qreal North = searchCoordinates.at(1);
     qreal East  = searchCoordinates.at(2);

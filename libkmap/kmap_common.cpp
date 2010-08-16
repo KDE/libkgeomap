@@ -33,7 +33,7 @@ namespace KMap
  * @brief Parse a 'lat,lon' string a returned by the JavaScript parts
  * @return true if the string could be parsed successfully
  */
-bool WMWHelperParseLatLonString(const QString& latLonString, WMWGeoCoordinate* const coordinates)
+bool WMWHelperParseLatLonString(const QString& latLonString, GeoCoordinates* const coordinates)
 {
     // parse a 'lat,lon' string:
     const QStringList coordinateStrings = latLonString.trimmed().split(',');
@@ -51,7 +51,7 @@ bool WMWHelperParseLatLonString(const QString& latLonString, WMWGeoCoordinate* c
         {
             if (coordinates)
             {
-                *coordinates = WMWGeoCoordinate(ptLatitude, ptLongitude);
+                *coordinates = GeoCoordinates(ptLatitude, ptLongitude);
             }
 
             return true;
@@ -102,7 +102,7 @@ bool WMWHelperParseXYStringToPoint(const QString& xyString, QPoint* const point)
 /**
  * @brief Parses a '((lat1, lon1), (lat2, lon2))' bounds string as returned by the JavaScript parts
  */
-bool WMWHelperParseBoundsString(const QString& boundsString, QPair<WMWGeoCoordinate, WMWGeoCoordinate>* const boundsCoordinates)
+bool WMWHelperParseBoundsString(const QString& boundsString, QPair<GeoCoordinates, GeoCoordinates>* const boundsCoordinates)
 {
     // bounds are returned as ((lat1, lon1), (lat2, lon2))
 
@@ -129,7 +129,7 @@ bool WMWHelperParseBoundsString(const QString& boundsString, QPair<WMWGeoCoordin
             valid                      &= coord1String.startsWith('(') && coord1String.endsWith(')');
             valid                      &= coord2String.startsWith('(') && coord2String.endsWith(')');
 
-            WMWGeoCoordinate coord1, coord2;
+            GeoCoordinates coord1, coord2;
             if (valid)
             {
                 valid = WMWHelperParseLatLonString(coord1String.mid(1, coord1String.length()-2), &coord1);
@@ -141,7 +141,7 @@ bool WMWHelperParseBoundsString(const QString& boundsString, QPair<WMWGeoCoordin
 
             if (valid && boundsCoordinates)
             {
-                *boundsCoordinates = QPair<WMWGeoCoordinate, WMWGeoCoordinate>(coord1, coord2);
+                *boundsCoordinates = QPair<GeoCoordinates, GeoCoordinates>(coord1, coord2);
             }
 
             return valid;
@@ -154,9 +154,9 @@ bool WMWHelperParseBoundsString(const QString& boundsString, QPair<WMWGeoCoordin
 /**
  * @brief Split bounds crossing the dateline into parts which do not cross the dateline
  */
-WMWGeoCoordinate::PairList WMWHelperNormalizeBounds(const WMWGeoCoordinate::Pair& boundsPair)
+GeoCoordinates::PairList WMWHelperNormalizeBounds(const GeoCoordinates::Pair& boundsPair)
 {
-    WMWGeoCoordinate::PairList boundsList;
+    GeoCoordinates::PairList boundsList;
 
     const qreal bWest  = boundsPair.first.lon();
     const qreal bEast  = boundsPair.second.lon();
@@ -166,12 +166,12 @@ WMWGeoCoordinate::PairList WMWHelperNormalizeBounds(const WMWGeoCoordinate::Pair
 
     if (bEast<bWest)
     {
-        boundsList << WMWGeoCoordinate::makePair(bSouth, -180, bNorth, bEast);
-        boundsList << WMWGeoCoordinate::makePair(bSouth, bWest, bNorth, 180);
+        boundsList << GeoCoordinates::makePair(bSouth, -180, bNorth, bEast);
+        boundsList << GeoCoordinates::makePair(bSouth, bWest, bNorth, 180);
     }
     else
     {
-        boundsList << WMWGeoCoordinate::makePair(bSouth, bWest, bNorth, bEast);
+        boundsList << GeoCoordinates::makePair(bSouth, bWest, bNorth, bEast);
     }
 //     kDebug()<<boundsList;
     return boundsList;

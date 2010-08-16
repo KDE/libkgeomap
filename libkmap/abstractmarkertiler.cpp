@@ -137,7 +137,7 @@ AbstractMarkerTiler::NonEmptyIterator::NonEmptyIterator(AbstractMarkerTiler* con
 }
 
 AbstractMarkerTiler::NonEmptyIterator::NonEmptyIterator(AbstractMarkerTiler* const model, const int level, 
-                                                        const WMWGeoCoordinate::PairList& normalizedMapBounds)
+                                                        const GeoCoordinates::PairList& normalizedMapBounds)
                                      : d(new AbstractMarkerTilerNonEmptyIteratorPrivate())
 {
     d->model = model;
@@ -147,7 +147,7 @@ AbstractMarkerTiler::NonEmptyIterator::NonEmptyIterator(AbstractMarkerTiler* con
     // store the coordinates of the bounds as indices:
     for (int i=0; i<normalizedMapBounds.count(); ++i)
     {
-        WMWGeoCoordinate::Pair currentBounds = normalizedMapBounds.at(i);
+        GeoCoordinates::Pair currentBounds = normalizedMapBounds.at(i);
         KMAP_ASSERT(currentBounds.first.lat()<currentBounds.second.lat());
         KMAP_ASSERT(currentBounds.first.lon()<currentBounds.second.lon());
 
@@ -382,7 +382,7 @@ AbstractMarkerTiler* AbstractMarkerTiler::NonEmptyIterator::model() const
     return d->model;
 }
 
-AbstractMarkerTiler::TileIndex AbstractMarkerTiler::TileIndex::fromCoordinates(const KMap::WMWGeoCoordinate& coordinate,
+AbstractMarkerTiler::TileIndex AbstractMarkerTiler::TileIndex::fromCoordinates(const KMap::GeoCoordinates& coordinate,
                                                                                const int getLevel)
 {
     KMAP_ASSERT(getLevel<=MaxLevel);
@@ -448,7 +448,7 @@ AbstractMarkerTiler::TileIndex AbstractMarkerTiler::TileIndex::fromCoordinates(c
     return resultIndex;
 }
 
-WMWGeoCoordinate AbstractMarkerTiler::TileIndex::toCoordinates() const
+GeoCoordinates AbstractMarkerTiler::TileIndex::toCoordinates() const
 {
     // TODO: safeguards against rounding errors!
     qreal tileLatBL     = -90.0;
@@ -475,11 +475,11 @@ WMWGeoCoordinate AbstractMarkerTiler::TileIndex::toCoordinates() const
         tileLonWidth  /= lonDivisor;
     }
 
-    return WMWGeoCoordinate(tileLatBL, tileLonBL);
+    return GeoCoordinates(tileLatBL, tileLonBL);
 }
 
 
-WMWGeoCoordinate AbstractMarkerTiler::TileIndex::toCoordinates(const CornerPosition ofCorner) const
+GeoCoordinates AbstractMarkerTiler::TileIndex::toCoordinates(const CornerPosition ofCorner) const
 {
     // TODO: safeguards against rounding errors!
     qreal tileLatBL     = -90.0;
@@ -528,7 +528,7 @@ WMWGeoCoordinate AbstractMarkerTiler::TileIndex::toCoordinates(const CornerPosit
         tileLonWidth  /= lonDivisor;
     }
 
-    return WMWGeoCoordinate(tileLatBL, tileLonBL);
+    return GeoCoordinates(tileLatBL, tileLonBL);
 }
 
 
@@ -566,7 +566,7 @@ void AbstractMarkerTiler::onIndicesClicked(const TileIndex::List& tileIndicesLis
     Q_UNUSED(currentMouseMode);
 }
 
-void AbstractMarkerTiler::onIndicesMoved(const TileIndex::List& tileIndicesList, const WMWGeoCoordinate& targetCoordinates,
+void AbstractMarkerTiler::onIndicesMoved(const TileIndex::List& tileIndicesList, const GeoCoordinates& targetCoordinates,
                                          const QPersistentModelIndex& targetSnapIndex)
 {
     Q_UNUSED(tileIndicesList);

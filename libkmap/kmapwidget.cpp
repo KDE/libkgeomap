@@ -68,6 +68,7 @@
 #include "map-backend.h"
 #include "kmap_dragdrophandler.h"
 #include "version.h"
+#include "kmap_modelhelper.h"
 
 using namespace Marble;
 
@@ -89,7 +90,7 @@ namespace KMap
  * 
  * Now, a brief introduction on how to get libkmap working is provided:
  * @li First, an instance of @c KMapWidget has to be created.
- * @li Next, @c WMWModelHelper has to be subclassed and at least the pure virtual functions have to be implemented.
+ * @li Next, @c ModelHelper has to be subclassed and at least the pure virtual functions have to be implemented.
  * @li To show the model's data ungrouped, the model helper has to be added to @c KMapWidget instance using addUngroupedModel.
  * @li To show the model's data grouped, an instance of @c AbstractMarkerTiler has to be created and the model helper has to be
  *     set to it using setMarkerModelHelper. The @c AbstractMarkerTiler has then to be given to KMapWidget using setGroupedModel. If
@@ -175,7 +176,7 @@ public:
     QStackedLayout*         stackedLayout;
 
     // these values are cached in case the backend is not ready:
-    WMWGeoCoordinate        cacheCenterCoordinate;
+    GeoCoordinates        cacheCenterCoordinate;
     QString                 cacheZoom;
     QList<qreal>            cacheSelectionRectangle;
 
@@ -587,15 +588,15 @@ void KMapWidget::saveBackendToCache()
         d->oldSelectionRectangle   = d->cacheSelectionRectangle;
 }
 
-WMWGeoCoordinate KMapWidget::getCenter() const
+GeoCoordinates KMapWidget::getCenter() const
 {
     if (!d->currentBackendReady)
-        return WMWGeoCoordinate();
+        return GeoCoordinates();
 
     return d->currentBackend->getCenter();
 }
 
-void KMapWidget::setCenter(const WMWGeoCoordinate& coordinate)
+void KMapWidget::setCenter(const GeoCoordinates& coordinate)
 {
     d->cacheCenterCoordinate = coordinate;
 
@@ -691,10 +692,10 @@ void KMapWidget::readSettingsFromGroup(const KConfigGroup* const group)
 
     setBackend(group->readEntry("Backend", "marble"));
 
-    const WMWGeoCoordinate centerDefault = WMWGeoCoordinate(52.0, 6.0);
+    const GeoCoordinates centerDefault = GeoCoordinates(52.0, 6.0);
     const QString centerGeoUrl = group->readEntry("Center", centerDefault.geoUrl());
     bool centerGeoUrlValid = false;
-    const WMWGeoCoordinate centerCoordinate = WMWGeoCoordinate::fromGeoUrl(centerGeoUrl, &centerGeoUrlValid);
+    const GeoCoordinates centerCoordinate = GeoCoordinates::fromGeoUrl(centerGeoUrl, &centerGeoUrlValid);
     setCenter(centerGeoUrlValid ? centerCoordinate : centerDefault);
     setZoom(group->readEntry("Zoom", d->cacheZoom));
 
@@ -942,7 +943,7 @@ void KMapWidget::updateClusters()
         return;
 
     const int markerLevel = d->currentBackend->getMarkerModelLevel();
-    QList<QPair<WMWGeoCoordinate, WMWGeoCoordinate> > mapBounds = d->currentBackend->getNormalizedBounds();
+    QList<QPair<GeoCoordinates, GeoCoordinates> > mapBounds = d->currentBackend->getNormalizedBounds();
 
 //     // debug output for tile level diagnostics:
 //     QIntList tile1;
@@ -953,8 +954,8 @@ void KMapWidget::updateClusters()
 //         tile2 = tile1;
 //         tile2<<0;
 //         tile1<<1;
-//         const WMWGeoCoordinate tile1Coordinate = s->markerModel->tileIndexToCoordinate(tile1);
-//         const WMWGeoCoordinate tile2Coordinate = s->markerModel->tileIndexToCoordinate(tile2);
+//         const GeoCoordinates tile1Coordinate = s->markerModel->tileIndexToCoordinate(tile1);
+//         const GeoCoordinates tile2Coordinate = s->markerModel->tileIndexToCoordinate(tile2);
 //         QPoint tile1Point, tile2Point;
 //         d->currentBackend->screenCoordinates(tile1Coordinate, &tile1Point);
 //         d->currentBackend->screenCoordinates(tile2Coordinate, &tile2Point);
@@ -982,7 +983,7 @@ void KMapWidget::updateClusters()
         const AbstractMarkerTiler::TileIndex tileIndex = tileIterator.currentIndex();
 
         // find out where the tile is on the map:
-        const WMWGeoCoordinate tileCoordinate = tileIndex.toCoordinates();
+        const GeoCoordinates tileCoordinate = tileIndex.toCoordinates();
         debugTilesSearched++;
         QPoint tilePoint;
         if (!d->currentBackend->screenCoordinates(tileCoordinate, &tilePoint))
@@ -1082,7 +1083,7 @@ void KMapWidget::updateClusters()
         if (markerMax==0)
             break;
 
-        WMWGeoCoordinate clusterCoordinates = pixelNonEmptyTileIndexGrid.at(markerX+markerY*gridWidth).first().toCoordinates();
+        GeoCoordinates clusterCoordinates = pixelNonEmptyTileIndexGrid.at(markerX+markerY*gridWidth).first().toCoordinates();
         WMWCluster cluster;
         cluster.coordinates = clusterCoordinates;
         cluster.pixelPos = QPoint(markerX, markerY);
@@ -1435,7 +1436,7 @@ void KMapWidget::slotClustersMoved(const QIntList& clusterIndices, const QPair<i
 
     // TODO: we actually expect only one clusterindex
     int clusterIndex = clusterIndices.first();
-    WMWGeoCoordinate targetCoordinates = s->clusterList.at(clusterIndex).coordinates;
+    GeoCoordinates targetCoordinates = s->clusterList.at(clusterIndex).coordinates;
 
     AbstractMarkerTiler::TileIndex::List movedTileIndices;
     if (s->clusterList.at(clusterIndex).selectedState==WMWSelectedNone)
@@ -1475,7 +1476,7 @@ bool KMapWidget::queryAltitudes(const WMWAltitudeLookup::List& queryItems, const
     return false;
 }
 
-void KMapWidget::addUngroupedModel(WMWModelHelper* const modelHelper)
+void KMapWidget::addUngroupedModel(ModelHelper* const modelHelper)
 {
     s->ungroupedModels << modelHelper;
 
@@ -1578,7 +1579,7 @@ void KMapWidget::slotClustersClicked(const QIntList& clusterIndices)
                     AbstractMarkerTiler::TileIndex::fromIntList(currentCluster.tileIndicesList.at(j));
                 for(int corner=1; corner<=4; corner++)
                 {
-                    WMWGeoCoordinate currentTileCoordinate = currentTileIndex.toCoordinates();
+                    GeoCoordinates currentTileCoordinate = currentTileIndex.toCoordinates();
 
                     const Marble::GeoDataCoordinates tileCoordinate(currentTileCoordinate.lon(), 
                                                                     currentTileCoordinate.lat(),
@@ -1695,7 +1696,7 @@ void KMapWidget::dropEvent(QDropEvent* event)
         return;
     }
 
-    WMWGeoCoordinate dropCoordinates;
+    GeoCoordinates dropCoordinates;
     if (!d->currentBackend->geoCoordinates(event->pos(), &dropCoordinates))
         return;
 
@@ -2215,7 +2216,7 @@ void KMapWidget::slotUngroupedModelChanged()
         return;
     }
 
-    WMWModelHelper* const senderHelper = qobject_cast<WMWModelHelper*>(senderObject);
+    ModelHelper* const senderHelper = qobject_cast<ModelHelper*>(senderObject);
     if (senderHelper)
     {
         for (int i=0; i<s->ungroupedModels.count(); ++i)
