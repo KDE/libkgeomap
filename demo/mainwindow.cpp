@@ -200,6 +200,7 @@ MainWindow::MainWindow(KCmdLineArgs* const cmdLineArgs, QWidget* const parent)
     d->mapWidget = new KMapWidget(d->splitter);
     d->mapWidget->setEditModeAvailable(true);
     d->mapWidget->setGroupedModel(mm);
+    d->mapWidget->setActive(true);
     d->mapWidget->setDragDropHandler(new DemoDragDropHandler(d->displayMarkersModel, d->mapWidget));
 
     connect(d->mapWidget, SIGNAL(signalAltitudeLookupReady(const KMapIface::WMWAltitudeLookup::List&)),
