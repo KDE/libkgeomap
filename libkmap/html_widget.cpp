@@ -70,7 +70,7 @@ public:
     WMWGeoCoordinate    intermediateSelectionPoint;
     WMWGeoCoordinate    secondSelectionPoint;
     QList<qreal>        displayedRectangle;
-    MouseMode           currentMouseMode;
+    MouseModes          currentMouseMode;
     QPoint              firstSelectionScreenPoint;
     QPoint              secondSelectionScreenPoint;
 };
@@ -336,7 +336,7 @@ void HTMLWidget::removeSelectionRectangle()
     runScript(QString("removeDisplayedRectangle();"));
 }
 
-void HTMLWidget::mouseModeChanged(MouseMode mouseMode)
+void HTMLWidget::mouseModeChanged(const MouseModes mouseMode)
 {
     bool state;
     d->currentMouseMode = mouseMode;

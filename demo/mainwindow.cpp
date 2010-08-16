@@ -75,6 +75,8 @@ MarkerModelHelper::MarkerModelHelper(QAbstractItemModel* const itemModel, QItemS
    m_itemModel(itemModel),
    m_itemSelectionModel(itemSelectionModel)
 {
+    connect(itemModel, SIGNAL(dataChanged(const QModelIndex&, const QModelIndex&)),
+            this, SLOT(signalModelChangedDrastically()));
 }
 
 MarkerModelHelper::~MarkerModelHelper()
@@ -202,6 +204,8 @@ MainWindow::MainWindow(KCmdLineArgs* const cmdLineArgs, QWidget* const parent)
     d->mapWidget->setGroupedModel(mm);
     d->mapWidget->setActive(true);
     d->mapWidget->setDragDropHandler(new DemoDragDropHandler(d->displayMarkersModel, d->mapWidget));
+    d->mapWidget->setVisibleMouseModes(KMapIface::MouseModePan|KMapIface::MouseModeZoom|KMapIface::MouseModeSelectThumbnail);
+    d->mapWidget->setAvailableMouseModes(KMapIface::MouseModePan|KMapIface::MouseModeZoom|KMapIface::MouseModeSelectThumbnail);
 
     connect(d->mapWidget, SIGNAL(signalAltitudeLookupReady(const KMapIface::WMWAltitudeLookup::List&)),
             this, SLOT(slotAltitudeLookupReady(const KMapIface::WMWAltitudeLookup::List&)));

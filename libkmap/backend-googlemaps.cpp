@@ -976,7 +976,7 @@ void BackendGoogleMaps::removeSelectionRectangle()
     d->htmlWidget->removeSelectionRectangle();
 }
 
-void BackendGoogleMaps::mouseModeChanged(MouseMode mouseMode)
+void BackendGoogleMaps::mouseModeChanged(const MouseModes mouseMode)
 {
 
     d->htmlWidget->mouseModeChanged(mouseMode);

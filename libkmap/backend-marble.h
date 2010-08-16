@@ -102,7 +102,7 @@ public:
     virtual void setSelectionRectangle(const QList<double>& searchCoordinates);
     virtual QList<qreal> getSelectionRectangle();
     virtual void removeSelectionRectangle(/*DisplayedRectangles whatToChange*/);
-    virtual void mouseModeChanged(MouseMode mouseMode);
+    virtual void mouseModeChanged(const MouseModes mouseMode);
 
     virtual void setSelectionStatus(const bool status);
     virtual void centerOn(const Marble::GeoDataLatLonBox& box); 

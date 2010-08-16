@@ -110,7 +110,8 @@ public:
     int getThumbnailSize() const;
     int getUndecoratedThumbnailSize() const;
     void setEditEnabled(const bool state);
-    void setMouseModesVisibility(const bool state);   
+    void setAvailableMouseModes(const MouseModes mouseModes);
+    void setVisibleMouseModes(const MouseModes mouseModes);
  
     QList<qreal> selectionCoordinates() const;
     void setSelectionCoordinates(QList<double>& sel);

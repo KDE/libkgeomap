@@ -72,8 +72,12 @@ void ItemMarkerTiler::setMarkerModelHelper(WMWModelHelper* const modelHelper)
         connect(d->markerModel, SIGNAL(rowsAboutToBeRemoved(const QModelIndex&, int, int)),
                 this, SLOT(slotSourceModelRowsAboutToBeRemoved(const QModelIndex&, int, int)));
 
-        connect(d->markerModel, SIGNAL(dataChanged(const QModelIndex&, const QModelIndex&)),
-                this, SLOT(slotSourceModelDataChanged(const QModelIndex&, const QModelIndex&)));
+        // TODO: this signal now has to be monitored in the model helper
+//         connect(d->markerModel, SIGNAL(dataChanged(const QModelIndex&, const QModelIndex&)),
+//                 this, SLOT(slotSourceModelDataChanged(const QModelIndex&, const QModelIndex&)));
+
+        connect(d->modelHelper, SIGNAL(signalModelChangedDrastically()),
+                this, SLOT(slotSourceModelReset()), Qt::QueuedConnection);
 
         connect(d->markerModel, SIGNAL(modelReset()),
                 this, SLOT(slotSourceModelReset()));
@@ -244,6 +248,7 @@ void ItemMarkerTiler::slotThumbnailAvailableForIndex(const QPersistentModelIndex
 
 void ItemMarkerTiler::slotSourceModelReset()
 {
+    kDebug()<<"----";
     setDirty();
 }
 

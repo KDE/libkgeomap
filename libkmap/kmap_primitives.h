@@ -84,10 +84,14 @@ enum MouseMode
 {
     MouseModePan = 1,
     MouseModeSelection = 2,
-    MouseModeZoom = 3,
-    MouseModeFilter = 4,
-    MouseModeSelectThumbnail = 5
+    MouseModeZoom = 4,
+    MouseModeFilter = 8,
+    MouseModeSelectThumbnail = 16,
+    MouseModeLast = 16
 };
+
+Q_DECLARE_FLAGS(MouseModes, MouseMode)
+Q_DECLARE_OPERATORS_FOR_FLAGS(MouseModes);
 
 enum DisplayedRectangles
 {
@@ -364,6 +368,7 @@ Q_SIGNALS:
 
     void signalVisibilityChanged();
     void signalThumbnailAvailableForIndex(const QPersistentModelIndex& index, const QPixmap& pixmap);
+    void signalModelChangedDrastically();
 };
 
 

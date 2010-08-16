@@ -139,7 +139,7 @@ public:
     QPoint                 firstSelectionScreenPoint;
     QPoint                 secondSelectionScreenPoint;
     SelRectangleHDirection currentRectDrawingDirection;
-    MouseMode              currentMouseMode;
+    MouseModes             currentMouseMode;
     WMWGeoCoordinate       firstSelectionPoint;
     WMWGeoCoordinate       intermediateSelectionPoint;
     WMWGeoCoordinate       secondSelectionPoint;
@@ -1328,7 +1328,7 @@ void BackendMarble::removeSelectionRectangle()
     d->marbleWidget->update();
 }
 
-void BackendMarble::mouseModeChanged(MouseMode mouseMode)
+void BackendMarble::mouseModeChanged(const MouseModes mouseMode)
 {
     d->currentMouseMode = mouseMode;
 

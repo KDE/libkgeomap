@@ -142,7 +142,6 @@ public:
         lazyReclusteringRequested(false),
         clustersDirty(false),
         editModeAvailable(false),
-        mouseModesAvailable(false),
         dragDropHandler(0),
         sortMenu(0),
         thumbnailSize(KMapIfaceMinThumbnailSize),
@@ -162,7 +161,9 @@ public:
         thumbnailTimerCount(0),
         thumbnailsHaveBeenLoaded(false),
         activeState(false),
-        hasSelection(false)
+        hasSelection(false),
+        availableMouseModes(0),
+        visibleMouseModes(0)
     {
     }
 
@@ -196,7 +197,6 @@ public:
     bool                    lazyReclusteringRequested;
     bool                    clustersDirty;
     bool                    editModeAvailable;
-    bool                    mouseModesAvailable;
 
     DragDropHandler*        dragDropHandler;
 
@@ -218,7 +218,15 @@ public:
     KAction*                actionSetFilterMode;
     KAction*                actionRemoveFilterMode;
     KAction*                actionSetSelectThumbnailMode;
-    MouseMode               currentMouseMode;
+    MouseModes              currentMouseMode;
+    QToolButton*            setPanModeButton;
+    QToolButton*            setSelectionModeButton;
+    QToolButton*            removeCurrentSelectionButton;
+    QToolButton*            setZoomModeButton;
+    QToolButton*            setFilterModeButton;
+    QToolButton*            removeFilterModeButton;
+    QToolButton*            setSelectThumbnailMode;
+    
     bool                    modelBasedFilter;
 
     QTimer*                 thumbnailTimer;
@@ -227,6 +235,8 @@ public:
 
     bool                    activeState;
     bool                    hasSelection;
+    MouseModes              availableMouseModes;
+    MouseModes              visibleMouseModes;
 };
 
 KMapWidget::KMapWidget(QWidget* const parent)
@@ -806,34 +816,36 @@ QWidget* KMapWidget::getControlWidget()
         QToolButton* const decreaseThumbnailSizeButton = new QToolButton(d->controlWidget);
         decreaseThumbnailSizeButton->setDefaultAction(d->actionDecreaseThumbnailSize);
 
+        /* --- --- --- */
 
         d->mouseModesHolder = new KHBox(d->controlWidget);
-        d->mouseModesHolder->setVisible(d->mouseModesAvailable); 
 
         new KSeparator(Qt::Vertical, d->mouseModesHolder);
 
-        QToolButton* const setPanModeButton = new QToolButton(d->mouseModesHolder);
-        setPanModeButton->setDefaultAction(d->actionSetPanMode);
+        d->setPanModeButton = new QToolButton(d->mouseModesHolder);
+        d->setPanModeButton->setDefaultAction(d->actionSetPanMode);
 
-        QToolButton* const setSelectionModeButton = new QToolButton(d->mouseModesHolder);
-        setSelectionModeButton->setDefaultAction(d->actionSetSelectionMode);
+        d->setSelectionModeButton = new QToolButton(d->mouseModesHolder);
+        d->setSelectionModeButton->setDefaultAction(d->actionSetSelectionMode);
 
-        QToolButton* const removeCurrentSelectionButton = new QToolButton(d->mouseModesHolder);
-        removeCurrentSelectionButton->setDefaultAction(d->actionRemoveCurrentSelection);
+        d->removeCurrentSelectionButton = new QToolButton(d->mouseModesHolder);
+        d->removeCurrentSelectionButton->setDefaultAction(d->actionRemoveCurrentSelection);
 
-        QToolButton* const setZoomModeButton = new QToolButton(d->mouseModesHolder);
-        setZoomModeButton->setDefaultAction(d->actionSetZoomMode);
+        d->setZoomModeButton = new QToolButton(d->mouseModesHolder);
+        d->setZoomModeButton->setDefaultAction(d->actionSetZoomMode);
 
-        QToolButton* const setFilterModeButton = new QToolButton(d->mouseModesHolder);
-        setFilterModeButton->setDefaultAction(d->actionSetFilterMode);
+        d->setFilterModeButton = new QToolButton(d->mouseModesHolder);
+        d->setFilterModeButton->setDefaultAction(d->actionSetFilterMode);
 
-        QToolButton* const removeFilterModeButton = new QToolButton(d->mouseModesHolder);
-        removeFilterModeButton->setDefaultAction(d->actionRemoveFilterMode);
+        d->removeFilterModeButton = new QToolButton(d->mouseModesHolder);
+        d->removeFilterModeButton->setDefaultAction(d->actionRemoveFilterMode);
 
-        QToolButton* const setSelectThumbnailMode = new QToolButton(d->mouseModesHolder);
-        setSelectThumbnailMode->setDefaultAction(d->actionSetSelectThumbnailMode);
+        d->setSelectThumbnailMode = new QToolButton(d->mouseModesHolder);
+        d->setSelectThumbnailMode->setDefaultAction(d->actionSetSelectThumbnailMode);
 
         d->hBoxForAdditionalControlWidgetItems = new KHBox(d->controlWidget);
+
+        setVisibleMouseModes(d->visibleMouseModes);
 
         // add stretch after the controls:
         QHBoxLayout* const hBoxLayout = reinterpret_cast<QHBoxLayout*>(d->controlWidget->layout());
@@ -870,6 +882,14 @@ void KMapWidget::slotUpdateActionsEnabled()
     d->actionDecreaseThumbnailSize->setEnabled((!s->inEditMode)&&(d->thumbnailSize>KMapIfaceMinThumbnailSize));
     // TODO: define an upper limit!
     d->actionIncreaseThumbnailSize->setEnabled(!s->inEditMode);
+
+    d->actionSetSelectionMode->setEnabled(d->availableMouseModes.testFlag(MouseModeSelection));
+    d->actionRemoveCurrentSelection->setEnabled(d->availableMouseModes.testFlag(MouseModeSelection));
+    d->actionSetPanMode->setEnabled(d->availableMouseModes.testFlag(MouseModePan));
+    d->actionSetZoomMode->setEnabled(d->availableMouseModes.testFlag(MouseModeZoom));
+    d->actionSetFilterMode->setEnabled(d->availableMouseModes.testFlag(MouseModeFilter));
+    d->actionRemoveFilterMode->setEnabled(d->availableMouseModes.testFlag(MouseModeFilter));
+    d->actionSetSelectThumbnailMode->setEnabled(d->availableMouseModes.testFlag(MouseModeSelectThumbnail));
 }
 
 void KMapWidget::slotChangeBackend(QAction* action)
@@ -1543,7 +1563,7 @@ void KMapWidget::slotClustersClicked(const QIntList& clusterIndices)
 
     int maxTileLevel = 0;
 
-    if((d->currentMouseMode == MouseModeZoom) || (d->currentMouseMode == MouseModeFilter && d->selectionRectangle.isEmpty()))
+    if ((d->currentMouseMode == MouseModeZoom) || (d->currentMouseMode == MouseModeFilter && d->selectionRectangle.isEmpty()))
     {
         Marble::GeoDataLineString tileString;
 
@@ -1610,7 +1630,7 @@ void KMapWidget::slotClustersClicked(const QIntList& clusterIndices)
             emit signalNewSelectionFromMap();
         }
     }
-    else if((d->currentMouseMode == MouseModeFilter && !d->selectionRectangle.isEmpty()) || (d->currentMouseMode == MouseModeSelectThumbnail))
+    else if ((d->currentMouseMode == MouseModeFilter && !d->selectionRectangle.isEmpty()) || (d->currentMouseMode == MouseModeSelectThumbnail))
     {
     // update the selection state of the clusters
         for (int i=0; i<clusterIndices.count(); ++i)
@@ -1709,16 +1729,6 @@ void KMapWidget::setEditModeAvailable(const bool state)
     if (d->browseModeControlsHolder)
     {
         d->browseModeControlsHolder->setVisible(d->editModeAvailable);
-    }
-}
-
-void KMapWidget::setMouseModesVisibility(const bool state)
-{
-    d->mouseModesAvailable = state;
-
-    if(d->mouseModesAvailable)
-    {
-        d->mouseModesHolder->setVisible(d->mouseModesAvailable);
     }
 }
 
@@ -2286,6 +2296,29 @@ void KMapWidget::setActive(const bool state)
 bool KMapWidget::getActiveState()
 {
     return d->activeState;
+}
+
+void KMapWidget::setVisibleMouseModes(const MouseModes mouseModes)
+{
+    d->visibleMouseModes = mouseModes;
+
+    if (d->mouseModesHolder)
+    {
+        d->mouseModesHolder->setVisible(d->visibleMouseModes);
+
+        d->setSelectionModeButton->setVisible(d->visibleMouseModes.testFlag(MouseModeSelection));
+        d->removeCurrentSelectionButton->setVisible(d->visibleMouseModes.testFlag(MouseModeSelection));
+        d->setPanModeButton->setVisible(d->visibleMouseModes.testFlag(MouseModePan));
+        d->setZoomModeButton->setVisible(d->visibleMouseModes.testFlag(MouseModeZoom));
+        d->setFilterModeButton->setVisible(d->visibleMouseModes.testFlag(MouseModeFilter));
+        d->removeFilterModeButton->setVisible(d->visibleMouseModes.testFlag(MouseModeFilter));
+        d->setSelectThumbnailMode->setVisible(d->visibleMouseModes.testFlag(MouseModeSelectThumbnail));
+    }
+}
+
+void KMapWidget::setAvailableMouseModes(const MouseModes mouseModes)
+{
+    d->availableMouseModes = mouseModes;
 }
 
 } /* namespace KMapIface */

@@ -108,7 +108,7 @@ public:
     virtual void setSelectionRectangle(const QList<double>& searchCorrdinates) = 0;
     virtual QList<qreal> getSelectionRectangle() = 0;
     virtual void removeSelectionRectangle() = 0;
-    virtual void mouseModeChanged(MouseMode mouseMode) = 0;
+    virtual void mouseModeChanged(const MouseModes mouseMode) = 0;
 
     const QExplicitlySharedDataPointer<WMWSharedData> s;
 
