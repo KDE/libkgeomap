@@ -59,7 +59,7 @@
 #endif // KMAP_MARBLE_ADD_LAYER
 
 #include "abstractmarkertiler.h"
-#include "kmapwidget.h"
+#include "kmap_widget.h"
 #include "kmap_modelhelper.h"
 
 namespace KMap

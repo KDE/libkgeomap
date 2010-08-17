@@ -62,7 +62,7 @@
 
 // local includes
 
-#include "kmapwidget.h"
+#include "kmap_widget.h"
 #include "itemmarkertiler.h"
 #include "mytreewidget.h"
 #include "dragdrophandler.h"

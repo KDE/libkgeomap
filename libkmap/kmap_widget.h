@@ -24,8 +24,8 @@
  *
  * ============================================================ */
 
-#ifndef KMAPWIDGET_H
-#define KMAPWIDGET_H
+#ifndef KMAP_WIDGET_H
+#define KMAP_WIDGET_H
 
 // Qt includes
 
@@ -195,4 +195,4 @@ private:
 
 } /* namespace KMap */
 
-#endif /* KMAPWIDGET_H */
+#endif /* KMAP_WIDGET_H */

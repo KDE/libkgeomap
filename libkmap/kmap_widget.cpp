@@ -24,7 +24,7 @@
  *
  * ============================================================ */
 
-#include "kmapwidget.moc"
+#include "kmap_widget.moc"
 
 // C++ includes
 

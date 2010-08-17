@@ -44,7 +44,7 @@
 // local includes
 
 #include "html_widget.h"
-#include "kmapwidget.h"
+#include "kmap_widget.h"
 #include "abstractmarkertiler.h"
 #include "kmap_modelhelper.h"
 
