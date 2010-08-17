@@ -2266,7 +2266,7 @@ void KMapWidget::setEditEnabled(const bool state)
 
 // Static methods ---------------------------------------------------------
 
-QString KMapWidget::LibMarbleWidget()
+QString KMapWidget::MarbleWidgetVersion()
 {
     return QString(MARBLE_VERSION_STRING);
 }

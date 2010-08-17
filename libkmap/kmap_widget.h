@@ -154,7 +154,7 @@ public:
 
     /** Return a string version of LibMarbleWidget release in format "major.minor.patch"
      */
-    static QString LibMarbleWidget();
+    static QString MarbleWidgetVersion();
 
     /** Return a string version of libkmap release
      */
