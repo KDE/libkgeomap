@@ -997,13 +997,12 @@ void BackendGoogleMaps::mouseModeChanged(const MouseModes mouseMode)
 }
 
 void BackendGoogleMaps::slotSelectionHasBeenMade(const QList<double>& searchCoordinates)
-{   
+{
     emit signalSelectionHasBeenMade(searchCoordinates);
 }
 
-void BackendGoogleMaps::setSelectionStatus(const bool status)
+void BackendGoogleMaps::setSelectionStatus(const bool /*status*/)
 {
-
 }
 
 void BackendGoogleMaps::centerOn( const Marble::GeoDataLatLonBox& latLonBox)

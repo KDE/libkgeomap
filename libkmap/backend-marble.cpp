@@ -900,7 +900,7 @@ bool BackendMarble::eventFilter(QObject *object, QEvent *event)
                 d->secondSelectionScreenPoint = mouseEvent->pos();
 
                 kDebug()<<d->firstSelectionScreenPoint<<" "<<d->secondSelectionScreenPoint;
-                
+
                 qreal lonWest, latNorth, lonEast, latSouth;
 
                 if(d->firstSelectionScreenPoint.x() < d->secondSelectionScreenPoint.x())
@@ -924,7 +924,7 @@ bool BackendMarble::eventFilter(QObject *object, QEvent *event)
                     latNorth = d->intermediateSelectionPoint.lat();
                     latSouth = d->firstSelectionPoint.lat();
                 }
-              
+
                 QList<qreal> selectionCoordinates;
                 selectionCoordinates << lonWest << latNorth << lonEast << latSouth;
 
@@ -980,7 +980,7 @@ bool BackendMarble::eventFilter(QObject *object, QEvent *event)
                 d->searchRectangleCoordinates.clear();                
  
                 emit signalSelectionHasBeenMade(selectionCoordinates);
-        
+
                 d->firstSelectionPoint.clear();
                 d->secondSelectionPoint.clear();
             }
@@ -1313,7 +1313,7 @@ void BackendMarble::setSelectionRectangle(const QList<qreal>& searchCoordinates)
         return;
 
     d->displayedRectangle = searchCoordinates;
-    d->marbleWidget->update();    
+    d->marbleWidget->update();
 }
 
 QList<qreal> BackendMarble::getSelectionRectangle()
@@ -1336,13 +1336,11 @@ void BackendMarble::mouseModeChanged(const MouseModes mouseMode)
         d->firstSelectionPoint.clear();
         d->secondSelectionPoint.clear();
         d->marbleWidget->update();
-    }    
+    }
 }
 
-void BackendMarble::setSelectionStatus(const bool status)
+void BackendMarble::setSelectionStatus(const bool /*status*/)
 {
-
-
 }
 
 void BackendMarble::centerOn(const Marble::GeoDataLatLonBox& box)
