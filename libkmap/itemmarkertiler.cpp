@@ -44,7 +44,7 @@ public:
     {
     }
 
-    ModelHelper*      modelHelper;
+    ModelHelper*         modelHelper;
     QItemSelectionModel* selectionModel;
     QAbstractItemModel*  markerModel;
     bool                 activeState;
@@ -53,6 +53,8 @@ public:
 ItemMarkerTiler::ItemMarkerTiler(ModelHelper* const modelHelper, QObject* const parent)
                : AbstractMarkerTiler(parent), d(new ItemMarkerTilerPrivate())
 {
+    resetRootTile();
+
     setMarkerModelHelper(modelHelper);
 }
 
@@ -150,7 +152,7 @@ void ItemMarkerTiler::slotSelectionChanged(const QItemSelection& selected, const
             for (int l=0; l<=TileIndex::MaxLevel; ++l)
             {
                 const TileIndex tileIndex = TileIndex::fromCoordinates(coordinates, l);
-                Tile* const myTile = getTile(tileIndex, true);
+                MyTile* const myTile = static_cast<MyTile*>(getTile(tileIndex, true));
                 if (!myTile)
                     break;
 
@@ -177,7 +179,7 @@ void ItemMarkerTiler::slotSelectionChanged(const QItemSelection& selected, const
             for (int l=0; l<=TileIndex::MaxLevel; ++l)
             {
                 const TileIndex tileIndex = TileIndex::fromCoordinates(coordinates, l);
-                Tile* const myTile = getTile(tileIndex, true);
+                MyTile* const myTile = static_cast<MyTile*>(getTile(tileIndex, true));
                 if (!myTile)
                     break;
 
@@ -286,12 +288,12 @@ void ItemMarkerTiler::removeMarkerIndexFromGrid(const QModelIndex& markerIndex, 
         return;
 
     const TileIndex tileIndex = TileIndex::fromCoordinates(markerCoordinates, TileIndex::MaxLevel);
-    QList<Tile*> tiles;
+    QList<MyTile*> tiles;
     // here l functions as the number of indices that we actually use, therefore we have to go one more up
     // in this case, l==0 returns the root tile
     for (int l=0; l<=TileIndex::MaxLevel+1; ++l)
     {
-        Tile* const currentTile = getTile(tileIndex.mid(0, l), true);
+        MyTile* const currentTile = static_cast<MyTile*>(getTile(tileIndex.mid(0, l), true));
         if (!currentTile)
             break;
 
@@ -308,13 +310,13 @@ void ItemMarkerTiler::removeMarkerIndexFromGrid(const QModelIndex& markerIndex, 
     // delete the tiles which are now empty!
     for (int l = tiles.count()-1; l>0; --l)
     {
-        Tile* const currentTile = tiles.at(l);
+        MyTile* const currentTile = tiles.at(l);
 
         if (!currentTile->markerIndices.isEmpty())
             break;
 
-        Tile* const parentTile = tiles.at(l-1);
-        parentTile->deleteChild(currentTile);
+        MyTile* const parentTile = tiles.at(l-1);
+        tileDeleteChild(parentTile, currentTile);
     }
 }
 
@@ -327,7 +329,7 @@ int ItemMarkerTiler::getTileMarkerCount(const AbstractMarkerTiler::TileIndex& ti
 
     KMAP_ASSERT(tileIndex.level()<=TileIndex::MaxLevel);
 
-    Tile* const myTile = getTile(tileIndex, true);
+    MyTile* const myTile = static_cast<MyTile*>(getTile(tileIndex, true));
 
     if (!myTile)
     {
@@ -346,7 +348,7 @@ int ItemMarkerTiler::getTileSelectedCount(const AbstractMarkerTiler::TileIndex& 
 
     KMAP_ASSERT(tileIndex.level()<=TileIndex::MaxLevel);
 
-    Tile* const myTile = getTile(tileIndex, true);
+    MyTile* const myTile = static_cast<MyTile*>(getTile(tileIndex, true));
 
     if (!myTile)
     {
@@ -365,7 +367,7 @@ WMWSelectionState ItemMarkerTiler::getTileSelectedState(const AbstractMarkerTile
 
     KMAP_ASSERT(tileIndex.level()<=TileIndex::MaxLevel);
 
-    Tile* const myTile = getTile(tileIndex, true);
+    MyTile* const myTile = static_cast<MyTile*>(getTile(tileIndex, true));
 
     if (!myTile)
     {
@@ -394,12 +396,12 @@ AbstractMarkerTiler::Tile* ItemMarkerTiler::getTile(const AbstractMarkerTiler::T
 
     KMAP_ASSERT(tileIndex.level()<=TileIndex::MaxLevel);
 
-    Tile* tile = rootTile();
+    MyTile* tile = static_cast<MyTile*>(rootTile());
     for (int level = 0; level < tileIndex.indexCount(); ++level)
     {
         const int currentIndex = tileIndex.linearIndex(level);
 
-        Tile* childTile = 0;
+        MyTile* childTile = 0;
         if (tile->children.isEmpty())
         {
             tile->prepareForChildren(QIntPair(TileIndex::Tiling, TileIndex::Tiling));
@@ -421,10 +423,10 @@ AbstractMarkerTiler::Tile* ItemMarkerTiler::getTile(const AbstractMarkerTiler::T
                     const TileIndex markerTileIndex = TileIndex::fromCoordinates(currentMarkerCoordinates, level);
                     const int newTileIndex = markerTileIndex.toIntList().last();
 
-                    Tile* newTile = tile->children.at(newTileIndex);
+                    MyTile* newTile = static_cast<MyTile*>(tile->children.at(newTileIndex));
                     if (newTile==0)
                     {
-                        newTile = new Tile();
+                        newTile = static_cast<MyTile*>(tileNew());
                         tile->addChild(newTileIndex, newTile);
                     }
                     newTile->markerIndices<<currentMarkerIndex;
@@ -438,7 +440,7 @@ AbstractMarkerTiler::Tile* ItemMarkerTiler::getTile(const AbstractMarkerTiler::T
                 }
             }
         }
-        childTile = tile->children.at(currentIndex);
+        childTile = static_cast<MyTile*>(tile->children.at(currentIndex));
 
         if (childTile==0)
         {
@@ -448,7 +450,7 @@ AbstractMarkerTiler::Tile* ItemMarkerTiler::getTile(const AbstractMarkerTiler::T
                 return 0;
             }
 
-            childTile = new Tile();
+            childTile = static_cast<MyTile*>(tileNew());
             tile->addChild(currentIndex, childTile);
         }
         tile = childTile;
@@ -466,7 +468,7 @@ QList<QPersistentModelIndex> ItemMarkerTiler::getTileMarkerIndices(const Abstrac
 
     KMAP_ASSERT(tileIndex.level()<=TileIndex::MaxLevel);
 
-    Tile* const myTile = getTile(tileIndex, true);
+    MyTile* const myTile = static_cast<MyTile*>(getTile(tileIndex, true));
 
     if (!myTile)
     {
@@ -498,7 +500,7 @@ void ItemMarkerTiler::addMarkerIndexToGrid(const QPersistentModelIndex& markerIn
     }
 
     // add the marker to all existing tiles:
-    Tile* currentTile = rootTile();
+    MyTile* currentTile = static_cast<MyTile*>(rootTile());
     for (int l = 0; l<=TileIndex::MaxLevel; ++l)
     {
         currentTile->markerIndices<<markerIndex;
@@ -513,11 +515,11 @@ void ItemMarkerTiler::addMarkerIndexToGrid(const QPersistentModelIndex& markerIn
 
         // the tile has children. make sure the tile for our marker exists:
         const int nextIndex = tileIndex.linearIndex(l);
-        Tile* nextTile = currentTile->children.at(nextIndex);
+        MyTile* nextTile = static_cast<MyTile*>(currentTile->children.at(nextIndex));
         if (nextTile==0)
         {
             // we have to create the tile:
-            nextTile = new Tile();
+            nextTile = static_cast<MyTile*>(tileNew());
             currentTile->addChild(nextIndex, nextTile);
         }
 
@@ -631,6 +633,16 @@ void ItemMarkerTiler::slotSourceModelLayoutChanged()
 void ItemMarkerTiler::setActive(const bool state)
 {
     d->activeState = state;
+}
+
+AbstractMarkerTiler::Tile* ItemMarkerTiler::tileNew()
+{
+    return new MyTile();
+}
+
+void ItemMarkerTiler::tileDeleteInternal(AbstractMarkerTiler::Tile* const tile)
+{
+    delete static_cast<MyTile*>(tile);
 }
 
 } // namespace KMap

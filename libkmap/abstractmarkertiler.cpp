@@ -36,10 +36,9 @@ class AbstractMarkerTiler::AbstractMarkerTilerPrivate
 public:
 
     AbstractMarkerTilerPrivate()
-        : rootTile(new AbstractMarkerTiler::Tile()),
-                   isDirty(true)
+        : rootTile(0),
+          isDirty(true)
     {
-        rootTile->prepareForChildren(QIntPair(AbstractMarkerTiler::TileIndex::Tiling, AbstractMarkerTiler::TileIndex::Tiling));
     }
 
     AbstractMarkerTiler::Tile* rootTile;
@@ -54,7 +53,7 @@ AbstractMarkerTiler::AbstractMarkerTiler(QObject* const parent)
 AbstractMarkerTiler::~AbstractMarkerTiler()
 {
     // delete all tiles
-    delete d->rootTile;
+    tileDelete(d->rootTile);
 
     delete d;
 }
@@ -552,8 +551,8 @@ void AbstractMarkerTiler::setDirty(const bool state)
 
 AbstractMarkerTiler::Tile* AbstractMarkerTiler::resetRootTile()
 {
-    delete d->rootTile;
-    d->rootTile = new Tile();
+    tileDelete(d->rootTile);
+    d->rootTile = tileNew();
     d->rootTile->prepareForChildren(QIntPair(TileIndex::Tiling, TileIndex::Tiling));
 
     return d->rootTile;
@@ -572,6 +571,48 @@ void AbstractMarkerTiler::onIndicesMoved(const TileIndex::List& tileIndicesList,
     Q_UNUSED(tileIndicesList);
     Q_UNUSED(targetCoordinates);
     Q_UNUSED(targetSnapIndex);
+}
+
+AbstractMarkerTiler::Tile* AbstractMarkerTiler::tileNew()
+{
+    return new Tile();
+}
+
+void AbstractMarkerTiler::tileDelete(AbstractMarkerTiler::Tile* const tile)
+{
+    tileDeleteChildren(tile);
+
+    tileDeleteInternal(tile);
+}
+
+void AbstractMarkerTiler::tileDeleteInternal(AbstractMarkerTiler::Tile* const tile)
+{
+    delete tile;
+}
+
+void AbstractMarkerTiler::tileDeleteChildren(AbstractMarkerTiler::Tile* const tile)
+{
+    if (!tile)
+        return;
+
+    foreach(Tile* tilec, tile->children)
+    {
+        tileDelete(tilec);
+    }
+    tile->children.clear();
+    tile->childrenMask.clear();
+}
+
+void AbstractMarkerTiler::tileDeleteChild(AbstractMarkerTiler::Tile* const parentTile, AbstractMarkerTiler::Tile* const childTile, const int knownLinearIndex)
+{
+    int tileIndex = knownLinearIndex;
+    if (tileIndex<0)
+    {
+        tileIndex = parentTile->children.indexOf(childTile);
+    }
+    parentTile->children.replace(tileIndex, 0);
+
+    tileDelete(childTile);
 }
 
 } /* namespace KMap */

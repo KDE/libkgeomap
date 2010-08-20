@@ -214,7 +214,6 @@ public:
         Tile()
             : children(),
               childrenMask(),
-              markerIndices(),
               selectedCount(0),
               markerCount(0)
         {
@@ -222,17 +221,6 @@ public:
 
         ~Tile()
         {
-            deleteChildren();
-        }
-
-        void deleteChildren()
-        {
-            foreach(const Tile* tile, children)
-            {
-                delete tile;
-            }
-            children.clear();
-            childrenMask.clear();
         }
 
         void prepareForChildren(const QPair<int, int>& childCount)
@@ -257,82 +245,22 @@ public:
             return childrenMask.testBit(linearIndex);
         }
 
-        void deleteChild(Tile* const childTile, const int knownLinearIndex = -1)
-        {
-            int tileIndex = knownLinearIndex;
-            if (tileIndex<0)
-            {
-                tileIndex = children.indexOf(childTile);
-            }
-            children.replace(tileIndex, 0);
-            delete childTile;
-        }
-
-        void removeMarkerIndexOrInvalidIndex(const QModelIndex& indexToRemove)
-        {
-            int i=0;
-            while (i<markerIndices.count())
-            {
-                const QPersistentModelIndex& currentIndex = markerIndices.at(i);
-
-                // NOTE: this function is usually called after the model has sent
-                //       an aboutToRemove-signal. It is possible that the persistent
-                //       marker index became invalid before the caller received the signal.
-                //       we remove any invalid indices as we find them.
-                if ( !currentIndex.isValid() )
-                {
-                    markerIndices.takeAt(i);
-                    markerCount = markerIndices.count();
-                    continue;
-                }
-
-                if ( currentIndex == indexToRemove )
-                {
-                    markerIndices.takeAt(i);
-                    markerCount = markerIndices.count();
-                    return;
-                }
-
-                ++i;
-            }
-        }
-
-        class ImageFromTileInfo
-        {
-        public:
-            ImageFromTileInfo()
-            :id(-2),
-             url(), 
-             coordinate(),
-             rating(),
-             creationDate()
-            {
-            }
-            
-            ~ImageFromTileInfo()
-            {
-            }
-
-            int                 id;
-            KUrl                url;
-            GeoCoordinates    coordinate;
-            int                 rating;
-            QDateTime           creationDate;
-        };
-
-
         QVector<Tile*>               children;
         QBitArray                    childrenMask;
-        QList<QPersistentModelIndex> markerIndices;
         int                          selectedCount;
         int                          markerCount;
-        QList<ImageFromTileInfo>     imagesFromTileInfo;
     };
 
     AbstractMarkerTiler(QObject* const parent = 0);
     ~AbstractMarkerTiler();
 
+    void tileDeleteChildren(Tile* const tile);
+    void tileDelete(Tile* const tile);
+    void tileDeleteChild(Tile* const parentTile, Tile* const childTile, const int knownLinearIndex = -1);
+
     // these have to be implemented
+    virtual Tile* tileNew();
+    virtual void tileDeleteInternal(Tile* const tile);
     virtual void prepareTiles(const GeoCoordinates& upperLeft, const GeoCoordinates& lowerRight, int level) = 0;
     virtual void regenerateTiles() = 0;
     virtual Tile* getTile(const TileIndex& tileIndex, const bool stopIfEmpty = false) = 0;
@@ -356,7 +284,6 @@ public:
     bool isDirty() const;
     void setDirty(const bool state = true);
     Tile* resetRootTile();
-    
 
 public:
 

@@ -616,14 +616,15 @@ void TestModel::testSelectionState1()
 
 void TestModel::benchmarkIteratorWholeWorld()
 {
+    return;
 //     QBENCHMARK
     {
         QScopedPointer<QStandardItemModel> itemModel(new QStandardItemModel());
         ItemMarkerTiler mm(new MarkerModelHelper(itemModel.data(), 0));
         const int maxLevel = ItemMarkerTiler::TileIndex::MaxLevel;
 
-        for (int l = 0; l<=maxLevel; ++l)
         {
+            int l = maxLevel-1;
             ItemMarkerTiler::NonEmptyIterator it(&mm, l);
             QVERIFY( CountMarkersInIterator(&it) == 0 );
         }
@@ -638,7 +639,7 @@ void TestModel::benchmarkIteratorWholeWorld()
             }
         }
 
-        QBENCHMARK
+//         QBENCHMARK
         {
             const int l=maxLevel;
 //             for (int l = 0; l<=maxLevel; ++l)

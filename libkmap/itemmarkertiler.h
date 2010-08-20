@@ -42,9 +42,52 @@ class KMAP_EXPORT ItemMarkerTiler : public AbstractMarkerTiler
 
 public:
 
+    class MyTile : public Tile
+    {
+    public:
+        MyTile()
+        : Tile(),
+          markerIndices()
+        {
+        }
+
+        QList<QPersistentModelIndex> markerIndices;
+
+        void removeMarkerIndexOrInvalidIndex(const QModelIndex& indexToRemove)
+        {
+            int i=0;
+            while (i<markerIndices.count())
+            {
+                const QPersistentModelIndex& currentIndex = markerIndices.at(i);
+
+                // NOTE: this function is usually called after the model has sent
+                //       an aboutToRemove-signal. It is possible that the persistent
+                //       marker index became invalid before the caller received the signal.
+                //       we remove any invalid indices as we find them.
+                if ( !currentIndex.isValid() )
+                {
+                    markerIndices.takeAt(i);
+                    markerCount = markerIndices.count();
+                    continue;
+                }
+
+                if ( currentIndex == indexToRemove )
+                {
+                    markerIndices.takeAt(i);
+                    markerCount = markerIndices.count();
+                    return;
+                }
+
+                ++i;
+            }
+        }
+    };
+
     ItemMarkerTiler(ModelHelper* const modelHelper, QObject* const parent = 0);
     ~ItemMarkerTiler();
 
+    virtual Tile* tileNew();
+    virtual void tileDeleteInternal(Tile* const tile);
     virtual void prepareTiles(const GeoCoordinates& upperLeft, const GeoCoordinates& lowerRight, int level);
     virtual void regenerateTiles();
     virtual Tile* getTile(const TileIndex& tileIndex, const bool stopIfEmpty = false);
