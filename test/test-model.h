@@ -46,6 +46,9 @@ public:
     virtual QItemSelectionModel* selectionModel() const;
     virtual bool itemCoordinates(const QModelIndex& index, KMap::GeoCoordinates* const coordinates) const;
 
+private Q_SLOTS:
+    void slotDataChanged(const QModelIndex& topLeft, const QModelIndex& bottomRight);
+
 private:
     QAbstractItemModel* const m_itemModel;
     QItemSelectionModel* const m_itemSelectionModel;

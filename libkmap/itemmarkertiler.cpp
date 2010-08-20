@@ -81,7 +81,7 @@ void ItemMarkerTiler::setMarkerModelHelper(ModelHelper* const modelHelper)
 //                 this, SLOT(slotSourceModelDataChanged(const QModelIndex&, const QModelIndex&)));
 
         connect(d->modelHelper, SIGNAL(signalModelChangedDrastically()),
-                this, SLOT(slotSourceModelReset()), Qt::QueuedConnection);
+                this, SLOT(slotSourceModelReset()));
 
         connect(d->markerModel, SIGNAL(modelReset()),
                 this, SLOT(slotSourceModelReset()));

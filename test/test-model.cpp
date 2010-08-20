@@ -37,10 +37,17 @@ MarkerModelHelper::MarkerModelHelper(QAbstractItemModel* const itemModel, QItemS
    m_itemModel(itemModel),
    m_itemSelectionModel(itemSelectionModel)
 {
+    connect(itemModel, SIGNAL(dataChanged(const QModelIndex&, const QModelIndex&)),
+            this, SLOT(slotDataChanged(const QModelIndex&, const QModelIndex&)));
 }
 
 MarkerModelHelper::~MarkerModelHelper()
 {
+}
+
+void MarkerModelHelper::slotDataChanged(const QModelIndex& topLeft, const QModelIndex& bottomRight)
+{
+    emit(signalModelChangedDrastically());
 }
 
 QAbstractItemModel* MarkerModelHelper::model() const
@@ -633,7 +640,8 @@ void TestModel::benchmarkIteratorWholeWorld()
 
         QBENCHMARK
         {
-            for (int l = 0; l<=maxLevel; ++l)
+            const int l=maxLevel;
+//             for (int l = 0; l<=maxLevel; ++l)
             {
                 // iterate over the whole world:
                 ItemMarkerTiler::NonEmptyIterator it(&mm, l);
