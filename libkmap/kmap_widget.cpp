@@ -289,7 +289,8 @@ void KMapWidget::createActions()
 
     d->actionBrowseMode = new KAction(d->actionGroupMode);
     // TODO: icon
-    d->actionBrowseMode->setText("B");
+    //d->actionBrowseMode->setText("B");
+    d->actionBrowseMode->setIcon(SmallIcon("folder-image"));
     d->actionBrowseMode->setToolTip(i18n("Switch to browse mode"));
     d->actionBrowseMode->setCheckable(true);
     d->actionBrowseMode->setChecked(true);
