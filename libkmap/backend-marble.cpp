@@ -838,7 +838,52 @@ QString BackendMarble::getZoom() const
 
 int BackendMarble::getMarkerModelLevel()
 {
-    return AbstractMarkerTiler::TileIndex::MaxLevel-1;
+//    return AbstractMarkerTiler::TileIndex::MaxLevel-1;
+    KMAP_ASSERT(isReady());
+    if (!isReady())
+    {
+        return 0;
+    }
+
+    // get the current zoom level:
+    const QString currentMarbleZoom = getZoom();
+    const QString currentGMapsZoom = s->worldMapWidget->convertZoomToBackendZoom(currentMarbleZoom, "googlemaps");
+    const QStringList zoomParts = currentGMapsZoom.split(':');
+    KMAP_ASSERT(zoomParts.count()==2);
+    const int currentZoom = zoomParts.last().toInt();
+
+    int tileLevel = 0;
+         if (currentZoom== 0) { tileLevel = 1; }
+    else if (currentZoom== 1) { tileLevel = 1; }
+    else if (currentZoom== 2) { tileLevel = 1; }
+    else if (currentZoom== 3) { tileLevel = 2; }
+    else if (currentZoom== 4) { tileLevel = 2; }
+    else if (currentZoom== 5) { tileLevel = 3; }
+    else if (currentZoom== 6) { tileLevel = 3; }
+    else if (currentZoom== 7) { tileLevel = 3; }
+    else if (currentZoom== 8) { tileLevel = 4; }
+    else if (currentZoom== 9) { tileLevel = 4; }
+    else if (currentZoom==10) { tileLevel = 4; }
+    else if (currentZoom==11) { tileLevel = 4; }
+    else if (currentZoom==12) { tileLevel = 4; }
+    else if (currentZoom==13) { tileLevel = 4; }
+    else if (currentZoom==14) { tileLevel = 5; }
+    else if (currentZoom==15) { tileLevel = 5; }
+    else if (currentZoom==16) { tileLevel = 5; }
+    else if (currentZoom==17) { tileLevel = 5; }
+    else if (currentZoom==18) { tileLevel = 6; }
+    else if (currentZoom==19) { tileLevel = 6; }
+    else if (currentZoom==20) { tileLevel = 6; }
+    else if (currentZoom==21) { tileLevel = 7; }
+    else if (currentZoom==22) { tileLevel = 7; }
+    else
+    {
+        tileLevel = AbstractMarkerTiler::TileIndex::MaxLevel-1;
+    }
+
+    KMAP_ASSERT(tileLevel <= AbstractMarkerTiler::TileIndex::MaxLevel-1);
+
+    return tileLevel;
 }
 
 GeoCoordinates::PairList BackendMarble::getNormalizedBounds()
