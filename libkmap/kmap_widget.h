@@ -122,6 +122,10 @@ public:
     bool getSelectionStatus() const;
     void setActive(const bool state);
     bool getActiveState();
+    bool getStickyModeState() const;
+    void setStickyModeState(const bool state);
+    void setVisibleExtraActions(const ExtraActions actions);
+    void setEnabledExtraActions(const ExtraActions actions);
  
 public Q_SLOTS:
 
@@ -140,6 +144,7 @@ public Q_SLOTS:
     void slotRemoveCurrentSelection();
     void slotRemoveCurrentFilter();
     void stopThumbnailTimer();
+    void slotStickyModeChanged();
 
 Q_SIGNALS:
 
@@ -149,6 +154,7 @@ Q_SIGNALS:
     void signalNewSelectionFromMap();
     void signalRemoveCurrentSelection();
     void signalRemoveCurrentFilter();
+    void signalStickyModeChanged();
 
 public:
 

@@ -164,7 +164,11 @@ public:
         activeState(false),
         hasSelection(false),
         availableMouseModes(0),
-        visibleMouseModes(0)
+        visibleMouseModes(0),
+        availableExtraActions(0),
+        visibleExtraActions(0),
+        actionStickyMode(0),
+        buttonStickyMode(0)
     {
     }
 
@@ -238,6 +242,11 @@ public:
     bool                    hasSelection;
     MouseModes              availableMouseModes;
     MouseModes              visibleMouseModes;
+
+    ExtraActions            availableExtraActions;
+    ExtraActions            visibleExtraActions;
+    KAction*                actionStickyMode;
+    QToolButton*            buttonStickyMode;
 };
 
 KMapWidget::KMapWidget(QWidget* const parent)
@@ -358,6 +367,12 @@ void KMapWidget::createActions()
     d->actionSetSelectThumbnailMode->setToolTip(i18n("Select images"));
     d->actionSetSelectThumbnailMode->setIcon(SmallIcon("edit-select"));
 
+    d->actionStickyMode = new KAction(this);
+    d->actionStickyMode->setCheckable(true);
+    d->actionStickyMode->setToolTip(i18n("Lock the map position"));
+    connect(d->actionStickyMode, SIGNAL(triggered(const bool)),
+            this, SLOT(slotStickyModeChanged()));
+
     // TODO: for later actions
 //     action->setToolTip(i18n("Zoom into a group"));
 //     action->setIcon(SmallIcon("page-zoom"));
@@ -404,7 +419,6 @@ void KMapWidget::createActions()
     connect(d->actionRemoveCurrentSelection, SIGNAL(triggered()),
             this, SLOT(slotRemoveCurrentSelection()));
 
-        
 }
 
 void KMapWidget::createActionsForBackendSelection()
@@ -678,6 +692,10 @@ void KMapWidget::saveSettingsToGroup(KConfigGroup* const group)
     group->writeEntry("Grouping Radius", d->groupingRadius);
     group->writeEntry("Edit Grouping Radius", d->editGroupingRadius);
     group->writeEntry("In Edit Mode", s->inEditMode);
+    if (d->visibleExtraActions.testFlag(ExtraActionSticky))
+    {
+        group->writeEntry("Sticky Mode State", d->actionStickyMode->isChecked());
+    }
 
     for (int i=0; i<d->loadedBackends.size(); ++i)
     {
@@ -722,6 +740,7 @@ void KMapWidget::readSettingsFromGroup(const KConfigGroup* const group)
         d->loadedBackends.at(i)->readSettingsFromGroup(group);
     }
 
+    d->actionStickyMode->setChecked(group->readEntry("Sticky Mode State", d->actionStickyMode->isChecked()));
     slotUpdateActionsEnabled();
 }
 
@@ -845,9 +864,13 @@ QWidget* KMapWidget::getControlWidget()
         d->setSelectThumbnailMode = new QToolButton(d->mouseModesHolder);
         d->setSelectThumbnailMode->setDefaultAction(d->actionSetSelectThumbnailMode);
 
+        d->buttonStickyMode = new QToolButton(d->controlWidget);
+        d->buttonStickyMode->setDefaultAction(d->actionStickyMode);
+
         d->hBoxForAdditionalControlWidgetItems = new KHBox(d->controlWidget);
 
         setVisibleMouseModes(d->visibleMouseModes);
+        setVisibleExtraActions(d->visibleExtraActions);
 
         // add stretch after the controls:
         QHBoxLayout* const hBoxLayout = reinterpret_cast<QHBoxLayout*>(d->controlWidget->layout());
@@ -892,6 +915,9 @@ void KMapWidget::slotUpdateActionsEnabled()
     d->actionSetFilterMode->setEnabled(d->availableMouseModes.testFlag(MouseModeFilter));
     d->actionRemoveFilterMode->setEnabled(d->availableMouseModes.testFlag(MouseModeFilter));
     d->actionSetSelectThumbnailMode->setEnabled(d->availableMouseModes.testFlag(MouseModeSelectThumbnail));
+
+    d->actionStickyMode->setEnabled(d->availableExtraActions.testFlag(ExtraActionSticky));
+    d->actionStickyMode->setIcon(SmallIcon(d->actionStickyMode->isChecked()?"object-locked":"object-unlocked"));
 }
 
 void KMapWidget::slotChangeBackend(QAction* action)
@@ -2321,6 +2347,42 @@ void KMapWidget::setVisibleMouseModes(const MouseModes mouseModes)
 void KMapWidget::setAvailableMouseModes(const MouseModes mouseModes)
 {
     d->availableMouseModes = mouseModes;
+}
+
+bool KMapWidget::getStickyModeState() const
+{
+    return d->actionStickyMode->isChecked();
+}
+
+void KMapWidget::setStickyModeState(const bool state)
+{
+    d->actionStickyMode->setChecked(state);
+    slotUpdateActionsEnabled();
+}
+
+void KMapWidget::setVisibleExtraActions(const ExtraActions actions)
+{
+    d->visibleExtraActions = actions;
+
+    if (d->buttonStickyMode)
+    {
+        d->buttonStickyMode->setVisible(actions.testFlag(ExtraActionSticky));
+    }
+
+    slotUpdateActionsEnabled();
+}
+
+void KMapWidget::setEnabledExtraActions(const ExtraActions actions)
+{
+    d->availableExtraActions = actions;
+
+    slotUpdateActionsEnabled();
+}
+
+void KMapWidget::slotStickyModeChanged()
+{
+    slotUpdateActionsEnabled();
+    emit(signalStickyModeChanged());
 }
 
 } /* namespace KMap */
