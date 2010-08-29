@@ -24,17 +24,13 @@
 #
 # ============================================================
 
-INCLUDE_DIRECTORIES( ${KEXIV2_INCLUDE_DIR}
-                     ${LIBMARBLEWIDGET_INCLUDE_DIR}
-                   )
+INCLUDE_DIRECTORIES(${LIBMARBLEWIDGET_INCLUDE_DIR})
 
 INCLUDE(CheckIncludeFile)
 CHECK_INCLUDE_FILE("valgrind/valgrind.h" HAVE_VALGRIND)
 IF(${HAVE_VALGRIND})
     ADD_DEFINITIONS(-DKMAP_HAVE_VALGRIND)
 ENDIF(${HAVE_VALGRIND})
-
-ADD_DEFINITIONS(${KEXIV2_DEFINITIONS})
 
 CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/version.h.cmake ${CMAKE_CURRENT_BINARY_DIR}/version.h)
 
@@ -81,7 +77,6 @@ TARGET_LINK_LIBRARIES(kmap ${QT_QTGUI_LIBRARY}
                            ${KDE4_UI_LIBS}
                            ${KDE4_KPARTS_LIBS}
                            ${KDE4_KHTML_LIBS}
-                           ${KEXIV2_LIBRARIES}
                            ${LIBMARBLEWIDGET_LIBRARY}
                            )
 

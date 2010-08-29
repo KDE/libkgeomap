@@ -24,7 +24,8 @@
 #
 # ============================================================
 
-INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/../libkmap)
+INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/../libkmap ${KEXIV2_INCLUDE_DIR})
+ADD_DEFINITIONS(${KEXIV2_DEFINITIONS})
 
 SET(demo_sources
     demo-main.cpp
