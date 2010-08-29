@@ -35,11 +35,12 @@ SET(demo_sources
    )
 
 KDE4_ADD_EXECUTABLE( libkmap_demo ${demo_sources} )
-target_link_libraries( libkmap_demo kmap ${KEXIV2_LIBRARIES} 
-					 ${QT_QTGUI_LIBRARY} 
-					 ${KDE4_KDECORE_LIBS}
-                           		 ${KDE4_UI_LIBS}
-		                         ${KDE4_KPARTS_LIBS}
-                		         ${KDE4_KHTML_LIBS})
+target_link_libraries( libkmap_demo kmap
+                        ${KEXIV2_LIBRARIES}
+                        ${QT_QTGUI_LIBRARY} 
+                        ${KDE4_KDECORE_LIBS}
+                        ${KDE4_UI_LIBS}
+                        ${KDE4_KPARTS_LIBS}
+                        ${KDE4_KHTML_LIBS})
 
 INSTALL(TARGETS libkmap_demo ${INSTALL_TARGETS_DEFAULT_ARGS})
