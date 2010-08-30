@@ -888,7 +888,12 @@ int BackendMarble::getMarkerModelLevel()
 
 GeoCoordinates::PairList BackendMarble::getNormalizedBounds()
 {
+    // TODO: not sure whether this is the exact version where this was changed
+#if MARBLE_VERSION < 0x000b00
     const Marble::GeoDataLatLonAltBox marbleBounds = d->marbleWidget->map()->viewParams()->viewport()->viewLatLonAltBox();
+#else
+    const Marble::GeoDataLatLonAltBox marbleBounds = d->marbleWidget->viewport()->viewLatLonAltBox();
+#endif
 //     kDebug()<<marbleBounds.toString(GeoDataCoordinates::Degree);
 
     const GeoCoordinates::Pair boundsPair = GeoCoordinates::makePair(
