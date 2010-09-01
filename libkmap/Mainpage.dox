@@ -1,0 +1,7 @@
+/** @mainpage libKMap
+
+libkmap is a library which allows you to display image positions on a map. It provides automatic grouping of images which are close together and modifying the positions of images using draggable markers. It currently provides two backends which can be used to display the maps, Google Maps and Marble. To get started, read the documentation for KMap::KMapWidget.
+
+@see KMap::KMapWidget
+
+ */

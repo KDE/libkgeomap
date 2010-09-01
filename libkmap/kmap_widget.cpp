@@ -1,4 +1,5 @@
 /** ===========================================================
+ * @file
  *
  * This file is a part of digiKam project
  * <a href="http://www.digikam.org">http://www.digikam.org</a>
@@ -69,8 +70,6 @@
 #include "kmap_dragdrophandler.h"
 #include "version.h"
 #include "kmap_modelhelper.h"
-
-using namespace Marble;
 
 namespace KMap
 {
@@ -2295,7 +2294,7 @@ void KMapWidget::setEditEnabled(const bool state)
 
 QString KMapWidget::MarbleWidgetVersion()
 {
-    return QString(MARBLE_VERSION_STRING);
+    return QString(Marble::MARBLE_VERSION_STRING);
 }
 
 QString KMapWidget::version()

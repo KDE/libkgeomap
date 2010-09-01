@@ -1,4 +1,5 @@
 /** ===========================================================
+ * @file
  *
  * This file is a part of digiKam project
  * <a href="http://www.digikam.org">http://www.digikam.org</a>
@@ -36,10 +37,12 @@
 #include <marble/global.h>
 #include <marble/GeoDataLatLonBox.h>
 
+/// @cond false
 namespace Marble
 {
     class GeoPainter;
 }
+/// @endcond
 
 namespace KMap
 {
