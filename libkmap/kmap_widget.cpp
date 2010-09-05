@@ -99,9 +99,9 @@ namespace KMap
  *     as well and added to the model using setDragDropHandler.
  */
 
-const int KMapMinEditGroupingRadius = 1;
-const int KMapMinGroupingRadius     = 15;
-const int KMapMinThumbnailSize      = 30;
+const int KMapMinMarkerGroupingRadius        = 1;
+const int KMapMinThumbnailGroupingRadius     = 15;
+const int KMapMinThumbnailSize               = KMapMinThumbnailGroupingRadius * 2;
 
 /**
  * @brief Helper function, returns the square of the distance between two points
@@ -133,20 +133,16 @@ public:
         actionGroupBackendSelection(0),
         actionZoomIn(0),
         actionZoomOut(0),
-        actionBrowseMode(0),
-        actionEditMode(0),
-        actionGroupMode(0),
-        browseModeControlsHolder(0),
+        actionShowThumbnails(0),
         mouseModesHolder(0),
         controlWidget(0),
         lazyReclusteringRequested(false),
         clustersDirty(false),
-        editModeAvailable(false),
         dragDropHandler(0),
         sortMenu(0),
         thumbnailSize(KMapMinThumbnailSize),
-        groupingRadius(KMapMinGroupingRadius),
-        editGroupingRadius(KMapMinEditGroupingRadius),
+        thumbnailGroupingRadius(KMapMinThumbnailGroupingRadius),
+        markerGroupingRadius(KMapMinMarkerGroupingRadius),
         actionIncreaseThumbnailSize(0),
         actionDecreaseThumbnailSize(0),
         actionSetSelectionMode(0),
@@ -188,10 +184,7 @@ public:
     QActionGroup*           actionGroupBackendSelection;
     KAction*                actionZoomIn;
     KAction*                actionZoomOut;
-    KAction*                actionBrowseMode;
-    KAction*                actionEditMode;
-    QActionGroup*           actionGroupMode;
-    QWidget*                browseModeControlsHolder;
+    KAction*                actionShowThumbnails;
     QWidget*                mouseModesHolder;
     QPointer<KHBox>         controlWidget;
     KAction*                actionPreviewSingleItems;
@@ -200,14 +193,13 @@ public:
 
     bool                    lazyReclusteringRequested;
     bool                    clustersDirty;
-    bool                    editModeAvailable;
 
     DragDropHandler*        dragDropHandler;
 
     QMenu*                  sortMenu;
     int                     thumbnailSize;
-    int                     groupingRadius;
-    int                     editGroupingRadius;
+    int                     thumbnailGroupingRadius;
+    int                     markerGroupingRadius;
     KAction*                actionIncreaseThumbnailSize;
     KAction*                actionDecreaseThumbnailSize;
     KHBox*                  hBoxForAdditionalControlWidgetItems;
@@ -285,26 +277,12 @@ void KMapWidget::createActions()
     connect(d->actionZoomOut, SIGNAL(triggered()),
             this, SLOT(slotZoomOut()));
 
-    // actions to switch between edit mode and browse mode
-    d->actionGroupMode = new QActionGroup(this);
-    d->actionGroupMode->setExclusive(true);
+    d->actionShowThumbnails = new KAction(this);
+    d->actionShowThumbnails->setToolTip(i18n("Switch between markers and thumbnails."));
+    d->actionShowThumbnails->setCheckable(true);
 
-    d->actionEditMode = new KAction(d->actionGroupMode);
-    // TODO: icon
-    d->actionEditMode->setText("E");
-    d->actionEditMode->setToolTip(i18n("Switch to edit mode"));
-    d->actionEditMode->setCheckable(true);
-
-    d->actionBrowseMode = new KAction(d->actionGroupMode);
-    // TODO: icon
-    //d->actionBrowseMode->setText("B");
-    d->actionBrowseMode->setIcon(SmallIcon("folder-image"));
-    d->actionBrowseMode->setToolTip(i18n("Switch to browse mode"));
-    d->actionBrowseMode->setCheckable(true);
-    d->actionBrowseMode->setChecked(true);
-
-    connect(d->actionGroupMode, SIGNAL(triggered(QAction*)),
-            this, SLOT(slotGroupModeChanged(QAction*)));
+    connect(d->actionShowThumbnails, SIGNAL(triggered(bool)),
+            this, SLOT(slotShowThumbnailsChanged()));
 
     // create backend selection entries:
     d->actionGroupBackendSelection = new QActionGroup(this);
@@ -688,9 +666,9 @@ void KMapWidget::saveSettingsToGroup(KConfigGroup* const group)
     group->writeEntry("Preview Grouped Items", s->previewGroupedItems);
     group->writeEntry("Show numbers on items", s->showNumbersOnItems);
     group->writeEntry("Thumbnail Size", d->thumbnailSize);
-    group->writeEntry("Grouping Radius", d->groupingRadius);
-    group->writeEntry("Edit Grouping Radius", d->editGroupingRadius);
-    group->writeEntry("In Edit Mode", s->inEditMode);
+    group->writeEntry("Thumbnail Grouping Radius", d->thumbnailGroupingRadius);
+    group->writeEntry("Marker Grouping Radius", d->markerGroupingRadius);
+    group->writeEntry("Show Thumbnails", s->showThumbnails);
     if (d->visibleExtraActions.testFlag(ExtraActionSticky))
     {
         group->writeEntry("Sticky Mode State", d->actionStickyMode->isChecked());
@@ -722,17 +700,10 @@ void KMapWidget::readSettingsFromGroup(const KConfigGroup* const group)
     d->actionShowNumbersOnItems->setChecked(group->readEntry("Show numbers on items", true));
 
     setThumnailSize(group->readEntry("Thumbnail Size", 2*KMapMinThumbnailSize));
-    setGroupingRadius(group->readEntry("Grouping Radius", 2*KMapMinGroupingRadius));
-    setEditGroupingRadius(group->readEntry("Edit Grouping Radius", KMapMinEditGroupingRadius));
-    s->inEditMode = group->readEntry("In Edit Mode", false);
-    if (s->inEditMode)
-    {
-        d->actionEditMode->setChecked(true);
-    }
-    else
-    {
-        d->actionBrowseMode->setChecked(true);
-    }
+    setThumbnailGroupingRadius(group->readEntry("Thumbnail Grouping Radius", 2*KMapMinThumbnailGroupingRadius));
+    setMarkerGroupingRadius(group->readEntry("Edit Grouping Radius", KMapMinMarkerGroupingRadius));
+    s->showThumbnails = group->readEntry("Show Thumbnails", false);
+    d->actionShowThumbnails->setChecked(s->showThumbnails);
 
     for (int i=0; i<d->loadedBackends.size(); ++i)
     {
@@ -765,7 +736,7 @@ void KMapWidget::rebuildConfigurationMenu()
         d->currentBackend->addActionsToConfigurationMenu(d->configurationMenu);
     }
 
-    if (!s->inEditMode)
+    if (s->showThumbnails)
     {
         d->configurationMenu->addSeparator();
 
@@ -816,17 +787,8 @@ QWidget* KMapWidget::getControlWidget()
         QToolButton* const zoomOutButton = new QToolButton(d->controlWidget);
         zoomOutButton->setDefaultAction(d->actionZoomOut);
 
-        // browse mode controls:
-        d->browseModeControlsHolder = new KHBox(d->controlWidget);
-        d->browseModeControlsHolder->setVisible(d->editModeAvailable);
-
-        new KSeparator(Qt::Vertical, d->browseModeControlsHolder);
-
-        QToolButton* const browseModeButton = new QToolButton(d->browseModeControlsHolder);
-        browseModeButton->setDefaultAction(d->actionBrowseMode);
-
-        QToolButton* const editModeButton = new QToolButton(d->browseModeControlsHolder);
-        editModeButton->setDefaultAction(d->actionEditMode);
+        QToolButton* const showThumbnailsButton = new QToolButton(d->controlWidget);
+        showThumbnailsButton->setDefaultAction(d->actionShowThumbnails);
 
         new KSeparator(Qt::Vertical, d->controlWidget);
 
@@ -903,9 +865,9 @@ void KMapWidget::slotZoomOut()
 
 void KMapWidget::slotUpdateActionsEnabled()
 {
-    d->actionDecreaseThumbnailSize->setEnabled((!s->inEditMode)&&(d->thumbnailSize>KMapMinThumbnailSize));
+    d->actionDecreaseThumbnailSize->setEnabled((s->showThumbnails)&&(d->thumbnailSize>KMapMinThumbnailSize));
     // TODO: define an upper limit!
-    d->actionIncreaseThumbnailSize->setEnabled(!s->inEditMode);
+    d->actionIncreaseThumbnailSize->setEnabled(s->showThumbnails);
 
     d->actionSetSelectionMode->setEnabled(d->availableMouseModes.testFlag(MouseModeSelection));
     d->actionRemoveCurrentSelection->setEnabled(d->availableMouseModes.testFlag(MouseModeSelection));
@@ -916,7 +878,10 @@ void KMapWidget::slotUpdateActionsEnabled()
     d->actionSetSelectThumbnailMode->setEnabled(d->availableMouseModes.testFlag(MouseModeSelectThumbnail));
 
     d->actionStickyMode->setEnabled(d->availableExtraActions.testFlag(ExtraActionSticky));
+
+    // TODO: cache the icons somewhere?
     d->actionStickyMode->setIcon(SmallIcon(d->actionStickyMode->isChecked()?"object-locked":"object-unlocked"));
+    d->actionShowThumbnails->setIcon(d->actionShowThumbnails->isChecked()?SmallIcon("folder-image"):s->markerPixmaps["marker-icon-16x16"]);
 }
 
 void KMapWidget::slotChangeBackend(QAction* action)
@@ -956,7 +921,7 @@ void KMapWidget::updateClusters()
     d->clustersDirty = false;
 
     // constants for clusters
-    const int ClusterRadius          = s->inEditMode ? d->editGroupingRadius : d->groupingRadius;
+    const int ClusterRadius          = s->showThumbnails ? d->thumbnailGroupingRadius : d->markerGroupingRadius;
     const QSize ClusterDefaultSize   = QSize(2*ClusterRadius, 2*ClusterRadius);
     const int ClusterGridSizeScreen  = 4*ClusterRadius;
     const QSize ClusterMaxPixmapSize = QSize(ClusterGridSizeScreen, ClusterGridSizeScreen);
@@ -1547,10 +1512,9 @@ void KMapWidget::setGroupedModel(AbstractMarkerTiler* const markerModel)
     slotRequestLazyReclustering();
 }
 
-void KMapWidget::slotGroupModeChanged(QAction* triggeredAction)
+void KMapWidget::slotShowThumbnailsChanged()
 {
-    Q_UNUSED(triggeredAction);
-    s->inEditMode = d->actionEditMode->isChecked();
+    s->showThumbnails = d->actionShowThumbnails->isChecked();
 
     slotUpdateActionsEnabled();
     slotRequestLazyReclustering();
@@ -1685,7 +1649,8 @@ void KMapWidget::slotClustersClicked(const QIntList& clusterIndices)
 
 void KMapWidget::dragEnterEvent(QDragEnterEvent* event)
 {
-    if ( (!s->editEnabled) || (!d->dragDropHandler) )
+    // TODO: ignore drops if no marker tiler or model can accept them
+    if (!d->dragDropHandler)
     {
         event->ignore();
         return;
@@ -1716,7 +1681,7 @@ void KMapWidget::dropEvent(QDropEvent* event)
     // remove the drag marker:
 //     d->currentBackend->updateDragDropMarker(QPoint(), 0);
 
-    if ( (!s->editEnabled) || (!d->dragDropHandler) )
+    if (!d->dragDropHandler)
     {
         event->ignore();
         return;
@@ -1744,19 +1709,6 @@ void KMapWidget::dragLeaveEvent(QDragLeaveEvent* event)
 void KMapWidget::markClustersAsDirty()
 {
     d->clustersDirty = true;
-}
-
-/**
- * @brief Controls whether the user can switch from browse to edit mode.
- */
-void KMapWidget::setEditModeAvailable(const bool state)
-{
-    d->editModeAvailable = state;
-
-    if (d->browseModeControlsHolder)
-    {
-        d->browseModeControlsHolder->setVisible(d->editModeAvailable);
-    }
 }
 
 void KMapWidget::setDragDropHandler(DragDropHandler* const dragDropHandler)
@@ -1839,7 +1791,7 @@ QPixmap KMapWidget::getDecoratedPixmapForCluster(const int clusterId, const WMWS
                         &markerCount);
 
     // determine whether we should use a pixmap or a placeholder
-    if (s->inEditMode)
+    if (!s->showThumbnails)
     {
         QString pixmapName = fillColor.name().mid(1);
         if (selectedState==WMWSelectedAll)
@@ -1986,41 +1938,41 @@ void KMapWidget::setThumnailSize(const int newThumbnailSize)
     d->thumbnailSize = qMax(KMapMinThumbnailSize, newThumbnailSize);
 
     // make sure the grouping radius is larger than the thumbnail size
-    if (2*d->groupingRadius < newThumbnailSize)
+    if (2*d->thumbnailGroupingRadius < newThumbnailSize)
     {
         // TODO: more straightforward way for this?
-        d->groupingRadius = newThumbnailSize/2 + newThumbnailSize%2;
+        d->thumbnailGroupingRadius = newThumbnailSize/2 + newThumbnailSize%2;
     }
 
-    if (!s->inEditMode)
+    if (s->showThumbnails)
     {
         slotRequestLazyReclustering();
     }
     slotUpdateActionsEnabled();
 }
 
-void KMapWidget::setGroupingRadius(const int newGroupingRadius)
+void KMapWidget::setThumbnailGroupingRadius(const int newGroupingRadius)
 {
-    d->groupingRadius = qMax(KMapMinGroupingRadius, newGroupingRadius);
+    d->thumbnailGroupingRadius = qMax(KMapMinThumbnailGroupingRadius, newGroupingRadius);
 
     // make sure the thumbnails are smaller than the grouping radius
-    if (2*d->groupingRadius < d->thumbnailSize)
+    if (2*d->thumbnailGroupingRadius < d->thumbnailSize)
     {
         d->thumbnailSize = 2*newGroupingRadius;
     }
 
-    if (!s->inEditMode)
+    if (s->showThumbnails)
     {
         slotRequestLazyReclustering();
     }
     slotUpdateActionsEnabled();
 }
 
-void KMapWidget::setEditGroupingRadius(const int newGroupingRadius)
+void KMapWidget::setMarkerGroupingRadius(const int newGroupingRadius)
 {
-    d->editGroupingRadius = qMax(KMapMinEditGroupingRadius, newGroupingRadius);
+    d->markerGroupingRadius = qMax(KMapMinMarkerGroupingRadius, newGroupingRadius);
 
-    if (s->inEditMode)
+    if (!s->showThumbnails)
     {
         slotRequestLazyReclustering();
     }
@@ -2029,7 +1981,7 @@ void KMapWidget::setEditGroupingRadius(const int newGroupingRadius)
 
 void KMapWidget::slotDecreaseThumbnailSize()
 {
-    if (s->inEditMode)
+    if (!s->showThumbnails)
         return;
 
     if (d->thumbnailSize>KMapMinThumbnailSize)
@@ -2038,13 +1990,13 @@ void KMapWidget::slotDecreaseThumbnailSize()
 
         // make sure the grouping radius is also decreased
         // this will automatically decrease the thumbnail size as well
-        setGroupingRadius(newThumbnailSize/2);
+        setThumbnailGroupingRadius(newThumbnailSize/2);
     }
 }
 
 void KMapWidget::slotIncreaseThumbnailSize()
 {
-    if (s->inEditMode)
+    if (!s->showThumbnails)
         return;
 
     setThumnailSize(d->thumbnailSize+5);
@@ -2285,11 +2237,6 @@ void KMapWidget::addWidgetToControlWidget(QWidget* const newWidget)
     }
 }
 
-void KMapWidget::setEditEnabled(const bool state)
-{
-    s->editEnabled = state;
-}
-
 // Static methods ---------------------------------------------------------
 
 QString KMapWidget::MarbleWidgetVersion()
@@ -2382,6 +2329,14 @@ void KMapWidget::slotStickyModeChanged()
 {
     slotUpdateActionsEnabled();
     emit(signalStickyModeChanged());
+}
+
+void KMapWidget::setAllowModifications(const bool state)
+{
+    s->modificationsAllowed = state;
+
+    slotUpdateActionsEnabled();
+    slotRequestLazyReclustering();
 }
 
 } /* namespace KMap */

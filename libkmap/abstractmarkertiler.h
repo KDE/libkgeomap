@@ -51,6 +51,14 @@ Q_OBJECT
 
 public:
 
+    enum Flag
+    {
+        FlagNull = 0,
+        FlagMovable = 1
+    };
+
+    Q_DECLARE_FLAGS(Flags, Flag)
+
     class TileIndex
     {
     public:
@@ -260,6 +268,7 @@ public:
     void tileDeleteChild(Tile* const parentTile, Tile* const childTile, const int knownLinearIndex = -1);
 
     // these have to be implemented
+    virtual Flags tilerFlags() const;
     virtual Tile* tileNew();
     virtual void tileDeleteInternal(Tile* const tile);
     virtual void prepareTiles(const GeoCoordinates& upperLeft, const GeoCoordinates& lowerRight, int level) = 0;
@@ -333,5 +342,6 @@ inline QDebug operator<<(QDebug debugOut, const KMap::AbstractMarkerTiler::TileI
     return debugOut;
 }
 
+Q_DECLARE_OPERATORS_FOR_FLAGS(KMap::AbstractMarkerTiler::Flags)
 
 #endif /* ABSTRACTMARKERTILER_H */

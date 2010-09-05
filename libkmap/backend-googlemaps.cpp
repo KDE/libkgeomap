@@ -610,8 +610,9 @@ void BackendGoogleMaps::updateClusters()
     // TODO: only update clusters that have actually changed!
 
     // re-transfer all markers to the javascript-part:
+    const bool canMoveItems = s->modificationsAllowed && s->markerModel->tilerFlags().testFlag(AbstractMarkerTiler::FlagMovable) && !s->showThumbnails;
     d->htmlWidget->runScript(QString("wmwClearClusters();"));
-    d->htmlWidget->runScript(QString("wmwSetIsInEditMode(%1);").arg(s->inEditMode?"true":"false"));
+    d->htmlWidget->runScript(QString("wmwSetIsInEditMode(%1);").arg(s->showThumbnails?"false":"true"));
     for (int currentIndex = 0; currentIndex<s->clusterList.size(); ++currentIndex)
     {
         const WMWCluster& currentCluster = s->clusterList.at(currentIndex);
@@ -620,7 +621,7 @@ void BackendGoogleMaps::updateClusters()
                 .arg(currentIndex)
                 .arg(currentCluster.coordinates.latString())
                 .arg(currentCluster.coordinates.lonString())
-                .arg(s->inEditMode?"true":"false")
+                .arg(canMoveItems?"true":"false")
                 .arg(currentCluster.markerCount)
                 .arg(currentCluster.markerSelectedCount)
             );
@@ -628,7 +629,7 @@ void BackendGoogleMaps::updateClusters()
         // TODO: for now, only set generated pixmaps when not in edit mode
         // this can be changed once we figure out how to appropriately handle
         // the selection state changes when a marker is dragged
-        if (!s->inEditMode)
+        if (s->showThumbnails)
         {
             QPoint clusterCenterPoint;
             // TODO: who calculates the override values?
@@ -873,7 +874,7 @@ void BackendGoogleMaps::updateZoomMinMaxCache()
 void BackendGoogleMaps::slotThumbnailAvailableForIndex(const QVariant& index, const QPixmap& pixmap)
 {
     kDebug()<<index<<pixmap.size();
-    if (pixmap.isNull() || s->inEditMode)
+    if (pixmap.isNull() || !s->showThumbnails)
         return;
 
     // TODO: properly reject pixmaps with the wrong size

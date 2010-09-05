@@ -99,15 +99,15 @@ public:
           visibleMarkers(),
           markerModel(0),
           clusterList(),
-          inEditMode(false),
-          editEnabled(true),
+          showThumbnails(true),
           haveMovingCluster(false),
           markerPixmap(),
           markerPixmaps(),
           previewSingleItems(true),
           previewGroupedItems(true),
           showNumbersOnItems(true),
-          sortKey(0)
+          sortKey(0),
+          modificationsAllowed(true)
     {
         QStringList markerColors;
         markerColors << "00ff00" << "00ffff" << "ff0000" << "ff7f00" << "ffff00";
@@ -122,6 +122,10 @@ public:
                 markerPixmaps[pixmapName] = QPixmap(markerUrl.toLocalFile());
             }
         }
+
+        const KUrl markerIconUrl = KStandardDirs::locate("data", "libkmap/marker-icon-16x16.png");
+        markerPixmaps["marker-icon-16x16"] = QPixmap(markerIconUrl.toLocalFile());
+
         markerPixmap = markerPixmaps["00ff00"];
     }
 
@@ -129,9 +133,8 @@ public:
     QIntList                  visibleMarkers;
     AbstractMarkerTiler*      markerModel;
     WMWCluster::List          clusterList;
-    QList<ModelHelper*>    ungroupedModels;
-    bool                      inEditMode;
-    bool                      editEnabled;
+    QList<ModelHelper*>       ungroupedModels;
+    bool                      showThumbnails;
     bool                      haveMovingCluster;
     QPixmap                   markerPixmap;
     QMap<QString, QPixmap>    markerPixmaps;
@@ -139,6 +142,7 @@ public:
     bool                      previewGroupedItems;
     bool                      showNumbersOnItems;
     int                       sortKey;
+    bool                      modificationsAllowed;
 };
 
 // helper functions:

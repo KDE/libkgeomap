@@ -646,4 +646,15 @@ void ItemMarkerTiler::tileDeleteInternal(AbstractMarkerTiler::Tile* const tile)
     delete static_cast<MyTile*>(tile);
 }
 
+AbstractMarkerTiler::Flags ItemMarkerTiler::tilerFlags() const
+{
+    Flags resultFlags = FlagNull;
+    if (d->modelHelper->modelFlags().testFlag(ModelHelper::FlagMovable))
+    {
+        resultFlags|=FlagMovable;
+    }
+
+    return resultFlags;
+}
+
 } // namespace KMap

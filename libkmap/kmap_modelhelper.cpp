@@ -42,10 +42,10 @@ namespace KMap
  * @li selectionModel(): Returns a pointer to the selection model. It may return a null-pointer
  *     if no selection model is used.
  * @li itemCoordinates(): Returns the coordinates for a given item index, if it has any.
+ * @li modelFlags(): Returns flags for the model.
  *
  * For ungrouped models, the following functions should also be implemented:
  * @li itemIcon(): Returns an icon for an index, and an offset to the 'center' of the item.
- * @li modelFlags(): Returns flags for the model.
  * @li itemFlags(): Returns flags for individual items.
  * @li snapItemsTo(): Grouped items have been moved and should snap to an index.
  *

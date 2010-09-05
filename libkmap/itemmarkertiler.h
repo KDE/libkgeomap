@@ -87,6 +87,7 @@ public:
     ItemMarkerTiler(ModelHelper* const modelHelper, QObject* const parent = 0);
     ~ItemMarkerTiler();
 
+    virtual Flags tilerFlags() const;
     virtual Tile* tileNew();
     virtual void tileDeleteInternal(Tile* const tile);
     virtual void prepareTiles(const GeoCoordinates& upperLeft, const GeoCoordinates& lowerRight, int level);

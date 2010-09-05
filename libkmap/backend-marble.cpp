@@ -988,7 +988,7 @@ bool BackendMarble::eventFilter(QObject *object, QEvent *event)
         else if (   (event->type() == QEvent::MouseButtonRelease)
              && ( mouseEvent->button() == Qt::LeftButton ) )
         {
-            if(!d->firstSelectionPoint.hasCoordinates())
+            if (!d->firstSelectionPoint.hasCoordinates())
             {
                 geoCoordinates(mouseEvent->pos(), &d->firstSelectionPoint);
                 d->firstSelectionScreenPoint = mouseEvent->pos();
@@ -1002,7 +1002,7 @@ bool BackendMarble::eventFilter(QObject *object, QEvent *event)
 
                 qreal lonWest, latNorth, lonEast, latSouth;
 
-                if(d->firstSelectionScreenPoint.x() < d->secondSelectionScreenPoint.x())
+                if (d->firstSelectionScreenPoint.x() < d->secondSelectionScreenPoint.x())
                 {
                     lonWest = d->firstSelectionPoint.lon();
                     lonEast = d->secondSelectionPoint.lon();
@@ -1013,7 +1013,7 @@ bool BackendMarble::eventFilter(QObject *object, QEvent *event)
                     lonEast = d->firstSelectionPoint.lon(); 
                 }
 
-                if(d->firstSelectionScreenPoint.y() < d->secondSelectionScreenPoint.y())
+                if (d->firstSelectionScreenPoint.y() < d->secondSelectionScreenPoint.y())
                 {
                     latNorth = d->firstSelectionPoint.lat();
                     latSouth = d->secondSelectionPoint.lat();
@@ -1121,7 +1121,7 @@ bool BackendMarble::eventFilter(QObject *object, QEvent *event)
         else if (   (event->type() == QEvent::MouseMove)
                 && (d->havePotentiallyMouseMovingObject || d->haveMouseMovingObject) )
         {
-            if ( (!s->editEnabled) || ((d->mouseMoveClusterIndex>=0)&&!s->inEditMode) )
+            if ( (!s->modificationsAllowed) || (!s->markerModel->tilerFlags().testFlag(AbstractMarkerTiler::FlagMovable)) || ((d->mouseMoveClusterIndex>=0)&&s->showThumbnails) )
             {
                 // clusters only move in edit mode and when edit mode is enabled
                 // TODO: this blocks moving of the map in non-edit mode
@@ -1274,7 +1274,7 @@ void BackendMarble::updateActionAvailability()
 void BackendMarble::slotThumbnailAvailableForIndex(const QVariant& index, const QPixmap& pixmap)
 {
     kDebug()<<index<<pixmap.size();
-    if (pixmap.isNull() || s->inEditMode)
+    if (pixmap.isNull() || !s->showThumbnails)
         return;
 
     // TODO: properly reject pixmaps with the wrong size

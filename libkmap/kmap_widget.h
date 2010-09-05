@@ -99,7 +99,7 @@ public:
     void addUngroupedModel(ModelHelper* const modelHelper);
     void setGroupedModel(AbstractMarkerTiler* const markerModel);
 
-    void setEditModeAvailable(const bool state);
+    void setShowThumbnails(const bool state);
     void setDragDropHandler(DragDropHandler* const dragDropHandler);
     QVariant getClusterRepresentativeMarker(const int clusterIndex, const int sortKey);
 
@@ -107,13 +107,13 @@ public:
     void setSortKey(const int sortKey);
     QPixmap getDecoratedPixmapForCluster(const int clusterId, const WMWSelectionState* const selectedStateOverride, const int* const countOverride, QPoint* const centerPoint);
     void setThumnailSize(const int newThumbnailSize);
-    void setGroupingRadius(const int newGroupingRadius);
-    void setEditGroupingRadius(const int newGroupingRadius);
+    void setThumbnailGroupingRadius(const int newGroupingRadius);
+    void setMarkerGroupingRadius(const int newGroupingRadius);
     int getThumbnailSize() const;
     int getUndecoratedThumbnailSize() const;
-    void setEditEnabled(const bool state);
     void setAvailableMouseModes(const MouseModes mouseModes);
     void setVisibleMouseModes(const MouseModes mouseModes);
+    void setAllowModifications(const bool state);
  
     QList<qreal> selectionCoordinates() const;
     void setSelectionCoordinates(QList<double>& sel);
@@ -186,7 +186,7 @@ protected Q_SLOTS:
     void slotBackendZoomChanged(const QString& newZoom);
     void slotClustersMoved(const QIntList& clusterIndices, const QPair<int, QModelIndex>& snapTarget);
     void slotClustersClicked(const QIntList& clusterIndices);
-    void slotGroupModeChanged(QAction* triggeredAction);
+    void slotShowThumbnailsChanged();
     void slotRequestLazyReclustering();
     void slotLazyReclusteringRequestCallBack();
     void slotItemDisplaySettingsChanged();

@@ -200,7 +200,6 @@ MainWindow::MainWindow(KCmdLineArgs* const cmdLineArgs, QWidget* const parent)
     setCentralWidget(d->splitter);
 
     d->mapWidget = new KMapWidget(d->splitter);
-    d->mapWidget->setEditModeAvailable(true);
     d->mapWidget->setGroupedModel(mm);
     d->mapWidget->setActive(true);
     d->mapWidget->setDragDropHandler(new DemoDragDropHandler(d->displayMarkersModel, d->mapWidget));
@@ -496,4 +495,9 @@ void MainWindow::createMenus()
             this, SLOT(slotAddImages()));
 
     menuBar()->addMenu(helpMenu());
+}
+
+KMap::ModelHelper::Flags MarkerModelHelper::modelFlags() const
+{
+    return FlagMovable;
 }

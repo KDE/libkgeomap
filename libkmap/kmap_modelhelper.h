@@ -80,10 +80,10 @@ public:
     virtual QAbstractItemModel* model() const = 0;
     virtual QItemSelectionModel* selectionModel() const = 0;
     virtual bool itemCoordinates(const QModelIndex& index, GeoCoordinates* const coordinates) const = 0;
+    virtual Flags modelFlags() const;
 
     // these are necessary for ungrouped models
     virtual QPixmap itemIcon(const QModelIndex& index, QPoint* const offset) const;
-    virtual Flags modelFlags() const;
     virtual Flags itemFlags(const QModelIndex& index) const;
     virtual void snapItemsTo(const QModelIndex& targetIndex, const QList<QModelIndex>& snappedIndices);
 

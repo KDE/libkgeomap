@@ -616,4 +616,9 @@ void AbstractMarkerTiler::tileDeleteChild(AbstractMarkerTiler::Tile* const paren
     tileDelete(childTile);
 }
 
+AbstractMarkerTiler::Flags AbstractMarkerTiler::tilerFlags() const
+{
+    return FlagNull;
+}
+
 } /* namespace KMap */

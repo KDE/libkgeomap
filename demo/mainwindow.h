@@ -53,6 +53,7 @@ public:
     virtual QItemSelectionModel* selectionModel() const;
     virtual bool itemCoordinates(const QModelIndex& index, KMap::GeoCoordinates* const coordinates) const;
     virtual void onIndicesMoved(const QList<QPersistentModelIndex>& movedIndices, const KMap::GeoCoordinates& targetCoordinates, const QPersistentModelIndex& targetSnapIndex);
+    virtual Flags modelFlags() const;
 
 private:
     QAbstractItemModel* const m_itemModel;
