@@ -481,12 +481,6 @@ bool KMapWidget::setBackend(const QString& backendName)
                         d->currentBackend, SLOT(slotThumbnailAvailableForIndex(const QVariant&, const QPixmap&)));
         }
 
-        if (d->currentBackend->backendName() == QString("marble"))
-        {
-            disconnect(d->currentBackend->mapWidget(), SIGNAL(regionSelected(const QList<double>&)),
-                    this, SLOT(slotNewSelectionFromMap(const QList<double>&)));
-        }
-
         disconnect(d->currentBackend, SIGNAL(signalSelectionHasBeenMade(const QList<double>&)),
                 this, SLOT(slotNewSelectionFromMap(const QList<double>&)));
 
@@ -526,12 +520,6 @@ bool KMapWidget::setBackend(const QString& backendName)
             {
                 connect(s->markerModel, SIGNAL(signalThumbnailAvailableForIndex(const QVariant&, const QPixmap&)),
                         d->currentBackend, SLOT(slotThumbnailAvailableForIndex(const QVariant&, const QPixmap&)));
-            }
-
-            if (backendName == QString("marble"))
-            {
-               connect(d->currentBackend->mapWidget(), SIGNAL(regionSelected(const QList<double>&)),
-                       this, SLOT(slotNewSelectionFromMap(const QList<double>&)));
             }
 
             connect(d->currentBackend, SIGNAL(signalSelectionHasBeenMade(const QList<double>&)),
