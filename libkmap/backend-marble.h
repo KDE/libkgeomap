@@ -102,8 +102,8 @@ public:
     void setShowOverviewMap(const bool state);
     void setShowScaleBar(const bool state);
 
-    virtual void setSelectionRectangle(const QList<double>& searchCoordinates);
-    virtual QList<qreal> getSelectionRectangle();
+    virtual void setSelectionRectangle(const GeoCoordinates::Pair& searchCoordinates);
+    virtual GeoCoordinates::Pair getSelectionRectangle();
     virtual void removeSelectionRectangle(/*DisplayedRectangles whatToChange*/);
     virtual void mouseModeChanged(const MouseModes mouseMode);
 

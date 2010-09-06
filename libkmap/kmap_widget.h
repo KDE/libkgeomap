@@ -114,10 +114,9 @@ public:
     void setAvailableMouseModes(const MouseModes mouseModes);
     void setVisibleMouseModes(const MouseModes mouseModes);
     void setAllowModifications(const bool state);
- 
-    QList<qreal> selectionCoordinates() const;
-    void setSelectionCoordinates(QList<double>& sel);
-    QList<qreal> getSelectionRectangle();
+
+    void setSelectionCoordinates(const GeoCoordinates::Pair& sel);
+    GeoCoordinates::Pair getSelectionRectangle();
     void clearSelectionRectangle();
     void setSelectionStatus(const bool status);
     bool getSelectionStatus() const;
@@ -136,7 +135,6 @@ public Q_SLOTS:
     void slotClustersNeedUpdating();
     void slotDecreaseThumbnailSize();
     void slotIncreaseThumbnailSize();
-    void slotNewSelectionFromMap(const QList<double>& sel);
     void slotSetSelectionMode();
     void slotSetPanMode();
     void slotSetZoomMode();
@@ -191,6 +189,7 @@ protected Q_SLOTS:
     void slotLazyReclusteringRequestCallBack();
     void slotItemDisplaySettingsChanged();
     void slotUngroupedModelChanged();
+    void slotNewSelectionFromMap(const KMap::GeoCoordinates::Pair& sel);
 
 private:
 

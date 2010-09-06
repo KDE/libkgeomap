@@ -108,8 +108,8 @@ public:
 
     virtual void updateActionAvailability() = 0;
 
-    virtual void setSelectionRectangle(const QList<double>& searchCorrdinates) = 0;
-    virtual QList<qreal> getSelectionRectangle() = 0;
+    virtual void setSelectionRectangle(const GeoCoordinates::Pair& searchCorrdinates) = 0;
+    virtual GeoCoordinates::Pair getSelectionRectangle() = 0;
     virtual void removeSelectionRectangle() = 0;
     virtual void mouseModeChanged(const MouseModes mouseMode) = 0;
 
@@ -133,7 +133,7 @@ Q_SIGNALS:
     void signalMarkersMoved(const QIntList& markerIndices);
     void signalZoomChanged(const QString& newZoom);
     void signalSpecialMarkersMoved(const QList<QPersistentModelIndex>& indices);
-    void signalSelectionHasBeenMade(const QList<double>&);
+    void signalSelectionHasBeenMade(const KMap::GeoCoordinates::Pair& coordinates);
 
 };
 

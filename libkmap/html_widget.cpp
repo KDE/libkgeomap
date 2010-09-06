@@ -70,7 +70,7 @@ public:
     GeoCoordinates    firstSelectionPoint;
     GeoCoordinates    intermediateSelectionPoint;
     GeoCoordinates    secondSelectionPoint;
-    QList<qreal>        displayedRectangle;
+    GeoCoordinates::Pair displayedRectangle;
     MouseModes          currentMouseMode;
     QPoint              firstSelectionScreenPoint;
     QPoint              secondSelectionScreenPoint;
@@ -182,8 +182,10 @@ void HTMLWidget::khtmlMouseReleaseEvent(khtml::MouseReleaseEvent* e)
                 runScript(QString("setDisplayedRectangle(%1, %2, %3, %4);").arg(lonWest).arg(latNorth).arg(lonEast).arg(latSouth));
                 runScript(QString("removeSelectionRectangle();"));              
  
-                QList<qreal> selectionCoordinates;
-                selectionCoordinates << lonWest << latNorth << lonEast << latSouth;
+                const GeoCoordinates::Pair selectionCoordinates(
+                        GeoCoordinates(latNorth, lonWest),
+                        GeoCoordinates(latSouth, lonEast)
+                    );
 
                 emit selectionHasBeenMade(selectionCoordinates);
 
@@ -237,7 +239,7 @@ void HTMLWidget::khtmlMouseMoveEvent(khtml::MouseMoveEvent *e)
             latNorth = d->intermediateSelectionPoint.lat();
             latSouth = d->firstSelectionPoint.lat();
         }
-                
+
         runScript(QString("setSelectionRectangle(%1, %2, %3, %4, 'red');").arg(lonWest).arg(latNorth).arg(lonEast).arg(latSouth));
     }
 
@@ -304,19 +306,18 @@ bool HTMLWidget::eventFilter(QObject* object, QEvent* event)
     return false;
 }
 
-void HTMLWidget::setSelectionRectangle(const QList<qreal>& searchCoordinates)
+void HTMLWidget::setSelectionRectangle(const GeoCoordinates::Pair& searchCoordinates)
 {
-    if(searchCoordinates.isEmpty())
+    if(!searchCoordinates.first.hasCoordinates())
     {
-        d->displayedRectangle.clear();
+        d->displayedRectangle.first.clear();
         return;
-    }    
+    }
 
-    GeoCoordinates firstPoint,secondPoint;
-    qreal West  = searchCoordinates.at(0);
-    qreal North = searchCoordinates.at(1);
-    qreal East  = searchCoordinates.at(2);
-    qreal South = searchCoordinates.at(3);
+    qreal West  = searchCoordinates.first.lon();
+    qreal North = searchCoordinates.first.lat();
+    qreal East  = searchCoordinates.second.lon();
+    qreal South = searchCoordinates.second.lat();
     
     runScript(QString("setDisplayedRectangle(%1, %2, %3, %4);").arg(West).arg(North).arg(East).arg(South));
     runScript(QString("clearSelectionPoints();"));
@@ -324,16 +325,16 @@ void HTMLWidget::setSelectionRectangle(const QList<qreal>& searchCoordinates)
     d->displayedRectangle = searchCoordinates;
 }
 
-QList<qreal> HTMLWidget::getSelectionRectangle()
+GeoCoordinates::Pair HTMLWidget::getSelectionRectangle()
 {
     return d->displayedRectangle;
 }
 
 void HTMLWidget::removeSelectionRectangle()
 {
-    if(d->displayedRectangle.isEmpty())
+    if(!d->displayedRectangle.first.hasCoordinates())
         return;
-    d->displayedRectangle.clear();
+    d->displayedRectangle.first.clear();
     runScript(QString("removeDisplayedRectangle();"));
 }
 

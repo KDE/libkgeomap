@@ -133,9 +133,9 @@ public:
     qreal                  clustersDirtyCacheLat;
     qreal                  clustersDirtyCacheLon;
 
-    QList<qreal>           searchRectangleCoordinates;
-    QList<qreal>           displayedRectangle;
-    QList<int>             searchRectangleScreenCoordinates;
+    GeoCoordinates::Pair    searchRectangleCoordinates;
+    GeoCoordinates::Pair    displayedRectangle;
+    QRect                  searchRectangleScreenCoordinates;
     QPoint                 firstSelectionScreenPoint;
     QPoint                 secondSelectionScreenPoint;
     SelRectangleHDirection currentRectDrawingDirection;
@@ -167,9 +167,6 @@ BackendMarble::BackendMarble(const QExplicitlySharedDataPointer<WMWSharedData>& 
 
     connect(d->marbleWidget, SIGNAL(zoomChanged(int)),
             this, SLOT(slotMarbleZoomChanged(int)));
-
-   // connect(d->marbleWidget, SIGNAL(regionSelected(const QList<double>&)),
-   //         this, SLOT(slotNewSelectionFromMap(const QList<double>&)));
 
     // set a backend first
     setMapTheme(d->cacheMapTheme);
@@ -614,12 +611,14 @@ void BackendMarble::marbleCustomPaint(Marble::GeoPainter* painter)
     }
 
     //here we drawe the selection rectangle
-    if(!d->displayedRectangle.isEmpty())
+    if(d->displayedRectangle.first.hasCoordinates())
     {
-        const qreal lonWest  = d->displayedRectangle.at(0);
-        const qreal latNorth = d->displayedRectangle.at(1);
-        const qreal lonEast  = d->displayedRectangle.at(2);
-        const qreal latSouth = d->displayedRectangle.at(3);
+        const GeoCoordinates topLeft = d->displayedRectangle.first;
+        const GeoCoordinates bottomRight = d->displayedRectangle.second;
+        const qreal lonWest  = topLeft.lon();
+        const qreal latNorth = topLeft.lat();
+        const qreal lonEast  = bottomRight.lon();
+        const qreal latSouth = bottomRight.lat();
 
 
         Marble::GeoDataCoordinates coordTopLeft(lonWest, latNorth, 0, Marble::GeoDataCoordinates::Degree);
@@ -647,13 +646,14 @@ void BackendMarble::marbleCustomPaint(Marble::GeoPainter* painter)
         painter->drawPolygon(polyRing);
     }
 
-    if(!d->searchRectangleCoordinates.isEmpty())
+    if(d->searchRectangleCoordinates.first.hasCoordinates())
     {
-        const qreal lonWest  = d->searchRectangleCoordinates.at(0);
-        const qreal latNorth = d->searchRectangleCoordinates.at(1);
-        const qreal lonEast  = d->searchRectangleCoordinates.at(2);
-        const qreal latSouth = d->searchRectangleCoordinates.at(3);
-
+        const GeoCoordinates topLeft = d->searchRectangleCoordinates.first;
+        const GeoCoordinates bottomRight = d->searchRectangleCoordinates.second;
+        const qreal lonWest  = topLeft.lon();
+        const qreal latNorth = topLeft.lat();
+        const qreal lonEast  = bottomRight.lon();
+        const qreal latSouth = bottomRight.lat();
 
         Marble::GeoDataCoordinates coordTopLeft(lonWest, latNorth, 0, Marble::GeoDataCoordinates::Degree);
         Marble::GeoDataCoordinates coordTopRight(lonEast, latNorth, 0, Marble::GeoDataCoordinates::Degree);
@@ -976,8 +976,10 @@ bool BackendMarble::eventFilter(QObject *object, QEvent *event)
                     latSouth = d->firstSelectionPoint.lat();
                 }
 
-                QList<qreal> selectionCoordinates;
-                selectionCoordinates << lonWest << latNorth << lonEast << latSouth;
+                const GeoCoordinates::Pair selectionCoordinates(
+                        GeoCoordinates(latNorth, lonWest),
+                        GeoCoordinates(latSouth, lonEast)
+                    );
 
                 //setSelectionRectangle(selectionCoordinates, SelectionRectangle);
                 d->searchRectangleCoordinates = selectionCoordinates;
@@ -1024,11 +1026,13 @@ bool BackendMarble::eventFilter(QObject *object, QEvent *event)
                     latSouth = d->firstSelectionPoint.lat();
                 }
 
-                QList<qreal> selectionCoordinates;
-                selectionCoordinates << lonWest << latNorth << lonEast << latSouth;
+                const GeoCoordinates::Pair selectionCoordinates(
+                        GeoCoordinates(latNorth, lonWest),
+                        GeoCoordinates(latSouth, lonEast)
+                    );
 
                 setSelectionRectangle(selectionCoordinates);
-                d->searchRectangleCoordinates.clear();                
+                d->searchRectangleCoordinates.first.clear();
  
                 emit signalSelectionHasBeenMade(selectionCoordinates);
 
@@ -1358,23 +1362,20 @@ bool BackendMarble::findSnapPoint(const QPoint& actualPoint, QPoint* const snapP
     return foundSnapPoint;
 }
 
-void BackendMarble::setSelectionRectangle(const QList<qreal>& searchCoordinates)
+void BackendMarble::setSelectionRectangle(const GeoCoordinates::Pair& searchCoordinates)
 {
-    if(searchCoordinates.isEmpty())
-        return;
-
     d->displayedRectangle = searchCoordinates;
     d->marbleWidget->update();
 }
 
-QList<qreal> BackendMarble::getSelectionRectangle()
+GeoCoordinates::Pair BackendMarble::getSelectionRectangle()
 {
     return d->displayedRectangle;
 }
 
 void BackendMarble::removeSelectionRectangle()
 {
-    d->displayedRectangle.clear();
+    d->displayedRectangle.first.clear();
     d->marbleWidget->update();
 }
 

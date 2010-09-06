@@ -90,8 +90,8 @@ public:
     void setShowScaleControl(const bool state);
     void setShowNavigationControl(const bool state);
 
-    virtual void setSelectionRectangle(const QList<double>& searchCoordinates);
-    virtual QList<qreal> getSelectionRectangle();
+    virtual void setSelectionRectangle(const GeoCoordinates::Pair& searchCoordinates);
+    virtual GeoCoordinates::Pair getSelectionRectangle();
     virtual void removeSelectionRectangle();
     virtual void mouseModeChanged(const MouseModes mouseMode);
 
@@ -104,7 +104,6 @@ public Q_SLOTS:
     virtual void slotClustersNeedUpdating();
     virtual void slotThumbnailAvailableForIndex(const QVariant& index, const QPixmap& pixmap);
     void slotUngroupedModelChanged(const int mindex);
-    void slotSelectionHasBeenMade(const QList<qreal>& searchCoordinates);
 
 protected:
 
@@ -119,6 +118,7 @@ private Q_SLOTS:
     void slotMapTypeActionTriggered(QAction* action);
     void slotHTMLEvents(const QStringList& eventStrings);
     void slotFloatSettingsTriggered(QAction* action);
+    void slotSelectionHasBeenMade(const KMap::GeoCoordinates::Pair& searchCoordinates);
 
 private:
 

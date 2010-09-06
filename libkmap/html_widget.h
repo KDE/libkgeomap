@@ -53,8 +53,8 @@ public:
     QVariant runScript(const QString& scriptCode);
     bool runScript2Coordinates(const QString& scriptCode, GeoCoordinates* const coordinates);
     void mouseModeChanged(const MouseModes mouseMode);
-    void setSelectionRectangle(const QList<qreal>& searchCoordinates);
-    QList<qreal> getSelectionRectangle();
+    void setSelectionRectangle(const GeoCoordinates::Pair& searchCoordinates);
+    GeoCoordinates::Pair getSelectionRectangle();
     void centerOn(const qreal west, const qreal north, const qreal east, const qreal south);
     void removeSelectionRectangle();
     
@@ -74,7 +74,7 @@ Q_SIGNALS:
 
     void signalHTMLEvents(const QStringList& events);
     void signalJavaScriptReady();
-    void selectionHasBeenMade(const QList<qreal>& coordinatesRect);
+    void selectionHasBeenMade(const KMap::GeoCoordinates::Pair& coordinatesRect);
 
 private:
 

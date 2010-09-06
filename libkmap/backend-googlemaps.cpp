@@ -115,8 +115,8 @@ BackendGoogleMaps::BackendGoogleMaps(const QExplicitlySharedDataPointer<WMWShare
     connect(d->htmlWidget, SIGNAL(signalHTMLEvents(const QStringList&)),
             this, SLOT(slotHTMLEvents(const QStringList&)));
 
-    connect(d->htmlWidget, SIGNAL(selectionHasBeenMade(const QList<qreal>&)),
-            this, SLOT(slotSelectionHasBeenMade(const QList<qreal>&)));
+    connect(d->htmlWidget, SIGNAL(selectionHasBeenMade(const KMap::GeoCoordinates::Pair&)),
+            this, SLOT(slotSelectionHasBeenMade(const KMap::GeoCoordinates::Pair&)));
 
     loadInitialHTML();
 
@@ -964,12 +964,12 @@ bool BackendGoogleMaps::eventFilter(QObject* object, QEvent* event)
     return false;
 }
 
-void BackendGoogleMaps::setSelectionRectangle(const QList<double>& searchCoordinates)
+void BackendGoogleMaps::setSelectionRectangle(const GeoCoordinates::Pair& searchCoordinates)
 {
     d->htmlWidget->setSelectionRectangle(searchCoordinates);
 }
 
-QList<qreal> BackendGoogleMaps::getSelectionRectangle()
+GeoCoordinates::Pair BackendGoogleMaps::getSelectionRectangle()
 {
     return d->htmlWidget->getSelectionRectangle();
 }
@@ -998,7 +998,7 @@ void BackendGoogleMaps::mouseModeChanged(const MouseModes mouseMode)
 
 }
 
-void BackendGoogleMaps::slotSelectionHasBeenMade(const QList<double>& searchCoordinates)
+void BackendGoogleMaps::slotSelectionHasBeenMade(const KMap::GeoCoordinates::Pair& searchCoordinates)
 {
     emit signalSelectionHasBeenMade(searchCoordinates);
 }

@@ -175,9 +175,9 @@ public:
     QStackedLayout*         stackedLayout;
 
     // these values are cached in case the backend is not ready:
-    GeoCoordinates        cacheCenterCoordinate;
+    GeoCoordinates          cacheCenterCoordinate;
     QString                 cacheZoom;
-    QList<qreal>            cacheSelectionRectangle;
+    GeoCoordinates::Pair     cacheSelectionRectangle;
 
     // actions for controlling the widget
     QMenu*                  configurationMenu;
@@ -204,8 +204,8 @@ public:
     KAction*                actionDecreaseThumbnailSize;
     KHBox*                  hBoxForAdditionalControlWidgetItems;
 
-    QList<qreal>            selectionRectangle;
-    QList<qreal>            oldSelectionRectangle;
+    GeoCoordinates::Pair     selectionRectangle;
+    GeoCoordinates::Pair     oldSelectionRectangle;
 
     KAction*                actionRemoveCurrentSelection;
     KAction*                actionSetSelectionMode;
@@ -481,8 +481,8 @@ bool KMapWidget::setBackend(const QString& backendName)
                         d->currentBackend, SLOT(slotThumbnailAvailableForIndex(const QVariant&, const QPixmap&)));
         }
 
-        disconnect(d->currentBackend, SIGNAL(signalSelectionHasBeenMade(const QList<double>&)),
-                this, SLOT(slotNewSelectionFromMap(const QList<double>&)));
+        disconnect(d->currentBackend, SIGNAL(signalSelectionHasBeenMade(const KMap::GeoCoordinates::Pair&)),
+                this, SLOT(slotNewSelectionFromMap(const KMap::GeoCoordinates::Pair&)));
 
     }
 
@@ -522,8 +522,8 @@ bool KMapWidget::setBackend(const QString& backendName)
                         d->currentBackend, SLOT(slotThumbnailAvailableForIndex(const QVariant&, const QPixmap&)));
             }
 
-            connect(d->currentBackend, SIGNAL(signalSelectionHasBeenMade(const QList<double>&)),
-                    this, SLOT(slotNewSelectionFromMap(const QList<double>&)));
+            connect(d->currentBackend, SIGNAL(signalSelectionHasBeenMade(const KMap::GeoCoordinates::Pair&)),
+                    this, SLOT(slotNewSelectionFromMap(const KMap::GeoCoordinates::Pair&)));
 
             // call this slot manually in case the backend was ready right away:
             if (d->currentBackend->isReady())
@@ -564,7 +564,7 @@ void KMapWidget::saveBackendToCache()
     d->cacheCenterCoordinate   = getCenter();
     d->cacheZoom               = getZoom();
     d->cacheSelectionRectangle = getSelectionRectangle();
-    if(!d->cacheSelectionRectangle.isEmpty())
+    if(d->cacheSelectionRectangle.first.hasCoordinates())
         d->oldSelectionRectangle   = d->cacheSelectionRectangle;
 }
 
@@ -1399,7 +1399,7 @@ QString KMapWidget::getZoom()
 }
 
 
-QList<qreal> KMapWidget::getSelectionRectangle()
+GeoCoordinates::Pair KMapWidget::getSelectionRectangle()
 {
     if(d->currentBackendReady)
     {
@@ -1542,7 +1542,7 @@ void KMapWidget::slotClustersClicked(const QIntList& clusterIndices)
 
     int maxTileLevel = 0;
 
-    if ((d->currentMouseMode == MouseModeZoom) || (d->currentMouseMode == MouseModeFilter && d->selectionRectangle.isEmpty()))
+    if ((d->currentMouseMode == MouseModeZoom) || (d->currentMouseMode == MouseModeFilter && !d->selectionRectangle.first.hasCoordinates()))
     {
         Marble::GeoDataLineString tileString;
 
@@ -1596,12 +1596,12 @@ void KMapWidget::slotClustersClicked(const QIntList& clusterIndices)
         else
         {
             d->modelBasedFilter = false;
-            QList<qreal> newSelection;
-            const qreal boxWest  = latLonBox.west(Marble::GeoDataCoordinates::Degree);
-            const qreal boxNorth = latLonBox.north(Marble::GeoDataCoordinates::Degree);
-            const qreal boxEast  = latLonBox.east(Marble::GeoDataCoordinates::Degree);
-            const qreal boxSouth = latLonBox.south(Marble::GeoDataCoordinates::Degree);
-            newSelection<<boxWest<<boxNorth<<boxEast<<boxSouth;
+            const GeoCoordinates::Pair newSelection(
+                    GeoCoordinates(latLonBox.north(Marble::GeoDataCoordinates::Degree),
+                                latLonBox.west(Marble::GeoDataCoordinates::Degree)),
+                    GeoCoordinates(latLonBox.south(Marble::GeoDataCoordinates::Degree),
+                                latLonBox.east(Marble::GeoDataCoordinates::Degree))
+                );
  
             d->selectionRectangle = newSelection;
             d->cacheSelectionRectangle = newSelection;
@@ -1609,7 +1609,7 @@ void KMapWidget::slotClustersClicked(const QIntList& clusterIndices)
             emit signalNewSelectionFromMap();
         }
     }
-    else if ((d->currentMouseMode == MouseModeFilter && !d->selectionRectangle.isEmpty()) || (d->currentMouseMode == MouseModeSelectThumbnail))
+    else if ((d->currentMouseMode == MouseModeFilter && d->selectionRectangle.first.hasCoordinates()) || (d->currentMouseMode == MouseModeSelectThumbnail))
     {
     // update the selection state of the clusters
         for (int i=0; i<clusterIndices.count(); ++i)
@@ -2012,12 +2012,7 @@ bool KMapWidget::getSelectionStatus() const
     return d->hasSelection;
 }
 
-QList<double> KMapWidget::selectionCoordinates() const
-{
-    return d->selectionRectangle;
-}
-
-void KMapWidget::setSelectionCoordinates(QList<qreal>& sel)
+void KMapWidget::setSelectionCoordinates(const GeoCoordinates::Pair& sel)
 {
     if(d->currentMouseMode == MouseModeSelection || d->hasSelection)  
         d->currentBackend->setSelectionRectangle(sel);
@@ -2025,18 +2020,17 @@ void KMapWidget::setSelectionCoordinates(QList<qreal>& sel)
         d->currentBackend->removeSelectionRectangle();
     d->cacheSelectionRectangle = sel;
     d->selectionRectangle = sel;
-    if(!sel.isEmpty())
+    if(sel.first.hasCoordinates())
         d->oldSelectionRectangle = sel;
 }
 
 void KMapWidget::clearSelectionRectangle()
 {
-    d->selectionRectangle.clear();
+    d->selectionRectangle.first.clear();
 }
 
-void KMapWidget::slotNewSelectionFromMap(const QList<qreal>& sel)
+void KMapWidget::slotNewSelectionFromMap(const KMap::GeoCoordinates::Pair& sel)
 {
-
     d->selectionRectangle      = sel;
     d->cacheSelectionRectangle = sel;
     d->oldSelectionRectangle   = sel;
@@ -2148,8 +2142,6 @@ void KMapWidget::slotRemoveCurrentSelection()
     emit signalRemoveCurrentSelection();
     clearSelectionRectangle();
     d->currentBackend->removeSelectionRectangle();
-    if(d->currentMouseMode == MouseModeSelection)
-        d->currentBackend->setSelectionRectangle(d->oldSelectionRectangle);
 }
 
 void KMapWidget::slotRemoveCurrentFilter()
