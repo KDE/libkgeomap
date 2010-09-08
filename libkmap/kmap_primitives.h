@@ -77,12 +77,12 @@ inline void KMap_assert(const char* const condition, const char* const filename,
 
 enum MouseMode
 {
-    MouseModePan = 1,
-    MouseModeSelection = 2,
-    MouseModeZoom = 4,
-    MouseModeFilter = 8,
+    MouseModePan             = 1,
+    MouseModeSelection       = 2,
+    MouseModeZoom            = 4,
+    MouseModeFilter          = 8,
     MouseModeSelectThumbnail = 16,
-    MouseModeLast = 16
+    MouseModeLast            = 16
 };
 
 Q_DECLARE_FLAGS(MouseModes, MouseMode)
@@ -103,7 +103,7 @@ enum DisplayedRectangles
     Both
 };
 
-typedef QList<int> QIntList;
+typedef QList<int>      QIntList;
 typedef QPair<int, int> QIntPair;
 
 enum WMWSelectionState
@@ -118,7 +118,7 @@ class KMAP_EXPORT WMWAltitudeLookup
 {
 public:
 
-    GeoCoordinates                 coordinates;
+    GeoCoordinates                   coordinates;
     QVariant                         data;
 
     typedef QList<WMWAltitudeLookup> List;
