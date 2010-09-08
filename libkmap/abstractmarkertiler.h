@@ -47,13 +47,13 @@ namespace KMap
 
 class KMAP_EXPORT AbstractMarkerTiler : public QObject
 {
-Q_OBJECT
+    Q_OBJECT
 
 public:
 
     enum Flag
     {
-        FlagNull = 0,
+        FlagNull    = 0,
         FlagMovable = 1
     };
 
@@ -62,6 +62,7 @@ public:
     class TileIndex
     {
     public:
+
         enum Constants
         {
             MaxLevel       = 9,
@@ -129,11 +130,11 @@ public:
 
         inline void latLonIndex(const int getLevel, int* const latIndex, int* const lonIndex) const
         {
-            KMAP_ASSERT(getLevel<=level());
+            KMAP_ASSERT(getLevel <= level());
             *latIndex = indexLat(getLevel);
             *lonIndex = indexLon(getLevel);
-            KMAP_ASSERT(*latIndex<Tiling);
-            KMAP_ASSERT(*lonIndex<Tiling);
+            KMAP_ASSERT(*latIndex < Tiling);
+            KMAP_ASSERT(*lonIndex < Tiling);
         }
 
         inline void appendLatLonIndex(const int latIndex, const int lonIndex)
@@ -144,7 +145,7 @@ public:
         inline QIntList toIntList() const
         {
             QIntList result;
-            for (int i=0; i<m_indicesCount; ++i)
+            for (int i=0; i < m_indicesCount; ++i)
             {
                 result << m_indices[i];
             }
@@ -160,7 +161,7 @@ public:
         inline static TileIndex fromIntList(const QIntList& intList)
         {
             TileIndex result;
-            for (int i=0; i<intList.count(); ++i)
+            for (int i=0; i < intList.count(); ++i)
                 result.appendLinearIndex(intList.at(i));
 
             return result;
@@ -168,10 +169,10 @@ public:
 
         inline static bool indicesEqual(const TileIndex& a, const TileIndex& b, const int upToLevel)
         {
-            KMAP_ASSERT(a.level()>=upToLevel);
-            KMAP_ASSERT(b.level()>=upToLevel);
+            KMAP_ASSERT(a.level() >= upToLevel);
+            KMAP_ASSERT(b.level() >= upToLevel);
 
-            for (int i=0; i<=upToLevel; ++i)
+            for (int i=0; i <= upToLevel; ++i)
             {
                 if (a.linearIndex(i)!=b.linearIndex(i))
                     return false;
@@ -182,9 +183,9 @@ public:
 
         inline TileIndex mid(const int first, const int len) const
         {
-            KMAP_ASSERT(first+(len-1)<=m_indicesCount);
+            KMAP_ASSERT(first+(len-1) <= m_indicesCount);
             TileIndex result;
-            for (int i = first; i<first+len; ++i)
+            for (int i = first; i < first+len; ++i)
             {
                 result.appendLinearIndex(m_indices[i]);
             }
@@ -201,7 +202,7 @@ public:
         inline static QList<QIntList> listToIntListList(const QList<TileIndex>& tileIndexList)
         {
             QList<QIntList> result;
-            for (int i=0; i<tileIndexList.count(); ++i)
+            for (int i=0; i < tileIndexList.count(); ++i)
             {
                 result << tileIndexList.at(i).toIntList();
             }
@@ -254,10 +255,10 @@ public:
             return childrenMask.testBit(linearIndex);
         }
 
-        QVector<Tile*>               children;
-        QBitArray                    childrenMask;
-        int                          selectedCount;
-        int                          markerCount;
+        QVector<Tile*> children;
+        QBitArray      childrenMask;
+        int            selectedCount;
+        int            markerCount;
     };
 
     AbstractMarkerTiler(QObject* const parent = 0);
@@ -332,9 +333,7 @@ private:
     AbstractMarkerTilerPrivate* const d;
 };
 
-
 } /* namespace KMap */
-
 
 inline QDebug operator<<(QDebug debugOut, const KMap::AbstractMarkerTiler::TileIndex& tileIndex)
 {
