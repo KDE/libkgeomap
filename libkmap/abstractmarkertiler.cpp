@@ -149,11 +149,11 @@ AbstractMarkerTiler::NonEmptyIterator::NonEmptyIterator(AbstractMarkerTiler* con
     for (int i=0; i < normalizedMapBounds.count(); ++i)
     {
         GeoCoordinates::Pair currentBounds = normalizedMapBounds.at(i);
-        KMAP_ASSERT(currentBounds.first.lat()<currentBounds.second.lat());
-        KMAP_ASSERT(currentBounds.first.lon()<currentBounds.second.lon());
+        KMAP_ASSERT(currentBounds.first.lat() < currentBounds.second.lat());
+        KMAP_ASSERT(currentBounds.first.lon() < currentBounds.second.lon());
 
         const TileIndex startIndex = TileIndex::fromCoordinates(currentBounds.first, d->level);
-        const TileIndex endIndex = TileIndex::fromCoordinates(currentBounds.second, d->level);
+        const TileIndex endIndex   = TileIndex::fromCoordinates(currentBounds.second, d->level);
 
 //         kDebug()<<currentBounds.first.geoUrl()<<startIndex<<currentBounds.second.geoUrl()<<endIndex;
         d->boundsList << QPair<TileIndex, TileIndex>(startIndex, endIndex);
@@ -390,10 +390,10 @@ AbstractMarkerTiler::TileIndex AbstractMarkerTiler::TileIndex::fromCoordinates(c
     if (!coordinate.hasCoordinates())
         return TileIndex();
 
-    qreal tileLatBL = -90.0;
-    qreal tileLonBL = -180.0;
+    qreal tileLatBL     = -90.0;
+    qreal tileLonBL     = -180.0;
     qreal tileLatHeight = 180.0;
-    qreal tileLonWidth = 360.0;
+    qreal tileLonWidth  = 360.0;
 
     TileIndex resultIndex;
     for (int l = 0; l <= getLevel; ++l)
@@ -432,7 +432,7 @@ AbstractMarkerTiler::TileIndex AbstractMarkerTiler::TileIndex::fromCoordinates(c
         }
         if (haveRoundingErrors)
         {
-//             kDebug()<<QString("Rounding errors at level %1!").arg(l);
+//             kDebug() << QString("Rounding errors at level %1!").arg(l);
         }
 
         resultIndex.appendLatLonIndex(latIndex, lonIndex);
