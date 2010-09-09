@@ -63,12 +63,12 @@ public:
     {
     }
 
-    QPointer<HTMLWidget>                      htmlWidget;
-    QPointer<QWidget>                         htmlWidgetWrapper;
-    bool                                      isReady;
+    QPointer<HTMLWidget>                  htmlWidget;
+    QPointer<QWidget>                     htmlWidgetWrapper;
+    bool                                  isReady;
 
-    int                                       cacheZoom;
-    GeoCoordinates                          cacheCenter;
+    int                                   cacheZoom;
+    GeoCoordinates                        cacheCenter;
     QPair<GeoCoordinates, GeoCoordinates> cacheBounds;
 };
 
