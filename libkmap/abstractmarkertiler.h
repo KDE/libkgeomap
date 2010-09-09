@@ -59,7 +59,9 @@ public:
 
     Q_DECLARE_FLAGS(Flags, Flag)
 
-    class TileIndex
+public:
+
+    class KMAP_EXPORT TileIndex
     {
     public:
 
@@ -217,6 +219,8 @@ public:
         int m_indices[MaxIndexCount];
     };
 
+public:
+
     class Tile
     {
     public:
@@ -255,11 +259,41 @@ public:
             return childrenMask.testBit(linearIndex);
         }
 
+    public:
+
         QVector<Tile*> children;
         QBitArray      childrenMask;
         int            selectedCount;
         int            markerCount;
     };
+
+public:
+
+    class NonEmptyIterator
+    {
+    public:
+
+        NonEmptyIterator(AbstractMarkerTiler* const model, const int level);
+        NonEmptyIterator(AbstractMarkerTiler* const model, const int level, const TileIndex& startIndex, const TileIndex& endIndex);
+        NonEmptyIterator(AbstractMarkerTiler* const model, const int level, const GeoCoordinates::PairList& normalizedMapBounds);
+        ~NonEmptyIterator();
+
+        bool atEnd() const;
+        TileIndex nextIndex();
+        TileIndex currentIndex() const;
+        AbstractMarkerTiler* model() const;
+
+    private:
+
+        bool initializeNextBounds();
+
+    private:
+
+        class AbstractMarkerTilerNonEmptyIteratorPrivate;
+        AbstractMarkerTilerNonEmptyIteratorPrivate* const d;
+    };
+
+public:
 
     AbstractMarkerTiler(QObject* const parent = 0);
     ~AbstractMarkerTiler();
@@ -295,32 +329,6 @@ public:
     bool isDirty() const;
     void setDirty(const bool state = true);
     Tile* resetRootTile();
-
-public:
-
-    class NonEmptyIterator
-    {
-    public:
-
-        NonEmptyIterator(AbstractMarkerTiler* const model, const int level);
-        NonEmptyIterator(AbstractMarkerTiler* const model, const int level, const TileIndex& startIndex, const TileIndex& endIndex);
-        NonEmptyIterator(AbstractMarkerTiler* const model, const int level, const GeoCoordinates::PairList& normalizedMapBounds);
-        ~NonEmptyIterator();
-
-        bool atEnd() const;
-        TileIndex nextIndex();
-        TileIndex currentIndex() const;
-        AbstractMarkerTiler* model() const;
-
-    private:
-
-        bool initializeNextBounds();
-
-    private:
-
-        class AbstractMarkerTilerNonEmptyIteratorPrivate;
-        AbstractMarkerTilerNonEmptyIteratorPrivate* const d;
-    };
 
 Q_SIGNALS:
 
