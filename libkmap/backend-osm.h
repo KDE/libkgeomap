@@ -97,4 +97,3 @@ private:
 } /* KMap */
 
 #endif /* BACKEND_OSM_H */
-
