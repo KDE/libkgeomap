@@ -63,6 +63,35 @@ public:
     KMapWidget(QWidget* const parent = 0);
     ~KMapWidget();
 
+    void saveSettingsToGroup(KConfigGroup* const group);
+    void readSettingsFromGroup(const KConfigGroup* const group);
+
+    // data:
+    //@{
+    void addUngroupedModel(ModelHelper* const modelHelper);
+    void setGroupedModel(AbstractMarkerTiler* const markerModel);
+    void setDragDropHandler(DragDropHandler* const dragDropHandler);
+    //@}
+
+    /// @name UI setup
+    //@{
+    KAction* getControlAction(const QString& actionName);
+    QWidget* getControlWidget();
+    void addWidgetToControlWidget(QWidget* const newWidget);
+    void setSortOptionsMenu(QMenu* const sortMenu);
+    void setAvailableMouseModes(const MouseModes mouseModes);
+    void setVisibleMouseModes(const MouseModes mouseModes);
+    void setAllowModifications(const bool state);
+    void setActive(const bool state);
+    bool getActiveState();
+    bool getStickyModeState() const;
+    void setStickyModeState(const bool state);
+    void setVisibleExtraActions(const ExtraActions actions);
+    void setEnabledExtraActions(const ExtraActions actions);
+    //@}
+
+    ///@name Map related functions
+    //@{
     QStringList availableBackends() const;
     bool setBackend(const QString& backendName);
 
@@ -71,14 +100,37 @@ public:
 
     void setZoom(const QString& newZoom);
     QString getZoom();
+    //@}
 
-    void saveSettingsToGroup(KConfigGroup* const group);
-    void readSettingsFromGroup(const KConfigGroup* const group);
+    /// @name Appearance
+    //@{
+    void setSortKey(const int sortKey);
+    void setThumnailSize(const int newThumbnailSize);
+    void setThumbnailGroupingRadius(const int newGroupingRadius);
+    void setMarkerGroupingRadius(const int newGroupingRadius);
+    int getThumbnailSize() const;
+    int getUndecoratedThumbnailSize() const;
+    void setShowThumbnails(const bool state);
 
-    KAction* getControlAction(const QString& actionName);
-    QWidget* getControlWidget();
-    void addWidgetToControlWidget(QWidget* const newWidget);
+    /// @name Selection rectangle
+    //@{
+    void setSelectionCoordinates(const GeoCoordinates::Pair& sel);
+    GeoCoordinates::Pair getSelectionRectangle();
+    void clearSelectionRectangle();
+    void setSelectionStatus(const bool status);
+    bool getSelectionStatus() const;
+    //@}
 
+    /// @name Miscellaneous
+    //@{
+    bool queryAltitudes(const WMWAltitudeLookup::List& queryItems, const QString& backendName = "");
+    //@}
+
+    /**
+     * @name Internal
+     * Functions that are only used internally and should be hidden from the public interface
+     */
+    //@{
     void updateMarkers();
     void updateClusters();
     void markClustersAsDirty();
@@ -94,61 +146,43 @@ public:
                        Qt::PenStyle *strokeStyle, QString *labelText, QColor *labelColor) const;
 
     QString convertZoomToBackendZoom(const QString& someZoom, const QString& targetBackend) const;
-    bool queryAltitudes(const WMWAltitudeLookup::List& queryItems, const QString& backendName = "");
-
-    void addUngroupedModel(ModelHelper* const modelHelper);
-    void setGroupedModel(AbstractMarkerTiler* const markerModel);
-
-    void setShowThumbnails(const bool state);
-    void setDragDropHandler(DragDropHandler* const dragDropHandler);
-    QVariant getClusterRepresentativeMarker(const int clusterIndex, const int sortKey);
-
-    void setSortOptionsMenu(QMenu* const sortMenu);
-    void setSortKey(const int sortKey);
     QPixmap getDecoratedPixmapForCluster(const int clusterId, const WMWSelectionState* const selectedStateOverride, const int* const countOverride, QPoint* const centerPoint);
-    void setThumnailSize(const int newThumbnailSize);
-    void setThumbnailGroupingRadius(const int newGroupingRadius);
-    void setMarkerGroupingRadius(const int newGroupingRadius);
-    int getThumbnailSize() const;
-    int getUndecoratedThumbnailSize() const;
-    void setAvailableMouseModes(const MouseModes mouseModes);
-    void setVisibleMouseModes(const MouseModes mouseModes);
-    void setAllowModifications(const bool state);
+    QVariant getClusterRepresentativeMarker(const int clusterIndex, const int sortKey);
+    //@}
 
-    void setSelectionCoordinates(const GeoCoordinates::Pair& sel);
-    GeoCoordinates::Pair getSelectionRectangle();
-    void clearSelectionRectangle();
-    void setSelectionStatus(const bool status);
-    bool getSelectionStatus() const;
-    void setActive(const bool state);
-    bool getActiveState();
-    bool getStickyModeState() const;
-    void setStickyModeState(const bool state);
-    void setVisibleExtraActions(const ExtraActions actions);
-    void setEnabledExtraActions(const ExtraActions actions);
- 
 public Q_SLOTS:
 
+    /// @name Appearance
+    //@{
     void slotZoomIn();
     void slotZoomOut();
-    void slotUpdateActionsEnabled();
-    void slotClustersNeedUpdating();
     void slotDecreaseThumbnailSize();
     void slotIncreaseThumbnailSize();
-    void slotSetSelectionMode();
+    //@}
+
+    /// @name Internal?
+    //@{
+    void slotUpdateActionsEnabled();
+    void slotClustersNeedUpdating();
+    void stopThumbnailTimer();
+    void slotStickyModeChanged();
+    //@}
+
+    /// @name Mouse modes
+    //@{
     void slotSetPanMode();
     void slotSetZoomMode();
     void slotSetFilterMode();
     void slotSetSelectThumbnailMode();
+    void slotSetSelectionMode();
     void slotRemoveCurrentSelection();
     void slotRemoveCurrentFilter();
-    void stopThumbnailTimer();
-    void slotStickyModeChanged();
+    //@}
+
 
 Q_SIGNALS:
 
     void signalAltitudeLookupReady(const KMap::WMWAltitudeLookup::List& altitudes);
-    void signalSpecialMarkersMoved(const QList<QPersistentModelIndex>& indices);
     void signalUngroupedModelChanged(const int index);
     void signalNewSelectionFromMap();
     void signalRemoveCurrentSelection();
@@ -197,6 +231,8 @@ private:
 
     class KMapWidgetPrivate;
     KMapWidgetPrivate* const d;
+
+    Q_DISABLE_COPY(KMapWidget)
 };
 
 } /* namespace KMap */
