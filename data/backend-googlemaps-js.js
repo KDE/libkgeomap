@@ -511,7 +511,7 @@ function selectionModeStatus(state){
 
 }
 
-function setMapBoundaries(west, north, east, south){
+function setMapBoundaries(west, north, east, south, useSaneZoomLevel){
 
     firstPoint = new google.maps.LatLng(south, west, true);
     secondPoint = new google.maps.LatLng(north, east, true);
@@ -519,6 +519,9 @@ function setMapBoundaries(west, north, east, south){
     newBounds = new google.maps.LatLngBounds(firstPoint, secondPoint);
     map.fitBounds(newBounds);
 
+    if (useSaneZoomLevel && (map.getZoom()>17)) {
+        map.setZoom(17);
+    }
 }
 
 

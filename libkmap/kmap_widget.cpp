@@ -2320,5 +2320,43 @@ void KMapWidget::setAllowModifications(const bool state)
     slotRequestLazyReclustering();
 }
 
+/**
+ * @brief Adjusts the visible map area such that all grouped markers are visible.
+ *
+ * Note that a call to this function currently has no effect if the widget has been
+ * set inactive via setActive() or the backend is not yet ready.
+ *
+ * @param useSaneZoomLevel Stop zooming at a sane level, if markers are too close together.
+ */
+void KMapWidget::adjustBoundariesToGroupedMarkers(const bool useSaneZoomLevel)
+{
+    if ( (!d->activeState) || (!s->markerModel) || (!d->currentBackend) )
+        return;
+
+    Marble::GeoDataLineString tileString;
+
+    // TODO: not sure that this is the best way to find the bounding box of all items
+    for (AbstractMarkerTiler::NonEmptyIterator tileIterator(s->markerModel, AbstractMarkerTiler::TileIndex::MaxLevel); !tileIterator.atEnd(); tileIterator.nextIndex())
+    {
+        const AbstractMarkerTiler::TileIndex tileIndex = tileIterator.currentIndex();
+        for(int corner=1; corner<=4; corner++)
+        {
+            GeoCoordinates currentTileCoordinate = tileIndex.toCoordinates();
+
+            const Marble::GeoDataCoordinates tileCoordinate(currentTileCoordinate.lon(),
+                                                            currentTileCoordinate.lat(),
+                                                            0,
+                                                            Marble::GeoDataCoordinates::Degree);
+
+            tileString.append(tileCoordinate);
+        }
+    }
+
+    Marble::GeoDataLatLonBox latLonBox = Marble::GeoDataLatLonBox::fromLineString(tileString);
+
+    // TODO: use a sane zoom level
+    d->currentBackend->centerOn(latLonBox, useSaneZoomLevel);
+}
+
 } /* namespace KMap */
 

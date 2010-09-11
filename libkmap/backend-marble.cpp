@@ -363,6 +363,13 @@ void BackendMarble::setMapTheme(const QString& newMapTheme)
     setShowCompass(d->cacheShowCompass);
     setShowOverviewMap(d->cacheShowOverviewMap);
 
+    // make sure the zoom level is okay
+    if ( (d->marbleWidget->zoom()>d->marbleWidget->maximumZoom()) ||
+         (d->marbleWidget->zoom()<d->marbleWidget->minimumZoom()) )
+    {
+        d->marbleWidget->zoomView(d->marbleWidget->maximumZoom());
+    }
+
     updateActionAvailability();
 }
 
@@ -1395,10 +1402,25 @@ void BackendMarble::setSelectionStatus(const bool /*status*/)
 {
 }
 
-void BackendMarble::centerOn(const Marble::GeoDataLatLonBox& box)
+void BackendMarble::centerOn(const Marble::GeoDataLatLonBox& box, const bool useSaneZoomLevel)
 {
+    Q_UNUSED(useSaneZoomLevel)
+
     d->marbleWidget->centerOn(box, false);
 
+    // simple check to see whether the zoom level is now too high
+    // TODO: for very small boxes, Marbles zoom becomes -2billion. Catch this case here.
+    // TODO: determine a more sane zoom level to stop at and handle the useSaneZoomLevel parameter
+    int maxZoomLevel = d->marbleWidget->maximumZoom();
+    if (useSaneZoomLevel)
+    {
+        maxZoomLevel = qMin(maxZoomLevel, 3400);
+    }
+    if ( (d->marbleWidget->zoom()>maxZoomLevel) ||
+         (d->marbleWidget->zoom()<d->marbleWidget->minimumZoom()) )
+    {
+        d->marbleWidget->zoomView(maxZoomLevel);
+    }
 }
 
 void BackendMarble::setActive(const bool state)

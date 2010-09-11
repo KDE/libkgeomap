@@ -357,10 +357,10 @@ void HTMLWidget::mouseModeChanged(const MouseModes mouseMode)
     }
 }
 
-void HTMLWidget::centerOn(const qreal west, const qreal north, const qreal east, const qreal south)
+void HTMLWidget::centerOn(const qreal west, const qreal north, const qreal east, const qreal south, const bool useSaneZoomLevel)
 {
 //    kDebug()<<"West:"<<west<<" North:"<<north<<" East:"<<east<<" South:"<<south;
-    runScript(QString("setMapBoundaries(%1, %2, %3, %4);").arg(west).arg(north).arg(east).arg(south));
+    runScript(QString("setMapBoundaries(%1, %2, %3, %4, %5);").arg(west).arg(north).arg(east).arg(south).arg(useSaneZoomLevel?1:0));
 }
 
 } /* namespace KMap */

@@ -100,6 +100,8 @@ public:
 
     void setZoom(const QString& newZoom);
     QString getZoom();
+
+    void adjustBoundariesToGroupedMarkers(const bool useSaneZoomLevel = true);
     //@}
 
     /// @name Appearance

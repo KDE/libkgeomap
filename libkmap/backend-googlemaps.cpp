@@ -1007,14 +1007,15 @@ void BackendGoogleMaps::setSelectionStatus(const bool /*status*/)
 {
 }
 
-void BackendGoogleMaps::centerOn( const Marble::GeoDataLatLonBox& latLonBox)
+void BackendGoogleMaps::centerOn( const Marble::GeoDataLatLonBox& latLonBox, const bool useSaneZoomLevel)
 {
     const qreal boxWest  = latLonBox.west(Marble::GeoDataCoordinates::Degree);
     const qreal boxNorth = latLonBox.north(Marble::GeoDataCoordinates::Degree);
     const qreal boxEast  = latLonBox.east(Marble::GeoDataCoordinates::Degree);
     const qreal boxSouth = latLonBox.south(Marble::GeoDataCoordinates::Degree);
 
-    d->htmlWidget->centerOn(boxWest, boxNorth, boxEast, boxSouth);
+    d->htmlWidget->centerOn(boxWest, boxNorth, boxEast, boxSouth, useSaneZoomLevel);
+    kDebug()<<getZoom();
 }
 
 void BackendGoogleMaps::setActive(const bool state)

@@ -55,7 +55,7 @@ public:
     void mouseModeChanged(const MouseModes mouseMode);
     void setSelectionRectangle(const GeoCoordinates::Pair& searchCoordinates);
     GeoCoordinates::Pair getSelectionRectangle();
-    void centerOn(const qreal west, const qreal north, const qreal east, const qreal south);
+    void centerOn(const qreal west, const qreal north, const qreal east, const qreal south, const bool useSaneZoomLevel = true);
     void removeSelectionRectangle();
     
 protected:

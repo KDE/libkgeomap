@@ -117,7 +117,7 @@ public:
 
     virtual void setSelectionStatus(const bool status) = 0;
     //virtual bool getSelectionStatus(
-    virtual void centerOn(const Marble::GeoDataLatLonBox& box) = 0;
+    virtual void centerOn(const Marble::GeoDataLatLonBox& box, const bool useSaneZoomLevel = true) = 0;
     virtual void setActive(const bool state) = 0;
 
 public Q_SLOTS:
