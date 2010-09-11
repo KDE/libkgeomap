@@ -97,6 +97,7 @@ namespace KMap
  *     just the number of items in a particular area, and picks representative items for thumbnails.
  * @li To handle dropping of items from the host applications UI onto the map, @c DragDropHandler has to be subclassed
  *     as well and added to the model using setDragDropHandler.
+ * @li Finally, setActive() has to be called to tell the widget that it should start displaying things.
  */
 
 const int KMapMinMarkerGroupingRadius        = 1;
