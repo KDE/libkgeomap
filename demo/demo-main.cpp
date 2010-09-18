@@ -34,7 +34,7 @@
 // local includes
 
 #include "mainwindow.h"
-#include "libkmap/version.h"
+#include "version.h"
 
 int main(int argc, char* argv[])
 {
