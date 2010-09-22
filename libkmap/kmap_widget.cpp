@@ -1479,6 +1479,42 @@ void KMapWidget::addUngroupedModel(ModelHelper* const modelHelper)
     emit(signalUngroupedModelChanged(s->ungroupedModels.count() - 1));
 }
 
+void KMapWidget::removeUngroupedModel(ModelHelper* const modelHelper)
+{
+    if (!modelHelper)
+        return;
+
+    const int modelIndex = s->ungroupedModels.indexOf(modelHelper);
+    if (modelIndex<0)
+        return;
+
+    // TODO: monitor all model signals!
+    disconnect(modelHelper->model(), SIGNAL(dataChanged(const QModelIndex&, const QModelIndex&)),
+            this, SLOT(slotUngroupedModelChanged()));
+    disconnect(modelHelper->model(), SIGNAL(rowsInserted(const QModelIndex&, int, int)),
+            this, SLOT(slotUngroupedModelChanged()));
+    disconnect(modelHelper->model(), SIGNAL(modelReset()),
+            this, SLOT(slotUngroupedModelChanged()));
+    disconnect(modelHelper, SIGNAL(signalVisibilityChanged()),
+            this, SLOT(slotUngroupedModelChanged()));
+
+    if (modelHelper->selectionModel())
+    {
+        disconnect(modelHelper->selectionModel(), SIGNAL(currentChanged(const QModelIndex&, const QModelIndex&)),
+            this, SLOT(slotUngroupedModelChanged()));
+    }
+
+    s->ungroupedModels.removeAt(modelIndex);
+
+    // the indices changed, therefore send out notifications
+    // sending out a signal with i=s->ungroupedModel.count()
+    // will cause the backends to see that the last model is missing
+    for (int i=modelIndex; i<=s->ungroupedModels.count(); ++i)
+    {
+        emit(signalUngroupedModelChanged(i));
+    }
+}
+
 void KMapWidget::setGroupedModel(AbstractMarkerTiler* const markerModel)
 {
     s->markerModel = markerModel;
@@ -2048,9 +2084,13 @@ void KMapWidget::slotSetPanMode()
         d->actionSetFilterMode->setChecked(false);
         d->actionSetSelectThumbnailMode->setChecked(false);
 
-        d->currentBackend->mouseModeChanged(MouseModePan);
-        if(!d->hasSelection)
-           d->currentBackend->removeSelectionRectangle(); 
+        if (d->currentBackend)
+        {
+            d->currentBackend->mouseModeChanged(MouseModePan);
+
+            if(!d->hasSelection)
+                d->currentBackend->removeSelectionRectangle();
+        }
     }
     else
     {

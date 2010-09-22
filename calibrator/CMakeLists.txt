@@ -3,7 +3,7 @@
 # This file is a part of digiKam project
 # <a href="http://www.digikam.org">http://www.digikam.org</a>
 #
-# @date   2010-06-29
+# @date   2010-09-18
 # @brief  world maps library interface for KDE
 #
 # @author Copyright (C) 2010 by Gilles Caulier
@@ -24,25 +24,15 @@
 #
 # ============================================================
 
-INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/../libkmap ${KEXIV2_INCLUDE_DIR})
-ADD_DEFINITIONS(${KEXIV2_DEFINITIONS})
+SET(calibrator_sources
+        calibrator.cpp
+    )
 
-SET(demo_sources
-    demo-main.cpp
-    mainwindow.cpp
-    myimageitem.cpp
-    mytreewidget.cpp
-    dragdrophandler.cpp
-   )
-
-KDE4_ADD_EXECUTABLE( libkmap_demo ${demo_sources} )
-target_link_libraries( libkmap_demo
+KDE4_ADD_EXECUTABLE(libkmap_calibrator ${calibrator_sources})
+TARGET_LINK_LIBRARIES(libkmap_calibrator
                         kmap
-                        ${KEXIV2_LIBRARIES}
-                        ${QT_QTGUI_LIBRARY} 
+                        ${QT_QTGUI_LIBRARY}
                         ${KDE4_KDECORE_LIBS}
                         ${KDE4_UI_LIBS}
                         ${KDE4_KPARTS_LIBS}
                         ${KDE4_KHTML_LIBS})
-
-INSTALL(TARGETS libkmap_demo ${INSTALL_TARGETS_DEFAULT_ARGS})

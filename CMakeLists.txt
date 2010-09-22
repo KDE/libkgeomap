@@ -82,6 +82,7 @@ SET(KMAP_LIB_SO_VERSION_STRING "${KMAP_LIB_SO_CUR_VERSION}.${KMAP_LIB_SO_REV_VER
 
 SUBDIRS(libkmap)
 SUBDIRS(test)
+SUBDIRS(calibrator)
 IF(KEXIV2_FOUND)
     SUBDIRS(demo)
     MESSAGE(STATUS "kexiv2 found, the demo application will be compiled.")

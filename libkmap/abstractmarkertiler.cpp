@@ -500,28 +500,34 @@ GeoCoordinates AbstractMarkerTiler::TileIndex::toCoordinates(const CornerPositio
         const int lonIndex     = indexLon(l);
 
         // update the start position for the next tile:
-        if(l+1 >= m_indicesCount)
+        if (l+1 >= m_indicesCount)
         {
-            if(ofCorner == CornerNW)
+            if (ofCorner == CornerNW)
             {
                 tileLatBL += latIndex*dLat;
                 tileLonBL += lonIndex*dLon;
             }
-            else if(ofCorner == CornerSW)
+            else if (ofCorner == CornerSW)
             {
                 tileLatBL += (latIndex+1)*dLat;
                 tileLonBL += lonIndex*dLon;
             }
-            else if(ofCorner == CornerNE)
+            else if (ofCorner == CornerNE)
             {
                 tileLatBL += latIndex*dLat;
                 tileLonBL += (lonIndex+1)*dLon;
             }
-            else if(ofCorner == CornerSE)
+            else if (ofCorner == CornerSE)
             {
                 tileLatBL += (latIndex+1)*dLat;
                 tileLonBL += (lonIndex+1)*dLon;
             }
+        }
+        else
+        {
+            // update the start position for the next tile:
+            tileLatBL     += latIndex*dLat;
+            tileLonBL     += lonIndex*dLon;
         }
 
         tileLatHeight /= latDivisor;

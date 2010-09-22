@@ -335,7 +335,14 @@ void BackendGoogleMaps::slotUngroupedModelChanged(const int mindex)
         return;
 
     d->htmlWidget->runScript(QString("wmwClearMarkers(%1);").arg(mindex));
+
+    // this can happen when a model was removed and we are simply asked to remove its markers
+    if (mindex>s->ungroupedModels.count())
+        return;
+
     ModelHelper* const modelHelper = s->ungroupedModels.at(mindex);
+    if (!modelHelper)
+        return;
 
     if (!modelHelper->modelFlags().testFlag(ModelHelper::FlagVisible))
             return;

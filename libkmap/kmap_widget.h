@@ -69,6 +69,7 @@ public:
     // data:
     //@{
     void addUngroupedModel(ModelHelper* const modelHelper);
+    void removeUngroupedModel(ModelHelper* const modelHelper);
     void setGroupedModel(AbstractMarkerTiler* const markerModel);
     void setDragDropHandler(DragDropHandler* const dragDropHandler);
     //@}
