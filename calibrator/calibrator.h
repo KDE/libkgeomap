@@ -32,7 +32,7 @@
 
 // local includes
 
-#include "libkmap/kmap_modelhelper.h"
+#include "../libkmap/kmap_modelhelper.h"
 
 class QStandardItemModel;
 

@@ -24,6 +24,8 @@
 #
 # ============================================================
 
+INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/../libkmap)
+
 SET(calibrator_sources
         calibrator.cpp
     )
