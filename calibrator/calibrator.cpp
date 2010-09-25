@@ -256,6 +256,13 @@ void Calibrator::updateMarkers()
         << QIntPair(Tiling*(Tiling/2-1)+Tiling/2-1, Tiling*Tiling-1)
         << QIntPair(Tiling*(Tiling/2)+Tiling/2-1, Tiling-1);
 
+    // at +/- ~70 degrees (cutoff of Mercator projection is at 80):
+    partialTilePositions
+        << QIntPair(Tiling, 0)
+        << QIntPair(2*Tiling-1, Tiling-1)
+        << QIntPair(Tiling*(Tiling-2), Tiling*(Tiling-1))
+        << QIntPair(Tiling*(Tiling-1)-1, Tiling*Tiling-1);
+
     for (int ptp = 0; ptp<partialTilePositions.count(); ++ptp)
     {
         QIntPair currentPair = partialTilePositions.at(ptp);

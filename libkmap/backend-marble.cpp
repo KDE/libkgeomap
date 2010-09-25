@@ -853,43 +853,47 @@ int BackendMarble::getMarkerModelLevel()
         return 0;
     }
 
-    // get the current zoom level:
-    const QString currentMarbleZoom = getZoom();
-    const QString currentGMapsZoom = s->worldMapWidget->convertZoomToBackendZoom(currentMarbleZoom, "googlemaps");
-    const QStringList zoomParts = currentGMapsZoom.split(':');
-    KMAP_ASSERT(zoomParts.count()==2);
-    const int currentZoom = zoomParts.last().toInt();
-
+    const int currentZoom = d->marbleWidget->zoom();
     int tileLevel = 0;
-         if (currentZoom== 0) { tileLevel = 1; }
-    else if (currentZoom== 1) { tileLevel = 1; }
-    else if (currentZoom== 2) { tileLevel = 1; }
-    else if (currentZoom== 3) { tileLevel = 2; }
-    else if (currentZoom== 4) { tileLevel = 2; }
-    else if (currentZoom== 5) { tileLevel = 3; }
-    else if (currentZoom== 6) { tileLevel = 3; }
-    else if (currentZoom== 7) { tileLevel = 3; }
-    else if (currentZoom== 8) { tileLevel = 4; }
-    else if (currentZoom== 9) { tileLevel = 4; }
-    else if (currentZoom==10) { tileLevel = 4; }
-    else if (currentZoom==11) { tileLevel = 4; }
-    else if (currentZoom==12) { tileLevel = 4; }
-    else if (currentZoom==13) { tileLevel = 4; }
-    else if (currentZoom==14) { tileLevel = 5; }
-    else if (currentZoom==15) { tileLevel = 5; }
-    else if (currentZoom==16) { tileLevel = 5; }
-    else if (currentZoom==17) { tileLevel = 5; }
-    else if (currentZoom==18) { tileLevel = 6; }
-    else if (currentZoom==19) { tileLevel = 6; }
-    else if (currentZoom==20) { tileLevel = 6; }
-    else if (currentZoom==21) { tileLevel = 7; }
-    else if (currentZoom==22) { tileLevel = 7; }
-    else
+    const Marble::Projection currentProjection = d->marbleWidget->projection();
+    switch (currentProjection)
     {
-        tileLevel = AbstractMarkerTiler::TileIndex::MaxLevel-1;
+    case Marble::Equirectangular:
+
+             if (currentZoom<1000) { tileLevel = 4; }
+        else if (currentZoom<1400) { tileLevel = 5; }
+        else if (currentZoom<1900) { tileLevel = 6; }
+        else if (currentZoom<2300) { tileLevel = 7; }
+        else if (currentZoom<2800) { tileLevel = 8; }
+        else                       { tileLevel = 9; }
+        // note: level 9 is not enough starting at zoom level 3200
+        break;
+
+    case Marble::Mercator:
+
+             if (currentZoom<1000) { tileLevel = 4; }
+        else if (currentZoom<1500) { tileLevel = 5; }
+        else if (currentZoom<1900) { tileLevel = 6; }
+        else if (currentZoom<2300) { tileLevel = 7; }
+        else if (currentZoom<2800) { tileLevel = 8; }
+        else                       { tileLevel = 9; }
+        // note: level 9 is not enough starting at zoom level 3200
+        break;
+
+    default:
+    case Marble::Spherical:
+
+             if (currentZoom<1300) { tileLevel = 5; }
+        else if (currentZoom<1800) { tileLevel = 6; }
+        else if (currentZoom<2200) { tileLevel = 7; }
+        else if (currentZoom<2800) { tileLevel = 8; }
+        else                       { tileLevel = 9; }
+        // note: level 9 is not enough starting at zoom level 3200
+        break;
     }
 
-    KMAP_ASSERT(tileLevel <= AbstractMarkerTiler::TileIndex::MaxLevel-1);
+    // TODO: verify that this assertion was too strict
+//     KMAP_ASSERT(tileLevel <= AbstractMarkerTiler::TileIndex::MaxLevel-1);
 
     return tileLevel;
 }
