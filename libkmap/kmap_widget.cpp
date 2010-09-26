@@ -1592,9 +1592,18 @@ void KMapWidget::slotClustersClicked(const QIntList& clusterIndices)
             {
                 const AbstractMarkerTiler::TileIndex& currentTileIndex = 
                     AbstractMarkerTiler::TileIndex::fromIntList(currentCluster.tileIndicesList.at(j));
-                for(int corner=1; corner<=4; corner++)
+                for (int corner=1; corner<=4; ++corner)
                 {
-                    GeoCoordinates currentTileCoordinate = currentTileIndex.toCoordinates();
+                    GeoCoordinates currentTileCoordinate;
+
+                    if (corner == 1)
+                        currentTileCoordinate = currentTileIndex.toCoordinates(AbstractMarkerTiler::TileIndex::CornerNW);
+                    else if (corner == 2)
+                        currentTileCoordinate = currentTileIndex.toCoordinates(AbstractMarkerTiler::TileIndex::CornerSW);
+                    else if (corner == 3)
+                        currentTileCoordinate = currentTileIndex.toCoordinates(AbstractMarkerTiler::TileIndex::CornerNE);
+                    else if (corner == 4)
+                        currentTileCoordinate = currentTileIndex.toCoordinates(AbstractMarkerTiler::TileIndex::CornerSE);
 
                     const Marble::GeoDataCoordinates tileCoordinate(currentTileCoordinate.lon(), 
                                                                     currentTileCoordinate.lat(),
@@ -1643,7 +1652,9 @@ void KMapWidget::slotClustersClicked(const QIntList& clusterIndices)
             d->selectionRectangle = newSelection;
             d->cacheSelectionRectangle = newSelection;
             d->oldSelectionRectangle = newSelection;
+            d->currentBackend->setSelectionRectangle(d->selectionRectangle);
             emit signalNewSelectionFromMap();
+
         }
     }
     else if ((d->currentMouseMode == MouseModeFilter && d->selectionRectangle.first.hasCoordinates()) || (d->currentMouseMode == MouseModeSelectThumbnail))
