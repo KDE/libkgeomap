@@ -589,7 +589,7 @@ void ItemMarkerTiler::onIndicesClicked(const TileIndex::List& tileIndicesList, c
     // TODO: when do we report the clicks to the modelHelper?
     //d->modelHelper->onIndicesClicked(clickedMarkers);
     }
-    else if(currentMouseMode == MouseModeFilter)
+    else if(currentMouseMode == MouseModeFilterModel)
     {
         d->modelHelper->onIndicesClicked(clickedMarkers);
     }

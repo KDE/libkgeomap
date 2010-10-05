@@ -80,9 +80,10 @@ enum MouseMode
     MouseModePan             = 1,
     MouseModeSelection       = 2,
     MouseModeZoom            = 4,
-    MouseModeFilter          = 8,
-    MouseModeSelectThumbnail = 16,
-    MouseModeLast            = 16
+    MouseModeFilterDatabase  = 8,
+    MouseModeFilterModel     = 16,
+    MouseModeSelectThumbnail = 32,
+    MouseModeLast            = 32
 };
 
 Q_DECLARE_FLAGS(MouseModes, MouseMode)

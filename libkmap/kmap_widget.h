@@ -175,7 +175,8 @@ public Q_SLOTS:
     //@{
     void slotSetPanMode();
     void slotSetZoomMode();
-    void slotSetFilterMode();
+    void slotSetFilterDatabaseMode();
+    void slotSetFilterModelMode();
     void slotSetSelectThumbnailMode();
     void slotSetSelectionMode();
     void slotRemoveCurrentSelection();
