@@ -87,7 +87,7 @@ enum MouseMode
 };
 
 Q_DECLARE_FLAGS(MouseModes, MouseMode)
-Q_DECLARE_OPERATORS_FOR_FLAGS(MouseModes);
+Q_DECLARE_OPERATORS_FOR_FLAGS(MouseModes)
 
 enum ExtraAction
 {
@@ -95,7 +95,7 @@ enum ExtraAction
 };
 
 Q_DECLARE_FLAGS(ExtraActions, ExtraAction)
-Q_DECLARE_OPERATORS_FOR_FLAGS(ExtraActions);
+Q_DECLARE_OPERATORS_FOR_FLAGS(ExtraActions)
 
 enum DisplayedRectangles
 {

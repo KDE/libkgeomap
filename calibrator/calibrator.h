@@ -56,7 +56,7 @@ private:
     class CalibratorModelHelperPrivate;
     CalibratorModelHelperPrivate* const d;
 
-    Q_DISABLE_COPY(CalibratorModelHelper);
+    Q_DISABLE_COPY(CalibratorModelHelper)
 };
 
 class Calibrator : public KMainWindow
