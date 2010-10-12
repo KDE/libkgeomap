@@ -799,13 +799,13 @@ int BackendGoogleMaps::getMarkerModelLevel()
     else if (currentZoom==13) { tileLevel = 4; }
     else if (currentZoom==14) { tileLevel = 5; }
     else if (currentZoom==15) { tileLevel = 5; }
-    else if (currentZoom==16) { tileLevel = 5; }
-    else if (currentZoom==17) { tileLevel = 5; }
-    else if (currentZoom==18) { tileLevel = 6; }
-    else if (currentZoom==19) { tileLevel = 6; }
-    else if (currentZoom==20) { tileLevel = 6; }
-    else if (currentZoom==21) { tileLevel = 7; }
-    else if (currentZoom==22) { tileLevel = 7; }
+    else if (currentZoom==16) { tileLevel = 6; }
+    else if (currentZoom==17) { tileLevel = 7; }
+    else if (currentZoom==18) { tileLevel = 7; }
+    else if (currentZoom==19) { tileLevel = 8; }
+    else if (currentZoom==20) { tileLevel = 9; }
+    else if (currentZoom==21) { tileLevel = 9; }
+    else if (currentZoom==22) { tileLevel = 9; }
     else
     {
         tileLevel = AbstractMarkerTiler::TileIndex::MaxLevel-1;
