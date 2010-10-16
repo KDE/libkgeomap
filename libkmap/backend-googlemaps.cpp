@@ -562,7 +562,7 @@ void BackendGoogleMaps::slotHTMLEvents(const QStringList& events)
     if (!movedMarkers.isEmpty())
     {
         kDebug()<<movedMarkers;
-        emit(signalSpecialMarkersMoved(movedMarkers));
+//         emit(signalSpecialMarkersMoved(movedMarkers));
     }
 
     if (!clickedClusters.isEmpty())

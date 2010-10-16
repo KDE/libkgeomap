@@ -480,9 +480,6 @@ bool KMapWidget::setBackend(const QString& backendName)
         disconnect(d->currentBackend, SIGNAL(signalMarkersMoved(const QIntList&)),
                 this, SLOT(slotMarkersMoved(const QIntList&)));
 
-        disconnect(d->currentBackend, SIGNAL(signalSpecialMarkersMoved(const QList<QPersistentModelIndex>&)),
-                    this, SIGNAL(signalSpecialMarkersMoved(const QList<QPersistentModelIndex>&)));
-
         disconnect(this, SIGNAL(signalUngroupedModelChanged(const int)),
                     d->currentBackend, SLOT(slotUngroupedModelChanged(const int)));
 
@@ -518,9 +515,6 @@ bool KMapWidget::setBackend(const QString& backendName)
 
             connect(d->currentBackend, SIGNAL(signalClustersClicked(const QIntList&)),
                     this, SLOT(slotClustersClicked(const QIntList&)));
-
-            connect(d->currentBackend, SIGNAL(signalSpecialMarkersMoved(const QList<QPersistentModelIndex>&)),
-                    this, SIGNAL(signalSpecialMarkersMoved(const QList<QPersistentModelIndex>&)));
 
             // TODO: this connection is queued because otherwise QAbstractItemModel::itemSelected does not
             //       reflect the true state. Maybe monitor another signal instead?

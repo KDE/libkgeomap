@@ -132,7 +132,6 @@ Q_SIGNALS:
     void signalClustersClicked(const QIntList& clusterIndices);
     void signalMarkersMoved(const QIntList& markerIndices);
     void signalZoomChanged(const QString& newZoom);
-    void signalSpecialMarkersMoved(const QList<QPersistentModelIndex>& indices);
     void signalSelectionHasBeenMade(const KMap::GeoCoordinates::Pair& coordinates);
 
 };
