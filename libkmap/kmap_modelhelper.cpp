@@ -83,9 +83,30 @@ QPersistentModelIndex ModelHelper::bestRepresentativeIndexFromList(const QList<Q
     return list.first();
 }
 
-QPixmap ModelHelper::itemIcon(const QModelIndex& /*index*/, QPoint* const /*offset*/) const
+/**
+ * @brief Returns the icon for an ungrouped marker.
+ *
+ * The icon can either be returned as a URL to an image, or as a QPixmap. If the caller
+ * can handle URLs (for example, to display them in HTML), he can provide the URL parameter.
+ * However, the ModelHelper may still choose to return a QPixmap instead, if no URL is
+ * available.
+ *
+ * @param index Modelindex of the marker.
+ * @param offset Offset of the zero point in the icon, given from the bottom-left.
+ * @param size Size of the icon, only populated if a URL is returned.
+ * @param pixmap Holder for the pixmap of the icon.
+ * @param url URL of the icon if available.
+ */
+bool ModelHelper::itemIcon(const QModelIndex& index, QPoint* const offset,
+                           QSize* const size, QPixmap* const pixmap, KUrl* const url) const
 {
-    return QPixmap();
+    Q_UNUSED(index)
+    Q_UNUSED(offset)
+    Q_UNUSED(size)
+    Q_UNUSED(pixmap)
+    Q_UNUSED(url)
+
+    return false;
 }
 
 ModelHelper::Flags ModelHelper::modelFlags() const

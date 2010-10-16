@@ -502,8 +502,9 @@ void BackendMarble::marbleCustomPaint(Marble::GeoPainter* painter)
                 continue;
 
             QPoint markerCenterPoint;
-            QPixmap markerPixmap = modelHelper->itemIcon(currentIndex, &markerCenterPoint);
-            if (markerPixmap.isNull())
+            QPixmap markerPixmap;
+            const bool haveMarkerPixmap = modelHelper->itemIcon(currentIndex, &markerCenterPoint, 0, &markerPixmap, 0);
+            if (!haveMarkerPixmap || markerPixmap.isNull())
             {
                 markerPixmap = s->markerPixmap;
                 markerCenterPoint = QPoint(markerPixmap.width()/2, 0);

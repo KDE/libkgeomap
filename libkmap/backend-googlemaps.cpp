@@ -373,9 +373,23 @@ void BackendGoogleMaps::slotUngroupedModelChanged(const int mindex)
             );
 
         QPoint markerCenterPoint;
-        QPixmap markerPixmap = modelHelper->itemIcon(currentIndex, &markerCenterPoint);
+        QSize markerSize;
+        QPixmap markerPixmap;
+        KUrl markerUrl;
+        const bool markerHasIcon = modelHelper->itemIcon(currentIndex, &markerCenterPoint,
+                                                         &markerSize, &markerPixmap, &markerUrl);
 
-        setMarkerPixmap(mindex, row, markerCenterPoint, markerPixmap);
+        if (markerHasIcon)
+        {
+            if (!markerUrl.isEmpty())
+            {
+                setMarkerPixmap(mindex, row, markerCenterPoint, markerSize, markerUrl);
+            }
+            else
+            {
+                setMarkerPixmap(mindex, row, markerCenterPoint, markerPixmap);
+            }
+        }
     }
 
 }
@@ -930,7 +944,8 @@ void BackendGoogleMaps::setClusterPixmap(const int clusterId, const QPoint& cent
                 );
 }
 
-void BackendGoogleMaps::setMarkerPixmap(const int modelId, const int markerId, const QPoint& centerPoint, const QPixmap& markerPixmap)
+void BackendGoogleMaps::setMarkerPixmap(const int modelId, const int markerId,
+                                        const QPoint& centerPoint, const QPixmap& markerPixmap)
 {
     QByteArray bytes;
     QBuffer buffer(&bytes);
@@ -946,6 +961,23 @@ void BackendGoogleMaps::setMarkerPixmap(const int modelId, const int markerId, c
                     .arg(imageData)
                     .arg(markerPixmap.width())
                     .arg(markerPixmap.height())
+                    .arg(modelId)
+                );
+}
+
+void BackendGoogleMaps::setMarkerPixmap(const int modelId, const int markerId,
+                                        const QPoint& centerPoint, const QSize& iconSize,
+                                        const KUrl& iconUrl
+                                       )
+{
+    /// @todo Sort the parameters
+    d->htmlWidget->runScript(QString("wmwSetMarkerPixmap(%7,%1,%5,%6,%2,%3,'%4');")
+                    .arg(markerId)
+                    .arg(centerPoint.x())
+                    .arg(iconSize.height()-centerPoint.y())
+                    .arg(iconUrl.url()) /// @todo Escape characters like apostrophe
+                    .arg(iconSize.width())
+                    .arg(iconSize.height())
                     .arg(modelId)
                 );
 }
