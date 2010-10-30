@@ -86,6 +86,12 @@ enum MouseMode
     MouseModeLast            = 32
 };
 
+enum FilterMode
+{
+    DatabaseFilter = 1,
+    ModelFilter    = 2
+};
+
 Q_DECLARE_FLAGS(MouseModes, MouseMode)
 Q_DECLARE_OPERATORS_FOR_FLAGS(MouseModes)
 

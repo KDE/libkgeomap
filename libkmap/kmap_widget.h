@@ -103,6 +103,7 @@ public:
     QString getZoom();
 
     void adjustBoundariesToGroupedMarkers(const bool useSaneZoomLevel = true);
+    void refreshMap();
     //@}
 
     /// @name Appearance
@@ -192,6 +193,8 @@ Q_SIGNALS:
     void signalRemoveCurrentSelection();
     void signalRemoveCurrentFilter();
     void signalStickyModeChanged();
+    void signalMouseModeChanged(const KMap::MouseMode& currentMouseMode);
+    void signalNewMapFilter(const KMap::FilterMode& newFilter);
 
 public:
 

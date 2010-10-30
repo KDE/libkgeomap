@@ -179,7 +179,7 @@ public:
     // these values are cached in case the backend is not ready:
     GeoCoordinates          cacheCenterCoordinate;
     QString                 cacheZoom;
-    GeoCoordinates::Pair     cacheSelectionRectangle;
+    GeoCoordinates::Pair    cacheSelectionRectangle;
 
     // actions for controlling the widget
     QMenu*                  configurationMenu;
@@ -206,8 +206,8 @@ public:
     KAction*                actionDecreaseThumbnailSize;
     KHBox*                  hBoxForAdditionalControlWidgetItems;
 
-    GeoCoordinates::Pair     selectionRectangle;
-    GeoCoordinates::Pair     oldSelectionRectangle;
+    GeoCoordinates::Pair    selectionRectangle;
+    GeoCoordinates::Pair    oldSelectionRectangle;
 
     KAction*                actionRemoveCurrentSelection;
     KAction*                actionSetSelectionMode;
@@ -357,14 +357,6 @@ void KMapWidget::createActions()
     d->actionStickyMode->setToolTip(i18n("Lock the map position"));
     connect(d->actionStickyMode, SIGNAL(triggered(const bool)),
             this, SLOT(slotStickyModeChanged()));
-
-    // TODO: for later actions
-//     action->setToolTip(i18n("Zoom into a group"));
-//     action->setIcon(SmallIcon("page-zoom"));
-//     action->setToolTip(i18n("Filter images"));
-//     action->setIcon(SmallIcon("view-filter"));
-//     action->setToolTip(i18n("Select images"));
-//     action->setIcon(SmallIcon("edit-select"));
 
     connect(d->actionIncreaseThumbnailSize, SIGNAL(triggered(bool)),
             this, SLOT(slotIncreaseThumbnailSize()));
@@ -1662,6 +1654,7 @@ void KMapWidget::slotClustersClicked(const QIntList& clusterIndices)
             d->oldSelectionRectangle = newSelection;
             d->currentBackend->setSelectionRectangle(d->selectionRectangle);
             emit signalNewSelectionFromMap();
+            emit signalNewMapFilter(DatabaseFilter);
 
         }
     }
@@ -1680,9 +1673,10 @@ void KMapWidget::slotClustersClicked(const QIntList& clusterIndices)
                 const AbstractMarkerTiler::TileIndex& currentTileIndex = AbstractMarkerTiler::TileIndex::fromIntList(currentCluster.tileIndicesList.at(j));
                 tileIndices << currentTileIndex;
             }
-            if(d->currentMouseMode == MouseModeFilterModel)
+            if (d->currentMouseMode == MouseModeFilterModel)
             {
                 d->modelBasedFilter = true;
+                emit signalNewMapFilter(ModelFilter);
                 s->markerModel->onIndicesClicked(tileIndices, currentCluster.selectedState, MouseModeFilterModel);
             }
             else
@@ -2111,6 +2105,7 @@ void KMapWidget::slotSetPanMode()
             if(!d->hasSelection)
                 d->currentBackend->removeSelectionRectangle();
         }
+        emit signalMouseModeChanged(MouseModePan);
     }
     else
     {
@@ -2133,6 +2128,7 @@ void KMapWidget::slotSetSelectionMode()
         d->currentBackend->setSelectionRectangle(d->oldSelectionRectangle);
 
         d->currentBackend->mouseModeChanged(MouseModeSelection);
+        emit signalMouseModeChanged(MouseModeSelection);
     }
     else
     {
@@ -2154,6 +2150,7 @@ void KMapWidget::slotSetZoomMode()
         d->actionSetSelectThumbnailMode->setChecked(false);        
 
         d->currentBackend->mouseModeChanged(MouseModeZoom);
+        emit signalMouseModeChanged(MouseModeZoom);
     }
     else
     {
@@ -2174,6 +2171,7 @@ void KMapWidget::slotSetFilterDatabaseMode()
         d->actionSetFilterModelMode->setChecked(false);
     
         d->currentBackend->mouseModeChanged(MouseModeFilterDatabase);
+        emit signalMouseModeChanged(MouseModeFilterDatabase);
     }
     else
     {
@@ -2196,6 +2194,7 @@ void KMapWidget::slotSetFilterModelMode()
         d->actionSetFilterDatabaseMode->setChecked(false);
     
         d->currentBackend->mouseModeChanged(MouseModeFilterModel);
+        emit signalMouseModeChanged(MouseModeFilterModel);
     }
     else
     {
@@ -2218,6 +2217,7 @@ void KMapWidget::slotSetSelectThumbnailMode()
         d->actionSetFilterModelMode->setChecked(false);
     
         d->currentBackend->mouseModeChanged(MouseModeSelectThumbnail);
+        emit signalMouseModeChanged(MouseModeSelectThumbnail);
     }
     else
     {
@@ -2325,6 +2325,15 @@ void KMapWidget::setActive(const bool state)
 {
     const bool oldState = d->activeState;
     d->activeState = state;
+
+    if(state)
+    {
+        if(d->currentMouseMode != MouseModeSelection && !d->hasSelection)
+        {
+            //d->currentBackend->removeSelectionRectangle();    
+        }
+    }
+
     if (d->currentBackend)
     {
         d->currentBackend->setActive(state);
@@ -2448,6 +2457,11 @@ void KMapWidget::adjustBoundariesToGroupedMarkers(const bool useSaneZoomLevel)
 
     // TODO: use a sane zoom level
     d->currentBackend->centerOn(latLonBox, useSaneZoomLevel);
+}
+
+void KMapWidget::refreshMap()
+{
+    slotRequestLazyReclustering();
 }
 
 } /* namespace KMap */
