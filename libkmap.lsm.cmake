@@ -1,7 +1,7 @@
 Begin4
 Title:          libkmap
 Version:        ${KMAP_LIB_VERSION_STRING}
-Entered-date:   2010-16-06
+Entered-date:   2010-06-30
 Description:    A world map library.
 Keywords:       kde image marble openstreetmap googlemap digikam kipi-plugins
 Author:         caulier dot gilles at gmail dot com (Gilles Caulier)
