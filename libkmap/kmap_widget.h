@@ -115,6 +115,7 @@ public:
     int getThumbnailSize() const;
     int getUndecoratedThumbnailSize() const;
     void setShowThumbnails(const bool state);
+    //@}
 
     /// @name Selection rectangle
     //@{
