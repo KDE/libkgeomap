@@ -561,7 +561,7 @@ void KMapWidget::saveBackendToCache()
     d->cacheCenterCoordinate   = getCenter();
     d->cacheZoom               = getZoom();
     d->cacheSelectionRectangle = getSelectionRectangle();
-    if(d->cacheSelectionRectangle.first.hasCoordinates())
+    if (d->cacheSelectionRectangle.first.hasCoordinates())
         d->oldSelectionRectangle   = d->cacheSelectionRectangle;
 }
 
@@ -608,7 +608,7 @@ void KMapWidget::slotBackendReady(const QString& backendName)
     }
 
 
-    if(!d->thumbnailsHaveBeenLoaded)
+    if (!d->thumbnailsHaveBeenLoaded)
     {
         d->thumbnailTimer      = new QTimer(this);
         d->thumbnailTimerCount = 0;
@@ -628,7 +628,7 @@ void KMapWidget::stopThumbnailTimer()
 {
     d->currentBackend->updateMarkers();
     d->thumbnailTimerCount++;
-    if(d->thumbnailTimerCount == 10)
+    if (d->thumbnailTimerCount == 10)
     {
         d->thumbnailTimer->stop();
         d->thumbnailsHaveBeenLoaded = true;
@@ -1402,7 +1402,7 @@ QString KMapWidget::getZoom()
 
 GeoCoordinates::Pair KMapWidget::getSelectionRectangle()
 {
-    if(d->currentBackendReady)
+    if (d->currentBackendReady)
     {
         d->cacheSelectionRectangle = d->currentBackend->getSelectionRectangle();
     }
@@ -1554,7 +1554,7 @@ void KMapWidget::slotRequestLazyReclustering()
         return;
 
     d->clustersDirty = true;
-    if(d->activeState)
+    if (d->activeState)
     {
         d->lazyReclusteringRequested = true;
         QTimer::singleShot(0, this, SLOT(slotLazyReclusteringRequestCallBack()));
@@ -1610,7 +1610,7 @@ void KMapWidget::slotClustersClicked(const QIntList& clusterIndices)
                                                                                               0, 
                                                                     Marble::GeoDataCoordinates::Degree);
 
-                    if(maxTileLevel < currentTileIndex.level())
+                    if (maxTileLevel < currentTileIndex.level())
                         maxTileLevel = currentTileIndex.level();                        
 
                     tileString.append(tileCoordinate);
@@ -1620,7 +1620,7 @@ void KMapWidget::slotClustersClicked(const QIntList& clusterIndices)
 
         Marble::GeoDataLatLonBox latLonBox = Marble::GeoDataLatLonBox::fromLineString(tileString);
       
-/*        if(maxTileLevel != 0)
+/*        if (maxTileLevel != 0)
         {
             //increase the selection boundaries with 0.1 degrees because some thumbnails aren't catched by selection
             latLonBox.setWest((latLonBox.west(Marble::GeoDataCoordinates::Degree)-(0.1/maxTileLevel)), Marble::GeoDataCoordinates::Degree);
@@ -1635,7 +1635,7 @@ void KMapWidget::slotClustersClicked(const QIntList& clusterIndices)
             latLonBox.setEast((latLonBox.east(Marble::GeoDataCoordinates::Degree)+0.0001), Marble::GeoDataCoordinates::Degree);
             latLonBox.setSouth((latLonBox.south(Marble::GeoDataCoordinates::Degree)-0.0001), Marble::GeoDataCoordinates::Degree);
       //  }
-        if(d->currentMouseMode == MouseModeZoom)
+        if (d->currentMouseMode == MouseModeZoom)
         {
             d->currentBackend->centerOn(latLonBox);
         }
@@ -2064,13 +2064,13 @@ bool KMapWidget::getSelectionStatus() const
 
 void KMapWidget::setSelectionCoordinates(const GeoCoordinates::Pair& sel)
 {
-    if(d->currentMouseMode == MouseModeSelection || d->hasSelection)  
+    if (d->currentMouseMode == MouseModeSelection || d->hasSelection)
         d->currentBackend->setSelectionRectangle(sel);
     else
         d->currentBackend->removeSelectionRectangle();
     d->cacheSelectionRectangle = sel;
     d->selectionRectangle = sel;
-    if(sel.first.hasCoordinates())
+    if (sel.first.hasCoordinates())
         d->oldSelectionRectangle = sel;
 }
 
@@ -2089,7 +2089,7 @@ void KMapWidget::slotNewSelectionFromMap(const KMap::GeoCoordinates::Pair& sel)
 
 void KMapWidget::slotSetPanMode()
 {
-    if(d->actionSetPanMode->isChecked())
+    if (d->actionSetPanMode->isChecked())
     {
         d->currentMouseMode = MouseModePan;
         d->actionSetSelectionMode->setChecked(false);
@@ -2102,21 +2102,21 @@ void KMapWidget::slotSetPanMode()
         {
             d->currentBackend->mouseModeChanged(MouseModePan);
 
-            if(!d->hasSelection)
+            if (!d->hasSelection)
                 d->currentBackend->removeSelectionRectangle();
         }
         emit signalMouseModeChanged(MouseModePan);
     }
     else
     {
-        if(d->currentMouseMode == MouseModePan)
+        if (d->currentMouseMode == MouseModePan)
             d->actionSetPanMode->setChecked(true);
     }
 }
 
 void KMapWidget::slotSetSelectionMode()
 {
-    if(d->actionSetSelectionMode->isChecked())
+    if (d->actionSetSelectionMode->isChecked())
     {
         d->currentMouseMode = MouseModeSelection;
         d->actionSetPanMode->setChecked(false);
@@ -2132,7 +2132,7 @@ void KMapWidget::slotSetSelectionMode()
     }
     else
     {
-        if(d->currentMouseMode == MouseModeSelection)
+        if (d->currentMouseMode == MouseModeSelection)
             d->actionSetSelectionMode->setChecked(true);
     }
 }
@@ -2140,7 +2140,7 @@ void KMapWidget::slotSetSelectionMode()
 
 void KMapWidget::slotSetZoomMode()
 {
-    if(d->actionSetZoomMode->isChecked())
+    if (d->actionSetZoomMode->isChecked())
     { 
         d->currentMouseMode = MouseModeZoom;
         d->actionSetPanMode->setChecked(false);
@@ -2154,14 +2154,14 @@ void KMapWidget::slotSetZoomMode()
     }
     else
     {
-        if(d->currentMouseMode == MouseModeZoom)
+        if (d->currentMouseMode == MouseModeZoom)
             d->actionSetZoomMode->setChecked(true);
     }
 }
 
 void KMapWidget::slotSetFilterDatabaseMode()
 {
-    if(d->actionSetFilterDatabaseMode->isChecked())
+    if (d->actionSetFilterDatabaseMode->isChecked())
     {
         d->currentMouseMode = MouseModeFilterDatabase;
         d->actionSetPanMode->setChecked(false);
@@ -2175,7 +2175,7 @@ void KMapWidget::slotSetFilterDatabaseMode()
     }
     else
     {
-        if(d->currentMouseMode == MouseModeFilterDatabase)
+        if (d->currentMouseMode == MouseModeFilterDatabase)
         {
             d->actionSetFilterDatabaseMode->setChecked(true);
         }
@@ -2184,7 +2184,7 @@ void KMapWidget::slotSetFilterDatabaseMode()
 
 void KMapWidget::slotSetFilterModelMode()
 {
-    if(d->actionSetFilterModelMode->isChecked())
+    if (d->actionSetFilterModelMode->isChecked())
     {
         d->currentMouseMode = MouseModeFilterModel;
         d->actionSetPanMode->setChecked(false);
@@ -2198,7 +2198,7 @@ void KMapWidget::slotSetFilterModelMode()
     }
     else
     {
-        if(d->currentMouseMode == MouseModeFilterModel)
+        if (d->currentMouseMode == MouseModeFilterModel)
         {
             d->actionSetFilterModelMode->setChecked(true);
         }
@@ -2207,7 +2207,7 @@ void KMapWidget::slotSetFilterModelMode()
 
 void KMapWidget::slotSetSelectThumbnailMode()
 {
-    if(d->actionSetSelectThumbnailMode->isChecked())
+    if (d->actionSetSelectThumbnailMode->isChecked())
     {
         d->currentMouseMode = MouseModeSelectThumbnail;
         d->actionSetPanMode->setChecked(false);
@@ -2221,7 +2221,7 @@ void KMapWidget::slotSetSelectThumbnailMode()
     }
     else
     {
-        if(d->currentMouseMode == MouseModeSelectThumbnail)
+        if (d->currentMouseMode == MouseModeSelectThumbnail)
             d->actionSetSelectThumbnailMode->setChecked(true);
     }
 }
@@ -2326,9 +2326,9 @@ void KMapWidget::setActive(const bool state)
     const bool oldState = d->activeState;
     d->activeState = state;
 
-    if(state)
+    if (state)
     {
-        if(d->currentMouseMode != MouseModeSelection && !d->hasSelection)
+        if (d->currentMouseMode != MouseModeSelection && !d->hasSelection)
         {
             //d->currentBackend->removeSelectionRectangle();    
         }
@@ -2342,7 +2342,7 @@ void KMapWidget::setActive(const bool state)
     {
         s->markerModel->setActive(state);
     }
-    if(state && !oldState && d->clustersDirty)
+    if (state && !oldState && d->clustersDirty)
     {
         slotRequestLazyReclustering();
     }

@@ -451,7 +451,7 @@ bool BackendMarble::geoCoordinates(const QPoint& point, GeoCoordinates* const co
 
 void BackendMarble::marbleCustomPaint(Marble::GeoPainter* painter)
 {
-    if(!d->activeState)
+    if (!d->activeState)
         return;
 
     // check whether the parameters of the map changed and we may have to update the clusters:
@@ -619,7 +619,7 @@ void BackendMarble::marbleCustomPaint(Marble::GeoPainter* painter)
     }
 
     //here we drawe the selection rectangle
-    if(d->displayedRectangle.first.hasCoordinates())
+    if (d->displayedRectangle.first.hasCoordinates())
     {
         const GeoCoordinates topLeft = d->displayedRectangle.first;
         const GeoCoordinates bottomRight = d->displayedRectangle.second;
@@ -654,7 +654,7 @@ void BackendMarble::marbleCustomPaint(Marble::GeoPainter* painter)
         painter->drawPolygon(polyRing);
     }
 
-    if(d->searchRectangleCoordinates.first.hasCoordinates())
+    if (d->searchRectangleCoordinates.first.hasCoordinates())
     {
         const GeoCoordinates topLeft = d->searchRectangleCoordinates.first;
         const GeoCoordinates bottomRight = d->searchRectangleCoordinates.second;
@@ -679,7 +679,7 @@ void BackendMarble::marbleCustomPaint(Marble::GeoPainter* painter)
 #endif // MARBLE_VERSION < 0x000800
 
         QPen selectionPen;
-        if(d->intermediateSelectionPoint.hasCoordinates())
+        if (d->intermediateSelectionPoint.hasCoordinates())
             selectionPen.setColor(Qt::red);
         else
             selectionPen.setColor(Qt::blue);
@@ -939,13 +939,13 @@ bool BackendMarble::eventFilter(QObject *object, QEvent *event)
         return QObject::eventFilter(object, event);
     }
 
-    if(d->currentMouseMode == MouseModePan)
+    if (d->currentMouseMode == MouseModePan)
         return QObject::eventFilter(object, event);
 
     QMouseEvent* const mouseEvent = static_cast<QMouseEvent*>(event);
     bool doFilterEvent = false;
 
-    if(d->currentMouseMode == MouseModeSelection)
+    if (d->currentMouseMode == MouseModeSelection)
     {
         if (   ( event->type() == QEvent::MouseButtonPress )
             && ( mouseEvent->button()==Qt::LeftButton ) )
@@ -956,7 +956,7 @@ bool BackendMarble::eventFilter(QObject *object, QEvent *event)
         }
         else if (event->type() == QEvent::MouseMove)
         {
-            if(d->firstSelectionPoint.hasCoordinates() && !d->secondSelectionPoint.hasCoordinates())
+            if (d->firstSelectionPoint.hasCoordinates() && !d->secondSelectionPoint.hasCoordinates())
             {
                 d->intermediateSelectionPoint.clear();
                 geoCoordinates(mouseEvent->pos(), &d->intermediateSelectionPoint);
@@ -966,7 +966,7 @@ bool BackendMarble::eventFilter(QObject *object, QEvent *event)
 
                 qreal lonWest, latNorth, lonEast, latSouth;
 
-                if(d->firstSelectionScreenPoint.x() < d->secondSelectionScreenPoint.x())
+                if (d->firstSelectionScreenPoint.x() < d->secondSelectionScreenPoint.x())
                 {
                     lonWest = d->firstSelectionPoint.lon();
                     lonEast = d->intermediateSelectionPoint.lon();
@@ -977,7 +977,7 @@ bool BackendMarble::eventFilter(QObject *object, QEvent *event)
                     lonEast = d->firstSelectionPoint.lon(); 
                 }
 
-                if(d->firstSelectionScreenPoint.y() < d->secondSelectionScreenPoint.y())
+                if (d->firstSelectionScreenPoint.y() < d->secondSelectionScreenPoint.y())
                 {
                     latNorth = d->firstSelectionPoint.lat();
                     latSouth = d->intermediateSelectionPoint.lat();
@@ -1395,7 +1395,7 @@ void BackendMarble::mouseModeChanged(const MouseModes mouseMode)
 {
     d->currentMouseMode = mouseMode;
 
-    if(d->currentMouseMode != MouseModeSelection)
+    if (d->currentMouseMode != MouseModeSelection)
     {
         d->firstSelectionPoint.clear();
         d->secondSelectionPoint.clear();

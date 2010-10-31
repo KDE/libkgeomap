@@ -1023,7 +1023,7 @@ void BackendGoogleMaps::mouseModeChanged(const MouseModes mouseMode)
 
     d->htmlWidget->mouseModeChanged(mouseMode);
 /*
-    if(mouseMode == MouseModeSelection)
+    if (mouseMode == MouseModeSelection)
     {
        // d->htmlWidget->runScript(QString("selectionModeStatus(true)"));
         d->htmlWidget->mouseModeChanged(true);
