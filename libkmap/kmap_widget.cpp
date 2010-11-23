@@ -314,7 +314,7 @@ void KMapWidget::createActions()
     d->actionRemoveCurrentSelection = new KAction(this);
     //d->actionRemoveCurrentSelection->setEnabled(false);
     d->actionRemoveCurrentSelection->setIcon(SmallIcon("edit-clear"));
-    d->actionRemoveCurrentSelection->setToolTip("Removes current selection.");
+    d->actionRemoveCurrentSelection->setToolTip(i18n("Removes current selection."));
 
     d->actionSetSelectionMode = new KAction(this);
     d->actionSetSelectionMode->setCheckable(true);
