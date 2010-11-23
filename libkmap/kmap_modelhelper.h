@@ -31,13 +31,10 @@
 
 #include <QAbstractItemModel>
 #include <QItemSelectionModel>
-#include <QMimeData>
 #include <QPersistentModelIndex>
 #include <QPixmap>
 #include <QPoint>
 #include <QString>
-#include <QStringList>
-#include <QVariant>
 
 // Kde includes
 

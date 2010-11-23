@@ -30,9 +30,6 @@
 // Qt includes
 
 #include <QBitArray>
-#include <QDateTime>
-#include <QItemSelectionModel>
-#include <QMetaType>
 #include <QObject>
 #include <QPoint>
 

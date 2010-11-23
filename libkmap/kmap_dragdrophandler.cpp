@@ -28,7 +28,6 @@
 
 // Qt includes
 
-#include <QAbstractItemModel>
 
 // local includes
 

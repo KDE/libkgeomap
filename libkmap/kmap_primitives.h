@@ -31,7 +31,6 @@
 
 #include <QPersistentModelIndex>
 #include <QString>
-#include <QStringList>
 #include <QVariant>
 
 // Kde includes

@@ -29,7 +29,6 @@
 
 // Qt includes
 
-#include <QAbstractItemModel>
 #include <QWidget>
 #include <QStringList>
 

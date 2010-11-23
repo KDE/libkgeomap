@@ -31,7 +31,6 @@
 #include <QBuffer>
 #include <QActionGroup>
 #include <QMenu>
-#include <QPainter>
 #include <QPointer>
 
 // KDE includes

@@ -28,7 +28,6 @@
 
 // Qt includes
 
-#include <QActionGroup>
 #include <QMenu>
 #include <QPointer>
 

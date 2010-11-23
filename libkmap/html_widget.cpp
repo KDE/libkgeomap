@@ -29,7 +29,6 @@
 // Qt includes
 
 #include <QTimer>
-#include <QPainter>
 
 // KDE includes
 

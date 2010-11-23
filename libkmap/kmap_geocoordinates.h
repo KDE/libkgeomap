@@ -30,7 +30,7 @@
 // Qt includes
 
 #include <QString>
-
+#include <QStringList>
 // Kde includes
 
 #include <kdebug.h>

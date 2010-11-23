@@ -31,6 +31,7 @@
 // local includes
 
 #include "abstractmarkertiler.h"
+#include <QItemSelection>
 
 namespace KMap
 {

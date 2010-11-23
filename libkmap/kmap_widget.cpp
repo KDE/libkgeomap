@@ -32,7 +32,6 @@
 
 // Qt includes
 
-#include <QBitmap>
 #include <QDragEnterEvent>
 #include <QDropEvent>
 #include <QItemSelectionModel>
