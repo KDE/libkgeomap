@@ -41,7 +41,6 @@
 #include <kapplication.h>
 #include <KAboutData>
 #include <KCmdLineArgs>
-#include <KCmdLineOptions>
 
 // local includes
 
