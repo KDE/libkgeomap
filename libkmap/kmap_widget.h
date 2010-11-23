@@ -40,7 +40,6 @@
 
 class KAction;
 class KConfigGroup;
-class QItemSelectionModel;
 class QDragEnterEvent;
 class QDropEvent;
 class QMenu;

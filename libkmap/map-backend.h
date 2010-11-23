@@ -42,7 +42,6 @@
 #include <marble/GeoDataLatLonBox.h>
 
 class QMenu;
-class QPersistentModelIndex;
 class KConfigGroup;
 
 namespace KMap

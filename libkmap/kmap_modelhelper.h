@@ -52,7 +52,6 @@
 namespace KMap
 {
 
-class KMapWidget;
 
 class KMAP_EXPORT ModelHelper : public QObject
 {
