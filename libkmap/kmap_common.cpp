@@ -37,7 +37,7 @@ namespace KMap
 bool WMWHelperParseLatLonString(const QString& latLonString, GeoCoordinates* const coordinates)
 {
     // parse a 'lat,lon' string:
-    const QStringList coordinateStrings = latLonString.trimmed().split(',');
+    const QStringList coordinateStrings = latLonString.trimmed().split(QLatin1Char( ',' ));
     bool valid = ( coordinateStrings.size() == 2 );
     if (valid)
     {
@@ -70,11 +70,11 @@ bool WMWHelperParseXYStringToPoint(const QString& xyString, QPoint* const point)
     // a point is returned as (x, y)
 
     const QString myXYString = xyString.trimmed();
-    bool valid = myXYString.startsWith('(') && myXYString.endsWith(')');
+    bool valid = myXYString.startsWith(QLatin1Char( '(' )) && myXYString.endsWith(QLatin1Char( ')' ));
     QStringList pointStrings;
     if (valid)
     {
-        pointStrings = myXYString.mid(1, myXYString.length()-2).split(',');
+        pointStrings = myXYString.mid(1, myXYString.length()-2).split(QLatin1Char( ',' ));
         valid = ( pointStrings.size() == 2 );
     }
     if (valid)
@@ -111,7 +111,7 @@ bool WMWHelperParseBoundsString(const QString& boundsString, QPair<GeoCoordinate
 
     // check for minimum length
     bool valid =  myBoundsString.size() >= 13;
-    valid      &= myBoundsString.startsWith('(') && myBoundsString.endsWith(')');
+    valid      &= myBoundsString.startsWith(QLatin1Char( '(' )) && myBoundsString.endsWith(QLatin1Char( ')' ));
 
     if (valid)
     {
@@ -119,16 +119,16 @@ bool WMWHelperParseBoundsString(const QString& boundsString, QPair<GeoCoordinate
         const QString string1 = myBoundsString.mid(1, myBoundsString.length()-2).trimmed();
 
         // split the string at the middle comma:
-        const int dumpComma  = string1.indexOf(",", 0);
-        const int splitComma = string1.indexOf(",", dumpComma+1);
+        const int dumpComma  = string1.indexOf(QLatin1String( "," ), 0);
+        const int splitComma = string1.indexOf(QLatin1String( "," ), dumpComma+1);
         valid                = (dumpComma>=0) && (splitComma>=0);
 
         if (valid)
         {
             const QString coord1String =  string1.mid(0, splitComma).trimmed();
             const QString coord2String =  string1.mid(splitComma+1).trimmed();
-            valid                      &= coord1String.startsWith('(') && coord1String.endsWith(')');
-            valid                      &= coord2String.startsWith('(') && coord2String.endsWith(')');
+            valid                      &= coord1String.startsWith(QLatin1Char( '(' )) && coord1String.endsWith(QLatin1Char( ')' ));
+            valid                      &= coord2String.startsWith(QLatin1Char( '(' )) && coord2String.endsWith(QLatin1Char( ')' ));
 
             GeoCoordinates coord1, coord2;
             if (valid)

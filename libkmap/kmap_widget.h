@@ -125,7 +125,7 @@ public:
 
     /// @name Miscellaneous
     //@{
-    bool queryAltitudes(const WMWAltitudeLookup::List& queryItems, const QString& backendName = "");
+    bool queryAltitudes(const WMWAltitudeLookup::List& queryItems, const QString& backendName = QLatin1String( "" ));
     //@}
 
     /**

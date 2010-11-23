@@ -47,7 +47,7 @@ int main(int argc, char* argv[])
         ki18n("(c) 2009-2010 Michael G. Hansen"),
         ki18n(""),                                         // optional text
         "http://www.digikam.org/sharedlibs",               // URI of homepage
-        ""                                                 // bugs e-mail address
+        ""                                                  // bugs e-mail address
     );
 
     aboutData.addAuthor(ki18n("Michael G. Hansen"),

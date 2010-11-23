@@ -35,7 +35,7 @@ void TestPrimitives::testGeoCoordinates()
 {
     GeoCoordinates coord1(52.0, 6.0);
     QVERIFY(coord1.hasCoordinates());
-    QCOMPARE(coord1.geoUrl(), QString("geo:52,6"));
+    QCOMPARE(coord1.geoUrl(), QLatin1String( "geo:52,6"));
 
     GeoCoordinates coord2(52.0, 6.0);
     GeoCoordinates coord3(53.0, 6.0);
@@ -54,24 +54,24 @@ void TestPrimitives::testParseLatLonString()
     GeoCoordinates coordinate;
 
     QVERIFY(WMWHelperParseLatLonString("52,6", &coordinate));
-    QCOMPARE(coordinate.geoUrl(), QString("geo:52,6"));
+    QCOMPARE(coordinate.geoUrl(), QLatin1String( "geo:52,6"));
 
     QVERIFY(WMWHelperParseLatLonString("52.5,6.5", &coordinate));
-    QCOMPARE(coordinate.geoUrl(), QString("geo:52.5,6.5"));
+    QCOMPARE(coordinate.geoUrl(), QLatin1String( "geo:52.5,6.5"));
 
     QVERIFY(WMWHelperParseLatLonString(" 52.5, 6.5 ", &coordinate));
-    QCOMPARE(coordinate.geoUrl(), QString("geo:52.5,6.5"));
+    QCOMPARE(coordinate.geoUrl(), QLatin1String( "geo:52.5,6.5"));
 
     QVERIFY(WMWHelperParseLatLonString("-52.5, 6.5 ", &coordinate));
-    QCOMPARE(coordinate.geoUrl(), QString("geo:-52.5,6.5"));
+    QCOMPARE(coordinate.geoUrl(), QLatin1String( "geo:-52.5,6.5"));
 
     QVERIFY(WMWHelperParseLatLonString("    -52.5,  6.5   ", &coordinate));
-    QCOMPARE(coordinate.geoUrl(), QString("geo:-52.5,6.5"));
+    QCOMPARE(coordinate.geoUrl(), QLatin1String( "geo:-52.5,6.5"));
 
     QVERIFY(WMWHelperParseLatLonString("52.5,-6.5", &coordinate));
-    QCOMPARE(coordinate.geoUrl(), QString("geo:52.5,-6.5"));
+    QCOMPARE(coordinate.geoUrl(), QLatin1String( "geo:52.5,-6.5"));
 
-    QVERIFY(!WMWHelperParseLatLonString("", 0));
+    QVERIFY(!WMWHelperParseLatLonString(QLatin1String( "" ), 0));
     QVERIFY(!WMWHelperParseLatLonString("52.6", 0));
     QVERIFY(!WMWHelperParseLatLonString("52.6,", 0));
     QVERIFY(!WMWHelperParseLatLonString(",6", 0));
@@ -100,7 +100,7 @@ void TestPrimitives::testParseXYStringToPoint()
     QVERIFY(WMWHelperParseXYStringToPoint("  ( 52, 6 )  ", &point));
     QCOMPARE(point, QPoint(52,6));
 
-    QVERIFY(!WMWHelperParseXYStringToPoint("", 0));
+    QVERIFY(!WMWHelperParseXYStringToPoint(QLatin1String( "" ), 0));
     QVERIFY(!WMWHelperParseXYStringToPoint("()", 0));
     QVERIFY(!WMWHelperParseXYStringToPoint("(52)", 0));
     QVERIFY(!WMWHelperParseXYStringToPoint("(52,6a)", 0));
@@ -118,24 +118,24 @@ void TestPrimitives::testParseBoundsString()
     GeoCoordinates::Pair bounds;
 
     QVERIFY(WMWHelperParseBoundsString("((-52,-6),(52,6))", &bounds));
-    QCOMPARE(bounds.first.geoUrl(), QString("geo:-52,-6"));
-    QCOMPARE(bounds.second.geoUrl(), QString("geo:52,6"));
+    QCOMPARE(bounds.first.geoUrl(), QLatin1String( "geo:-52,-6"));
+    QCOMPARE(bounds.second.geoUrl(), QLatin1String( "geo:52,6"));
 
     QVERIFY(WMWHelperParseBoundsString("((-52,-6), (52,6))", &bounds));
-    QCOMPARE(bounds.first.geoUrl(), QString("geo:-52,-6"));
-    QCOMPARE(bounds.second.geoUrl(), QString("geo:52,6"));
+    QCOMPARE(bounds.first.geoUrl(), QLatin1String( "geo:-52,-6"));
+    QCOMPARE(bounds.second.geoUrl(), QLatin1String( "geo:52,6"));
 
     QVERIFY(WMWHelperParseBoundsString("((-52, -6), (52, 6))", &bounds));
-    QCOMPARE(bounds.first.geoUrl(), QString("geo:-52,-6"));
-    QCOMPARE(bounds.second.geoUrl(), QString("geo:52,6"));
+    QCOMPARE(bounds.first.geoUrl(), QLatin1String( "geo:-52,-6"));
+    QCOMPARE(bounds.second.geoUrl(), QLatin1String( "geo:52,6"));
 
     QVERIFY(WMWHelperParseBoundsString("((10,20),(30,40))", &bounds));
-    QCOMPARE(bounds.first.geoUrl(), QString("geo:10,20"));
-    QCOMPARE(bounds.second.geoUrl(), QString("geo:30,40"));
+    QCOMPARE(bounds.first.geoUrl(), QLatin1String( "geo:10,20"));
+    QCOMPARE(bounds.second.geoUrl(), QLatin1String( "geo:30,40"));
 
     QVERIFY(WMWHelperParseBoundsString("((-52.5,-6.5),(52.5,6.5))", &bounds));
-    QCOMPARE(bounds.first.geoUrl(), QString("geo:-52.5,-6.5"));
-    QCOMPARE(bounds.second.geoUrl(), QString("geo:52.5,6.5"));
+    QCOMPARE(bounds.first.geoUrl(), QLatin1String( "geo:-52.5,-6.5"));
+    QCOMPARE(bounds.second.geoUrl(), QLatin1String( "geo:52.5,6.5"));
 
     QVERIFY(!WMWHelperParseBoundsString(" (-52.5,-6.5),(52.5,6.5))", 0));
     QVERIFY(!WMWHelperParseBoundsString("((-52.5,-6.5),(52.5,6.5) ", 0));

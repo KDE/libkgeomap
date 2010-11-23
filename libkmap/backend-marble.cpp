@@ -76,8 +76,8 @@ public:
         actionShowCompass(0),
         actionShowOverviewMap(0),
         actionShowScaleBar(0),
-        cacheMapTheme("atlas"),
-        cacheProjection("spherical"),
+        cacheMapTheme(QLatin1String( "atlas" )),
+        cacheProjection(QLatin1String( "spherical" )),
         cacheShowCompass(false),
         cacheShowScaleBar(false),
         cacheShowOverviewMap(false),
@@ -191,7 +191,7 @@ BackendMarble::~BackendMarble()
 
 QString BackendMarble::backendName() const
 {
-    return QString("marble");
+    return QLatin1String( "marble");
 }
 
 QString BackendMarble::backendHumanName() const
@@ -244,12 +244,12 @@ void BackendMarble::createActions()
     KAction* const actionAtlas = new KAction(d->actionGroupMapTheme);
     actionAtlas->setCheckable(true);
     actionAtlas->setText(i18n("Atlas map"));
-    actionAtlas->setData("atlas");
+    actionAtlas->setData(QLatin1String( "atlas" ));
 
     KAction* const actionOpenStreetmap = new KAction(d->actionGroupMapTheme);
     actionOpenStreetmap->setCheckable(true);
     actionOpenStreetmap->setText(i18n("OpenStreetMap"));
-    actionOpenStreetmap->setData("openstreetmap");
+    actionOpenStreetmap->setData(QLatin1String( "openstreetmap" ));
 
     // projection:
     d->actionGroupProjection = new QActionGroup(this);
@@ -261,17 +261,17 @@ void BackendMarble::createActions()
     KAction* const actionSpherical = new KAction(d->actionGroupProjection);
     actionSpherical->setCheckable(true);
     actionSpherical->setText(i18n("Spherical"));
-    actionSpherical->setData("spherical");
+    actionSpherical->setData(QLatin1String( "spherical" ));
 
     KAction* const actionMercator = new KAction(d->actionGroupProjection);
     actionMercator->setCheckable(true);
     actionMercator->setText(i18n("Mercator"));
-    actionMercator->setData("mercator");
+    actionMercator->setData(QLatin1String( "mercator" ));
 
     KAction* const actionEquirectangular = new KAction(d->actionGroupProjection);
     actionEquirectangular->setCheckable(true);
     actionEquirectangular->setText(i18n("Equirectangular"));
-    actionEquirectangular->setData("equirectangular");
+    actionEquirectangular->setData(QLatin1String( "equirectangular" ));
 
     // float items:
     d->actionGroupFloatItems = new QActionGroup(this);
@@ -281,17 +281,17 @@ void BackendMarble::createActions()
             this, SLOT(slotFloatSettingsTriggered(QAction*)));
 
     d->actionShowCompass = new KAction(i18n("Show compass"), d->actionGroupFloatItems);
-    d->actionShowCompass->setData("showcompass");
+    d->actionShowCompass->setData(QLatin1String( "showcompass" ));
     d->actionShowCompass->setCheckable(true);
     d->actionGroupFloatItems->addAction(d->actionShowCompass);
 
     d->actionShowOverviewMap = new KAction(i18n("Show overview map"), d->actionGroupFloatItems);
-    d->actionShowOverviewMap->setData("showoverviewmap");
+    d->actionShowOverviewMap->setData(QLatin1String( "showoverviewmap" ));
     d->actionShowOverviewMap->setCheckable(true);
     d->actionGroupFloatItems->addAction(d->actionShowOverviewMap);
 
     d->actionShowScaleBar = new KAction(i18n("Show scale bar"), d->actionGroupFloatItems);
-    d->actionShowScaleBar->setData("showscalebar");
+    d->actionShowScaleBar->setData(QLatin1String( "showscalebar" ));
     d->actionShowScaleBar->setCheckable(true);
     d->actionGroupFloatItems->addAction(d->actionShowScaleBar);
 }
@@ -347,13 +347,13 @@ void BackendMarble::setMapTheme(const QString& newMapTheme)
 
     if (d->marbleWidget)
     {
-        if (newMapTheme == QString("atlas"))
+        if (newMapTheme == QLatin1String( "atlas"))
         {
-            d->marbleWidget->setMapThemeId("earth/srtm/srtm.dgml");
+            d->marbleWidget->setMapThemeId(QLatin1String( "earth/srtm/srtm.dgml" ));
         }
-        else if (newMapTheme == QString("openstreetmap"))
+        else if (newMapTheme == QLatin1String( "openstreetmap"))
         {
-            d->marbleWidget->setMapThemeId("earth/openstreetmap/openstreetmap.dgml");
+            d->marbleWidget->setMapThemeId(QLatin1String( "earth/openstreetmap/openstreetmap.dgml" ));
         }
     }
 
@@ -467,7 +467,7 @@ void BackendMarble::marbleCustomPaint(Marble::GeoPainter* painter)
 
     painter->save();
     painter->autoMapQuality();
-    
+
     QPen circlePen(Qt::green);
     QBrush circleBrush(Qt::blue);
     // TODO: use global radius instead, but check the code here first
@@ -586,11 +586,11 @@ void BackendMarble::marbleCustomPaint(Marble::GeoPainter* painter)
             QString pixmapName = fillColor.name().mid(1);
             if (cluster.selectedState==WMWSelectedAll)
             {
-                pixmapName+="-selected";
+                pixmapName+=QLatin1String( "-selected" );
             }
             if (cluster.selectedState==WMWSelectedSome)
             {
-                pixmapName+="-someselected";
+                pixmapName+=QLatin1String( "-someselected" );
             }
             const QPixmap& markerPixmap = s->markerPixmaps[pixmapName];
             painter->drawPixmap(clusterPoint.x()-markerPixmap.width()/2, clusterPoint.y()-markerPixmap.height(), markerPixmap);
@@ -611,7 +611,7 @@ void BackendMarble::marbleCustomPaint(Marble::GeoPainter* painter)
                             &strokeStyle, &labelText, &labelColor);
 
         QString pixmapName = fillColor.name().mid(1);
-        pixmapName+="-selected";
+        pixmapName+=QLatin1String( "-selected" );
 
         const QPixmap& markerPixmap = s->markerPixmaps[pixmapName];
         painter->drawPixmap(d->dragDropMarkerPos.x()-markerPixmap.width()/2, d->dragDropMarkerPos.y()-markerPixmap.height(), markerPixmap);
@@ -701,16 +701,16 @@ QString BackendMarble::getProjection() const
         switch (currentProjection)
         {
         case Marble::Equirectangular:
-            d->cacheProjection = "equirectangular";
+            d->cacheProjection = QLatin1String( "equirectangular" );
             break;
 
         case Marble::Mercator:
-            d->cacheProjection = "mercator";
+            d->cacheProjection = QLatin1String( "mercator" );
             break;
 
         default:
         case Marble::Spherical:
-            d->cacheProjection = "spherical";
+            d->cacheProjection = QLatin1String( "spherical" );
             break;
         }
     }
@@ -724,11 +724,11 @@ void BackendMarble::setProjection(const QString& newProjection)
 
     if (d->marbleWidget)
     {
-        if (newProjection=="equirectangular")
+        if (newProjection==QLatin1String( "equirectangular" ))
         {
             d->marbleWidget->setProjection(Marble::Equirectangular);
         }
-        else if (newProjection=="mercator")
+        else if (newProjection==QLatin1String( "mercator" ))
         {
             d->marbleWidget->setProjection(Marble::Mercator);
         }
@@ -784,15 +784,15 @@ void BackendMarble::slotFloatSettingsTriggered(QAction* action)
     const QString actionIdString = action->data().toString();
     const bool actionState = action->isChecked();
 
-    if (actionIdString=="showcompass")
+    if (actionIdString==QLatin1String( "showcompass" ))
     {
         setShowCompass(actionState);
     }
-    else if (actionIdString=="showscalebar")
+    else if (actionIdString==QLatin1String( "showscalebar" ))
     {
         setShowScaleBar(actionState);
     }
-    else if (actionIdString=="showoverviewmap")
+    else if (actionIdString==QLatin1String( "showoverviewmap" ))
     {
         setShowOverviewMap(actionState);
     }
@@ -828,10 +828,10 @@ void BackendMarble::slotMarbleZoomChanged(int newZoom)
 
 void BackendMarble::setZoom(const QString& newZoom)
 {
-    const QString myZoomString = s->worldMapWidget->convertZoomToBackendZoom(newZoom, "marble");
-    KMAP_ASSERT(myZoomString.startsWith("marble:"));
+    const QString myZoomString = s->worldMapWidget->convertZoomToBackendZoom(newZoom, QLatin1String( "marble" ));
+    KMAP_ASSERT(myZoomString.startsWith(QLatin1String( "marble:" )));
 
-    const int myZoom = myZoomString.mid(QString("marble:").length()).toInt();
+    const int myZoom = myZoomString.mid(QString::fromLatin1( "marble:").length()).toInt();
     kDebug()<<myZoom;
 
     d->cacheZoom = myZoom;
@@ -841,7 +841,7 @@ void BackendMarble::setZoom(const QString& newZoom)
 QString BackendMarble::getZoom() const
 {
     d->cacheZoom = d->marbleWidget->zoom();
-    return QString("marble:%1").arg(d->cacheZoom);
+    return QString::fromLatin1( "marble:%1").arg(d->cacheZoom);
 }
 
 int BackendMarble::getMarkerModelLevel()
@@ -951,7 +951,7 @@ bool BackendMarble::eventFilter(QObject *object, QEvent *event)
         {
             // we need to filter this event because otherwise Marble displays
             // a left click context menu
-            doFilterEvent = true;     
+            doFilterEvent = true;
         }
         else if (event->type() == QEvent::MouseMove)
         {
@@ -961,7 +961,7 @@ bool BackendMarble::eventFilter(QObject *object, QEvent *event)
                 geoCoordinates(mouseEvent->pos(), &d->intermediateSelectionPoint);
                 d->secondSelectionScreenPoint = mouseEvent->pos();
 
-                kDebug()<<d->firstSelectionScreenPoint<<" "<<d->secondSelectionScreenPoint;
+                kDebug()<<d->firstSelectionScreenPoint<<QLatin1String( " " )<<d->secondSelectionScreenPoint;
 
                 qreal lonWest, latNorth, lonEast, latSouth;
 
@@ -973,7 +973,7 @@ bool BackendMarble::eventFilter(QObject *object, QEvent *event)
                 else
                 {
                     lonWest = d->intermediateSelectionPoint.lon();
-                    lonEast = d->firstSelectionPoint.lon(); 
+                    lonEast = d->firstSelectionPoint.lon();
                 }
 
                 if (d->firstSelectionScreenPoint.y() < d->secondSelectionScreenPoint.y())
@@ -1011,7 +1011,7 @@ bool BackendMarble::eventFilter(QObject *object, QEvent *event)
                 d->intermediateSelectionPoint.clear();
 
                 geoCoordinates(mouseEvent->pos(), &d->secondSelectionPoint);
-                d->secondSelectionScreenPoint = mouseEvent->pos(); 
+                d->secondSelectionScreenPoint = mouseEvent->pos();
 
                 qreal lonWest, latNorth, lonEast, latSouth;
 
@@ -1023,7 +1023,7 @@ bool BackendMarble::eventFilter(QObject *object, QEvent *event)
                 else
                 {
                     lonWest = d->secondSelectionPoint.lon();
-                    lonEast = d->firstSelectionPoint.lon(); 
+                    lonEast = d->firstSelectionPoint.lon();
                 }
 
                 if (d->firstSelectionScreenPoint.y() < d->secondSelectionScreenPoint.y())
@@ -1044,7 +1044,7 @@ bool BackendMarble::eventFilter(QObject *object, QEvent *event)
 
                 setSelectionRectangle(selectionCoordinates);
                 d->searchRectangleCoordinates.first.clear();
- 
+
                 emit signalSelectionHasBeenMade(selectionCoordinates);
 
                 d->firstSelectionPoint.clear();
@@ -1266,8 +1266,8 @@ bool BackendMarble::eventFilter(QObject *object, QEvent *event)
 void BackendMarble::updateActionAvailability()
 {
     kDebug()<<d->cacheZoom<<d->marbleWidget->maximumZoom()<<d->marbleWidget->minimumZoom();
-    s->worldMapWidget->getControlAction("zoomin")->setEnabled(d->cacheZoom<d->marbleWidget->maximumZoom());
-    s->worldMapWidget->getControlAction("zoomout")->setEnabled(d->cacheZoom>d->marbleWidget->minimumZoom());
+    s->worldMapWidget->getControlAction(QLatin1String( "zoomin" ))->setEnabled(d->cacheZoom<d->marbleWidget->maximumZoom());
+    s->worldMapWidget->getControlAction(QLatin1String( "zoomout" ))->setEnabled(d->cacheZoom>d->marbleWidget->minimumZoom());
 
     const QList<QAction*> mapThemeActions = d->actionGroupMapTheme->actions();
     for (int i=0; i<mapThemeActions.size(); ++i)

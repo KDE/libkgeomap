@@ -56,7 +56,7 @@ namespace KMap
 
 inline void KMap_assert(const char* const condition, const char* const filename, const int lineNumber)
 {
-    const QString debugString = QString("ASSERT: %1 - %2:%3").arg(condition).arg(filename).arg(lineNumber);
+    const QString debugString = QString::fromLatin1( "ASSERT: %1 - %2:%3").arg(QLatin1String( condition )).arg(QLatin1String( filename )).arg(lineNumber);
 #ifdef KMAP_HAVE_VALGRIND
     if (RUNNING_ON_VALGRIND>0)
     {

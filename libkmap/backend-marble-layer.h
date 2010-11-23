@@ -57,7 +57,7 @@ public:
     virtual ~BMLayer();
 
     virtual bool render(Marble::GeoPainter* painter, Marble::ViewportParams* viewport,
-                        const QString& renderPos = QString("NONE"), Marble::GeoSceneLayer* layer = 0);
+                        const QString& renderPos = QLatin1String( "NONE"), Marble::GeoSceneLayer* layer = 0);
     virtual QStringList renderPosition () const;
 
 private:

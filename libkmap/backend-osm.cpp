@@ -104,7 +104,7 @@ BackendOSM::~BackendOSM()
 
 QString BackendOSM::backendName() const
 {
-    return QString("osm");
+    return QLatin1String( "osm");
 }
 
 QString BackendOSM::backendHumanName() const
@@ -129,7 +129,7 @@ void BackendOSM::setCenter(const GeoCoordinates& coordinate)
 
     if (isReady())
     {
-        d->htmlWidget->runScript(QString("wmwSetCenter(%1, %2);").arg(d->cacheCenter.latString())
+        d->htmlWidget->runScript(QString::fromLatin1( "wmwSetCenter(%1, %2);").arg(d->cacheCenter.latString())
                                                                  .arg(d->cacheCenter.lonString()));
     }
 }
@@ -143,12 +143,12 @@ void BackendOSM::slotHTMLInitialized()
 {
     kDebug()<<1;
     d->isReady = true;
-    d->htmlWidget->runScript(QString("document.getElementById(\"map_canvas\").style.height=\"%1px\"")
+    d->htmlWidget->runScript(QLatin1String( "document.getElementById(\"map_canvas\").style.height=\"%1px\QLatin1String( "" ))
                              .arg(d->htmlWidgetWrapper->height()));
 
     // TODO: call javascript directly here and update action availability in one shot
     setCenter(d->cacheCenter);
-    d->htmlWidget->runScript(QString("wmwSetZoom(%1);").arg(d->cacheZoom));
+    d->htmlWidget->runScript(QString::fromLatin1( "wmwSetZoom(%1);").arg(d->cacheZoom));
     emit(signalBackendReady(backendName()));
 }
 
@@ -157,7 +157,7 @@ void BackendOSM::zoomIn()
     if (!d->isReady)
         return;
 
-    d->htmlWidget->runScript(QString("wmwZoomIn();"));
+    d->htmlWidget->runScript(QLatin1String( "wmwZoomIn();"));
 }
 
 void BackendOSM::zoomOut()
@@ -165,7 +165,7 @@ void BackendOSM::zoomOut()
     if (!d->isReady)
         return;
 
-    d->htmlWidget->runScript(QString("wmwZoomOut();"));
+    d->htmlWidget->runScript(QLatin1String( "wmwZoomOut();"));
 }
 
 void BackendOSM::updateActionsEnabled()
@@ -202,14 +202,14 @@ void BackendOSM::updateMarkers()
         return;
 
     // re-transfer all markers to the javascript-part:
-    d->htmlWidget->runScript(QString("wmwClearMarkers();"));
+    d->htmlWidget->runScript(QLatin1String( "wmwClearMarkers();"));
     for (int row = 0; row<s->specialMarkersModel->rowCount(); ++row)
     {
         const QModelIndex currentIndex = s->specialMarkersModel->index(row, 0);
 
         const GeoCoordinates currentCoordinates = s->specialMarkersModel->data(currentIndex, s->specialMarkersCoordinatesRole).value<GeoCoordinates>();
 
-        d->htmlWidget->runScript(QString("wmwAddMarker(%1, %2, %3, %4);")
+        d->htmlWidget->runScript(QLatin1String( "wmwAddMarker(%1, %2, %3, %4);")
                 .arg(row)
                 .arg(currentCoordinates.latString())
                 .arg(currentCoordinates.lonString())
@@ -231,7 +231,7 @@ void BackendOSM::slotHTMLEvents(const QStringList& events)
     {
         const QString eventCode = it->left(2);
         const QString eventParameter = it->mid(2);
-        const QStringList eventParameters = eventParameter.split('/');
+        const QStringList eventParameters = eventParameter.split(QLatin1Char( '/' ));
 
         if (eventCode=="MB")
         {   // NOTE: event currently disabled in javascript part
@@ -268,7 +268,7 @@ void BackendOSM::slotHTMLEvents(const QStringList& events)
             // re-read the marker position:
             GeoCoordinates clusterCoordinates;
             const bool isValid = d->htmlWidget->runScript2Coordinates(
-                    QString("wmwGetClusterPosition(%1);").arg(clusterIndex),
+                    QString::fromLatin1( "wmwGetClusterPosition(%1);").arg(clusterIndex),
                     &clusterCoordinates);
 
             if (!isValid)
@@ -294,7 +294,7 @@ void BackendOSM::slotHTMLEvents(const QStringList& events)
             // re-read the marker position:
             GeoCoordinates markerCoordinates;
             const bool isValid = d->htmlWidget->runScript2Coordinates(
-                    QString("wmwGetMarkerPosition(%1);").arg(markerRow),
+                    QString::fromLatin1( "wmwGetMarkerPosition(%1);").arg(markerRow),
                     &markerCoordinates
                 );
 
@@ -310,7 +310,7 @@ void BackendOSM::slotHTMLEvents(const QStringList& events)
         else if (eventCode=="do")
         {
             // debug output:
-            kDebug()<<QString("javascript:%1").arg(eventParameter);
+            kDebug()<<QString::fromLatin1( "javascript:%1").arg(eventParameter);
         }
     }
 
@@ -329,8 +329,8 @@ void BackendOSM::slotHTMLEvents(const QStringList& events)
     // now process the buffered events:
     if (zoomProbablyChanged)
     {
-        d->cacheZoom = d->htmlWidget->runScript(QString("wmwGetZoom();")).toInt();
-        emit(signalZoomChanged(QString("googlemaps:%1").arg(d->cacheZoom)));
+        d->cacheZoom = d->htmlWidget->runScript(QLatin1String( "wmwGetZoom();")).toInt();
+        emit(signalZoomChanged(QString::fromLatin1( "googlemaps:%1").arg(d->cacheZoom)));
     }
     if (centerProbablyChanged)
     {
@@ -367,7 +367,7 @@ void BackendOSM::updateClusters()
     // TODO: only update clusters that have actually changed!
 
     // re-transfer all markers to the javascript-part:
-    d->htmlWidget->runScript(QString("wmwClearClusters();"));
+    d->htmlWidget->runScript(QLatin1String( "wmwClearClusters();"));
     for (int currentIndex = 0; currentIndex<s->clusterList.size(); ++currentIndex)
     {
         const WMWCluster& currentCluster = s->clusterList.at(currentIndex);
@@ -383,7 +383,7 @@ void BackendOSM::updateClusters()
 
         const QString fillColorName = fillColor.name();
 
-        d->htmlWidget->runScript(QString("wmwAddCluster(%1, %2, %3, %4, '%5', '%6');")
+        d->htmlWidget->runScript(QLatin1String( "wmwAddCluster(%1, %2, %3, %4, '%5', '%6');")
                 .arg(currentIndex)
                 .arg(currentCluster.coordinates.latString())
                 .arg(currentCluster.coordinates.lonString())
@@ -402,7 +402,7 @@ bool BackendOSM::screenCoordinates(const GeoCoordinates& coordinates, QPoint* co
 
     const bool isValid = WMWHelperParseXYStringToPoint(
             d->htmlWidget->runScript(
-                QString("wmwLatLngToPixel(%1, %2);")
+                QLatin1String( "wmwLatLngToPixel(%1, %2);")
                     .arg(coordinates.latString())
                     .arg(coordinates.lonString())
                     ).toString(),
@@ -419,7 +419,7 @@ bool BackendOSM::GeoCoordinates(const QPoint& point, GeoCoordinates* const coord
         return false;
 
     const bool isValid = d->htmlWidget->runScript2Coordinates(
-            QString("wmwPixelToLatLng(%1, %2);")
+            QLatin1String( "wmwPixelToLatLng(%1, %2);")
                 .arg(point.x())
                 .arg(point.y()),
             coordinates);
@@ -445,21 +445,21 @@ void BackendOSM::setZoom(const QString& newZoom)
     const QString myZoomString = s->worldMapWidget->convertZoomToBackendZoom(newZoom, "googlemaps");
     KMAP_ASSERT(myZoomString.startsWith("googlemaps:"));
 
-    const int myZoom = myZoomString.mid(QString("googlemaps:").length()).toInt();
+    const int myZoom = myZoomString.mid(QLatin1String( "googlemaps:").length()).toInt();
     kDebug()<<myZoom;
 
     d->cacheZoom = myZoom;
 
     if (isReady())
     {
-        d->htmlWidget->runScript(QString("wmwSetZoom(%1);").arg(d->cacheZoom));
+        d->htmlWidget->runScript(QString::fromLatin1( "wmwSetZoom(%1);").arg(d->cacheZoom));
     }
 }
 
 QString BackendOSM::getZoom() const
 {
     // zoom settings for OSM are basically the same as for Google Maps, so just re-use the prefix
-    return QString("googlemaps:%1").arg(d->cacheZoom);
+    return QString::fromLatin1( "googlemaps:%1").arg(d->cacheZoom);
 }
 
 int BackendOSM::getMarkerModelLevel()

@@ -109,23 +109,23 @@ public:
           modificationsAllowed(true)
     {
         QStringList markerColors;
-        markerColors << "00ff00" << "00ffff" << "ff0000" << "ff7f00" << "ffff00";
+        markerColors << QLatin1String( "00ff00" ) << QLatin1String( "00ffff" ) << QLatin1String( "ff0000" ) << QLatin1String( "ff7f00" ) << QLatin1String( "ffff00" );
         QStringList stateNames;
-        stateNames << "" << "-selected" << "-someselected";
+        stateNames << QLatin1String( "" ) << QLatin1String( "-selected" ) << QLatin1String( "-someselected" );
         for (QStringList::const_iterator it = markerColors.constBegin(); it!=markerColors.constEnd(); ++it)
         {
             for (QStringList::const_iterator sit = stateNames.constBegin(); sit!=stateNames.constEnd(); ++sit)
             {
                 const QString pixmapName = *it + *sit;
-                const KUrl markerUrl = KStandardDirs::locate("data", QString("libkmap/marker-%1.png").arg(pixmapName));
+                const KUrl markerUrl = KStandardDirs::locate("data", QString::fromLatin1( "libkmap/marker-%1.png").arg(pixmapName));
                 markerPixmaps[pixmapName] = QPixmap(markerUrl.toLocalFile());
             }
         }
 
-        const KUrl markerIconUrl = KStandardDirs::locate("data", "libkmap/marker-icon-16x16.png");
-        markerPixmaps["marker-icon-16x16"] = QPixmap(markerIconUrl.toLocalFile());
+        const KUrl markerIconUrl = KStandardDirs::locate("data", QLatin1String( "libkmap/marker-icon-16x16.png" ));
+        markerPixmaps[QLatin1String( "marker-icon-16x16" )] = QPixmap(markerIconUrl.toLocalFile());
 
-        markerPixmap = markerPixmaps["00ff00"];
+        markerPixmap = markerPixmaps[QLatin1String( "00ff00" )];
     }
 
     KMapWidget*               worldMapWidget;

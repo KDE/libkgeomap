@@ -431,7 +431,7 @@ AbstractMarkerTiler::TileIndex AbstractMarkerTiler::TileIndex::fromCoordinates(c
         }
         if (haveRoundingErrors)
         {
-//             kDebug() << QString("Rounding errors at level %1!").arg(l);
+//             kDebug() << QString::fromLatin1( "Rounding errors at level %1!").arg(l);
         }
 
         resultIndex.appendLatLonIndex(latIndex, lonIndex);

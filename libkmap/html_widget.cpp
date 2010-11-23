@@ -133,7 +133,7 @@ void HTMLWidget::khtmlMouseReleaseEvent(khtml::MouseReleaseEvent* e)
     {
         if(!d->firstSelectionPoint.hasCoordinates())
         {
-            runScript2Coordinates( QString("wmwPixelToLatLng(%1, %2);")
+            runScript2Coordinates( QString::fromLatin1( "wmwPixelToLatLng(%1, %2);")
                                     .arg(e->x())
                                     .arg(e->y()),
                                    &d->firstSelectionPoint);
@@ -147,7 +147,7 @@ void HTMLWidget::khtmlMouseReleaseEvent(khtml::MouseReleaseEvent* e)
             if(!d->secondSelectionPoint.hasCoordinates())
             {
 
-                runScript2Coordinates( QString("wmwPixelToLatLng(%1, %2);")
+                runScript2Coordinates( QString::fromLatin1( "wmwPixelToLatLng(%1, %2);")
                                         .arg(e->x())
                                         .arg(e->y()),
                                         &d->secondSelectionPoint);
@@ -163,7 +163,7 @@ void HTMLWidget::khtmlMouseReleaseEvent(khtml::MouseReleaseEvent* e)
                 else
                 {
                     lonEast  = d->firstSelectionPoint.lon();
-                    lonWest  = d->secondSelectionPoint.lon(); 
+                    lonWest  = d->secondSelectionPoint.lon();
                 }
 
                 if(d->firstSelectionScreenPoint.y() < d->secondSelectionScreenPoint.y())
@@ -177,9 +177,9 @@ void HTMLWidget::khtmlMouseReleaseEvent(khtml::MouseReleaseEvent* e)
                     latSouth = d->firstSelectionPoint.lat();
                 }
 
-                runScript(QString("setDisplayedRectangle(%1, %2, %3, %4);").arg(lonWest).arg(latNorth).arg(lonEast).arg(latSouth));
-                runScript(QString("removeSelectionRectangle();"));              
- 
+                runScript(QString::fromLatin1( "setDisplayedRectangle(%1, %2, %3, %4);").arg(lonWest).arg(latNorth).arg(lonEast).arg(latSouth));
+                runScript(QLatin1String( "removeSelectionRectangle();"));
+
                 const GeoCoordinates::Pair selectionCoordinates(
                         GeoCoordinates(latNorth, lonWest),
                         GeoCoordinates(latSouth, lonEast)
@@ -190,9 +190,9 @@ void HTMLWidget::khtmlMouseReleaseEvent(khtml::MouseReleaseEvent* e)
                 d->firstSelectionPoint.clear();
                 d->intermediateSelectionPoint.clear();
                 d->secondSelectionPoint.clear();
-                runScript(QString("clearSelectionPoints();"));
+                runScript(QLatin1String( "clearSelectionPoints();"));
 
-                d->displayedRectangle = selectionCoordinates; 
+                d->displayedRectangle = selectionCoordinates;
             }
         }
     }
@@ -206,14 +206,14 @@ void HTMLWidget::khtmlMouseMoveEvent(khtml::MouseMoveEvent *e)
 
     if(d->currentMouseMode == MouseModeSelection && d->firstSelectionPoint.hasCoordinates() && !d->secondSelectionPoint.hasCoordinates())
     {
-        runScript2Coordinates( QString("wmwPixelToLatLng(%1, %2);")
+        runScript2Coordinates( QString::fromLatin1( "wmwPixelToLatLng(%1, %2);")
                                     .arg(e->x())
                                     .arg(e->y()),
                                    &d->intermediateSelectionPoint);
 
         d->secondSelectionScreenPoint = QPoint(e->x(), e->y());
 
-        kDebug()<<d->firstSelectionScreenPoint<<" "<<d->secondSelectionScreenPoint;
+        kDebug()<<d->firstSelectionScreenPoint<<QLatin1String( " " )<<d->secondSelectionScreenPoint;
 
         qreal lonWest, latNorth, lonEast, latSouth;
         if(d->firstSelectionScreenPoint.x() < d->secondSelectionScreenPoint.x())
@@ -224,7 +224,7 @@ void HTMLWidget::khtmlMouseMoveEvent(khtml::MouseMoveEvent *e)
         else
         {
             lonEast  = d->firstSelectionPoint.lon();
-            lonWest  = d->intermediateSelectionPoint.lon(); 
+            lonWest  = d->intermediateSelectionPoint.lon();
         }
 
         if(d->firstSelectionScreenPoint.y() < d->secondSelectionScreenPoint.y())
@@ -238,7 +238,7 @@ void HTMLWidget::khtmlMouseMoveEvent(khtml::MouseMoveEvent *e)
             latSouth = d->firstSelectionPoint.lat();
         }
 
-        runScript(QString("setSelectionRectangle(%1, %2, %3, %4, 'red');").arg(lonWest).arg(latNorth).arg(lonEast).arg(latSouth));
+        runScript(QString::fromLatin1( "setSelectionRectangle(%1, %2, %3, %4, 'red');").arg(lonWest).arg(latNorth).arg(lonEast).arg(latSouth));
     }
 
     slotScanForJSMessages();
@@ -249,15 +249,15 @@ void HTMLWidget::slotScanForJSMessages()
 {
     const QString status = jsStatusBarText();
 
-    if (status!="(event)")
+    if (status!=QLatin1String( "(event)" ))
         return;
 
     kDebug()<<status;
-    const QString eventBufferString = runScript(QString("wmwReadEventStrings();")).toString();
+    const QString eventBufferString = runScript(QLatin1String( "wmwReadEventStrings();")).toString();
     if (eventBufferString.isEmpty())
         return;
 
-    const QStringList events = eventBufferString.split('|');
+    const QStringList events = eventBufferString.split(QLatin1Char( '|' ));
 
     emit(signalHTMLEvents(events));
 }
@@ -316,9 +316,9 @@ void HTMLWidget::setSelectionRectangle(const GeoCoordinates::Pair& searchCoordin
     qreal North = searchCoordinates.first.lat();
     qreal East  = searchCoordinates.second.lon();
     qreal South = searchCoordinates.second.lat();
-    
-    runScript(QString("setDisplayedRectangle(%1, %2, %3, %4);").arg(West).arg(North).arg(East).arg(South));
-    runScript(QString("clearSelectionPoints();"));
+
+    runScript(QString::fromLatin1( "setDisplayedRectangle(%1, %2, %3, %4);").arg(West).arg(North).arg(East).arg(South));
+    runScript(QLatin1String( "clearSelectionPoints();"));
 
     d->displayedRectangle = searchCoordinates;
 }
@@ -333,7 +333,7 @@ void HTMLWidget::removeSelectionRectangle()
     if(!d->displayedRectangle.first.hasCoordinates())
         return;
     d->displayedRectangle.first.clear();
-    runScript(QString("removeDisplayedRectangle();"));
+    runScript(QLatin1String( "removeDisplayedRectangle();"));
 }
 
 void HTMLWidget::mouseModeChanged(const MouseModes mouseMode)
@@ -346,19 +346,19 @@ void HTMLWidget::mouseModeChanged(const MouseModes mouseMode)
         d->firstSelectionPoint.clear();
         d->secondSelectionPoint.clear();
         state = false;
-        runScript(QString("selectionModeStatus(%1);").arg(state)); 
+        runScript(QString::fromLatin1( "selectionModeStatus(%1);").arg(state));
     }
     else
     {
         state = true;
-        runScript(QString("selectionModeStatus(%1);").arg(state)); 
+        runScript(QString::fromLatin1( "selectionModeStatus(%1);").arg(state));
     }
 }
 
 void HTMLWidget::centerOn(const qreal west, const qreal north, const qreal east, const qreal south, const bool useSaneZoomLevel)
 {
 //    kDebug()<<"West:"<<west<<" North:"<<north<<" East:"<<east<<" South:"<<south;
-    runScript(QString("setMapBoundaries(%1, %2, %3, %4, %5);").arg(west).arg(north).arg(east).arg(south).arg(useSaneZoomLevel?1:0));
+    runScript(QString::fromLatin1( "setMapBoundaries(%1, %2, %3, %4, %5);").arg(west).arg(north).arg(east).arg(south).arg(useSaneZoomLevel?1:0));
 }
 
 } /* namespace KMap */

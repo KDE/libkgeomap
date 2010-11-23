@@ -66,7 +66,7 @@ public:
 
 // --------------------------------------------------------------------------
 
-BackendAltitudeGeonames::BackendAltitudeGeonames(const QExplicitlySharedDataPointer<WMWSharedData>& sharedData, 
+BackendAltitudeGeonames::BackendAltitudeGeonames(const QExplicitlySharedDataPointer<WMWSharedData>& sharedData,
                                                  QObject* const parent)
                        : AltitudeBackend(sharedData, parent), d(new BackendAltitudeGeonamesPrivate)
 {
@@ -79,7 +79,7 @@ BackendAltitudeGeonames::~BackendAltitudeGeonames()
 
 QString BackendAltitudeGeonames::backendName() const
 {
-    return QString("geonames");
+    return QLatin1String( "geonames");
 }
 
 QString BackendAltitudeGeonames::backendHumanName() const
@@ -132,8 +132,8 @@ bool BackendAltitudeGeonames::queryAltitudes(const WMWAltitudeLookup::List& quer
 
             if (!latString.isEmpty())
             {
-                latString+=',';
-                lonString+=',';
+                latString+=QLatin1Char( ',' );
+                lonString+=QLatin1Char( ',' );
             }
 
             latString+=queryCoordinates.latString();
@@ -141,8 +141,8 @@ bool BackendAltitudeGeonames::queryAltitudes(const WMWAltitudeLookup::List& quer
         }
 
         KUrl jobUrl("http://ws.geonames.org/srtm3");
-        jobUrl.addQueryItem("lats", latString);
-        jobUrl.addQueryItem("lngs", lonString);
+        jobUrl.addQueryItem(QLatin1String( "lats" ), latString);
+        jobUrl.addQueryItem(QLatin1String( "lngs" ), lonString);
 
         // TODO: KIO::NoReload ?
         // TODO: limit the number of concurrent queries
@@ -181,7 +181,7 @@ void BackendAltitudeGeonames::slotResult(KJob* kJob)
         {
             MergedAltitudeQueryJobs myJob = d->jobs.takeAt(i);
 
-            QStringList altitudes = QString(myJob.data).split(QRegExp("\\s+"));
+            QStringList altitudes = QString(QLatin1String( myJob.data )).split(QRegExp( QLatin1String( "\\s+" ) ) );
 
             int jobIndex = 0;
             foreach(const QString altitudeString, altitudes)
