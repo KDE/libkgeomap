@@ -196,7 +196,7 @@ QString BackendMarble::backendName() const
 
 QString BackendMarble::backendHumanName() const
 {
-    return i18n("Marble Desktop Globe");
+    return i18n("Marble Virtual Globe");
 }
 
 QWidget* BackendMarble::mapWidget() const
