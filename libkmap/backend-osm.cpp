@@ -143,7 +143,7 @@ void BackendOSM::slotHTMLInitialized()
 {
     kDebug()<<1;
     d->isReady = true;
-    d->htmlWidget->runScript(QLatin1String( "document.getElementById(\"map_canvas\").style.height=\"%1px\QLatin1String( "" ))
+    d->htmlWidget->runScript(QLatin1String( "document.getElementById(\"map_canvas\").style.height=\"%1px\"")
                              .arg(d->htmlWidgetWrapper->height()));
 
     // TODO: call javascript directly here and update action availability in one shot
