@@ -47,18 +47,6 @@ class KConfigGroup;
 namespace KMap
 {
 
-enum SelRectangleHDirection 
-{ 
-    Left = 0,
-    Right
-};
-
-enum SelRectangleVDirection
-{
-    Up = 0,
-    Down
-};
-
 class WMWSharedData;
 
 class MapBackend : public QObject
@@ -114,7 +102,6 @@ public:
     const QExplicitlySharedDataPointer<WMWSharedData> s;
 
     virtual void setSelectionStatus(const bool status) = 0;
-    //virtual bool getSelectionStatus(
     virtual void centerOn(const Marble::GeoDataLatLonBox& box, const bool useSaneZoomLevel = true) = 0;
     virtual void setActive(const bool state) = 0;
 

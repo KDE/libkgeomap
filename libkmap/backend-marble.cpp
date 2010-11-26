@@ -98,7 +98,6 @@ public:
         searchRectangleScreenCoordinates(),
         firstSelectionScreenPoint(),
         secondSelectionScreenPoint(),
-        currentRectDrawingDirection(Right),
         firstSelectionPoint(),
         secondSelectionPoint(),
         activeState(false)
@@ -137,7 +136,6 @@ public:
     QRect                  searchRectangleScreenCoordinates;
     QPoint                 firstSelectionScreenPoint;
     QPoint                 secondSelectionScreenPoint;
-    SelRectangleHDirection currentRectDrawingDirection;
     MouseModes             currentMouseMode;
     GeoCoordinates         firstSelectionPoint;
     GeoCoordinates         intermediateSelectionPoint;
