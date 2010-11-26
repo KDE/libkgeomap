@@ -859,9 +859,9 @@ void KMapWidget::slotUpdateActionsEnabled()
     d->actionRemoveCurrentSelection->setEnabled(d->availableMouseModes.testFlag(MouseModeSelection));
     d->actionSetPanMode->setEnabled(d->availableMouseModes.testFlag(MouseModePan));
     d->actionSetZoomMode->setEnabled(d->availableMouseModes.testFlag(MouseModeZoom));
-    d->actionSetFilterDatabaseMode->setEnabled(d->availableMouseModes.testFlag(MouseModeFilterDatabase));
-    d->actionSetFilterModelMode->setEnabled(d->availableMouseModes.testFlag(MouseModeFilterModel));
-    d->actionRemoveFilterMode->setEnabled(d->availableMouseModes.testFlag(MouseModeFilterDatabase));
+    d->actionSetFilterDatabaseMode->setEnabled(d->availableMouseModes.testFlag(MouseModeSelectionFromIcon));
+    d->actionSetFilterModelMode->setEnabled(d->availableMouseModes.testFlag(MouseModeFilter));
+    d->actionRemoveFilterMode->setEnabled(d->availableMouseModes.testFlag(MouseModeSelectionFromIcon));
     d->actionSetSelectThumbnailMode->setEnabled(d->availableMouseModes.testFlag(MouseModeSelectThumbnail));
 
     d->actionStickyMode->setEnabled(d->availableExtraActions.testFlag(ExtraActionSticky));
@@ -1577,7 +1577,7 @@ void KMapWidget::slotClustersClicked(const QIntList& clusterIndices)
 
     int maxTileLevel = 0;
 
-    if ((d->currentMouseMode == MouseModeZoom) || (d->currentMouseMode == MouseModeFilterDatabase)) // && !d->selectionRectangle.first.hasCoordinates()))
+    if ((d->currentMouseMode == MouseModeZoom) || (d->currentMouseMode == MouseModeSelectionFromIcon)) // && !d->selectionRectangle.first.hasCoordinates()))
     {
         Marble::GeoDataLineString tileString;
 
@@ -1656,7 +1656,7 @@ void KMapWidget::slotClustersClicked(const QIntList& clusterIndices)
 
         }
     }
-    else if ((d->currentMouseMode == MouseModeFilterModel && d->selectionRectangle.first.hasCoordinates()) || (d->currentMouseMode == MouseModeSelectThumbnail))
+    else if ((d->currentMouseMode == MouseModeFilter && d->selectionRectangle.first.hasCoordinates()) || (d->currentMouseMode == MouseModeSelectThumbnail))
     {
     // update the selection state of the clusters
         for (int i=0; i<clusterIndices.count(); ++i)
@@ -1671,11 +1671,11 @@ void KMapWidget::slotClustersClicked(const QIntList& clusterIndices)
                 const AbstractMarkerTiler::TileIndex& currentTileIndex = AbstractMarkerTiler::TileIndex::fromIntList(currentCluster.tileIndicesList.at(j));
                 tileIndices << currentTileIndex;
             }
-            if (d->currentMouseMode == MouseModeFilterModel)
+            if (d->currentMouseMode == MouseModeFilter)
             {
                 d->modelBasedFilter = true;
                 emit signalNewMapFilter(ModelFilter);
-                s->markerModel->onIndicesClicked(tileIndices, currentCluster.selectedState, MouseModeFilterModel);
+                s->markerModel->onIndicesClicked(tileIndices, currentCluster.selectedState, MouseModeFilter);
             }
             else
                 s->markerModel->onIndicesClicked(tileIndices, currentCluster.selectedState, MouseModeSelectThumbnail);
@@ -2161,19 +2161,19 @@ void KMapWidget::slotSetFilterDatabaseMode()
 {
     if (d->actionSetFilterDatabaseMode->isChecked())
     {
-        d->currentMouseMode = MouseModeFilterDatabase;
+        d->currentMouseMode = MouseModeSelectionFromIcon;
         d->actionSetPanMode->setChecked(false);
         d->actionSetSelectionMode->setChecked(false);
         d->actionSetZoomMode->setChecked(false);
         d->actionSetSelectThumbnailMode->setChecked(false);
         d->actionSetFilterModelMode->setChecked(false);
 
-        d->currentBackend->mouseModeChanged(MouseModeFilterDatabase);
-        emit signalMouseModeChanged(MouseModeFilterDatabase);
+        d->currentBackend->mouseModeChanged(MouseModeSelectionFromIcon);
+        emit signalMouseModeChanged(MouseModeSelectionFromIcon);
     }
     else
     {
-        if (d->currentMouseMode == MouseModeFilterDatabase)
+        if (d->currentMouseMode == MouseModeSelectionFromIcon)
         {
             d->actionSetFilterDatabaseMode->setChecked(true);
         }
@@ -2184,19 +2184,19 @@ void KMapWidget::slotSetFilterModelMode()
 {
     if (d->actionSetFilterModelMode->isChecked())
     {
-        d->currentMouseMode = MouseModeFilterModel;
+        d->currentMouseMode = MouseModeFilter;
         d->actionSetPanMode->setChecked(false);
         d->actionSetSelectionMode->setChecked(false);
         d->actionSetZoomMode->setChecked(false);
         d->actionSetSelectThumbnailMode->setChecked(false);
         d->actionSetFilterDatabaseMode->setChecked(false);
 
-        d->currentBackend->mouseModeChanged(MouseModeFilterModel);
-        emit signalMouseModeChanged(MouseModeFilterModel);
+        d->currentBackend->mouseModeChanged(MouseModeFilter);
+        emit signalMouseModeChanged(MouseModeFilter);
     }
     else
     {
-        if (d->currentMouseMode == MouseModeFilterModel)
+        if (d->currentMouseMode == MouseModeFilter)
         {
             d->actionSetFilterModelMode->setChecked(true);
         }
@@ -2363,9 +2363,9 @@ void KMapWidget::setVisibleMouseModes(const MouseModes mouseModes)
         d->removeCurrentSelectionButton->setVisible(d->visibleMouseModes.testFlag(MouseModeSelection));
         d->setPanModeButton->setVisible(d->visibleMouseModes.testFlag(MouseModePan));
         d->setZoomModeButton->setVisible(d->visibleMouseModes.testFlag(MouseModeZoom));
-        d->setFilterDatabaseModeButton->setVisible(d->visibleMouseModes.testFlag(MouseModeFilterDatabase));
-        d->setFilterModelModeButton->setVisible(d->visibleMouseModes.testFlag(MouseModeFilterModel));
-        d->removeFilterModeButton->setVisible(d->visibleMouseModes.testFlag(MouseModeFilterDatabase));
+        d->setFilterDatabaseModeButton->setVisible(d->visibleMouseModes.testFlag(MouseModeSelectionFromIcon));
+        d->setFilterModelModeButton->setVisible(d->visibleMouseModes.testFlag(MouseModeFilter));
+        d->removeFilterModeButton->setVisible(d->visibleMouseModes.testFlag(MouseModeSelectionFromIcon));
         d->setSelectThumbnailMode->setVisible(d->visibleMouseModes.testFlag(MouseModeSelectThumbnail));
     }
 }

@@ -75,13 +75,13 @@ inline void KMap_assert(const char* const condition, const char* const filename,
 
 enum MouseMode
 {
-    MouseModePan             = 1,
-    MouseModeSelection       = 2,
-    MouseModeZoom            = 4,
-    MouseModeFilterDatabase  = 8,
-    MouseModeFilterModel     = 16,
-    MouseModeSelectThumbnail = 32,
-    MouseModeLast            = 32
+    MouseModePan                = 1,
+    MouseModeSelection          = 2,
+    MouseModeZoom               = 4,
+    MouseModeSelectionFromIcon  = 8,
+    MouseModeFilter             = 16,
+    MouseModeSelectThumbnail    = 32,
+    MouseModeLast               = 32
 };
 
 enum FilterMode
