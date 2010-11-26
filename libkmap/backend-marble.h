@@ -121,6 +121,7 @@ protected:
     bool eventFilter(QObject* object, QEvent* event);
     void createActions();
     bool findSnapPoint(const QPoint& actualPoint, QPoint* const snapPoint, GeoCoordinates* const snapCoordinates, QPair<int, QModelIndex>* const snapTargetIndex);
+    void GeoPainter_drawPixmapAtCoordinates(Marble::GeoPainter* const painter, const QPixmap& pixmap, const GeoCoordinates& coordinates, const QPoint& basePoint);
 
 protected Q_SLOTS:
 

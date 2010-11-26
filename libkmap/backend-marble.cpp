@@ -446,6 +446,55 @@ bool BackendMarble::geoCoordinates(const QPoint& point, GeoCoordinates* const co
     return true;
 }
 
+/**
+ * @brief Helper function for the transition from bottomLeft origin to topLeft origin
+ */
+QPoint bottomLeftToTopLeft(const QPoint& oldPoint, const QSize& size)
+{
+    QPoint newPoint(oldPoint);
+    newPoint.setY(size.height()-oldPoint.y());
+
+    return newPoint;
+}
+
+/**
+ * @brief Replacement for Marble::GeoPainter::drawPixmap which takes a pixel offset
+ *
+ * @param painter Marble::GeoPainter on which to draw the pixmap
+ * @param pixmap Pixmap to be drawn
+ * @param coordinates GeoCoordinates where the image is to be drawn
+ * @param offsetPoint Point in the @p pixmap which should be at @p coordinates
+ */
+void BackendMarble::GeoPainter_drawPixmapAtCoordinates(Marble::GeoPainter* const painter, const QPixmap& pixmap, const GeoCoordinates& coordinates, const QPoint& offsetPoint)
+{
+    // base point starts at the top left of the pixmap
+
+    // try to convert the coordinates to pixels
+    QPoint pointOnScreen;
+    if (!screenCoordinates(coordinates, &pointOnScreen))
+    {
+        return;
+    }
+
+    // Marble::GeoPainter::drawPixmap(coordinates, pixmap) draws the pixmap centered on coordinates
+    // therefore we calculate the pixel position of the center of the image if its offsetPoint is to be
+    // at pointOnScreen:
+    const QSize pixmapSize = pixmap.size();
+    const QPoint pixmapHalfSize = QPoint(pixmapSize.width()/2, pixmapSize.height()/2);
+    const QPoint drawPoint = pointOnScreen + pixmapHalfSize - offsetPoint;
+
+    // now re-calculate the coordinates of the new pixel coordinates:
+    GeoCoordinates drawGeoCoordinates;
+    if (!geoCoordinates(drawPoint, &drawGeoCoordinates))
+    {
+        return;
+    }
+
+    // convert to Marble datatype and draw:
+    const Marble::GeoDataCoordinates mcoord(drawGeoCoordinates.lon(), drawGeoCoordinates.lat(), 0, Marble::GeoDataCoordinates::Degree);
+    painter->drawPixmap(mcoord, pixmap);
+}
+
 void BackendMarble::marbleCustomPaint(Marble::GeoPainter* painter)
 {
     if (!d->activeState)
@@ -496,7 +545,11 @@ void BackendMarble::marbleCustomPaint(Marble::GeoPainter* painter)
 
             QPoint markerPoint;
             if (!screenCoordinates(markerCoordinates, &markerPoint))
+            {
+                /// @todo This check does not work properly in all cases!
+                // the marker is not visible
                 continue;
+            }
 
             QPoint markerCenterPoint;
             QPixmap markerPixmap;
@@ -510,8 +563,8 @@ void BackendMarble::marbleCustomPaint(Marble::GeoPainter* painter)
             // drawPixmap wants to know the top-left point
             // our offset is counted from the bottom-left
             // and Qt's coordinate system starts at the top left of the screen!
-            const QPoint drawPoint = markerPoint - QPoint(0, markerPixmap.height()) - QPoint(markerCenterPoint.x(), -markerCenterPoint.y());
-            painter->drawPixmap(drawPoint, markerPixmap);
+            const QPoint markerOffsetPoint = bottomLeftToTopLeft(markerCenterPoint, markerPixmap.size());
+            GeoPainter_drawPixmapAtCoordinates(painter, markerPixmap, markerCoordinates, markerOffsetPoint);
         }
     }
 
@@ -546,7 +599,11 @@ void BackendMarble::marbleCustomPaint(Marble::GeoPainter* painter)
 
             QPoint clusterPoint;
             if (!screenCoordinates(clusterCoordinates, &clusterPoint))
+            {
+                /// @todo This check does not work properly in all cases!
+                // cluster is not visible
                 continue;
+            }
 
             QPoint clusterCenterPoint;
             const QPixmap clusterPixmap = s->worldMapWidget->getDecoratedPixmapForCluster(i, &selectionStateOverride, &markerCountOverride, &clusterCenterPoint);
@@ -554,8 +611,8 @@ void BackendMarble::marbleCustomPaint(Marble::GeoPainter* painter)
             // drawPixmap wants to know the top-left point
             // our offset is counted from the bottom-left
             // and Qt's coordinate system starts at the top left of the screen!
-            const QPoint drawPoint = clusterPoint - QPoint(0, clusterPixmap.height()) - QPoint(clusterCenterPoint.x(), -clusterCenterPoint.y());
-            painter->drawPixmap(drawPoint, clusterPixmap);
+            const QPoint clusterOffsetPoint = bottomLeftToTopLeft(clusterCenterPoint, clusterPixmap.size());
+            GeoPainter_drawPixmapAtCoordinates(painter, clusterPixmap, clusterCoordinates, clusterOffsetPoint);
         }
     }
 
@@ -615,7 +672,7 @@ void BackendMarble::marbleCustomPaint(Marble::GeoPainter* painter)
         painter->drawPixmap(d->dragDropMarkerPos.x()-markerPixmap.width()/2, d->dragDropMarkerPos.y()-markerPixmap.height(), markerPixmap);
     }
 
-    //here we drawe the selection rectangle
+    // here we draw the selection rectangle
     if (d->displayedRectangle.first.hasCoordinates())
     {
         const GeoCoordinates topLeft = d->displayedRectangle.first;
