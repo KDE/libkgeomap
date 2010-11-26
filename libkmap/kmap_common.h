@@ -95,7 +95,6 @@ public:
     WMWSharedData()
         : QSharedData(),
           worldMapWidget(0),
-          visibleMarkers(),
           markerModel(0),
           clusterList(),
           showThumbnails(true),
@@ -129,7 +128,6 @@ public:
     }
 
     KMapWidget*               worldMapWidget;
-    QIntList                  visibleMarkers;
     AbstractMarkerTiler*      markerModel;
     WMWCluster::List          clusterList;
     QList<ModelHelper*>       ungroupedModels;

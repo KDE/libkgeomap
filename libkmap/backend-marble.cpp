@@ -189,7 +189,7 @@ BackendMarble::~BackendMarble()
 
 QString BackendMarble::backendName() const
 {
-    return QLatin1String( "marble");
+    return QLatin1String("marble");
 }
 
 QString BackendMarble::backendHumanName() const

@@ -70,9 +70,9 @@ bool MarkerModelHelper::itemCoordinates(const QModelIndex& index, GeoCoordinates
     return true;
 }
 
-const GeoCoordinates coord_1_2 = GeoCoordinates::fromGeoUrl("geo:1,2");
-const GeoCoordinates coord_50_60 = GeoCoordinates::fromGeoUrl("geo:50,60");
-const GeoCoordinates coord_m50_m60 = GeoCoordinates::fromGeoUrl("geo:-50,-60");
+const GeoCoordinates coord_1_2 = GeoCoordinates::fromGeoUrl(QLatin1String("geo:1,2"));
+const GeoCoordinates coord_50_60 = GeoCoordinates::fromGeoUrl(QLatin1String("geo:50,60"));
+const GeoCoordinates coord_m50_m60 = GeoCoordinates::fromGeoUrl(QLatin1String("geo:-50,-60"));
 
 QStandardItem* MakeItemAt(const GeoCoordinates& coordinates)
 {
