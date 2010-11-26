@@ -8,11 +8,14 @@ See AUTHORS file for details.
 
 -- ABOUT --------------------------------------------------------------
 
-Libkmap is a wrapper around world map component as marble, openstreetmap and googlemap.
+Libkmap is a wrapper around world map components as marble, openstreetmap and googlemap.
 
-This library is used by kipi-plugins, digiKam and others kipi host programs.
+This library is used by kipi-plugins, digiKam and other kipi host programs.
 
-The library documentation is available on header files.
+The library documentation is available in the header and cpp files in doxygen style. You can use doxygen ( http://www.doxygen.org ) to generate documentation in HTML format:
+
+# cd libkmap
+# doxygen Doxyfile
 
 -- DEPENDENCIES -------------------------------------------------------
 
@@ -20,6 +23,8 @@ CMake           >= 2.4.x                    http://www.cmake.org
 libqt           >= 4.6.x                    http://www.qtsoftware.com
 libkde          >= 4.4.x                    http://www.kde.org
 libmarblewidget >= 0.7.x                    http://edu.kde.org/marble
+
+Optional dependency for the demo application:
 libkexiv2       >= 1.2.0                    http://www.digikam.org/sharedlibs
 
 -- INSTALL ------------------------------------------------------------
@@ -43,11 +48,11 @@ Compared to old KDE3 autoconf options:
 "cmake . -DCMAKE_BUILD_TYPE=debugfull" is equivalent to "./configure --enable-debug=full"
 "cmake . -DCMAKE_INSTALL_PREFIX=/usr"  is equivalent to "./configure --prefix=/usr"
 
-More details can be found ata this url: http://techbase.kde.org/Development/Tutorials/CMake#Environment_Variables
+More details can be found at this url: http://techbase.kde.org/Development/Tutorials/CMake#Environment_Variables
 
 -- CONTACT ------------------------------------------------------------
 
-If you have questions, comments, suggestions to make do email at:
+If you have questions, comments, suggestions, send an email to:
 
 kde-imaging@kde.org
 
@@ -57,13 +62,13 @@ IRC channel from freenode.net server:
 
 -- BUGS ---------------------------------------------------------------
 
-IMPORTANT : the bugreports and wishlist are hosted by the KDE bugs report 
-system who can be contacted by the standard Kde help menu of plugins dialog. 
+IMPORTANT : the bugreports and the wishlist are hosted by the KDE bugs report 
+system who can be contacted by the standard Kde help menu of the plugins dialog. 
 A mail will be automatically sent to the Kipi mailing list.
 There is no need to contact directly the Kipi mailing list for a bug report 
 or a devel wish.
 
-The current Kipi bugs and devel wish reported to the Kde bugs report can be see 
+The current Kipi bugs and devel wish reported to the Kde bugs report can be seen 
 at this url:
 
 http://bugs.kde.org/buglist.cgi?product=digikam&component=libkmap&bug_status=UNCONFIRMED&bug_status=NEW&bug_status=ASSIGNED&bug_status=REOPENED
