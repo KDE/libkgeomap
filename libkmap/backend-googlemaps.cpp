@@ -63,7 +63,7 @@ public:
       showMapTypeControlAction(0),
       showNavigationControlAction(0),
       showScaleControlAction(0),
-      cacheMapType(QLatin1String("ROADMAP" )),
+      cacheMapType(QLatin1String("ROADMAP")),
       cacheShowMapTypeControl(true),
       cacheShowNavigationControl(true),
       cacheShowScaleControl(true),
@@ -91,8 +91,8 @@ public:
     int                                       cacheZoom;
     int                                       cacheMaxZoom;
     int                                       cacheMinZoom;
-    GeoCoordinates                          cacheCenter;
-    QPair<GeoCoordinates, GeoCoordinates> cacheBounds;
+    GeoCoordinates                            cacheCenter;
+    QPair<GeoCoordinates, GeoCoordinates>     cacheBounds;
     bool                                      activeState;
 
 };
@@ -139,8 +139,17 @@ void BackendGoogleMaps::createActions()
             this, SLOT(slotMapTypeActionTriggered(QAction*)));
 
     QStringList mapTypes, mapTypesHumanNames;
-    mapTypes           << QLatin1String("ROADMAP" )       << QLatin1String("SATELLITE" )        << QLatin1String("HYBRID" )       << QLatin1String("TERRAIN" );
-    mapTypesHumanNames << i18n("Roadmap") << i18n("Satellite")  << i18n("Hybrid") << i18n("Terrain");
+    mapTypes
+        << QLatin1String("ROADMAP")
+        << QLatin1String("SATELLITE")
+        << QLatin1String("HYBRID")
+        << QLatin1String("TERRAIN");
+
+    mapTypesHumanNames
+        << i18n("Roadmap")
+        << i18n("Satellite")
+        << i18n("Hybrid")
+        << i18n("Terrain");
 
     for (int i = 0; i<mapTypes.count(); ++i)
     {
@@ -160,22 +169,22 @@ void BackendGoogleMaps::createActions()
     d->showMapTypeControlAction = new KAction(i18n("Show Map Type Control"), d->floatItemsActionGroup);
     d->showMapTypeControlAction->setCheckable(true);
     d->showMapTypeControlAction->setChecked(d->cacheShowMapTypeControl);
-    d->showMapTypeControlAction->setData(QLatin1String("showmaptypecontrol" ));
+    d->showMapTypeControlAction->setData(QLatin1String("showmaptypecontrol"));
 
     d->showNavigationControlAction = new KAction(i18n("Show Navigation Control"), d->floatItemsActionGroup);
     d->showNavigationControlAction->setCheckable(true);
     d->showNavigationControlAction->setChecked(d->cacheShowNavigationControl);
-    d->showNavigationControlAction->setData(QLatin1String("shownavigationcontrol" ));
+    d->showNavigationControlAction->setData(QLatin1String("shownavigationcontrol"));
 
     d->showScaleControlAction = new KAction(i18n("Show Scale Control"), d->floatItemsActionGroup);
     d->showScaleControlAction->setCheckable(true);
     d->showScaleControlAction->setChecked(d->cacheShowScaleControl);
-    d->showScaleControlAction->setData(QLatin1String("showscalecontrol" ));
+    d->showScaleControlAction->setData(QLatin1String("showscalecontrol"));
 }
 
 void BackendGoogleMaps::loadInitialHTML()
 {
-    const KUrl htmlUrl = KStandardDirs::locate("data", QLatin1String("libkmap/backend-googlemaps.html" ));
+    const KUrl htmlUrl = KStandardDirs::locate("data", QLatin1String("libkmap/backend-googlemaps.html"));
 
     d->htmlWidget->openUrl(htmlUrl);
 }
@@ -366,8 +375,8 @@ void BackendGoogleMaps::slotUngroupedModelChanged(const int mindex)
                 .arg(row)
                 .arg(currentCoordinates.latString())
                 .arg(currentCoordinates.lonString())
-                .arg(itemFlags.testFlag(ModelHelper::FlagMovable)?QLatin1String("true" ):QLatin1String("false" ))
-                .arg(itemFlags.testFlag(ModelHelper::FlagSnaps)?QLatin1String("true" ):QLatin1String("false" ))
+                .arg(itemFlags.testFlag(ModelHelper::FlagMovable)?QLatin1String("true" ):QLatin1String("false"))
+                .arg(itemFlags.testFlag(ModelHelper::FlagSnaps)?QLatin1String("true" ):QLatin1String("false"))
             );
 
         QPoint markerCenterPoint;
@@ -418,33 +427,33 @@ void BackendGoogleMaps::slotHTMLEvents(const QStringList& events)
         const QString eventParameter = it->mid(2);
         const QStringList eventParameters = eventParameter.split(QLatin1Char( '/' ));
 
-        if (eventCode == QLatin1String("MT" ))
+        if (eventCode == QLatin1String("MT"))
         {
             // map type changed
             mapTypeChanged = true;
             d->cacheMapType = eventParameter;
         }
-        else if (eventCode == QLatin1String("MB" ))
+        else if (eventCode == QLatin1String("MB"))
         {   // NOTE: event currently disabled in javascript part
             // map bounds changed
             centerProbablyChanged = true;
             zoomProbablyChanged = true;
             mapBoundsProbablyChanged = true;
         }
-        else if (eventCode == QLatin1String("ZC" ))
+        else if (eventCode == QLatin1String("ZC"))
         {   // NOTE: event currently disabled in javascript part
             // zoom changed
             zoomProbablyChanged = true;
             mapBoundsProbablyChanged = true;
         }
-        else if (eventCode == QLatin1String("id" ))
+        else if (eventCode == QLatin1String("id"))
         {
             // idle after drastic map changes
             centerProbablyChanged = true;
             zoomProbablyChanged = true;
             mapBoundsProbablyChanged = true;
         }
-        else if (eventCode == QLatin1String("cm" ))
+        else if (eventCode == QLatin1String("cm"))
         {
             // TODO: buffer this event type!
             // cluster moved
@@ -476,7 +485,7 @@ void BackendGoogleMaps::slotHTMLEvents(const QStringList& events)
 
             movedClusters << clusterIndex;
         }
-        else if (eventCode == QLatin1String("cs" ))
+        else if (eventCode == QLatin1String("cs"))
         {
             // TODO: buffer this event type!
             // cluster snapped
@@ -509,7 +518,7 @@ void BackendGoogleMaps::slotHTMLEvents(const QStringList& events)
             QPair<int, QModelIndex> snapTargetIndex(snapModelId, model->index(snapMarkerId, 0));
             emit(signalClustersMoved(QIntList()<<clusterIndex, snapTargetIndex));
         }
-        else if (eventCode == QLatin1String("cc" ))
+        else if (eventCode == QLatin1String("cc"))
         {
             // TODO: buffer this event type!
             // cluster clicked
@@ -526,7 +535,7 @@ void BackendGoogleMaps::slotHTMLEvents(const QStringList& events)
 
             clickedClusters << clusterIndex;
         }
-        else if (eventCode == QLatin1String("mm" ))
+        else if (eventCode == QLatin1String("mm"))
         {
 //             // TODO: buffer this event type!
 //             // marker moved
@@ -558,7 +567,7 @@ void BackendGoogleMaps::slotHTMLEvents(const QStringList& events)
 //
 //             movedMarkers << QPersistentModelIndex(markerIndex);
         }
-        else if (eventCode == QLatin1String("do" ))
+        else if (eventCode == QLatin1String("do"))
         {
             // debug output:
             kDebug() << QString::fromLatin1("javascript:%1").arg(eventParameter);
@@ -596,7 +605,7 @@ void BackendGoogleMaps::slotHTMLEvents(const QStringList& events)
     if (centerProbablyChanged)
     {
         // there is nothing we can do if the coordinates are invalid
-        /*const bool isValid = */d->htmlWidget->runScript2Coordinates(QLatin1String("wmwGetCenter();" ), &(d->cacheCenter));
+        /*const bool isValid = */d->htmlWidget->runScript2Coordinates(QLatin1String("wmwGetCenter();"), &(d->cacheCenter));
     }
 
     // update the actions if necessary:
@@ -607,7 +616,7 @@ void BackendGoogleMaps::slotHTMLEvents(const QStringList& events)
 
     if (mapBoundsProbablyChanged)
     {
-        const QString mapBoundsString = d->htmlWidget->runScript(QLatin1String("wmwGetBounds();" )).toString();
+        const QString mapBoundsString = d->htmlWidget->runScript(QLatin1String("wmwGetBounds();")).toString();
         KMapHelperParseBoundsString(mapBoundsString, &d->cacheBounds);
     }
 
@@ -640,7 +649,7 @@ void BackendGoogleMaps::updateClusters()
                 .arg(currentIndex)
                 .arg(currentCluster.coordinates.latString())
                 .arg(currentCluster.coordinates.lonString())
-                .arg(canMoveItems?QLatin1String("true" ):QLatin1String("false" ))
+                .arg(canMoveItems ? QLatin1String("true") : QLatin1String("false"))
                 .arg(currentCluster.markerCount)
                 .arg(currentCluster.markerSelectedCount)
             );
@@ -704,15 +713,15 @@ void BackendGoogleMaps::slotFloatSettingsTriggered(QAction* action)
     const QString actionIdString = action->data().toString();
     const bool actionState       = action->isChecked();
 
-    if (actionIdString == QLatin1String("showmaptypecontrol" ))
+    if (actionIdString == QLatin1String("showmaptypecontrol"))
     {
         setShowMapTypeControl(actionState);
     }
-    else if (actionIdString == QLatin1String("shownavigationcontrol" ))
+    else if (actionIdString == QLatin1String("shownavigationcontrol"))
     {
         setShowNavigationControl(actionState);
     }
-    else if (actionIdString == QLatin1String("showscalecontrol" ))
+    else if (actionIdString == QLatin1String("showscalecontrol"))
     {
         setShowScaleControl(actionState);
     }
@@ -728,7 +737,9 @@ void BackendGoogleMaps::setShowScaleControl(const bool state)
     if (!isReady())
         return;
 
-    d->htmlWidget->runScript(QString::fromLatin1("wmwSetShowScaleControl(%1);").arg(state?QLatin1String("true" ):QLatin1String("false" )));
+    d->htmlWidget->runScript(
+        QString::fromLatin1("wmwSetShowScaleControl(%1);")
+        .arg(state ? QLatin1String("true") : QLatin1String("false")));
 }
 
 void BackendGoogleMaps::setShowNavigationControl(const bool state)
@@ -741,7 +752,9 @@ void BackendGoogleMaps::setShowNavigationControl(const bool state)
     if (!isReady())
         return;
 
-    d->htmlWidget->runScript(QString::fromLatin1("wmwSetShowNavigationControl(%1);").arg(state?QLatin1String("true" ):QLatin1String("false" )));
+    d->htmlWidget->runScript(
+        QString::fromLatin1("wmwSetShowNavigationControl(%1);")
+        .arg(state ? QLatin1String("true") : QLatin1String("false")));
 }
 
 void BackendGoogleMaps::setShowMapTypeControl(const bool state)
@@ -754,7 +767,9 @@ void BackendGoogleMaps::setShowMapTypeControl(const bool state)
     if (!isReady())
         return;
 
-    d->htmlWidget->runScript(QString::fromLatin1("wmwSetShowMapTypeControl(%1);").arg(state?QLatin1String("true" ):QLatin1String("false" )));
+    d->htmlWidget->runScript(
+        QString::fromLatin1("wmwSetShowMapTypeControl(%1);")
+        .arg(state ? QLatin1String("true") : QLatin1String("false")));
 }
 
 void BackendGoogleMaps::slotClustersNeedUpdating()
@@ -764,8 +779,8 @@ void BackendGoogleMaps::slotClustersNeedUpdating()
 
 void BackendGoogleMaps::setZoom(const QString& newZoom)
 {
-    const QString myZoomString = s->worldMapWidget->convertZoomToBackendZoom(newZoom, QLatin1String("googlemaps" ));
-    KMAP_ASSERT(myZoomString.startsWith(QLatin1String("googlemaps:" )));
+    const QString myZoomString = s->worldMapWidget->convertZoomToBackendZoom(newZoom, QLatin1String("googlemaps"));
+    KMAP_ASSERT(myZoomString.startsWith(QLatin1String("googlemaps:")));
 
     const int myZoom = myZoomString.mid(QString::fromLatin1("googlemaps:").length()).toInt();
     kDebug() << myZoom;
@@ -879,8 +894,8 @@ void BackendGoogleMaps::updateActionAvailability()
         mapTypeActions.at(i)->setChecked(mapTypeActions.at(i)->data().toString()==currentMapType);
     }
 
-    s->worldMapWidget->getControlAction(QLatin1String("zoomin" ))->setEnabled(true/*d->cacheZoom<d->cacheMaxZoom*/);
-    s->worldMapWidget->getControlAction(QLatin1String("zoomout" ))->setEnabled(true/*d->cacheZoom>d->cacheMinZoom*/);
+    s->worldMapWidget->getControlAction(QLatin1String("zoomin"))->setEnabled(true/*d->cacheZoom<d->cacheMaxZoom*/);
+    s->worldMapWidget->getControlAction(QLatin1String("zoomout"))->setEnabled(true/*d->cacheZoom>d->cacheMinZoom*/);
 }
 
 void BackendGoogleMaps::updateZoomMinMaxCache()
