@@ -103,7 +103,7 @@ public:
 
     virtual void setSelectionRectangle(const GeoCoordinates::Pair& searchCoordinates);
     virtual GeoCoordinates::Pair getSelectionRectangle();
-    virtual void removeSelectionRectangle(/*DisplayedRectangles whatToChange*/);
+    virtual void removeSelectionRectangle();
     virtual void mouseModeChanged(const MouseModes mouseMode);
 
     virtual void setSelectionStatus(const bool status);

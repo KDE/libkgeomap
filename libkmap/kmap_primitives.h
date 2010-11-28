@@ -84,12 +84,6 @@ enum MouseMode
     MouseModeLast               = 32
 };
 
-enum FilterMode
-{
-    DatabaseFilter = 1,
-    ModelFilter    = 2
-};
-
 Q_DECLARE_FLAGS(MouseModes, MouseMode)
 Q_DECLARE_OPERATORS_FOR_FLAGS(MouseModes)
 
@@ -101,11 +95,10 @@ enum ExtraAction
 Q_DECLARE_FLAGS(ExtraActions, ExtraAction)
 Q_DECLARE_OPERATORS_FOR_FLAGS(ExtraActions)
 
-enum DisplayedRectangles
+enum FilterMode
 {
-    SelectionRectangle = 0,
-    DisplayedRectangle,
-    Both
+    DatabaseFilter = 1,
+    ModelFilter    = 2
 };
 
 typedef QList<int>      QIntList;
