@@ -34,7 +34,7 @@ namespace KMap
  * @brief Parse a 'lat,lon' string a returned by the JavaScript parts
  * @return true if the string could be parsed successfully
  */
-bool WMWHelperParseLatLonString(const QString& latLonString, GeoCoordinates* const coordinates)
+bool KMapHelperParseLatLonString(const QString& latLonString, GeoCoordinates* const coordinates)
 {
     // parse a 'lat,lon' string:
     const QStringList coordinateStrings = latLonString.trimmed().split(QLatin1Char( ',' ));
@@ -65,7 +65,7 @@ bool WMWHelperParseLatLonString(const QString& latLonString, GeoCoordinates* con
 /**
  * @brief Parse a '(x,y)' string as returned by the JavaScript parts
  */
-bool WMWHelperParseXYStringToPoint(const QString& xyString, QPoint* const point)
+bool KMapHelperParseXYStringToPoint(const QString& xyString, QPoint* const point)
 {
     // a point is returned as (x, y)
 
@@ -103,7 +103,7 @@ bool WMWHelperParseXYStringToPoint(const QString& xyString, QPoint* const point)
 /**
  * @brief Parses a '((lat1, lon1), (lat2, lon2))' bounds string as returned by the JavaScript parts
  */
-bool WMWHelperParseBoundsString(const QString& boundsString, QPair<GeoCoordinates, GeoCoordinates>* const boundsCoordinates)
+bool KMapHelperParseBoundsString(const QString& boundsString, QPair<GeoCoordinates, GeoCoordinates>* const boundsCoordinates)
 {
     // bounds are returned as ((lat1, lon1), (lat2, lon2))
 
@@ -119,8 +119,8 @@ bool WMWHelperParseBoundsString(const QString& boundsString, QPair<GeoCoordinate
         const QString string1 = myBoundsString.mid(1, myBoundsString.length()-2).trimmed();
 
         // split the string at the middle comma:
-        const int dumpComma  = string1.indexOf(QLatin1String( "," ), 0);
-        const int splitComma = string1.indexOf(QLatin1String( "," ), dumpComma+1);
+        const int dumpComma  = string1.indexOf(QLatin1String("," ), 0);
+        const int splitComma = string1.indexOf(QLatin1String("," ), dumpComma+1);
         valid                = (dumpComma>=0) && (splitComma>=0);
 
         if (valid)
@@ -133,11 +133,11 @@ bool WMWHelperParseBoundsString(const QString& boundsString, QPair<GeoCoordinate
             GeoCoordinates coord1, coord2;
             if (valid)
             {
-                valid = WMWHelperParseLatLonString(coord1String.mid(1, coord1String.length()-2), &coord1);
+                valid = KMapHelperParseLatLonString(coord1String.mid(1, coord1String.length()-2), &coord1);
             }
             if (valid)
             {
-                valid = WMWHelperParseLatLonString(coord2String.mid(1, coord2String.length()-2), &coord2);
+                valid = KMapHelperParseLatLonString(coord2String.mid(1, coord2String.length()-2), &coord2);
             }
 
             if (valid && boundsCoordinates)
@@ -155,7 +155,7 @@ bool WMWHelperParseBoundsString(const QString& boundsString, QPair<GeoCoordinate
 /**
  * @brief Split bounds crossing the dateline into parts which do not cross the dateline
  */
-GeoCoordinates::PairList WMWHelperNormalizeBounds(const GeoCoordinates::Pair& boundsPair)
+GeoCoordinates::PairList KMapHelperNormalizeBounds(const GeoCoordinates::Pair& boundsPair)
 {
     GeoCoordinates::PairList boundsList;
 

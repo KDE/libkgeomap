@@ -29,7 +29,7 @@
 namespace KMap
 {
 
-AltitudeBackend::AltitudeBackend(const QExplicitlySharedDataPointer<WMWSharedData>& sharedData, QObject* const parent)
+AltitudeBackend::AltitudeBackend(const QExplicitlySharedDataPointer<KMapSharedData>& sharedData, QObject* const parent)
                : QObject(parent), s(sharedData)
 {
 }

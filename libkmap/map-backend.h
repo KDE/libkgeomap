@@ -47,7 +47,7 @@ class KConfigGroup;
 namespace KMap
 {
 
-class WMWSharedData;
+class KMapSharedData;
 
 class MapBackend : public QObject
 {
@@ -56,7 +56,7 @@ Q_OBJECT
 
 public:
 
-    MapBackend(const QExplicitlySharedDataPointer<WMWSharedData>& sharedData, QObject* const parent);
+    MapBackend(const QExplicitlySharedDataPointer<KMapSharedData>& sharedData, QObject* const parent);
     virtual ~MapBackend();
 
     virtual QString backendName() const = 0;
@@ -89,7 +89,7 @@ public:
     virtual int getMarkerModelLevel() = 0;
     virtual GeoCoordinates::PairList getNormalizedBounds() = 0;
 
-//     virtual void updateDragDropMarker(const QPoint& pos, const WMWDragData* const dragData) = 0;
+//     virtual void updateDragDropMarker(const QPoint& pos, const KMapDragData* const dragData) = 0;
 //     virtual void updateDragDropMarkerPosition(const QPoint& pos) = 0;
 
     virtual void updateActionAvailability() = 0;
@@ -99,7 +99,7 @@ public:
     virtual void removeSelectionRectangle() = 0;
     virtual void mouseModeChanged(const MouseModes mouseMode) = 0;
 
-    const QExplicitlySharedDataPointer<WMWSharedData> s;
+    const QExplicitlySharedDataPointer<KMapSharedData> s;
 
     virtual void setSelectionStatus(const bool status) = 0;
     virtual void centerOn(const Marble::GeoDataLatLonBox& box, const bool useSaneZoomLevel = true) = 0;

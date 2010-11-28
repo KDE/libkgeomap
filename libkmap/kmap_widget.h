@@ -48,7 +48,7 @@ namespace KMap
 
 class AbstractMarkerTiler;
 class DragDropHandler;
-class WMWSharedData;
+class KMapSharedData;
 class ModelHelper;
 
 class KMAP_EXPORT KMapWidget : public QWidget
@@ -125,7 +125,7 @@ public:
 
     /// @name Miscellaneous
     //@{
-    bool queryAltitudes(const WMWAltitudeLookup::List& queryItems, const QString& backendName = QLatin1String( "" ));
+    bool queryAltitudes(const KMapAltitudeLookup::List& queryItems, const QString& backendName = QLatin1String( "" ));
     //@}
 
     /**
@@ -139,16 +139,16 @@ public:
 
     void getColorInfos(const int clusterIndex, QColor *fillColor, QColor *strokeColor,
                        Qt::PenStyle *strokeStyle, QString *labelText, QColor *labelColor,
-                       const WMWSelectionState* const overrideSelection = 0,
+                       const KMapSelectionState* const overrideSelection = 0,
                        const int* const overrideCount = 0) const;
 
-    void getColorInfos(const WMWSelectionState selectionState,
+    void getColorInfos(const KMapSelectionState selectionState,
                        const int nMarkers,
                        QColor *fillColor, QColor *strokeColor,
                        Qt::PenStyle *strokeStyle, QString *labelText, QColor *labelColor) const;
 
     QString convertZoomToBackendZoom(const QString& someZoom, const QString& targetBackend) const;
-    QPixmap getDecoratedPixmapForCluster(const int clusterId, const WMWSelectionState* const selectedStateOverride, const int* const countOverride, QPoint* const centerPoint);
+    QPixmap getDecoratedPixmapForCluster(const int clusterId, const KMapSelectionState* const selectedStateOverride, const int* const countOverride, QPoint* const centerPoint);
     QVariant getClusterRepresentativeMarker(const int clusterIndex, const int sortKey);
     //@}
 
@@ -185,7 +185,7 @@ public Q_SLOTS:
 
 Q_SIGNALS:
 
-    void signalAltitudeLookupReady(const KMap::WMWAltitudeLookup::List& altitudes);
+    void signalAltitudeLookupReady(const KMap::KMapAltitudeLookup::List& altitudes);
     void signalUngroupedModelChanged(const int index);
     void signalNewSelectionFromMap();
     void signalRemoveCurrentSelection();
@@ -232,7 +232,7 @@ protected Q_SLOTS:
 
 private:
 
-    const QExplicitlySharedDataPointer<WMWSharedData> s;
+    const QExplicitlySharedDataPointer<KMapSharedData> s;
 
     class KMapWidgetPrivate;
     KMapWidgetPrivate* const d;

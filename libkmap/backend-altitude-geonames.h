@@ -49,13 +49,13 @@ class BackendAltitudeGeonames : public AltitudeBackend
 
 public:
 
-    BackendAltitudeGeonames(const QExplicitlySharedDataPointer<WMWSharedData>& sharedData, QObject* const parent);
+    BackendAltitudeGeonames(const QExplicitlySharedDataPointer<KMapSharedData>& sharedData, QObject* const parent);
     virtual ~BackendAltitudeGeonames();
 
     virtual QString backendName() const;
     virtual QString backendHumanName() const;
 
-    virtual bool queryAltitudes(const WMWAltitudeLookup::List& queryItems);
+    virtual bool queryAltitudes(const KMapAltitudeLookup::List& queryItems);
 
 private Q_SLOTS:
 

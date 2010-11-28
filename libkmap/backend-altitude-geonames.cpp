@@ -45,7 +45,7 @@ public:
     {
     }
 
-    WMWAltitudeLookup::List lookups;
+    KMapAltitudeLookup::List lookups;
     QByteArray              data;
     KIO::Job*               kioJob;
 };
@@ -66,7 +66,7 @@ public:
 
 // --------------------------------------------------------------------------
 
-BackendAltitudeGeonames::BackendAltitudeGeonames(const QExplicitlySharedDataPointer<WMWSharedData>& sharedData,
+BackendAltitudeGeonames::BackendAltitudeGeonames(const QExplicitlySharedDataPointer<KMapSharedData>& sharedData,
                                                  QObject* const parent)
                        : AltitudeBackend(sharedData, parent), d(new BackendAltitudeGeonamesPrivate)
 {
@@ -79,7 +79,7 @@ BackendAltitudeGeonames::~BackendAltitudeGeonames()
 
 QString BackendAltitudeGeonames::backendName() const
 {
-    return QLatin1String( "geonames");
+    return QLatin1String("geonames");
 }
 
 QString BackendAltitudeGeonames::backendHumanName() const
@@ -87,14 +87,14 @@ QString BackendAltitudeGeonames::backendHumanName() const
     return i18n("geonames.org");
 }
 
-bool BackendAltitudeGeonames::queryAltitudes(const WMWAltitudeLookup::List& queryItems)
+bool BackendAltitudeGeonames::queryAltitudes(const KMapAltitudeLookup::List& queryItems)
 {
     // merge queries with the same coordinates into one query:
     // TODO: use a QMap instead to speed it up
     QList<MergedAltitudeQueryJobs> mergedJobs;
     for (int i = 0; i<queryItems.count(); ++i)
     {
-        WMWAltitudeLookup query = queryItems.at(i);
+        KMapAltitudeLookup query = queryItems.at(i);
         query.coordinates.clearAlt();
 
         bool foundIt = false;
@@ -141,8 +141,8 @@ bool BackendAltitudeGeonames::queryAltitudes(const WMWAltitudeLookup::List& quer
         }
 
         KUrl jobUrl("http://ws.geonames.org/srtm3");
-        jobUrl.addQueryItem(QLatin1String( "lats" ), latString);
-        jobUrl.addQueryItem(QLatin1String( "lngs" ), lonString);
+        jobUrl.addQueryItem(QLatin1String("lats" ), latString);
+        jobUrl.addQueryItem(QLatin1String("lngs" ), lonString);
 
         // TODO: KIO::NoReload ?
         // TODO: limit the number of concurrent queries
@@ -181,7 +181,7 @@ void BackendAltitudeGeonames::slotResult(KJob* kJob)
         {
             MergedAltitudeQueryJobs myJob = d->jobs.takeAt(i);
 
-            QStringList altitudes = QString(QLatin1String( myJob.data )).split(QRegExp( QLatin1String( "\\s+" ) ) );
+            QStringList altitudes = QString(QLatin1String( myJob.data )).split(QRegExp( QLatin1String("\\s+" ) ) );
 
             int jobIndex = 0;
             foreach(const QString altitudeString, altitudes)

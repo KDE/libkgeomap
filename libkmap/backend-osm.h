@@ -40,7 +40,7 @@ class BackendOSM : public MapBackend
 
 public:
 
-    BackendOSM(const QExplicitlySharedDataPointer<WMWSharedData>& sharedData, QObject* const parent = 0);
+    BackendOSM(const QExplicitlySharedDataPointer<KMapSharedData>& sharedData, QObject* const parent = 0);
     virtual ~BackendOSM();
 
     virtual QString backendName() const;

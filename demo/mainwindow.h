@@ -89,7 +89,7 @@ private Q_SLOTS:
     void slotFutureResultsReadyAt(int startIndex, int endIndex);
     void slotImageLoadingBunchReady();
     void slotMarkersMoved(const QList<QPersistentModelIndex>& markerIndices);
-    void slotAltitudeLookupReady(const KMap::WMWAltitudeLookup::List& altitudes);
+    void slotAltitudeLookupReady(const KMap::KMapAltitudeLookup::List& altitudes);
     void slotAddImages();
 
 private:

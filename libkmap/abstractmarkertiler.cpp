@@ -431,7 +431,7 @@ AbstractMarkerTiler::TileIndex AbstractMarkerTiler::TileIndex::fromCoordinates(c
         }
         if (haveRoundingErrors)
         {
-//             kDebug() << QString::fromLatin1( "Rounding errors at level %1!").arg(l);
+//             kDebug() << QString::fromLatin1("Rounding errors at level %1!").arg(l);
         }
 
         resultIndex.appendLatLonIndex(latIndex, lonIndex);
@@ -564,7 +564,7 @@ AbstractMarkerTiler::Tile* AbstractMarkerTiler::resetRootTile()
     return d->rootTile;
 }
 
-void AbstractMarkerTiler::onIndicesClicked(const TileIndex::List& tileIndicesList, const WMWSelectionState& groupSelectionState, MouseMode currentMouseMode)
+void AbstractMarkerTiler::onIndicesClicked(const TileIndex::List& tileIndicesList, const KMapSelectionState& groupSelectionState, MouseMode currentMouseMode)
 {
     Q_UNUSED(tileIndicesList);
     Q_UNUSED(groupSelectionState);

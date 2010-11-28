@@ -182,8 +182,8 @@ MainWindow::MainWindow(KCmdLineArgs* const cmdLineArgs, QWidget* const parent)
 
     resize(512, 512);
     setWindowTitle(i18n("LibKMap demo"));
-    setWindowIcon(SmallIcon( QLatin1String( "applications-internet" )));
-    setObjectName(QLatin1String( "Demo-KMap" ));
+    setWindowIcon(SmallIcon( QLatin1String("applications-internet" )));
+    setObjectName(QLatin1String("Demo-KMap" ));
 
     d->cmdLineArgs = cmdLineArgs;
 
@@ -206,8 +206,8 @@ MainWindow::MainWindow(KCmdLineArgs* const cmdLineArgs, QWidget* const parent)
     d->mapWidget->setVisibleMouseModes(KMap::MouseModePan|KMap::MouseModeZoom|KMap::MouseModeSelectThumbnail);
     d->mapWidget->setAvailableMouseModes(KMap::MouseModePan|KMap::MouseModeZoom|KMap::MouseModeSelectThumbnail);
 
-    connect(d->mapWidget, SIGNAL(signalAltitudeLookupReady(const KMap::WMWAltitudeLookup::List&)),
-            this, SLOT(slotAltitudeLookupReady(const KMap::WMWAltitudeLookup::List&)));
+    connect(d->mapWidget, SIGNAL(signalAltitudeLookupReady(const KMap::KMapAltitudeLookup::List&)),
+            this, SLOT(slotAltitudeLookupReady(const KMap::KMapAltitudeLookup::List&)));
 
     connect(d->markerModelHelper, SIGNAL(signalMarkersMoved(const QList<QPersistentModelIndex>&)),
             this, SLOT(slotMarkersMoved(const QList<QPersistentModelIndex>&)));
@@ -235,29 +235,29 @@ MainWindow::MainWindow(KCmdLineArgs* const cmdLineArgs, QWidget* const parent)
     GeoCoordinates::List markerList;
 
     // ice cafe
-    markerList<<GeoCoordinates::fromGeoUrl(QLatin1String( "geo:51.0913031421,6.88878178596,44" ));
+    markerList<<GeoCoordinates::fromGeoUrl(QLatin1String("geo:51.0913031421,6.88878178596,44" ));
 
     // bar
-    markerList<<GeoCoordinates::fromGeoUrl(QLatin1String( "geo:51.06711205,6.90020261667,43" ));
+    markerList<<GeoCoordinates::fromGeoUrl(QLatin1String("geo:51.06711205,6.90020261667,43" ));
 
     // Marienburg castle
-    markerList<<GeoCoordinates::fromGeoUrl(QLatin1String( "geo:51.087647318,6.88282728201,44" ));
+    markerList<<GeoCoordinates::fromGeoUrl(QLatin1String("geo:51.087647318,6.88282728201,44" ));
 
     // head of monster
-    markerList<<GeoCoordinates::fromGeoUrl(QLatin1String( "geo:51.0889433167,6.88000331667,39.6" ));
+    markerList<<GeoCoordinates::fromGeoUrl(QLatin1String("geo:51.0889433167,6.88000331667,39.6" ));
 
     // Langenfeld
-    markerList<<GeoCoordinates::fromGeoUrl(QLatin1String( "geo:51.1100157609,6.94911003113,51" ));
+    markerList<<GeoCoordinates::fromGeoUrl(QLatin1String("geo:51.1100157609,6.94911003113,51" ));
 
     // Sagrada Familia in Spain
-    markerList<<GeoCoordinates::fromGeoUrl(QLatin1String( "geo:41.4036480511,2.1743756533,46" ));
+    markerList<<GeoCoordinates::fromGeoUrl(QLatin1String("geo:41.4036480511,2.1743756533,46" ));
 
     if (cmdLineArgs->isSet("demopoints_single")||cmdLineArgs->isSet("demopoints_group"))
     {
         for (int i=0; i<markerList.count(); ++i)
         {
             QTreeWidgetItem* const treeItem = new QTreeWidgetItem();
-            treeItem->setText(0, QString::fromLatin1( "item %1").arg(i));
+            treeItem->setText(0, QString::fromLatin1("item %1").arg(i));
             treeItem->setText(1, markerList.at(i).geoUrl());
 
             d->treeWidget->addTopLevelItem(treeItem);
@@ -280,16 +280,16 @@ MainWindow::~MainWindow()
 
 void MainWindow::readSettings()
 {
-    KConfig config( QLatin1String( "kmap-demo-1" ));
+    KConfig config( QLatin1String("wmw-demo-1" ));
 
-    const KConfigGroup groupWidgetConfig = config.group(QLatin1String( "WidgetConfig"));
+    const KConfigGroup groupWidgetConfig = config.group(QLatin1String("WidgetConfig"));
     d->mapWidget->readSettingsFromGroup(&groupWidgetConfig);
 
-    KConfigGroup groupMainWindowConfig = config.group(QLatin1String( "MainWindowConfig"));
+    KConfigGroup groupMainWindowConfig = config.group(QLatin1String("MainWindowConfig"));
     d->lastImageOpenDir                = groupMainWindowConfig.readEntry("Last Image Open Directory", KUrl());
     if (groupMainWindowConfig.hasKey("SplitterState"))
     {
-        const QByteArray splitterState = QByteArray::fromBase64(groupMainWindowConfig.readEntry(QLatin1String( "SplitterState"), QByteArray()));
+        const QByteArray splitterState = QByteArray::fromBase64(groupMainWindowConfig.readEntry(QLatin1String("SplitterState"), QByteArray()));
         if (!splitterState.isEmpty())
         {
             d->splitter->restoreState(splitterState);
@@ -299,14 +299,14 @@ void MainWindow::readSettings()
 
 void MainWindow::saveSettings()
 {
-    KConfig config( QLatin1String( "kmap-demo-1" ));
+    KConfig config( QLatin1String("wmw-demo-1" ));
 
-    KConfigGroup groupWidgetConfig = config.group(QLatin1String( "WidgetConfig"));
+    KConfigGroup groupWidgetConfig = config.group(QLatin1String("WidgetConfig"));
     d->mapWidget->saveSettingsToGroup(&groupWidgetConfig);
 
-    KConfigGroup groupMainWindowConfig = config.group(QLatin1String( "MainWindowConfig"));
+    KConfigGroup groupMainWindowConfig = config.group(QLatin1String("MainWindowConfig"));
     groupMainWindowConfig.writeEntry("Last Image Open Directory", d->lastImageOpenDir);
-    groupMainWindowConfig.writeEntry(QLatin1String( "SplitterState"), d->splitter->saveState().toBase64());
+    groupMainWindowConfig.writeEntry(QLatin1String("SplitterState"), d->splitter->saveState().toBase64());
 }
 
 void MainWindow::closeEvent(QCloseEvent* e)
@@ -438,13 +438,13 @@ void MainWindow::slotImageLoadingBunchReady()
 void MainWindow::slotMarkersMoved(const QList<QPersistentModelIndex>& markerIndices)
 {
     // prepare altitude lookups
-    WMWAltitudeLookup::List altitudeQueries;
+    KMapAltitudeLookup::List altitudeQueries;
     for (int i=0; i<markerIndices.count(); ++i)
     {
         const QPersistentModelIndex currentIndex = markerIndices.at(i);
         const GeoCoordinates newCoordinates = currentIndex.data(RoleCoordinates).value<GeoCoordinates>();
 
-        WMWAltitudeLookup myLookup;
+        KMapAltitudeLookup myLookup;
         myLookup.coordinates = newCoordinates;
         myLookup.data = QVariant::fromValue(QPersistentModelIndex(currentIndex));
         altitudeQueries << myLookup;
@@ -452,15 +452,15 @@ void MainWindow::slotMarkersMoved(const QList<QPersistentModelIndex>& markerIndi
 
     if (!altitudeQueries.isEmpty())
     {
-        d->mapWidget->queryAltitudes(altitudeQueries, QLatin1String( "geonames" ));
+        d->mapWidget->queryAltitudes(altitudeQueries, QLatin1String("geonames" ));
     }
 }
 
-void MainWindow::slotAltitudeLookupReady(const WMWAltitudeLookup::List& altitudes)
+void MainWindow::slotAltitudeLookupReady(const KMapAltitudeLookup::List& altitudes)
 {
     for (int i=0; i<altitudes.count(); ++i)
     {
-        const WMWAltitudeLookup& myLookup = altitudes.at(i);
+        const KMapAltitudeLookup& myLookup = altitudes.at(i);
 
         const QPersistentModelIndex markerIndex = myLookup.data.value<QPersistentModelIndex>();
 
@@ -475,7 +475,7 @@ void MainWindow::slotAltitudeLookupReady(const WMWAltitudeLookup::List& altitude
 
 void MainWindow::slotAddImages()
 {
-    const KUrl::List fileNames = KFileDialog::getOpenUrls(d->lastImageOpenDir, QLatin1String( "*.jpg|*.jpeg|*.png"), this, i18n("Add image files"));
+    const KUrl::List fileNames = KFileDialog::getOpenUrls(d->lastImageOpenDir, QLatin1String("*.jpg|*.jpeg|*.png"), this, i18n("Add image files"));
 
     if (fileNames.isEmpty())
         return;

@@ -111,26 +111,26 @@ enum DisplayedRectangles
 typedef QList<int>      QIntList;
 typedef QPair<int, int> QIntPair;
 
-enum WMWSelectionState
+enum KMapSelectionState
 {
-    WMWSelectedNone = 0,
-    WMWSelectedSome = 1,
-    WMWSelectedAll  = 2
+    KMapSelectedNone = 0,
+    KMapSelectedSome = 1,
+    KMapSelectedAll  = 2
 };
 
 // primitives for altitude lookup:
-class KMAP_EXPORT WMWAltitudeLookup
+class KMAP_EXPORT KMapAltitudeLookup
 {
 public:
 
     GeoCoordinates                   coordinates;
     QVariant                         data;
 
-    typedef QList<WMWAltitudeLookup> List;
+    typedef QList<KMapAltitudeLookup> List;
 };
 
 } /* namespace KMap */
 
-Q_DECLARE_METATYPE(KMap::WMWAltitudeLookup)
+Q_DECLARE_METATYPE(KMap::KMapAltitudeLookup)
 
 #endif /* KMAP_PRIMITIVES_H */

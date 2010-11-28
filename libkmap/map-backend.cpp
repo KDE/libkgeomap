@@ -29,7 +29,7 @@
 namespace KMap
 {
 
-MapBackend::MapBackend(const QExplicitlySharedDataPointer<WMWSharedData>& sharedData, QObject* const parent)
+MapBackend::MapBackend(const QExplicitlySharedDataPointer<KMapSharedData>& sharedData, QObject* const parent)
           : QObject(parent), s(sharedData)
 {
 }

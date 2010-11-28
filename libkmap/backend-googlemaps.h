@@ -45,7 +45,7 @@ class BackendGoogleMaps : public MapBackend
 
 public:
 
-    BackendGoogleMaps(const QExplicitlySharedDataPointer<WMWSharedData>& sharedData, QObject* const parent = 0);
+    BackendGoogleMaps(const QExplicitlySharedDataPointer<KMapSharedData>& sharedData, QObject* const parent = 0);
     virtual ~BackendGoogleMaps();
 
     virtual QString backendName() const;
@@ -78,7 +78,7 @@ public:
     virtual int getMarkerModelLevel();
     virtual GeoCoordinates::PairList getNormalizedBounds();
 
-//     virtual void updateDragDropMarker(const QPoint& pos, const WMWDragData* const dragData);
+//     virtual void updateDragDropMarker(const QPoint& pos, const KMapDragData* const dragData);
 //     virtual void updateDragDropMarkerPosition(const QPoint& pos);
 
     virtual void updateActionAvailability();

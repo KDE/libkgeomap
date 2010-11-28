@@ -40,21 +40,21 @@ class KMAP_EXPORT AltitudeBackend : public QObject
 
 public:
 
-    AltitudeBackend(const QExplicitlySharedDataPointer<WMWSharedData>& sharedData, QObject* const parent);
+    AltitudeBackend(const QExplicitlySharedDataPointer<KMapSharedData>& sharedData, QObject* const parent);
     virtual ~AltitudeBackend();
 
     virtual QString backendName() const = 0;
     virtual QString backendHumanName() const = 0;
 
-    virtual bool queryAltitudes(const WMWAltitudeLookup::List& queryItems) = 0;
+    virtual bool queryAltitudes(const KMapAltitudeLookup::List& queryItems) = 0;
 
 Q_SIGNALS:
 
-    void signalAltitudes(const KMap::WMWAltitudeLookup::List results);
+    void signalAltitudes(const KMap::KMapAltitudeLookup::List results);
 
 public:
 
-    const QExplicitlySharedDataPointer<WMWSharedData> s;
+    const QExplicitlySharedDataPointer<KMapSharedData> s;
 };
 
 } /* namespace KMap */

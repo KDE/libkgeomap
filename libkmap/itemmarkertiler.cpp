@@ -358,7 +358,7 @@ int ItemMarkerTiler::getTileSelectedCount(const AbstractMarkerTiler::TileIndex& 
     return myTile->selectedCount;
 }
 
-WMWSelectionState ItemMarkerTiler::getTileSelectedState(const AbstractMarkerTiler::TileIndex& tileIndex)
+KMapSelectionState ItemMarkerTiler::getTileSelectedState(const AbstractMarkerTiler::TileIndex& tileIndex)
 {
     if (isDirty())
     {
@@ -371,20 +371,20 @@ WMWSelectionState ItemMarkerTiler::getTileSelectedState(const AbstractMarkerTile
 
     if (!myTile)
     {
-        return WMWSelectedNone;
+        return KMapSelectedNone;
     }
 
     const int selectedCount = myTile->selectedCount;
     if (selectedCount==0)
     {
-        return WMWSelectedNone;
+        return KMapSelectedNone;
     }
     else if (selectedCount==myTile->markerIndices.count())
     {
-        return WMWSelectedAll;
+        return KMapSelectedAll;
     }
 
-    return WMWSelectedSome;
+    return KMapSelectedSome;
 }
 
 AbstractMarkerTiler::Tile* ItemMarkerTiler::getTile(const AbstractMarkerTiler::TileIndex& tileIndex, const bool stopIfEmpty)
@@ -562,7 +562,7 @@ bool ItemMarkerTiler::indicesEqual(const QVariant& a, const QVariant& b) const
     return a.value<QPersistentModelIndex>()==b.value<QPersistentModelIndex>();
 }
 
-void ItemMarkerTiler::onIndicesClicked(const TileIndex::List& tileIndicesList, const WMWSelectionState& groupSelectionState, MouseMode currentMouseMode)
+void ItemMarkerTiler::onIndicesClicked(const TileIndex::List& tileIndicesList, const KMapSelectionState& groupSelectionState, MouseMode currentMouseMode)
 {
     QList<QPersistentModelIndex> clickedMarkers;
     for (int i=0; i<tileIndicesList.count(); ++i)
@@ -573,7 +573,7 @@ void ItemMarkerTiler::onIndicesClicked(const TileIndex::List& tileIndicesList, c
     }
     if(currentMouseMode == MouseModeSelectThumbnail)
     {
-        const bool doSelect = groupSelectionState!=WMWSelectedAll;
+        const bool doSelect = groupSelectionState!=KMapSelectedAll;
         if (d->selectionModel)
         {
             for (int i=0; i<clickedMarkers.count(); ++i)
