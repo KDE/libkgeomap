@@ -1842,7 +1842,7 @@ QPixmap KMapWidget::getDecoratedPixmapForCluster(const int clusterId, const KMap
 
         // update the display information stored in the cluster:
         cluster.pixmapType = KMapCluster::PixmapMarker;
-        cluster.pixmapOffset = QPoint(markerPixmap.width()/2, 0);
+        cluster.pixmapOffset = QPoint(markerPixmap.width()/2, markerPixmap.height()-1);
         cluster.pixmapSize = markerPixmap.size();
 
         if (centerPoint)

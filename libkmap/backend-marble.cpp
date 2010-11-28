@@ -447,17 +447,6 @@ bool BackendMarble::geoCoordinates(const QPoint& point, GeoCoordinates* const co
 }
 
 /**
- * @brief Helper function for the transition from bottomLeft origin to topLeft origin
- */
-QPoint bottomLeftToTopLeft(const QPoint& oldPoint, const QSize& size)
-{
-    QPoint newPoint(oldPoint);
-    newPoint.setY(size.height()-oldPoint.y());
-
-    return newPoint;
-}
-
-/**
  * @brief Replacement for Marble::GeoPainter::drawPixmap which takes a pixel offset
  *
  * @param painter Marble::GeoPainter on which to draw the pixmap
@@ -551,19 +540,15 @@ void BackendMarble::marbleCustomPaint(Marble::GeoPainter* painter)
                 continue;
             }
 
-            QPoint markerCenterPoint;
+            QPoint markerOffsetPoint;
             QPixmap markerPixmap;
-            const bool haveMarkerPixmap = modelHelper->itemIcon(currentIndex, &markerCenterPoint, 0, &markerPixmap, 0);
+            const bool haveMarkerPixmap = modelHelper->itemIcon(currentIndex, &markerOffsetPoint, 0, &markerPixmap, 0);
             if (!haveMarkerPixmap || markerPixmap.isNull())
             {
                 markerPixmap = s->markerPixmap;
-                markerCenterPoint = QPoint(markerPixmap.width()/2, 0);
+                markerOffsetPoint = QPoint(markerPixmap.width()/2, markerPixmap.height()-1);
             }
 
-            // drawPixmap wants to know the top-left point
-            // our offset is counted from the bottom-left
-            // and Qt's coordinate system starts at the top left of the screen!
-            const QPoint markerOffsetPoint = bottomLeftToTopLeft(markerCenterPoint, markerPixmap.size());
             GeoPainter_drawPixmapAtCoordinates(painter, markerPixmap, markerCoordinates, markerOffsetPoint);
         }
     }
@@ -605,13 +590,9 @@ void BackendMarble::marbleCustomPaint(Marble::GeoPainter* painter)
                 continue;
             }
 
-            QPoint clusterCenterPoint;
-            const QPixmap clusterPixmap = s->worldMapWidget->getDecoratedPixmapForCluster(i, &selectionStateOverride, &markerCountOverride, &clusterCenterPoint);
+            QPoint clusterOffsetPoint;
+            const QPixmap clusterPixmap = s->worldMapWidget->getDecoratedPixmapForCluster(i, &selectionStateOverride, &markerCountOverride, &clusterOffsetPoint);
 
-            // drawPixmap wants to know the top-left point
-            // our offset is counted from the bottom-left
-            // and Qt's coordinate system starts at the top left of the screen!
-            const QPoint clusterOffsetPoint = bottomLeftToTopLeft(clusterCenterPoint, clusterPixmap.size());
             GeoPainter_drawPixmapAtCoordinates(painter, clusterPixmap, clusterCoordinates, clusterOffsetPoint);
         }
     }
@@ -648,7 +629,7 @@ void BackendMarble::marbleCustomPaint(Marble::GeoPainter* painter)
                 pixmapName+=QLatin1String("-someselected" );
             }
             const QPixmap& markerPixmap = s->markerPixmaps[pixmapName];
-            painter->drawPixmap(clusterPoint.x()-markerPixmap.width()/2, clusterPoint.y()-markerPixmap.height(), markerPixmap);
+            painter->drawPixmap(clusterPoint.x()-markerPixmap.width()/2, clusterPoint.y()-markerPixmap.height()-1, markerPixmap);
         }
     }
 
@@ -669,7 +650,7 @@ void BackendMarble::marbleCustomPaint(Marble::GeoPainter* painter)
         pixmapName+=QLatin1String("-selected" );
 
         const QPixmap& markerPixmap = s->markerPixmaps[pixmapName];
-        painter->drawPixmap(d->dragDropMarkerPos.x()-markerPixmap.width()/2, d->dragDropMarkerPos.y()-markerPixmap.height(), markerPixmap);
+        painter->drawPixmap(d->dragDropMarkerPos.x()-markerPixmap.width()/2, d->dragDropMarkerPos.y()-markerPixmap.height()-1, markerPixmap);
     }
 
     // here we draw the selection rectangle
@@ -1166,8 +1147,8 @@ bool BackendMarble::eventFilter(QObject *object, QEvent *event)
 
                     QRect markerRect;
                     markerRect.setSize(cluster.pixmapSize);
-                    markerRect.moveBottomLeft(clusterPoint);
-                    markerRect.translate(-QPoint(cluster.pixmapOffset.x(), -cluster.pixmapOffset.y()));
+                    markerRect.moveTopLeft(clusterPoint);
+                    markerRect.translate(-cluster.pixmapOffset);
 
                     if (!markerRect.contains(mouseEvent->pos()))
                     {

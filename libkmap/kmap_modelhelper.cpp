@@ -91,7 +91,7 @@ QPersistentModelIndex ModelHelper::bestRepresentativeIndexFromList(const QList<Q
  * available.
  *
  * @param index Modelindex of the marker.
- * @param offset Offset of the zero point in the icon, given from the bottom-left.
+ * @param offset Offset of the zero point in the icon, given from the top-left.
  * @param size Size of the icon, only populated if a URL is returned.
  * @param pixmap Holder for the pixmap of the icon.
  * @param url URL of the icon if available.
