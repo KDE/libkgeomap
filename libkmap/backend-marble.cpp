@@ -545,7 +545,7 @@ void BackendMarble::marbleCustomPaint(Marble::GeoPainter* painter)
             const bool haveMarkerPixmap = modelHelper->itemIcon(currentIndex, &markerOffsetPoint, 0, &markerPixmap, 0);
             if (!haveMarkerPixmap || markerPixmap.isNull())
             {
-                markerPixmap = s->markerPixmap;
+                markerPixmap = KMapGlobalObject::instance()->getStandardMarkerPixmap();
                 markerOffsetPoint = QPoint(markerPixmap.width()/2, markerPixmap.height()-1);
             }
 
@@ -628,7 +628,7 @@ void BackendMarble::marbleCustomPaint(Marble::GeoPainter* painter)
             {
                 pixmapName+=QLatin1String("-someselected" );
             }
-            const QPixmap& markerPixmap = s->markerPixmaps[pixmapName];
+            const QPixmap& markerPixmap = KMapGlobalObject::instance()->getMarkerPixmap(pixmapName);
             painter->drawPixmap(clusterPoint.x()-markerPixmap.width()/2, clusterPoint.y()-markerPixmap.height()-1, markerPixmap);
         }
     }
@@ -649,7 +649,7 @@ void BackendMarble::marbleCustomPaint(Marble::GeoPainter* painter)
         QString pixmapName = fillColor.name().mid(1);
         pixmapName+=QLatin1String("-selected" );
 
-        const QPixmap& markerPixmap = s->markerPixmaps[pixmapName];
+        const QPixmap& markerPixmap = KMapGlobalObject::instance()->getMarkerPixmap(pixmapName);
         painter->drawPixmap(d->dragDropMarkerPos.x()-markerPixmap.width()/2, d->dragDropMarkerPos.y()-markerPixmap.height()-1, markerPixmap);
     }
 

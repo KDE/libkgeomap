@@ -868,7 +868,7 @@ void KMapWidget::slotUpdateActionsEnabled()
 
     // TODO: cache the icons somewhere?
     d->actionStickyMode->setIcon(SmallIcon( QLatin1String( d->actionStickyMode->isChecked()?"object-locked":"object-unlocked" )));
-    d->actionShowThumbnails->setIcon(d->actionShowThumbnails->isChecked()?SmallIcon( QLatin1String("folder-image") ):s->markerPixmaps[QLatin1String("marker-icon-16x16" )]);
+    d->actionShowThumbnails->setIcon(d->actionShowThumbnails->isChecked()?SmallIcon( QLatin1String("folder-image") ):KMapGlobalObject::instance()->getMarkerPixmap(QLatin1String("marker-icon-16x16" )));
 }
 
 void KMapWidget::slotChangeBackend(QAction* action)
@@ -1838,7 +1838,7 @@ QPixmap KMapWidget::getDecoratedPixmapForCluster(const int clusterId, const KMap
         {
             pixmapName+=QLatin1String("-someselected" );
         }
-        const QPixmap& markerPixmap = s->markerPixmaps[pixmapName];
+        const QPixmap& markerPixmap = KMapGlobalObject::instance()->getMarkerPixmap(pixmapName);
 
         // update the display information stored in the cluster:
         cluster.pixmapType = KMapCluster::PixmapMarker;

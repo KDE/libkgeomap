@@ -30,6 +30,87 @@
 namespace KMap
 {
 
+class KMapGlobalObjectCreator
+{
+public:
+
+    KMapGlobalObject object;
+};
+
+K_GLOBAL_STATIC(KMapGlobalObjectCreator, kmapGlobalObjectCreator);
+
+class KMapGlobalObject::Private
+{
+public:
+    Private()
+    : markerPixmaps()
+    {
+    }
+
+    // marker pixmaps:
+    QMap<QString, QPixmap>    markerPixmaps;
+
+    void loadMarkerPixmaps()
+    {
+        QStringList markerColors;
+        markerColors
+            << QLatin1String( "00ff00" )
+            << QLatin1String( "00ffff" )
+            << QLatin1String( "ff0000" )
+            << QLatin1String( "ff7f00" )
+            << QLatin1String( "ffff00" );
+
+        QStringList stateNames;
+        stateNames
+            << QLatin1String( "" )
+            << QLatin1String( "-selected" )
+            << QLatin1String( "-someselected" );
+
+        for (QStringList::const_iterator it = markerColors.constBegin(); it!=markerColors.constEnd(); ++it)
+        {
+            for (QStringList::const_iterator sit = stateNames.constBegin(); sit!=stateNames.constEnd(); ++sit)
+            {
+                const QString pixmapName = *it + *sit;
+                const KUrl markerUrl = KStandardDirs::locate("data", QString::fromLatin1( "libkmap/marker-%1.png").arg(pixmapName));
+                markerPixmaps[pixmapName] = QPixmap(markerUrl.toLocalFile());
+            }
+        }
+
+        const KUrl markerIconUrl = KStandardDirs::locate("data", QLatin1String( "libkmap/marker-icon-16x16.png" ));
+        markerPixmaps[QLatin1String( "marker-icon-16x16" )] = QPixmap(markerIconUrl.toLocalFile());
+    }
+};
+
+KMapGlobalObject::KMapGlobalObject()
+ : QObject(), d(new Private())
+{
+}
+
+KMapGlobalObject::~KMapGlobalObject()
+{
+    delete d;
+}
+
+KMapGlobalObject* KMapGlobalObject::instance()
+{
+    return &(kmapGlobalObjectCreator->object);
+}
+
+QPixmap KMapGlobalObject::getMarkerPixmap(const QString pixmapId)
+{
+    if (d->markerPixmaps.isEmpty())
+    {
+        d->loadMarkerPixmaps();
+    }
+
+    return d->markerPixmaps.value(pixmapId);
+}
+
+QPixmap KMapGlobalObject::getStandardMarkerPixmap()
+{
+    return getMarkerPixmap(QLatin1String( "00ff00" ));
+}
+
 /**
  * @brief Parse a 'lat,lon' string a returned by the JavaScript parts
  * @return true if the string could be parsed successfully
