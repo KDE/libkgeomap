@@ -36,7 +36,6 @@
 #include <kaction.h>
 #include <kconfiggroup.h>
 #include <khtml_part.h>
-#include <kstandarddirs.h>
 
 // local includes
 
@@ -89,7 +88,7 @@ BackendOSM::BackendOSM(const QExplicitlySharedDataPointer<KMapSharedData>& share
 
 void BackendOSM::loadInitialHTML()
 {
-    const KUrl htmlUrl = KStandardDirs::locate("data", "libkmap/backend-osm.html");
+    const KUrl htmlUrl = KMapGlobalObject::instance()->locateDataFile("backend-osm.html");
 
     d->htmlWidget->openUrl(htmlUrl);
 }

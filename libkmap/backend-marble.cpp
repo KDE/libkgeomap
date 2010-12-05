@@ -37,7 +37,6 @@
 #include <kaction.h>
 #include <kconfiggroup.h>
 #include <klocale.h>
-#include <kstandarddirs.h>
 
 // Marble widget includes
 

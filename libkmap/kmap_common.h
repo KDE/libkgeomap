@@ -61,6 +61,7 @@ public:
 
     QPixmap getMarkerPixmap(const QString pixmapId);
     QPixmap getStandardMarkerPixmap();
+    KUrl locateDataFile(const QString filename);
 
 private:
     KMapGlobalObject();
@@ -96,9 +97,9 @@ public:
     QList<QIntList>     tileIndicesList;
     int                 markerCount;
     int                 markerSelectedCount;
-    GeoCoordinates    coordinates;
+    GeoCoordinates      coordinates;
     QPoint              pixelPos;
-    KMapSelectionState   selectedState;
+    KMapSelectionState  selectedState;
     QMap<int, QVariant> representativeMarkers;
 
     enum PixmapType
@@ -134,7 +135,7 @@ public:
 
     KMapWidget*               worldMapWidget;
     AbstractMarkerTiler*      markerModel;
-    KMapCluster::List          clusterList;
+    KMapCluster::List         clusterList;
     QList<ModelHelper*>       ungroupedModels;
     bool                      showThumbnails;
     bool                      haveMovingCluster;

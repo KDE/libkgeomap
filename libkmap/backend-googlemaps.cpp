@@ -38,7 +38,6 @@
 #include <kaction.h>
 #include <kconfiggroup.h>
 #include <khtml_part.h>
-#include <kstandarddirs.h>
 
 // local includes
 
@@ -184,7 +183,7 @@ void BackendGoogleMaps::createActions()
 
 void BackendGoogleMaps::loadInitialHTML()
 {
-    const KUrl htmlUrl = KStandardDirs::locate("data", QLatin1String("libkmap/backend-googlemaps.html"));
+    const KUrl htmlUrl = KMapGlobalObject::instance()->locateDataFile(QLatin1String("backend-googlemaps.html"));
 
     d->htmlWidget->openUrl(htmlUrl);
 }

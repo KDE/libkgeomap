@@ -71,12 +71,13 @@ public:
             for (QStringList::const_iterator sit = stateNames.constBegin(); sit!=stateNames.constEnd(); ++sit)
             {
                 const QString pixmapName = *it + *sit;
-                const KUrl markerUrl = KStandardDirs::locate("data", QString::fromLatin1( "libkmap/marker-%1.png").arg(pixmapName));
+                const KUrl markerUrl = KMapGlobalObject::instance()->locateDataFile(
+                        QString::fromLatin1( "marker-%1.png").arg(pixmapName));
                 markerPixmaps[pixmapName] = QPixmap(markerUrl.toLocalFile());
             }
         }
 
-        const KUrl markerIconUrl = KStandardDirs::locate("data", QLatin1String( "libkmap/marker-icon-16x16.png" ));
+        const KUrl markerIconUrl = KMapGlobalObject::instance()->locateDataFile(QLatin1String( "marker-icon-16x16.png" ));
         markerPixmaps[QLatin1String( "marker-icon-16x16" )] = QPixmap(markerIconUrl.toLocalFile());
     }
 };
@@ -109,6 +110,14 @@ QPixmap KMapGlobalObject::getMarkerPixmap(const QString pixmapId)
 QPixmap KMapGlobalObject::getStandardMarkerPixmap()
 {
     return getMarkerPixmap(QLatin1String( "00ff00" ));
+}
+
+KUrl KMapGlobalObject::locateDataFile(const QString filename)
+{
+    return KStandardDirs::locate(
+                "data",
+                QLatin1String("libkmap/")+filename
+                          );
 }
 
 /**
