@@ -38,7 +38,6 @@
 
 // Marble Widget includes
 
-#include <marble/global.h>
 #include <marble/GeoDataLatLonBox.h>
 
 class QMenu;
