@@ -47,7 +47,6 @@
 #include <marble/MarbleWidget.h>
 #include <marble/ViewParams.h>
 #include <marble/ViewportParams.h>
-#include <marble/global.h>
 
 // local includes
 

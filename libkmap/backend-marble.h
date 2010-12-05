@@ -31,11 +31,6 @@
 
 #include "map-backend.h"
 
-// Marble Widget includes
-
-#include <marble/global.h>
-#include <marble/GeoDataLatLonBox.h>
-
 /// @cond false
 namespace Marble
 {
