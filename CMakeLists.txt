@@ -26,6 +26,9 @@
 
 PROJECT(libkmap)
 
+MESSAGE(STATUS "----------------------------------------------------------------------------------")
+MESSAGE(STATUS "Starting CMake configuration for: libkmap")
+
 FIND_PACKAGE(Qt4 4.6.0 REQUIRED)
 FIND_PACKAGE(KDE4 REQUIRED)
 
