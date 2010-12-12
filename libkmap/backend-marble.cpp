@@ -153,7 +153,14 @@ BackendMarble::BackendMarble(const QExplicitlySharedDataPointer<KMapSharedData>&
 #ifdef KMAP_MARBLE_ADD_LAYER
     d->marbleWidget = new Marble::MarbleWidget();
     d->bmLayer = new BMLayer(this);
+
+    /// @todo I am not sure this is the exact version where this was changed. If the build fails with the version you have, use the else-part of this.
+#if MARBLE_VERSION>=0x000b00
+    d->marbleWidget->map()->addLayer(d->bmLayer);
+#else
     d->marbleWidget->model()->addLayer(d->bmLayer);
+#endif 
+
 #else
     d->marbleWidget = new BMWidget(this);
 #endif
@@ -176,7 +183,14 @@ BackendMarble::~BackendMarble()
     if (d->marbleWidget)
     {
 #ifdef KMAP_MARBLE_ADD_LAYER
+
+    /// @todo I am not sure this is the exact version where this was changed. If the build fails with the version you have, use the else-part of this.
+#if MARBLE_VERSION>=0x000b00
+        d->marbleWidget->map()->removeLayer(d->bmLayer);
+#else
         d->marbleWidget->model()->removeLayer(d->bmLayer);
+#endif
+
         delete d->bmLayer;
 #endif
         delete d->marbleWidget;
