@@ -25,7 +25,7 @@
  *
  * ============================================================ */
 
-#include "kmap_common.h"
+#include "kmap_common.moc"
 
 namespace KMap
 {
