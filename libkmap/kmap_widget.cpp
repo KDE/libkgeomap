@@ -385,9 +385,10 @@ void KMapWidget::createActions()
 
     connect(d->actionSetFilterModelMode, SIGNAL(changed()),
             this, SLOT(slotSetFilterModelMode()));
-
-   // connect(d->actionRemoveFilterMode, SIGNAL(triggered()),
-   //         this, SIGNAL(signalRemoveCurrentFilter()));
+/*
+    connect(d->actionRemoveFilterMode, SIGNAL(triggered()),
+            this, SIGNAL(signalRemoveCurrentFilter()));
+*/
     connect(d->actionRemoveFilterMode, SIGNAL(triggered()),
             this, SLOT(slotRemoveCurrentFilter()));
 
@@ -484,7 +485,7 @@ bool KMapWidget::setBackend(const QString& backendName)
 
     }
 
-    MapBackend* backend;
+    MapBackend* backend = 0;
     foreach(backend, d->loadedBackends)
     {
         if (backend->backendName() == backendName)
@@ -2463,4 +2464,3 @@ void KMapWidget::refreshMap()
 }
 
 } /* namespace KMap */
-

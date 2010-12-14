@@ -83,7 +83,7 @@ public:
 };
 
 KMapGlobalObject::KMapGlobalObject()
- : QObject(), d(new Private())
+    : QObject(), d(new Private())
 {
 }
 
