@@ -832,6 +832,12 @@ void KMapWidget::slotZoomOut()
 
 void KMapWidget::slotUpdateActionsEnabled()
 {
+    if (!s->activeState)
+    {
+        // this widget is not active, no need to update the action availability
+        return;
+    }
+
     d->actionDecreaseThumbnailSize->setEnabled((s->showThumbnails)&&(d->thumbnailSize>KMapMinThumbnailSize));
     // TODO: define an upper limit!
     d->actionIncreaseThumbnailSize->setEnabled(s->showThumbnails);

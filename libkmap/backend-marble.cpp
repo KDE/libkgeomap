@@ -1313,7 +1313,7 @@ bool BackendMarble::eventFilter(QObject *object, QEvent *event)
 
 void BackendMarble::updateActionAvailability()
 {
-    if (!d->marbleWidget)
+    if ((!d->activeState) || (!d->marbleWidget))
     {
         return;
     }

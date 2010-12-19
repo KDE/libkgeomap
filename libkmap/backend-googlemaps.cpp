@@ -917,8 +917,10 @@ GeoCoordinates::PairList BackendGoogleMaps::getNormalizedBounds()
 
 void BackendGoogleMaps::updateActionAvailability()
 {
-    if (!isReady())
+    if ( (!d->activeState) || (!isReady()) )
+    {
         return;
+    }
 
     const QString currentMapType = getMapType();
     const QList<QAction*> mapTypeActions = d->mapTypeActionGroup->actions();
