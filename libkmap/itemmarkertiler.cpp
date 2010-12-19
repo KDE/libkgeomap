@@ -199,7 +199,7 @@ void ItemMarkerTiler::slotSourceModelDataChanged(const QModelIndex& topLeft, con
 {
     kDebug()<<topLeft<<bottomRight;
     setDirty();
-    if(d->activeState)
+    if (d->activeState)
         emit signalTilesOrSelectionChanged();
 
     // TODO: if only a few items were changed, try to see whether they are still in the right tiles
@@ -571,7 +571,7 @@ void ItemMarkerTiler::onIndicesClicked(const TileIndex::List& tileIndicesList, c
 
         clickedMarkers << getTileMarkerIndices(tileIndex);
     }
-    if(currentMouseMode == MouseModeSelectThumbnail)
+    if (currentMouseMode == MouseModeSelectThumbnail)
     {
         const bool doSelect = groupSelectionState!=KMapSelectedAll;
         if (d->selectionModel)
@@ -588,7 +588,7 @@ void ItemMarkerTiler::onIndicesClicked(const TileIndex::List& tileIndicesList, c
     // TODO: when do we report the clicks to the modelHelper?
     //d->modelHelper->onIndicesClicked(clickedMarkers);
     }
-    else if(currentMouseMode == MouseModeFilter)
+    else if (currentMouseMode == MouseModeFilter)
     {
         d->modelHelper->onIndicesClicked(clickedMarkers);
     }
