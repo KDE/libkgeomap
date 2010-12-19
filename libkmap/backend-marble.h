@@ -52,7 +52,9 @@ public:
 
     virtual QString backendName() const;
     virtual QString backendHumanName() const;
-    virtual QWidget* mapWidget() const;
+    virtual QWidget* mapWidget();
+    virtual void releaseWidget(KMapInternalWidgetInfo* const info);
+    virtual void mapWidgetDocked(const bool state);
 
     virtual GeoCoordinates getCenter() const;
     virtual void setCenter(const GeoCoordinates& coordinate);
@@ -97,7 +99,6 @@ public:
     void setShowScaleBar(const bool state);
 
     virtual void setSelectionRectangle(const GeoCoordinates::Pair& searchCoordinates);
-    virtual GeoCoordinates::Pair getSelectionRectangle();
     virtual void removeSelectionRectangle();
     virtual void mouseModeChanged(const MouseModes mouseMode);
 
@@ -117,6 +118,7 @@ protected:
     void createActions();
     bool findSnapPoint(const QPoint& actualPoint, QPoint* const snapPoint, GeoCoordinates* const snapCoordinates, QPair<int, QModelIndex>* const snapTargetIndex);
     void GeoPainter_drawPixmapAtCoordinates(Marble::GeoPainter* const painter, const QPixmap& pixmap, const GeoCoordinates& coordinates, const QPoint& basePoint);
+    void drawSearchRectangle(Marble::GeoPainter* const painter, const GeoCoordinates::Pair& searchRectangle, const bool isOldRectangle);
 
 protected Q_SLOTS:
 

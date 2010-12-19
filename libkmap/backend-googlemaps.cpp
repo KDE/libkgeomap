@@ -49,6 +49,19 @@
 namespace KMap
 {
 
+class GMInternalWidgetInfo
+{
+public:
+    HTMLWidget* htmlWidget;
+};
+
+} /* KMap */
+
+Q_DECLARE_METATYPE(KMap::GMInternalWidgetInfo)
+
+namespace KMap
+{
+
 class BackendGoogleMaps::BackendGoogleMapsPrivate
 {
 public:
@@ -70,7 +83,9 @@ public:
       cacheMaxZoom(0),
       cacheMinZoom(0),
       cacheCenter(0.0,0.0),
-      cacheBounds()
+      cacheBounds(),
+      activeState(false),
+      widgetIsDocked(false)
     {
     }
 
@@ -93,31 +108,13 @@ public:
     GeoCoordinates                            cacheCenter;
     QPair<GeoCoordinates, GeoCoordinates>     cacheBounds;
     bool                                      activeState;
-
+    bool                                      widgetIsDocked;
 };
 
 BackendGoogleMaps::BackendGoogleMaps(const QExplicitlySharedDataPointer<KMapSharedData>& sharedData, QObject* const parent)
                  : MapBackend(sharedData, parent), d(new BackendGoogleMapsPrivate())
 {
     createActions();
-
-    d->htmlWidgetWrapper = new QWidget();
-    d->htmlWidgetWrapper->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    d->htmlWidget        = new HTMLWidget(d->htmlWidgetWrapper);
-    d->htmlWidgetWrapper->resize(400,400);
-
-    connect(d->htmlWidget, SIGNAL(signalJavaScriptReady()),
-            this, SLOT(slotHTMLInitialized()));
-
-    connect(d->htmlWidget, SIGNAL(signalHTMLEvents(const QStringList&)),
-            this, SLOT(slotHTMLEvents(const QStringList&)));
-
-    connect(d->htmlWidget, SIGNAL(selectionHasBeenMade(const KMap::GeoCoordinates::Pair&)),
-            this, SLOT(slotSelectionHasBeenMade(const KMap::GeoCoordinates::Pair&)));
-
-    loadInitialHTML();
-
-    d->htmlWidgetWrapper->installEventFilter(this);
 }
 
 BackendGoogleMaps::~BackendGoogleMaps()
@@ -181,13 +178,6 @@ void BackendGoogleMaps::createActions()
     d->showScaleControlAction->setData(QLatin1String("showscalecontrol"));
 }
 
-void BackendGoogleMaps::loadInitialHTML()
-{
-    const KUrl htmlUrl = KMapGlobalObject::instance()->locateDataFile(QLatin1String("backend-googlemaps.html"));
-
-    d->htmlWidget->openUrl(htmlUrl);
-}
-
 QString BackendGoogleMaps::backendName() const
 {
     return QLatin1String("googlemaps");
@@ -198,8 +188,53 @@ QString BackendGoogleMaps::backendHumanName() const
     return i18n("Google Maps");
 }
 
-QWidget* BackendGoogleMaps::mapWidget() const
+QWidget* BackendGoogleMaps::mapWidget()
 {
+    if (!d->htmlWidgetWrapper)
+    {
+        KMapGlobalObject* const go = KMapGlobalObject::instance();
+
+        KMapInternalWidgetInfo info;
+        bool foundReusableWidget = go->getInternalWidgetFromPool(this, &info);
+        if (foundReusableWidget)
+        {
+            d->htmlWidgetWrapper = info.widget;
+            const GMInternalWidgetInfo intInfo = info.backendData.value<GMInternalWidgetInfo>();
+            d->htmlWidget = intInfo.htmlWidget;
+        }
+        else
+        {
+            // the widget has not been created yet, create it now:
+            d->htmlWidgetWrapper = new QWidget();
+            d->htmlWidgetWrapper->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+            d->htmlWidget        = new HTMLWidget(d->htmlWidgetWrapper);
+            d->htmlWidgetWrapper->resize(400,400);
+        }
+
+        connect(d->htmlWidget, SIGNAL(signalJavaScriptReady()),
+                this, SLOT(slotHTMLInitialized()));
+
+        connect(d->htmlWidget, SIGNAL(signalHTMLEvents(const QStringList&)),
+                this, SLOT(slotHTMLEvents(const QStringList&)));
+
+        connect(d->htmlWidget, SIGNAL(selectionHasBeenMade(const KMap::GeoCoordinates::Pair&)),
+                this, SLOT(slotSelectionHasBeenMade(const KMap::GeoCoordinates::Pair&)));
+
+        d->htmlWidget->setSharedKMapObject(s.data());
+        d->htmlWidgetWrapper->installEventFilter(this);
+
+        if (foundReusableWidget)
+        {
+            slotHTMLInitialized();
+        }
+        else
+        {
+            const KUrl htmlUrl = KMapGlobalObject::instance()->locateDataFile(QLatin1String("backend-googlemaps.html"));
+
+            d->htmlWidget->openUrl(htmlUrl);
+        }
+    }
+
     return d->htmlWidgetWrapper.data();
 }
 
@@ -225,7 +260,6 @@ bool BackendGoogleMaps::isReady() const
 
 void BackendGoogleMaps::slotHTMLInitialized()
 {
-    kDebug() << 1;
     d->isReady = true;
     d->htmlWidget->runScript(QString::fromLatin1("wmwWidgetResized(%1, %2)").arg(d->htmlWidgetWrapper->width()).arg(d->htmlWidgetWrapper->height()));
 
@@ -454,7 +488,7 @@ void BackendGoogleMaps::slotHTMLEvents(const QStringList& events)
         }
         else if (eventCode == QLatin1String("cm"))
         {
-            // TODO: buffer this event type!
+            /// @todo buffer this event type!
             // cluster moved
             bool okay = false;
             const int clusterIndex = eventParameter.toInt(&okay);
@@ -478,15 +512,15 @@ void BackendGoogleMaps::slotHTMLEvents(const QStringList& events)
             if (!isValid)
                 continue;
 
-            // TODO: this discards the altitude!
-            // TODO: is this really necessary? clusters should be regenerated anyway...
+            /// @todo this discards the altitude!
+            /// @todo is this really necessary? clusters should be regenerated anyway...
             s->clusterList[clusterIndex].coordinates = clusterCoordinates;
 
             movedClusters << clusterIndex;
         }
         else if (eventCode == QLatin1String("cs"))
         {
-            // TODO: buffer this event type!
+            /// @todo buffer this event type!
             // cluster snapped
             bool okay = false;
             const int clusterIndex = eventParameters.first().toInt(&okay);
@@ -511,7 +545,7 @@ void BackendGoogleMaps::slotHTMLEvents(const QStringList& events)
             if (!okay)
                 continue;
 
-            // TODO: emit signal here or later?
+            /// @todo emit signal here or later?
             ModelHelper* const modelHelper = s->ungroupedModels.at(snapModelId);
             QAbstractItemModel* const model = modelHelper->model();
             QPair<int, QModelIndex> snapTargetIndex(snapModelId, model->index(snapMarkerId, 0));
@@ -519,7 +553,7 @@ void BackendGoogleMaps::slotHTMLEvents(const QStringList& events)
         }
         else if (eventCode == QLatin1String("cc"))
         {
-            // TODO: buffer this event type!
+            /// @todo buffer this event type!
             // cluster clicked
             bool okay = false;
             const int clusterIndex = eventParameter.toInt(&okay);
@@ -1017,21 +1051,30 @@ bool BackendGoogleMaps::eventFilter(QObject* object, QEvent* event)
 
 void BackendGoogleMaps::setSelectionRectangle(const GeoCoordinates::Pair& searchCoordinates)
 {
-    d->htmlWidget->setSelectionRectangle(searchCoordinates);
-}
+    if (!d->htmlWidgetWrapper)
+    {
+        return;
+    }
 
-GeoCoordinates::Pair BackendGoogleMaps::getSelectionRectangle()
-{
-    return d->htmlWidget->getSelectionRectangle();
+    d->htmlWidget->setSelectionRectangle(searchCoordinates);
 }
 
 void BackendGoogleMaps::removeSelectionRectangle()
 {
+    if (!d->htmlWidget)
+    {
+        return;
+    }
+
     d->htmlWidget->removeSelectionRectangle();
 }
 
 void BackendGoogleMaps::mouseModeChanged(const MouseModes mouseMode)
 {
+    if (!d->htmlWidget)
+    {
+        return;
+    }
 
     d->htmlWidget->mouseModeChanged(mouseMode);
 /*
@@ -1060,6 +1103,12 @@ void BackendGoogleMaps::setSelectionStatus(const bool /*status*/)
 
 void BackendGoogleMaps::centerOn( const Marble::GeoDataLatLonBox& latLonBox, const bool useSaneZoomLevel)
 {
+    /// @todo Buffer this call if there is no widget or if inactive!
+    if (!d->htmlWidget)
+    {
+        return;
+    }
+
     const qreal boxWest  = latLonBox.west(Marble::GeoDataCoordinates::Degree);
     const qreal boxNorth = latLonBox.north(Marble::GeoDataCoordinates::Degree);
     const qreal boxEast  = latLonBox.east(Marble::GeoDataCoordinates::Degree);
@@ -1071,7 +1120,75 @@ void BackendGoogleMaps::centerOn( const Marble::GeoDataLatLonBox& latLonBox, con
 
 void BackendGoogleMaps::setActive(const bool state)
 {
+    const bool oldState = d->activeState;
     d->activeState = state;
+
+    if (oldState!=state)
+    {
+        if ((!state)&&d->htmlWidgetWrapper)
+        {
+            // we should share our widget in the list of widgets in the global object
+            KMapInternalWidgetInfo info;
+            info.widget = d->htmlWidgetWrapper.data();
+            info.currentOwner = this;
+            info.backendName = backendName();
+            info.state = d->widgetIsDocked ? KMapInternalWidgetInfo::InternalWidgetStillDocked : KMapInternalWidgetInfo::InternalWidgetUndocked;
+
+            GMInternalWidgetInfo intInfo;
+            intInfo.htmlWidget = d->htmlWidget.data();
+            info.backendData.setValue(intInfo);
+
+            KMapGlobalObject* const go = KMapGlobalObject::instance();
+            go->addMyInternalWidgetToPool(info);
+        }
+
+        if (state&&d->htmlWidgetWrapper)
+        {
+            // we should remove our widget from the list of widgets in the global object
+            KMapGlobalObject* const go = KMapGlobalObject::instance();
+            go->removeMyInternalWidgetFromPool(this);
+
+            /// @todo re-cluster, update markers?
+            setCenter(d->cacheCenter);
+            setMapType(d->cacheMapType);
+            setShowMapTypeControl(d->cacheShowMapTypeControl);
+            setShowNavigationControl(d->cacheShowNavigationControl);
+            setShowScaleControl(d->cacheShowScaleControl);
+        }
+    }
+}
+
+void BackendGoogleMaps::releaseWidget(KMapInternalWidgetInfo* const info)
+{
+    disconnect(d->htmlWidget, SIGNAL(signalJavaScriptReady()),
+               this, SLOT(slotHTMLInitialized()));
+
+    disconnect(d->htmlWidget, SIGNAL(signalHTMLEvents(const QStringList&)),
+               this, SLOT(slotHTMLEvents(const QStringList&)));
+
+    disconnect(d->htmlWidget, SIGNAL(selectionHasBeenMade(const KMap::GeoCoordinates::Pair&)),
+               this, SLOT(slotSelectionHasBeenMade(const KMap::GeoCoordinates::Pair&)));
+
+    d->htmlWidget->setSharedKMapObject(0);
+    d->htmlWidgetWrapper->removeEventFilter(this);
+
+    d->htmlWidget = 0;
+    d->htmlWidgetWrapper = 0;
+
+    info->currentOwner = 0;
+    info->state = KMapInternalWidgetInfo::InternalWidgetReleased;
+
+    /// @todo Tell the KMapWidget to remove the widget
+}
+
+void BackendGoogleMaps::mapWidgetDocked(const bool state)
+{
+    if (d->widgetIsDocked!=state)
+    {
+        KMapGlobalObject* const go = KMapGlobalObject::instance();
+        go->updatePooledWidgetState(d->htmlWidgetWrapper, state ? KMapInternalWidgetInfo::InternalWidgetStillDocked : KMapInternalWidgetInfo::InternalWidgetUndocked);
+    }
+    d->widgetIsDocked = state;
 }
 
 } /* namespace KMap */

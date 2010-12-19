@@ -60,9 +60,11 @@ public:
                         const QString& renderPos = QLatin1String( "NONE"), Marble::GeoSceneLayer* layer = 0);
     virtual QStringList renderPosition () const;
 
+    void setBackend(BackendMarble* const pMarbleBackend);
+
 private:
 
-    QPointer<BackendMarble> const marbleBackend;
+    QPointer<BackendMarble> marbleBackend;
 };
 
 } /* namespace KMap */

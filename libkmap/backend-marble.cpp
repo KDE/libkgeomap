@@ -63,6 +63,22 @@
 namespace KMap
 {
 
+class BMInternalWidgetInfo
+{
+public:
+
+#ifdef KMAP_MARBLE_ADD_LAYER
+    BMLayer*               bmLayer;
+#endif    
+};
+
+} /* KMap */
+
+Q_DECLARE_METATYPE(KMap::BMInternalWidgetInfo)
+
+namespace KMap
+{
+    
 class BackendMarble::BackendMarblePrivate
 {
 public:
@@ -75,7 +91,7 @@ public:
         actionShowOverviewMap(0),
         actionShowScaleBar(0),
         cacheMapTheme(QLatin1String("atlas" )),
-        cacheProjection(QLatin1String("spherical" )),
+        cacheProjection(QLatin1String("spherical")),
         cacheShowCompass(false),
         cacheShowScaleBar(false),
         cacheShowOverviewMap(false),
@@ -91,14 +107,11 @@ public:
         clustersDirtyCacheProjection(),
         clustersDirtyCacheLat(),
         clustersDirtyCacheLon(),
-        searchRectangleCoordinates(),
         displayedRectangle(),
-        searchRectangleScreenCoordinates(),
         firstSelectionScreenPoint(),
-        secondSelectionScreenPoint(),
         firstSelectionPoint(),
-        secondSelectionPoint(),
-        activeState(false)
+        activeState(false),
+        widgetIsDocked(false)
     {
     }
 
@@ -129,16 +142,13 @@ public:
     qreal                  clustersDirtyCacheLat;
     qreal                  clustersDirtyCacheLon;
 
-    GeoCoordinates::Pair    searchRectangleCoordinates;
-    GeoCoordinates::Pair    displayedRectangle;
-    QRect                  searchRectangleScreenCoordinates;
+    GeoCoordinates::Pair   displayedRectangle;
     QPoint                 firstSelectionScreenPoint;
-    QPoint                 secondSelectionScreenPoint;
-    MouseModes             currentMouseMode;
+    QPoint                 intermediateSelectionScreenPoint;
     GeoCoordinates         firstSelectionPoint;
     GeoCoordinates         intermediateSelectionPoint;
-    GeoCoordinates         secondSelectionPoint;
     bool                   activeState;
+    bool                   widgetIsDocked;
 
 #ifdef KMAP_MARBLE_ADD_LAYER
     BMLayer*               bmLayer;
@@ -149,37 +159,14 @@ BackendMarble::BackendMarble(const QExplicitlySharedDataPointer<KMapSharedData>&
              : MapBackend(sharedData, parent), d(new BackendMarblePrivate())
 {
     createActions();
-
-#ifdef KMAP_MARBLE_ADD_LAYER
-    d->marbleWidget = new Marble::MarbleWidget();
-    d->bmLayer = new BMLayer(this);
-
-    /// @todo I am not sure this is the exact version where this was changed. If the build fails with the version you have, use the else-part of this.
-#if MARBLE_VERSION>=0x000b00
-    d->marbleWidget->map()->addLayer(d->bmLayer);
-#else
-    d->marbleWidget->model()->addLayer(d->bmLayer);
-#endif 
-
-#else
-    d->marbleWidget = new BMWidget(this);
-#endif
-
-    d->marbleWidget->installEventFilter(this);
-
-    connect(d->marbleWidget, SIGNAL(zoomChanged(int)),
-            this, SLOT(slotMarbleZoomChanged(int)));
-
-    // set a backend first
-    setMapTheme(d->cacheMapTheme);
-
-    emit(signalBackendReady(backendName()));
-
-    d->currentMouseMode = MouseModePan;
 }
 
 BackendMarble::~BackendMarble()
 {
+    /// @todo Should we leave our widget in this list and not destroy it?
+    KMapGlobalObject* const go = KMapGlobalObject::instance();
+    go->removeMyInternalWidgetFromPool(this);
+
     if (d->marbleWidget)
     {
 #ifdef KMAP_MARBLE_ADD_LAYER
@@ -209,9 +196,74 @@ QString BackendMarble::backendHumanName() const
     return i18n("Marble Virtual Globe");
 }
 
-QWidget* BackendMarble::mapWidget() const
+QWidget* BackendMarble::mapWidget()
 {
+    if (!d->marbleWidget)
+    {
+        KMapGlobalObject* const go = KMapGlobalObject::instance();
+
+        KMapInternalWidgetInfo info;
+        if (go->getInternalWidgetFromPool(this, &info))
+        {
+            d->marbleWidget = qobject_cast<Marble::MarbleWidget*>(info.widget);
+            const BMInternalWidgetInfo intInfo = info.backendData.value<BMInternalWidgetInfo>();
+#ifdef KMAP_MARBLE_ADD_LAYER
+            d->bmLayer = intInfo.bmLayer;
+            d->bmLayer->setBackend(this);
+#endif
+        }
+        else
+        {
+#ifdef KMAP_MARBLE_ADD_LAYER
+            d->marbleWidget = new Marble::MarbleWidget();
+            d->bmLayer = new BMLayer(this);
+
+            /// @todo I am not sure this is the exact version where this was changed. If the build fails with the version you have, use the else-part of this.
+#if MARBLE_VERSION>=0x000b00
+            d->marbleWidget->map()->addLayer(d->bmLayer);
+#else
+            d->marbleWidget->model()->addLayer(d->bmLayer);
+#endif
+
+#else
+            d->marbleWidget = new BMWidget(this);
+#endif
+        }
+
+        d->marbleWidget->installEventFilter(this);
+
+        connect(d->marbleWidget, SIGNAL(zoomChanged(int)),
+                this, SLOT(slotMarbleZoomChanged(int)));
+
+        // set a backend first
+        /// @todo Do this only if we are set active!
+        setMapTheme(d->cacheMapTheme);
+
+        emit(signalBackendReady(backendName()));
+    }
+
     return d->marbleWidget;
+}
+
+void BackendMarble::releaseWidget(KMapInternalWidgetInfo* const info)
+{
+    info->widget->removeEventFilter(this);
+
+    BMInternalWidgetInfo intInfo = info->backendData.value<BMInternalWidgetInfo>();
+#ifdef KMAP_MARBLE_ADD_LAYER
+    if (intInfo.bmLayer)
+    {
+        intInfo.bmLayer->setBackend(0);
+    }
+#endif
+
+    disconnect(d->marbleWidget, SIGNAL(zoomChanged(int)),
+               this, SLOT(slotMarbleZoomChanged(int)));
+
+    info->currentOwner = 0;
+    info->state = KMapInternalWidgetInfo::InternalWidgetReleased;
+
+    /// @todo Tell the KMapWidget to remove the widget
 }
 
 GeoCoordinates BackendMarble::getCenter() const
@@ -355,16 +407,18 @@ void BackendMarble::setMapTheme(const QString& newMapTheme)
 {
     d->cacheMapTheme = newMapTheme;
 
-    if (d->marbleWidget)
+    if (!d->marbleWidget)
     {
-        if (newMapTheme == QLatin1String("atlas"))
-        {
-            d->marbleWidget->setMapThemeId(QLatin1String("earth/srtm/srtm.dgml" ));
-        }
-        else if (newMapTheme == QLatin1String("openstreetmap"))
-        {
-            d->marbleWidget->setMapThemeId(QLatin1String("earth/openstreetmap/openstreetmap.dgml" ));
-        }
+        return;
+    }
+
+    if (newMapTheme == QLatin1String("atlas"))
+    {
+        d->marbleWidget->setMapThemeId(QLatin1String("earth/srtm/srtm.dgml" ));
+    }
+    else if (newMapTheme == QLatin1String("openstreetmap"))
+    {
+        d->marbleWidget->setMapThemeId(QLatin1String("earth/openstreetmap/openstreetmap.dgml" ));
     }
 
     // the float items are reset when the theme is changed:
@@ -410,6 +464,9 @@ void BackendMarble::readSettingsFromGroup(const KConfigGroup* const group)
 
 void BackendMarble::updateMarkers()
 {
+    if (!d->marbleWidget)
+        return;
+
     // just redraw, that's it:
     d->marbleWidget->update();
 }
@@ -665,77 +722,17 @@ void BackendMarble::marbleCustomPaint(Marble::GeoPainter* painter)
         painter->drawPixmap(d->dragDropMarkerPos.x()-markerPixmap.width()/2, d->dragDropMarkerPos.y()-markerPixmap.height()-1, markerPixmap);
     }
 
-    // here we draw the selection rectangle
+    // here we draw the selection rectangle which is being made by the user right now
+    /// @todo merge drawing of the rectangles into one function
     if (d->displayedRectangle.first.hasCoordinates())
     {
-        const GeoCoordinates topLeft = d->displayedRectangle.first;
-        const GeoCoordinates bottomRight = d->displayedRectangle.second;
-        const qreal lonWest  = topLeft.lon();
-        const qreal latNorth = topLeft.lat();
-        const qreal lonEast  = bottomRight.lon();
-        const qreal latSouth = bottomRight.lat();
-
-
-        Marble::GeoDataCoordinates coordTopLeft(lonWest, latNorth, 0, Marble::GeoDataCoordinates::Degree);
-        Marble::GeoDataCoordinates coordTopRight(lonEast, latNorth, 0, Marble::GeoDataCoordinates::Degree);
-        Marble::GeoDataCoordinates coordBottomLeft(lonWest, latSouth, 0, Marble::GeoDataCoordinates::Degree);
-        Marble::GeoDataCoordinates coordBottomRight(lonEast, latSouth, 0, Marble::GeoDataCoordinates::Degree);
-        Marble::GeoDataLinearRing polyRing;
-
-#if MARBLE_VERSION < 0x000800
-        polyRing.append(&coordTopLeft);
-        polyRing.append(&coordTopRight);
-        polyRing.append(&coordBottomRight);
-        polyRing.append(&coordBottomLeft);
-#else // MARBLE_VERSION < 0x000800
-        polyRing << coordTopLeft << coordTopRight << coordBottomRight << coordBottomLeft;
-#endif // MARBLE_VERSION < 0x000800
-
-        QPen selectionPen;
-        selectionPen.setColor(Qt::blue);
-
-        selectionPen.setStyle(Qt::SolidLine);
-        selectionPen.setWidth(1);
-        painter->setPen(selectionPen);
-        painter->setBrush(Qt::NoBrush);
-        painter->drawPolygon(polyRing);
+        drawSearchRectangle(painter, d->displayedRectangle, false);
     }
 
-    if (d->searchRectangleCoordinates.first.hasCoordinates())
+    // draw the current or old search rectangle
+    if (s->selectionRectangle.first.hasCoordinates())
     {
-        const GeoCoordinates topLeft = d->searchRectangleCoordinates.first;
-        const GeoCoordinates bottomRight = d->searchRectangleCoordinates.second;
-        const qreal lonWest  = topLeft.lon();
-        const qreal latNorth = topLeft.lat();
-        const qreal lonEast  = bottomRight.lon();
-        const qreal latSouth = bottomRight.lat();
-
-        Marble::GeoDataCoordinates coordTopLeft(lonWest, latNorth, 0, Marble::GeoDataCoordinates::Degree);
-        Marble::GeoDataCoordinates coordTopRight(lonEast, latNorth, 0, Marble::GeoDataCoordinates::Degree);
-        Marble::GeoDataCoordinates coordBottomLeft(lonWest, latSouth, 0, Marble::GeoDataCoordinates::Degree);
-        Marble::GeoDataCoordinates coordBottomRight(lonEast, latSouth, 0, Marble::GeoDataCoordinates::Degree);
-        Marble::GeoDataLinearRing polyRing;
-
-#if MARBLE_VERSION < 0x000800
-        polyRing.append(&coordTopLeft);
-        polyRing.append(&coordTopRight);
-        polyRing.append(&coordBottomRight);
-        polyRing.append(&coordBottomLeft);
-#else // MARBLE_VERSION < 0x000800
-        polyRing << coordTopLeft << coordTopRight << coordBottomRight << coordBottomLeft;
-#endif // MARBLE_VERSION < 0x000800
-
-        QPen selectionPen;
-        if (d->intermediateSelectionPoint.hasCoordinates())
-            selectionPen.setColor(Qt::red);
-        else
-            selectionPen.setColor(Qt::blue);
-
-        selectionPen.setStyle(Qt::SolidLine);
-        selectionPen.setWidth(1);
-        painter->setPen(selectionPen);
-        painter->setBrush(Qt::NoBrush);
-        painter->drawPolygon(polyRing);
+        drawSearchRectangle(painter, s->selectionRectangle, d->intermediateSelectionPoint.hasCoordinates());
     }
 
     painter->restore();
@@ -848,6 +845,11 @@ void BackendMarble::slotFloatSettingsTriggered(QAction* action)
 
 void BackendMarble::slotClustersNeedUpdating()
 {
+    if (!d->marbleWidget)
+    {
+        return;
+    }
+
     // tell the widget to redraw:
     d->marbleWidget->update();
 }
@@ -986,13 +988,13 @@ bool BackendMarble::eventFilter(QObject *object, QEvent *event)
         return QObject::eventFilter(object, event);
     }
 
-    if (d->currentMouseMode == MouseModePan)
+    if (s->currentMouseMode == MouseModePan)
         return QObject::eventFilter(object, event);
 
     QMouseEvent* const mouseEvent = static_cast<QMouseEvent*>(event);
     bool doFilterEvent = false;
 
-    if (d->currentMouseMode == MouseModeSelection)
+    if (s->currentMouseMode == MouseModeSelection)
     {
         if (   ( event->type() == QEvent::MouseButtonPress )
             && ( mouseEvent->button()==Qt::LeftButton ) )
@@ -1003,17 +1005,17 @@ bool BackendMarble::eventFilter(QObject *object, QEvent *event)
         }
         else if (event->type() == QEvent::MouseMove)
         {
-            if (d->firstSelectionPoint.hasCoordinates() && !d->secondSelectionPoint.hasCoordinates())
+            if (d->firstSelectionPoint.hasCoordinates())
             {
                 d->intermediateSelectionPoint.clear();
                 geoCoordinates(mouseEvent->pos(), &d->intermediateSelectionPoint);
-                d->secondSelectionScreenPoint = mouseEvent->pos();
+                d->intermediateSelectionScreenPoint = mouseEvent->pos();
 
-                kDebug()<<d->firstSelectionScreenPoint<<QLatin1String(" " )<<d->secondSelectionScreenPoint;
+                kDebug()<<d->firstSelectionScreenPoint<<QLatin1String(" " )<<d->intermediateSelectionScreenPoint;
 
                 qreal lonWest, latNorth, lonEast, latSouth;
 
-                if (d->firstSelectionScreenPoint.x() < d->secondSelectionScreenPoint.x())
+                if (d->firstSelectionScreenPoint.x() < d->intermediateSelectionScreenPoint.x())
                 {
                     lonWest = d->firstSelectionPoint.lon();
                     lonEast = d->intermediateSelectionPoint.lon();
@@ -1024,7 +1026,7 @@ bool BackendMarble::eventFilter(QObject *object, QEvent *event)
                     lonEast = d->firstSelectionPoint.lon();
                 }
 
-                if (d->firstSelectionScreenPoint.y() < d->secondSelectionScreenPoint.y())
+                if (d->firstSelectionScreenPoint.y() < d->intermediateSelectionScreenPoint.y())
                 {
                     latNorth = d->firstSelectionPoint.lat();
                     latSouth = d->intermediateSelectionPoint.lat();
@@ -1041,7 +1043,7 @@ bool BackendMarble::eventFilter(QObject *object, QEvent *event)
                     );
 
                 //setSelectionRectangle(selectionCoordinates, SelectionRectangle);
-                d->searchRectangleCoordinates = selectionCoordinates;
+                d->displayedRectangle = selectionCoordinates;
                 d->marbleWidget->update();
             }
             doFilterEvent = true;
@@ -1058,30 +1060,31 @@ bool BackendMarble::eventFilter(QObject *object, QEvent *event)
             {
                 d->intermediateSelectionPoint.clear();
 
-                geoCoordinates(mouseEvent->pos(), &d->secondSelectionPoint);
-                d->secondSelectionScreenPoint = mouseEvent->pos();
+                GeoCoordinates secondSelectionPoint;
+                geoCoordinates(mouseEvent->pos(), &secondSelectionPoint);
+                QPoint secondSelectionScreenPoint = mouseEvent->pos();
 
                 qreal lonWest, latNorth, lonEast, latSouth;
 
-                if (d->firstSelectionScreenPoint.x() < d->secondSelectionScreenPoint.x())
+                if (d->firstSelectionScreenPoint.x() < secondSelectionScreenPoint.x())
                 {
                     lonWest = d->firstSelectionPoint.lon();
-                    lonEast = d->secondSelectionPoint.lon();
+                    lonEast = secondSelectionPoint.lon();
                 }
                 else
                 {
-                    lonWest = d->secondSelectionPoint.lon();
+                    lonWest = secondSelectionPoint.lon();
                     lonEast = d->firstSelectionPoint.lon();
                 }
 
-                if (d->firstSelectionScreenPoint.y() < d->secondSelectionScreenPoint.y())
+                if (d->firstSelectionScreenPoint.y() < secondSelectionScreenPoint.y())
                 {
                     latNorth = d->firstSelectionPoint.lat();
-                    latSouth = d->secondSelectionPoint.lat();
+                    latSouth = secondSelectionPoint.lat();
                 }
                 else
                 {
-                    latNorth = d->secondSelectionPoint.lat();
+                    latNorth = secondSelectionPoint.lat();
                     latSouth = d->firstSelectionPoint.lat();
                 }
 
@@ -1090,13 +1093,10 @@ bool BackendMarble::eventFilter(QObject *object, QEvent *event)
                         GeoCoordinates(latSouth, lonEast)
                     );
 
-                setSelectionRectangle(selectionCoordinates);
-                d->searchRectangleCoordinates.first.clear();
+                d->firstSelectionPoint.clear();
+                d->displayedRectangle.first.clear();
 
                 emit signalSelectionHasBeenMade(selectionCoordinates);
-
-                d->firstSelectionPoint.clear();
-                d->secondSelectionPoint.clear();
             }
 
             doFilterEvent = true;
@@ -1313,6 +1313,11 @@ bool BackendMarble::eventFilter(QObject *object, QEvent *event)
 
 void BackendMarble::updateActionAvailability()
 {
+    if (!d->marbleWidget)
+    {
+        return;
+    }
+
     kDebug()<<d->cacheZoom<<d->marbleWidget->maximumZoom()<<d->marbleWidget->minimumZoom();
     s->worldMapWidget->getControlAction(QLatin1String("zoomin" ))->setEnabled(d->cacheZoom<d->marbleWidget->maximumZoom());
     s->worldMapWidget->getControlAction(QLatin1String("zoomout" ))->setEnabled(d->cacheZoom>d->marbleWidget->minimumZoom());
@@ -1423,30 +1428,38 @@ bool BackendMarble::findSnapPoint(const QPoint& actualPoint, QPoint* const snapP
 
 void BackendMarble::setSelectionRectangle(const GeoCoordinates::Pair& searchCoordinates)
 {
-    d->displayedRectangle = searchCoordinates;
-    d->marbleWidget->update();
-}
+    // no need to store anything, we get it from the shared object
 
-GeoCoordinates::Pair BackendMarble::getSelectionRectangle()
-{
-    return d->displayedRectangle;
+    if (d->marbleWidget)
+    {
+        d->marbleWidget->update();
+    }
 }
 
 void BackendMarble::removeSelectionRectangle()
 {
-    d->displayedRectangle.first.clear();
-    d->marbleWidget->update();
+    /// @todo the kmapwidget should do that!
+    s->selectionRectangle.first.clear();
+
+    if (d->marbleWidget)
+    {
+        d->marbleWidget->update();
+    }
 }
 
 void BackendMarble::mouseModeChanged(const MouseModes mouseMode)
 {
-    d->currentMouseMode = mouseMode;
+    // we don't store the mouse mode here, we always read it from the shared object
 
-    if (d->currentMouseMode != MouseModeSelection)
+    if (s->currentMouseMode != MouseModeSelection)
     {
         d->firstSelectionPoint.clear();
-        d->secondSelectionPoint.clear();
-        d->marbleWidget->update();
+        d->intermediateSelectionPoint.clear();
+
+        if (d->marbleWidget)
+        {
+            d->marbleWidget->update();
+        }
     }
 }
 
@@ -1457,6 +1470,11 @@ void BackendMarble::setSelectionStatus(const bool /*status*/)
 void BackendMarble::centerOn(const Marble::GeoDataLatLonBox& box, const bool useSaneZoomLevel)
 {
     Q_UNUSED(useSaneZoomLevel)
+
+    if (!d->marbleWidget)
+    {
+        return;
+    }
 
     d->marbleWidget->centerOn(box, false);
 
@@ -1477,7 +1495,90 @@ void BackendMarble::centerOn(const Marble::GeoDataLatLonBox& box, const bool use
 
 void BackendMarble::setActive(const bool state)
 {
+    const bool oldState = d->activeState;
     d->activeState = state;
+
+    if (oldState!=state)
+    {
+        if ((!state)&&d->marbleWidget)
+        {
+            // we should share our widget in the list of widgets in the global object
+            KMapInternalWidgetInfo info;
+            info.widget = d->marbleWidget;
+            info.currentOwner = this;
+            info.backendName = backendName();
+            info.state = d->widgetIsDocked ? KMapInternalWidgetInfo::InternalWidgetStillDocked : KMapInternalWidgetInfo::InternalWidgetUndocked;
+            
+            BMInternalWidgetInfo intInfo;
+#ifdef KMAP_MARBLE_ADD_LAYER
+            intInfo.bmLayer = d->bmLayer;
+#endif
+            info.backendData.setValue(intInfo);
+
+            KMapGlobalObject* const go = KMapGlobalObject::instance();
+            go->addMyInternalWidgetToPool(info);
+        }
+
+        if (state&&d->marbleWidget)
+        {
+            // we should remove our widget from the list of widgets in the global object
+            KMapGlobalObject* const go = KMapGlobalObject::instance();
+            go->removeMyInternalWidgetFromPool(this);
+        }
+    }
+}
+
+void BackendMarble::mapWidgetDocked(const bool state)
+{
+    if (d->widgetIsDocked!=state)
+    {
+        KMapGlobalObject* const go = KMapGlobalObject::instance();
+        go->updatePooledWidgetState(d->marbleWidget, state ? KMapInternalWidgetInfo::InternalWidgetStillDocked : KMapInternalWidgetInfo::InternalWidgetUndocked);
+    }
+    d->widgetIsDocked = state;
+}
+
+void BackendMarble::drawSearchRectangle(Marble::GeoPainter* const painter, const GeoCoordinates::Pair& searchRectangle, const bool isOldRectangle)
+{
+    const GeoCoordinates& topLeft = searchRectangle.first;
+    const GeoCoordinates& bottomRight = searchRectangle.second;
+    const qreal lonWest  = topLeft.lon();
+    const qreal latNorth = topLeft.lat();
+    const qreal lonEast  = bottomRight.lon();
+    const qreal latSouth = bottomRight.lat();
+
+    Marble::GeoDataCoordinates coordTopLeft(lonWest, latNorth, 0, Marble::GeoDataCoordinates::Degree);
+    Marble::GeoDataCoordinates coordTopRight(lonEast, latNorth, 0, Marble::GeoDataCoordinates::Degree);
+    Marble::GeoDataCoordinates coordBottomLeft(lonWest, latSouth, 0, Marble::GeoDataCoordinates::Degree);
+    Marble::GeoDataCoordinates coordBottomRight(lonEast, latSouth, 0, Marble::GeoDataCoordinates::Degree);
+    Marble::GeoDataLinearRing polyRing;
+
+#if MARBLE_VERSION < 0x000800
+    polyRing.append(&coordTopLeft);
+    polyRing.append(&coordTopRight);
+    polyRing.append(&coordBottomRight);
+    polyRing.append(&coordBottomLeft);
+#else // MARBLE_VERSION < 0x000800
+    polyRing << coordTopLeft << coordTopRight << coordBottomRight << coordBottomLeft;
+#endif // MARBLE_VERSION < 0x000800
+
+    QPen selectionPen;
+    if (isOldRectangle)
+    {
+        // there is a new selection in progress,
+        // therefore display the current search rectangle in red
+        selectionPen.setColor(Qt::red);
+    }
+    else
+    {
+        selectionPen.setColor(Qt::blue);
+    }
+
+    selectionPen.setStyle(Qt::SolidLine);
+    selectionPen.setWidth(1);
+    painter->setPen(selectionPen);
+    painter->setBrush(Qt::NoBrush);
+    painter->drawPolygon(polyRing);
 }
 
 } /* namespace KMap */

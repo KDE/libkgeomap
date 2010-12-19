@@ -60,7 +60,9 @@ public:
 
     virtual QString backendName() const = 0;
     virtual QString backendHumanName() const = 0;
-    virtual QWidget* mapWidget() const = 0;
+    virtual QWidget* mapWidget() = 0;
+    virtual void releaseWidget(KMapInternalWidgetInfo* const info) = 0;
+    virtual void mapWidgetDocked(const bool state) = 0;
 
     virtual GeoCoordinates getCenter() const = 0;
     virtual void setCenter(const GeoCoordinates& coordinate) = 0;
@@ -94,7 +96,6 @@ public:
     virtual void updateActionAvailability() = 0;
 
     virtual void setSelectionRectangle(const GeoCoordinates::Pair& searchCorrdinates) = 0;
-    virtual GeoCoordinates::Pair getSelectionRectangle() = 0;
     virtual void removeSelectionRectangle() = 0;
     virtual void mouseModeChanged(const MouseModes mouseMode) = 0;
 

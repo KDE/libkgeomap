@@ -27,6 +27,11 @@
 
 #include "kmap_common.moc"
 
+// local includes
+
+#include "map-backend.h"
+
+
 namespace KMap
 {
 
@@ -43,9 +48,12 @@ class KMapGlobalObject::Private
 {
 public:
     Private()
-    : markerPixmaps()
+    : internalMapWidgetsPool(),
+      markerPixmaps()
     {
     }
+
+    QList<KMapInternalWidgetInfo> internalMapWidgetsPool;
 
     // marker pixmaps:
     QMap<QString, QPixmap>    markerPixmaps;
@@ -266,6 +274,101 @@ GeoCoordinates::PairList KMapHelperNormalizeBounds(const GeoCoordinates::Pair& b
     }
 //     kDebug()<<boundsList;
     return boundsList;
+}
+
+void KMapGlobalObject::removeMyInternalWidgetFromPool(const MapBackend* const mapBackend)
+{
+    for (int i=0; i<d->internalMapWidgetsPool.count(); ++i)
+    {
+        if (d->internalMapWidgetsPool.at(i).currentOwner==static_cast<const QObject* const>(mapBackend))
+        {
+            d->internalMapWidgetsPool.takeAt(i);
+            break;
+        }
+    }
+}
+
+bool KMapGlobalObject::getInternalWidgetFromPool(const MapBackend* const mapBackend, KMapInternalWidgetInfo* const targetInfo)
+{
+    const QString requestingBackendName = mapBackend->backendName();
+
+    // try to find an available widget:
+    int bestDockedWidget   = -1;
+    int bestUndockedWidget = -1;
+    int bestReleasedWidget = -1;
+    for (int i=0; i<d->internalMapWidgetsPool.count(); ++i)
+    {
+        const KMapInternalWidgetInfo& info = d->internalMapWidgetsPool.at(i);
+
+        if (info.backendName!=requestingBackendName)
+        {
+            continue;
+        }
+
+        if ((info.state.testFlag(KMapInternalWidgetInfo::InternalWidgetReleased)&&(bestReleasedWidget<0)))
+        {
+            bestReleasedWidget = i;
+            break;
+        }
+
+        if ((info.state.testFlag(KMapInternalWidgetInfo::InternalWidgetUndocked)&&(bestUndockedWidget<0)))
+        {
+            bestUndockedWidget = i;
+        }
+
+        if ((info.state.testFlag(KMapInternalWidgetInfo::InternalWidgetStillDocked)&&(bestDockedWidget<0)))
+        {
+            bestDockedWidget = i;
+        }
+    }
+
+    int widgetToUse = bestReleasedWidget;
+    if ((widgetToUse<0)&&(bestUndockedWidget>=0))
+    {
+        widgetToUse = bestUndockedWidget;
+    }
+    else
+    {
+        widgetToUse = bestDockedWidget;
+    }
+
+    if (widgetToUse<0)
+    {
+        return false;
+    }
+
+    *targetInfo = d->internalMapWidgetsPool.takeAt(widgetToUse);
+
+    if (targetInfo->currentOwner)
+    {
+        qobject_cast<MapBackend*>(targetInfo->currentOwner.data())->releaseWidget(targetInfo);
+    }
+
+    return true;
+}
+
+void KMapGlobalObject::addMyInternalWidgetToPool(const KMapInternalWidgetInfo& info)
+{
+    d->internalMapWidgetsPool.append(info);
+}
+
+void KMapGlobalObject::updatePooledWidgetState(const QWidget* const widget, const KMapInternalWidgetInfo::InternalWidgetState newState)
+{
+    for (int i=0; i<d->internalMapWidgetsPool.count(); ++i)
+    {
+        if (d->internalMapWidgetsPool.at(i).widget==widget)
+        {
+            KMapInternalWidgetInfo& info = d->internalMapWidgetsPool[i];
+            info.state = newState;
+
+            if (newState==KMapInternalWidgetInfo::InternalWidgetReleased)
+            {
+                info.currentOwner = 0;
+            }
+
+            break;
+        }
+    }
 }
 
 } /* namespace KMap */

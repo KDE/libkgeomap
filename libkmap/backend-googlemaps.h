@@ -45,7 +45,9 @@ public:
 
     virtual QString backendName() const;
     virtual QString backendHumanName() const;
-    virtual QWidget* mapWidget() const;
+    virtual QWidget* mapWidget();
+    virtual void releaseWidget(KMapInternalWidgetInfo* const info);
+    virtual void mapWidgetDocked(const bool state);
 
     virtual GeoCoordinates getCenter() const;
     virtual void setCenter(const GeoCoordinates& coordinate);
@@ -85,7 +87,6 @@ public:
     void setShowNavigationControl(const bool state);
 
     virtual void setSelectionRectangle(const GeoCoordinates::Pair& searchCoordinates);
-    virtual GeoCoordinates::Pair getSelectionRectangle();
     virtual void removeSelectionRectangle();
     virtual void mouseModeChanged(const MouseModes mouseMode);
 
@@ -117,7 +118,6 @@ private Q_SLOTS:
 
 private:
 
-    void loadInitialHTML();
     void updateZoomMinMaxCache();
 
 private:

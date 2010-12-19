@@ -31,6 +31,7 @@
 
 #include <QPixmap>
 #include <QPoint>
+#include <QPointer>
 #include <QSharedData>
 #include <QSize>
 
@@ -47,7 +48,43 @@ namespace KMap
 
 class AbstractMarkerTiler;
 class KMapWidget;
+class MapBackend;
 class ModelHelper;
+
+/**
+ * @brief Class to hold information about map widgets stored in the KMapGlobalObject
+ *
+ * @todo The list of these info structures has to be cleaned up periodically
+ */
+class KMapInternalWidgetInfo
+{
+public:
+    enum InternalWidgetState
+    {
+        InternalWidgetReleased    = 1,
+        InternalWidgetUndocked    = 2,
+        InternalWidgetStillDocked = 4
+    };
+
+    Q_DECLARE_FLAGS(InternalWidgetStates, InternalWidgetState)
+
+    InternalWidgetStates state;
+    QPointer<QWidget>    widget;
+    QVariant             backendData;
+    QString              backendName;
+    QPointer<QObject>    currentOwner;
+
+    KMapInternalWidgetInfo()
+     : state(),
+       widget(),
+       backendData(),
+       backendName(),
+       currentOwner(0)
+    {
+    }
+};
+
+Q_DECLARE_OPERATORS_FOR_FLAGS(KMapInternalWidgetInfo::InternalWidgetStates)
 
 /**
  * @brief Global object for libkmap to hold items common to all KMapWidget instances
@@ -59,9 +96,20 @@ class KMapGlobalObject : public QObject
 public:
     static KMapGlobalObject* instance();
 
+    /// @name Shared pixmaps
+    //@{
     QPixmap getMarkerPixmap(const QString pixmapId);
     QPixmap getStandardMarkerPixmap();
     KUrl locateDataFile(const QString filename);
+    //@}
+
+    /// @name Shared internal map widgets
+    //@{
+    void removeMyInternalWidgetFromPool(const MapBackend* const mapBackend);
+    bool getInternalWidgetFromPool(const MapBackend* const mapBackend, KMapInternalWidgetInfo* const targetInfo);
+    void addMyInternalWidgetToPool(const KMapInternalWidgetInfo& info);
+    void updatePooledWidgetState(const QWidget* const widget, const KMapInternalWidgetInfo::InternalWidgetState newState);
+    //@}
 
 private:
     KMapGlobalObject();
@@ -124,26 +172,51 @@ public:
           markerModel(0),
           clusterList(),
           showThumbnails(true),
-          haveMovingCluster(false),
           previewSingleItems(true),
           previewGroupedItems(true),
           showNumbersOnItems(true),
           sortKey(0),
-          modificationsAllowed(true)
+          modificationsAllowed(true),
+          selectionRectangle(),
+          haveMovingCluster(false),
+          hasSelection(false),
+          currentMouseMode(0),
+          availableMouseModes(0),
+          visibleMouseModes(0),
+          activeState(false),
+          modelBasedFilter(false)
     {
     }
 
+    /// @name Objects
+    //@{
     KMapWidget*               worldMapWidget;
     AbstractMarkerTiler*      markerModel;
     KMapCluster::List         clusterList;
     QList<ModelHelper*>       ungroupedModels;
+    //@}
+
+    /// @name Display options
+    //@{
     bool                      showThumbnails;
-    bool                      haveMovingCluster;
     bool                      previewSingleItems;
     bool                      previewGroupedItems;
     bool                      showNumbersOnItems;
     int                       sortKey;
     bool                      modificationsAllowed;
+    //@}
+
+    /// @name Current map state
+    //@{
+    GeoCoordinates::Pair      selectionRectangle;
+    bool                      haveMovingCluster;
+    bool                      hasSelection;
+    MouseModes                currentMouseMode;
+    MouseModes                availableMouseModes;
+    MouseModes                visibleMouseModes;
+    bool                      activeState;
+    bool                      modelBasedFilter;
+    //@}
 };
 
 // helper functions:

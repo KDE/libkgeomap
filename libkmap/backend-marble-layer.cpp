@@ -65,4 +65,9 @@ QStringList BMLayer::renderPosition () const
     return layerNames;
 }
 
+void BMLayer::setBackend(BackendMarble* const pMarbleBackend)
+{
+    marbleBackend = pMarbleBackend;
+}
+
 } /* namespace KMap */

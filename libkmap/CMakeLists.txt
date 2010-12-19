@@ -44,6 +44,7 @@ SET(widget_sources
     itemmarkertiler.cpp
     altitude-backend.cpp
     backend-altitude-geonames.cpp
+    placeholderwidget.cpp
    )
 
 SET(backend_marble_sources

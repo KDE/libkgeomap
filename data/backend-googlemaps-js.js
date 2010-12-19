@@ -27,10 +27,8 @@ var isInEditMode = false;
 var dragMarker;
 var dragSnappingToMid = -1;
 var dragSnappingToId = -1;
-var firstSelectionPoint;
-var secondSelectionPoint;
 var selectionRectangle;
-var displayedRectangle;
+var temporarySelectionRectangle;
 var markers = new Array();
 var markerCount = 0;
 
@@ -399,95 +397,92 @@ function wmwSetDragMarker(x, y, markerCount, markerSelectedCount) {
     });
 }
 
-function setSelectionRectangle(west, north, east, south, color){
-
-    firstSelectionPoint = new google.maps.LatLng(south,west,true);
-    secondSelectionPoint = new google.maps.LatLng(north,east,true);
-    var currentColor = color;
-
-    latLngBounds = new google.maps.LatLngBounds(
-                              firstSelectionPoint,
-                              secondSelectionPoint
-                              );
-
-    if(selectionRectangle == null){
-        if(currentColor == "red"){
-            selectionRectangle = new google.maps.Rectangle({
-                                                bounds: latLngBounds,
-                                                clickable: false,
-                                                fillOpacity: 0.0,
-                                                map: map,
-                                                strokeColor: "#FF0000",
-                                                strokeWeight: 1,
-                                                zIndex: 100
-                                                });
-        }
-        else{ 
-            selectionRectangle = new google.maps.Rectangle({
-                                                bounds: latLngBounds,
-                                                clickable: false,
-                                                fillOpacity: 0.0,
-                                                map: map,
-                                                strokeColor: "#0000FF",
-                                                strokeWeight: 1,
-                                                zIndex: 100
-                                                });
-       }
+function updateSelectionRectangleColor(){
+    if (selectionRectangle == null) {
+        return;
     }
-    else{
-        if(currentColor == "red"){
-            selectionRectangle.setOptions({
-                                          bounds: latLngBounds,
-                                          fillOpacity : 0.0,       
-                                          strokeColor : "#FF0000",
-                                          strokeWeight: 1
-                                          });
-        }
-        else{
-            selectionRectangle.setOptions({
-                                          bounds: latLngBounds,
-                                          fillOpacity : 0.0,       
-                                          strokeColor : "#0000FF",
-                                          strokeWeight: 1
-                                          });                                     
-        }
+
+    if (temporarySelectionRectangle == null) {
+        selectionRectangle.setOptions({
+                    fillOpacity : 0.0,
+                    strokeColor : "#0000ff",
+                    strokeWeight: 1
+                });
+    }
+    else {
+        selectionRectangle.setOptions({
+                    fillOpacity : 0.0,
+                    strokeColor : "#ff0000",
+                    strokeWeight: 1
+                });
     }
 }
 
+function setSelectionRectangle(west, north, east, south){
 
-function setDisplayedRectangle(west, north, east, south){
+    var firstSelectionPoint = new google.maps.LatLng(south,west,true);
+    var secondSelectionPoint = new google.maps.LatLng(north,east,true);
+
+    latLngBounds = new google.maps.LatLngBounds(
+                    firstSelectionPoint,
+                    secondSelectionPoint
+                );
+
+    if (selectionRectangle == null) {
+        selectionRectangle = new google.maps.Rectangle({
+                    bounds: latLngBounds,
+                    clickable: false,
+                    fillOpacity: 0.0,
+                    map: map,
+                    strokeColor: "#0000FF",
+                    strokeWeight: 1,
+                    zIndex: 100
+                });
+    }
+    else {
+        selectionRectangle.setOptions({
+                    bounds: latLngBounds,
+                    fillOpacity : 0.0,
+                    strokeColor : "#FF0000",
+                    strokeWeight: 1
+                });
+    }
+
+    updateSelectionRectangleColor();
+}
+
+
+function setTemporarySelectionRectangle(west, north, east, south){
 
     var firstPoint = new google.maps.LatLng(south,west,true);
     var secondPoint = new google.maps.LatLng(north,east,true);
 
-    latLngBounds = new google.maps.LatLngBounds(
+    var latLngBounds = new google.maps.LatLngBounds(
                               firstPoint,
                               secondPoint
                               );
 
-    if(displayedRectangle == null){
-        displayedRectangle = new google.maps.Rectangle({
-                                             bounds: latLngBounds,
-                                             clickable: false,
-                                             fillOpacity: 0.0,
-                                             map: map,
-                                             strokeColor: "#0000FF",
-                                             strokeWeight: 1,
-                                             zIndex: 100
-                                             });
+    if (temporarySelectionRectangle == null) {
+        temporarySelectionRectangle = new google.maps.Rectangle({
+                    bounds: latLngBounds,
+                    clickable: false,
+                    fillOpacity: 0.0,
+                    map: map,
+                    strokeColor: "#0000FF",
+                    strokeWeight: 1,
+                    zIndex: 100
+                });
     }
     else{
-       displayedRectangle.setOptions({
-                                     bounds: latLngBounds,
-                                     fillOpacity : 0.0,
-                                     strokeColor : "#0000FF",
-                                     strokeWeight: 1});
+       temporarySelectionRectangle.setOptions({
+                    bounds: latLngBounds,
+                    fillOpacity : 0.0,
+                    strokeColor : "#0000FF",
+                    strokeWeight: 1
+                });
     }
-}
 
-function clearSelectionPoints(){
-    firstSelectionPoint = null;
-    secondSelectionPoint = null;
+    updateSelectionRectangleColor();
 }
 
 function removeSelectionRectangle(){
@@ -495,18 +490,19 @@ function removeSelectionRectangle(){
     selectionRectangle = null;
 }
 
-function removeDisplayedRectangle(){
-    displayedRectangle.setMap(null);
-    displayedRectangle = null;
+function removeTemporarySelectionRectangle(){
+    temporarySelectionRectangle.setMap(null);
+    temporarySelectionRectangle = null;
+
+    updateSelectionRectangleColor();
 }
 
 function selectionModeStatus(state){
 
-    if(state == false){
-        map.draggable = true;
-    }
-    else{
-        map.draggable = false; 
+    map.draggable = !state;
+
+    if (!state) {
+        removeTemporarySelectionRectangle();
     }
 
 }

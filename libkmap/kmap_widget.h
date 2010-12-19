@@ -63,7 +63,7 @@ public:
     void saveSettingsToGroup(KConfigGroup* const group);
     void readSettingsFromGroup(const KConfigGroup* const group);
 
-    // data:
+    /// @name Data
     //@{
     void addUngroupedModel(ModelHelper* const modelHelper);
     void removeUngroupedModel(ModelHelper* const modelHelper);
@@ -215,6 +215,9 @@ protected:
     void dragLeaveEvent(QDragLeaveEvent* event);
     void createActions();
     void createActionsForBackendSelection();
+    void setShowPlaceholderWidget(const bool state);
+    void setMapWidgetInFrame(QWidget* const widgetForFrame);
+    void removeMapWidgetFromFrame();
 
 protected Q_SLOTS:
 

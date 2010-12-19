@@ -39,6 +39,8 @@
 namespace KMap
 {
 
+class KMapSharedData;
+
 class KMAP_EXPORT HTMLWidget : public KHTMLPart
 {
     Q_OBJECT
@@ -53,10 +55,10 @@ public:
     bool runScript2Coordinates(const QString& scriptCode, GeoCoordinates* const coordinates);
     void mouseModeChanged(const MouseModes mouseMode);
     void setSelectionRectangle(const GeoCoordinates::Pair& searchCoordinates);
-    GeoCoordinates::Pair getSelectionRectangle();
-    void centerOn(const qreal west, const qreal north, const qreal east, const qreal south, const bool useSaneZoomLevel = true);
     void removeSelectionRectangle();
-    
+    void centerOn(const qreal west, const qreal north, const qreal east, const qreal south, const bool useSaneZoomLevel = true);
+    void setSharedKMapObject(KMapSharedData* const sharedData);
+
 protected:
 
     bool eventFilter(QObject* object, QEvent* event);
@@ -79,6 +81,7 @@ private:
 
     class HTMLWidgetPrivate;
     HTMLWidgetPrivate* const d;
+    KMapSharedData* s;
 };
 
 } /* namespace KMap */
