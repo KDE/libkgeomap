@@ -34,17 +34,17 @@ IF(KDE4_BUILD_TESTS)
     SET(test_model_sources
         test-model.cpp
        )
-    KDE4_ADD_EXECUTABLE( test_model ${test_model_sources} )
-    TARGET_LINK_LIBRARIES( test_model kmap ${QT_QTTEST_LIBRARY} )
-    ADD_TEST( test_model ${EXECUTABLE_OUTPUT_PATH}/test_model )
+    KDE4_ADD_EXECUTABLE(kmap_test_model ${test_model_sources})
+    TARGET_LINK_LIBRARIES(kmap_test_model kmap ${QT_QTTEST_LIBRARY})
+    ADD_TEST(kmap_test_model ${EXECUTABLE_OUTPUT_PATH}/kmap_test_model)
 
     # test the marker model
     SET(test_primitives_sources
         test-primitives.cpp
        )
-    KDE4_ADD_EXECUTABLE( test_primitives ${test_primitives_sources} )
-    TARGET_LINK_LIBRARIES( test_primitives kmap ${QT_QTTEST_LIBRARY} )
-    ADD_TEST( test_primitives ${EXECUTABLE_OUTPUT_PATH}/test_primitives )
+    KDE4_ADD_EXECUTABLE(kmap_test_primitives ${test_primitives_sources})
+    TARGET_LINK_LIBRARIES(kmap_test_primitives kmap ${QT_QTTEST_LIBRARY})
+    ADD_TEST(kmap_test_primitives ${EXECUTABLE_OUTPUT_PATH}/kmap_test_primitives)
 
 ENDIF(KDE4_BUILD_TESTS)
 
