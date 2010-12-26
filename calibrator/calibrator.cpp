@@ -30,6 +30,7 @@
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QLineEdit>
+#include <QPushButton>
 #include <QRadioButton>
 #include <QSpinBox>
 #include <QStandardItemModel>
@@ -116,6 +117,8 @@ public:
     {
     }
 
+    QHBoxLayout                *hBoxLayout;
+    QList<QPair<QWidget*, KMap::KMapWidget*> >        extraWidgetHolders;
     QStandardItemModel         *model;
     CalibratorModelHelper      *modelHelper;
     KMap::ItemMarkerTiler      *markerTiler;
@@ -140,9 +143,14 @@ Calibrator::Calibrator()
     dummy1->setLayout(vboxLayout1);
     setCentralWidget(dummy1);
 
+    d->hBoxLayout = new QHBoxLayout();
+    vboxLayout1->addLayout(d->hBoxLayout);
+
+    QVBoxLayout* const vboxLayout2 = new QVBoxLayout();
+    d->hBoxLayout->addLayout(vboxLayout2);
     d->mapWidget = new KMap::KMapWidget(this);
-    vboxLayout1->addWidget(d->mapWidget);
-    vboxLayout1->addWidget(d->mapWidget->getControlWidget());
+    vboxLayout2->addWidget(d->mapWidget);
+    vboxLayout2->addWidget(d->mapWidget->getControlWidget());
 
     d->groupingMode = new QButtonGroup(this);
     d->groupingMode->setExclusive(true);
@@ -174,11 +182,24 @@ Calibrator::Calibrator()
     hboxLayout1->addStretch(10);
     vboxLayout1->addLayout(hboxLayout1);
 
+    QHBoxLayout* const hboxLayout2 = new QHBoxLayout(this);
+    QPushButton* const pbAddMap = new QPushButton(i18n("Add Map Widget"), this);
+    hboxLayout2->addWidget(pbAddMap);
+    QPushButton* const pbRemoveMap = new QPushButton(i18n("Remove Map Widget"), this);
+    hboxLayout2->addWidget(pbRemoveMap);
+    vboxLayout1->addLayout(hboxLayout2);
+
     connect(d->groupingMode, SIGNAL(buttonClicked(int)),
             this, SLOT(updateGroupingMode()));
 
     connect(d->sbLevel, SIGNAL(valueChanged(int)),
             this, SLOT(updateMarkers()));
+
+    connect(pbAddMap, SIGNAL(clicked()),
+            this, SLOT(slotAddMapWidget()));
+
+    connect(pbRemoveMap, SIGNAL(clicked()),
+            this, SLOT(slotRemoveMapWidget()));
 
     updateMarkers();
     updateGroupingMode();
@@ -205,11 +226,25 @@ void Calibrator::updateGroupingMode()
     {
         d->mapWidget->removeUngroupedModel(d->modelHelper);
         d->mapWidget->setGroupedModel(d->markerTiler);
+
+        for (int i = 0; i<d->extraWidgetHolders.count(); ++i)
+        {
+            KMap::KMapWidget* const mapWidget = d->extraWidgetHolders.at(i).second;
+            mapWidget->removeUngroupedModel(d->modelHelper);
+            mapWidget->setGroupedModel(d->markerTiler);
+        }
     }
     else
     {
         d->mapWidget->setGroupedModel(0);
         d->mapWidget->addUngroupedModel(d->modelHelper);
+
+        for (int i = 0; i<d->extraWidgetHolders.count(); ++i)
+        {
+            KMap::KMapWidget* const mapWidget = d->extraWidgetHolders.at(i).second;
+            mapWidget->setGroupedModel(0);
+            mapWidget->addUngroupedModel(d->modelHelper);
+        }
     }
 }
 
@@ -308,6 +343,36 @@ void Calibrator::updateZoomView()
     {
         d->zoomDisplay->setText(newZoom);
     }
+}
+
+void Calibrator::slotAddMapWidget()
+{
+    QVBoxLayout* boxLayout = new QVBoxLayout();
+    KMap::KMapWidget* mapWidget = new KMap::KMapWidget();
+    boxLayout->addWidget(mapWidget);
+    boxLayout->addWidget(mapWidget->getControlWidget());
+
+    QWidget* const dummyWidget = new QWidget();
+    dummyWidget->setLayout(boxLayout);
+    d->extraWidgetHolders.append(QPair<QWidget*, KMap::KMapWidget*>(dummyWidget, mapWidget));
+
+    d->hBoxLayout->addWidget(dummyWidget);
+
+    updateGroupingMode();
+
+    mapWidget->setActive(true);
+}
+
+void Calibrator::slotRemoveMapWidget()
+{
+    if (d->extraWidgetHolders.isEmpty())
+    {
+        return;
+    }
+
+    QPair<QWidget*, KMap::KMapWidget*> info =  d->extraWidgetHolders.takeLast();
+    d->hBoxLayout->removeWidget(info.first);
+    delete info.first;
 }
 
 int main(int argc, char* argv[])

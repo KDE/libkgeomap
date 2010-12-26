@@ -75,6 +75,8 @@ private Q_SLOTS:
     void updateGroupingMode();
     void updateMarkers();
     void updateZoomView();
+    void slotAddMapWidget();
+    void slotRemoveMapWidget();
 
 private:
 
