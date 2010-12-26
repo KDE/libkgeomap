@@ -1504,6 +1504,7 @@ void BackendMarble::setActive(const bool state)
         {
             // we should share our widget in the list of widgets in the global object
             KMapInternalWidgetInfo info;
+            info.deleteFunction = deleteInfoFunction;
             info.widget = d->marbleWidget;
             info.currentOwner = this;
             info.backendName = backendName();
@@ -1579,6 +1580,24 @@ void BackendMarble::drawSearchRectangle(Marble::GeoPainter* const painter, const
     painter->setPen(selectionPen);
     painter->setBrush(Qt::NoBrush);
     painter->drawPolygon(polyRing);
+}
+
+void BackendMarble::deleteInfoFunction(KMapInternalWidgetInfo* const info)
+{
+    if (info->currentOwner)
+    {
+        qobject_cast<MapBackend*>(info->currentOwner.data())->releaseWidget(info);
+    }
+
+    BMInternalWidgetInfo intInfo = info->backendData.value<BMInternalWidgetInfo>();
+#ifdef KMAP_MARBLE_ADD_LAYER
+    if (intInfo.bmLayer)
+    {
+        delete intInfo.bmLayer;
+    }
+#endif
+
+    delete info->widget.data();
 }
 
 } /* namespace KMap */

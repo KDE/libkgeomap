@@ -119,6 +119,7 @@ private Q_SLOTS:
 private:
 
     void updateZoomMinMaxCache();
+    static void deleteInfoFunction(KMapInternalWidgetInfo* const info);
 
 private:
 

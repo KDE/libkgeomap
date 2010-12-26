@@ -1131,6 +1131,7 @@ void BackendGoogleMaps::setActive(const bool state)
         {
             // we should share our widget in the list of widgets in the global object
             KMapInternalWidgetInfo info;
+            info.deleteFunction = deleteInfoFunction;
             info.widget = d->htmlWidgetWrapper.data();
             info.currentOwner = this;
             info.backendName = backendName();
@@ -1193,4 +1194,16 @@ void BackendGoogleMaps::mapWidgetDocked(const bool state)
     d->widgetIsDocked = state;
 }
 
+void BackendGoogleMaps::deleteInfoFunction(KMapInternalWidgetInfo* const info)
+{
+    if (info->currentOwner)
+    {
+        qobject_cast<MapBackend*>(info->currentOwner.data())->releaseWidget(info);
+    }
+
+    const GMInternalWidgetInfo intInfo = info->backendData.value<GMInternalWidgetInfo>();
+    delete intInfo.htmlWidget;
+
+    delete info->widget.data();
+}
 } /* namespace KMap */

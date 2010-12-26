@@ -59,6 +59,9 @@ class ModelHelper;
 class KMapInternalWidgetInfo
 {
 public:
+
+    typedef void (*DeleteFunction)(KMapInternalWidgetInfo* const info);
+
     enum InternalWidgetState
     {
         InternalWidgetReleased    = 1,
@@ -73,13 +76,15 @@ public:
     QVariant             backendData;
     QString              backendName;
     QPointer<QObject>    currentOwner;
+    DeleteFunction       deleteFunction;
 
     KMapInternalWidgetInfo()
      : state(),
        widget(),
        backendData(),
        backendName(),
-       currentOwner(0)
+       currentOwner(0),
+       deleteFunction(0)
     {
     }
 };
@@ -109,6 +114,7 @@ public:
     bool getInternalWidgetFromPool(const MapBackend* const mapBackend, KMapInternalWidgetInfo* const targetInfo);
     void addMyInternalWidgetToPool(const KMapInternalWidgetInfo& info);
     void updatePooledWidgetState(const QWidget* const widget, const KMapInternalWidgetInfo::InternalWidgetState newState);
+    void clearWidgetPool();
     //@}
 
 private:

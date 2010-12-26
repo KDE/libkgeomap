@@ -120,6 +120,8 @@ protected:
     void GeoPainter_drawPixmapAtCoordinates(Marble::GeoPainter* const painter, const QPixmap& pixmap, const GeoCoordinates& coordinates, const QPoint& basePoint);
     void drawSearchRectangle(Marble::GeoPainter* const painter, const GeoCoordinates::Pair& searchRectangle, const bool isOldRectangle);
 
+    static void deleteInfoFunction(KMapInternalWidgetInfo* const info);
+
 protected Q_SLOTS:
 
     void slotMapThemeActionTriggered(QAction* action);

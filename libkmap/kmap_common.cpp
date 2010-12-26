@@ -371,4 +371,17 @@ void KMapGlobalObject::updatePooledWidgetState(const QWidget* const widget, cons
     }
 }
 
+void KMapGlobalObject::clearWidgetPool()
+{
+    while (!d->internalMapWidgetsPool.isEmpty())
+    {
+        KMapInternalWidgetInfo info = d->internalMapWidgetsPool.takeLast();
+        kDebug()<<info.backendName<<info.deleteFunction;
+        if (info.deleteFunction)
+        {
+            info.deleteFunction(&info);
+        }
+    }
+}
+
 } /* namespace KMap */
