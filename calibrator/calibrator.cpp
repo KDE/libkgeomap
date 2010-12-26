@@ -26,6 +26,7 @@
 
 // Qt includes
 
+#include <QAction>
 #include <QButtonGroup>
 #include <QHBoxLayout>
 #include <QLabel>
@@ -35,6 +36,7 @@
 #include <QSpinBox>
 #include <QStandardItemModel>
 #include <QTimer>
+#include <QToolButton>
 #include <QVBoxLayout>
 
 // KDE includes
@@ -123,7 +125,6 @@ public:
     CalibratorModelHelper      *modelHelper;
     KMap::ItemMarkerTiler      *markerTiler;
 
-    KMap::KMapWidget           *mapWidget;
     QButtonGroup               *groupingMode;
     QSpinBox                   *sbLevel;
     QLineEdit                  *zoomDisplay;
@@ -145,12 +146,6 @@ Calibrator::Calibrator()
 
     d->hBoxLayout = new QHBoxLayout();
     vboxLayout1->addLayout(d->hBoxLayout);
-
-    QVBoxLayout* const vboxLayout2 = new QVBoxLayout();
-    d->hBoxLayout->addLayout(vboxLayout2);
-    d->mapWidget = new KMap::KMapWidget(this);
-    vboxLayout2->addWidget(d->mapWidget);
-    vboxLayout2->addWidget(d->mapWidget->getControlWidget());
 
     d->groupingMode = new QButtonGroup(this);
     d->groupingMode->setExclusive(true);
@@ -204,7 +199,7 @@ Calibrator::Calibrator()
     updateMarkers();
     updateGroupingMode();
 
-    d->mapWidget->setActive(true);
+    slotAddMapWidget();
 
     d->zoomDisplayTimer = new QTimer(this);
     d->zoomDisplayTimer->start(200);
@@ -222,26 +217,17 @@ void Calibrator::updateGroupingMode()
 {
     const bool shouldBeGrouped = d->groupingMode->checkedId()==0;
 
-    if (shouldBeGrouped)
+    for (int i = 0; i<d->extraWidgetHolders.count(); ++i)
     {
-        d->mapWidget->removeUngroupedModel(d->modelHelper);
-        d->mapWidget->setGroupedModel(d->markerTiler);
+        KMap::KMapWidget* const mapWidget = d->extraWidgetHolders.at(i).second;
 
-        for (int i = 0; i<d->extraWidgetHolders.count(); ++i)
+        if (shouldBeGrouped)
         {
-            KMap::KMapWidget* const mapWidget = d->extraWidgetHolders.at(i).second;
             mapWidget->removeUngroupedModel(d->modelHelper);
             mapWidget->setGroupedModel(d->markerTiler);
         }
-    }
-    else
-    {
-        d->mapWidget->setGroupedModel(0);
-        d->mapWidget->addUngroupedModel(d->modelHelper);
-
-        for (int i = 0; i<d->extraWidgetHolders.count(); ++i)
+        else
         {
-            KMap::KMapWidget* const mapWidget = d->extraWidgetHolders.at(i).second;
             mapWidget->setGroupedModel(0);
             mapWidget->addUngroupedModel(d->modelHelper);
         }
@@ -338,7 +324,13 @@ void Calibrator::updateMarkers()
 
 void Calibrator::updateZoomView()
 {
-    const QString newZoom = d->mapWidget->getZoom();
+    if (d->extraWidgetHolders.isEmpty())
+    {
+        return;
+    }
+
+    KMap::KMapWidget* const firstMapWidget = d->extraWidgetHolders.first().second;
+    const QString newZoom = firstMapWidget->getZoom();
     if (newZoom!=d->zoomDisplay->text())
     {
         d->zoomDisplay->setText(newZoom);
@@ -352,6 +344,16 @@ void Calibrator::slotAddMapWidget()
     boxLayout->addWidget(mapWidget);
     boxLayout->addWidget(mapWidget->getControlWidget());
 
+    QAction* const activateMapAction = new QAction(i18n("Active"), mapWidget);
+    activateMapAction->setData(QVariant::fromValue<void*>(mapWidget));
+    activateMapAction->setCheckable(true);
+    QToolButton* const toolButton = new QToolButton(mapWidget);
+    toolButton->setDefaultAction(activateMapAction);
+    mapWidget->addWidgetToControlWidget(toolButton);
+
+    connect(activateMapAction, SIGNAL(triggered(bool)),
+            this, SLOT(slotActivateMapActionTriggered(bool)));
+
     QWidget* const dummyWidget = new QWidget();
     dummyWidget->setLayout(boxLayout);
     d->extraWidgetHolders.append(QPair<QWidget*, KMap::KMapWidget*>(dummyWidget, mapWidget));
@@ -359,8 +361,6 @@ void Calibrator::slotAddMapWidget()
     d->hBoxLayout->addWidget(dummyWidget);
 
     updateGroupingMode();
-
-    mapWidget->setActive(true);
 }
 
 void Calibrator::slotRemoveMapWidget()
@@ -373,6 +373,18 @@ void Calibrator::slotRemoveMapWidget()
     QPair<QWidget*, KMap::KMapWidget*> info =  d->extraWidgetHolders.takeLast();
     d->hBoxLayout->removeWidget(info.first);
     delete info.first;
+}
+
+void Calibrator::slotActivateMapActionTriggered(bool state)
+{
+    QAction* const senderAction = qobject_cast<QAction*>(sender());
+    if (!senderAction)
+    {
+        return;
+    }
+
+    KMap::KMapWidget* const mapWidget = static_cast<KMap::KMapWidget*>(senderAction->data().value<void*>());
+    mapWidget->setActive(state);
 }
 
 int main(int argc, char* argv[])

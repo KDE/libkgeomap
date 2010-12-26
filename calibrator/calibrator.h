@@ -77,6 +77,7 @@ private Q_SLOTS:
     void updateZoomView();
     void slotAddMapWidget();
     void slotRemoveMapWidget();
+    void slotActivateMapActionTriggered(bool state);
 
 private:
 
