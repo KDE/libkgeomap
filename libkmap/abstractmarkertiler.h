@@ -316,6 +316,7 @@ public:
     virtual KMapSelectionState getTileSelectedState(const TileIndex& tileIndex) = 0;
 
     // these can be implemented if you want to react to actions in kmap
+    /// @todo Make currentMouseMode const
     virtual void onIndicesClicked(const TileIndex::List& tileIndicesList, const KMapSelectionState& groupSelectionState, MouseMode currentMouseMode);
     virtual void onIndicesMoved(const TileIndex::List& tileIndicesList, const GeoCoordinates& targetCoordinates, const QPersistentModelIndex& targetSnapIndex);
 
