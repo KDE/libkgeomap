@@ -292,7 +292,7 @@ public:
 public:
 
     AbstractMarkerTiler(QObject* const parent = 0);
-    ~AbstractMarkerTiler();
+    virtual ~AbstractMarkerTiler();
 
     void tileDeleteChildren(Tile* const tile);
     void tileDelete(Tile* const tile);
@@ -330,6 +330,13 @@ Q_SIGNALS:
 
     void signalTilesOrSelectionChanged();
     void signalThumbnailAvailableForIndex(const QVariant& index, const QPixmap& pixmap);
+
+protected:
+
+    /**
+     * @brief Only used to safely delete all tiles in the desctructor
+     */
+    void clear();
 
 private:
 

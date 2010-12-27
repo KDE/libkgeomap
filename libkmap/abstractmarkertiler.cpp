@@ -53,7 +53,7 @@ AbstractMarkerTiler::AbstractMarkerTiler(QObject* const parent)
 AbstractMarkerTiler::~AbstractMarkerTiler()
 {
     // delete all tiles
-    tileDelete(d->rootTile);
+    clear();
 
     delete d;
 }
@@ -624,6 +624,12 @@ void AbstractMarkerTiler::tileDeleteChild(AbstractMarkerTiler::Tile* const paren
 AbstractMarkerTiler::Flags AbstractMarkerTiler::tilerFlags() const
 {
     return FlagNull;
+}
+
+void AbstractMarkerTiler::clear()
+{
+    tileDelete(d->rootTile);
+    d->rootTile = 0;
 }
 
 } /* namespace KMap */

@@ -53,6 +53,10 @@ public:
         {
         }
 
+        ~MyTile()
+        {
+        }
+
         QList<QPersistentModelIndex> markerIndices;
 
         void removeMarkerIndexOrInvalidIndex(const QModelIndex& indexToRemove)
@@ -86,7 +90,7 @@ public:
     };
 
     ItemMarkerTiler(ModelHelper* const modelHelper, QObject* const parent = 0);
-    ~ItemMarkerTiler();
+    virtual ~ItemMarkerTiler();
 
     virtual Flags tilerFlags() const;
     virtual Tile* tileNew();
