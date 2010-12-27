@@ -263,6 +263,11 @@ void BackendMarble::releaseWidget(KMapInternalWidgetInfo* const info)
     info->currentOwner = 0;
     info->state = KMapInternalWidgetInfo::InternalWidgetReleased;
 
+    d->marbleWidget = 0;
+#ifdef KMAP_MARBLE_ADD_LAYER
+    d->bmLayer = 0;
+#endif /* KMAP_MARBLE_ADD_LAYER */
+
     /// @todo Tell the KMapWidget to remove the widget
 }
 
@@ -273,23 +278,38 @@ GeoCoordinates BackendMarble::getCenter() const
 
 void BackendMarble::setCenter(const GeoCoordinates& coordinate)
 {
+    if (!d->marbleWidget)
+    {
+        return;
+    }
+
     d->marbleWidget->setCenterLatitude(coordinate.lat());
     d->marbleWidget->setCenterLongitude(coordinate.lon());
 }
 
 bool BackendMarble::isReady() const
 {
-    return true;
+    return d->marbleWidget!=0;
 }
 
 void BackendMarble::zoomIn()
 {
+    if (!d->marbleWidget)
+    {
+        return;
+    }
+
     d->marbleWidget->zoomIn();
     d->marbleWidget->repaint();
 }
 
 void BackendMarble::zoomOut()
 {
+    if (!d->marbleWidget)
+    {
+        return;
+    }
+
     d->marbleWidget->zoomOut();
     d->marbleWidget->repaint();
 }
@@ -890,7 +910,11 @@ void BackendMarble::setZoom(const QString& newZoom)
 
 QString BackendMarble::getZoom() const
 {
-    d->cacheZoom = d->marbleWidget->zoom();
+    if (d->marbleWidget)
+    {
+        d->cacheZoom = d->marbleWidget->zoom();
+    }
+
     return QString::fromLatin1("marble:%1").arg(d->cacheZoom);
 }
 
