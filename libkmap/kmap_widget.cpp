@@ -304,7 +304,7 @@ void KMapWidget::createActions()
     d->actionRemoveCurrentSelection = new KAction(this);
     //d->actionRemoveCurrentSelection->setEnabled(false);
     d->actionRemoveCurrentSelection->setIcon(SmallIcon( QLatin1String("edit-clear" )));
-    d->actionRemoveCurrentSelection->setToolTip(i18n("Removes current selection."));
+    d->actionRemoveCurrentSelection->setToolTip(i18n("Removes the current region selection."));
 
     d->actionSetSelectionMode = new KAction(this);
     d->actionSetSelectionMode->setCheckable(true);
@@ -544,7 +544,14 @@ void KMapWidget::applyCacheToBackend()
     // TODO: only do this if the zoom was changed!
     setZoom(d->cacheZoom);
     d->currentBackend->mouseModeChanged(s->currentMouseMode);
-    setSelectionCoordinates(s->selectionRectangle);
+    if (s->selectionRectangle.first.hasCoordinates())
+    {
+        d->currentBackend->setSelectionRectangle(s->selectionRectangle);
+    }
+    else
+    {
+        d->currentBackend->removeSelectionRectangle();
+    }
 }
 
 void KMapWidget::saveBackendToCache()
@@ -1115,25 +1122,20 @@ void KMapWidget::updateClusters()
         KMapCluster& cluster = s->clusterList[i];
 
         int clusterSelectedCount = 0;
+        KMapGroupStateComputer clusterStateComputer;
         for (int iTile=0;
                 (iTile<cluster.tileIndicesList.count());
                 ++iTile)
         {
-            clusterSelectedCount+= s->markerModel->getTileSelectedCount(AbstractMarkerTiler::TileIndex::fromIntList(cluster.tileIndicesList.at(iTile)));
+            const AbstractMarkerTiler::TileIndex tileIndex =
+                AbstractMarkerTiler::TileIndex::fromIntList(cluster.tileIndicesList.at(iTile));
+
+            const KMapGroupState tileGroupState = s->markerModel->getTileGroupState(tileIndex);
+            clusterStateComputer.addState(tileGroupState);
+            clusterSelectedCount+= s->markerModel->getTileSelectedCount(tileIndex);
         }
         cluster.markerSelectedCount = clusterSelectedCount;
-        if (cluster.markerSelectedCount==0)
-        {
-            cluster.selectedState = KMapSelectedNone;
-        }
-        else if (cluster.markerSelectedCount==cluster.markerCount)
-        {
-            cluster.selectedState = KMapSelectedAll;
-        }
-        else
-        {
-            cluster.selectedState = KMapSelectedSome;
-        }
+        cluster.groupState = clusterStateComputer.getState();
     }
 
 //     kDebug()<<s->clusterList.size();
@@ -1163,7 +1165,7 @@ void KMapWidget::slotClustersNeedUpdating()
  */
 void KMapWidget::getColorInfos(const int clusterIndex, QColor *fillColor, QColor *strokeColor,
                                     Qt::PenStyle *strokeStyle, QString *labelText, QColor *labelColor,
-                                    const KMapSelectionState* const overrideSelection,
+                                    const KMapGroupState* const overrideSelection,
                                     const int* const overrideCount) const
 {
     // TODO: call the new getColorInfos function!
@@ -1172,12 +1174,12 @@ void KMapWidget::getColorInfos(const int clusterIndex, QColor *fillColor, QColor
     // TODO: check that this number is already valid!
     const int nMarkers = overrideCount ? *overrideCount : cluster.markerCount;
 
-    getColorInfos(overrideSelection?*overrideSelection:cluster.selectedState,
+    getColorInfos(overrideSelection?*overrideSelection:cluster.groupState,
                   nMarkers,
                   fillColor, strokeColor, strokeStyle, labelText, labelColor);
 }
 
-void KMapWidget::getColorInfos(const KMapSelectionState selectionState,
+void KMapWidget::getColorInfos(const KMapGroupState groupState,
                        const int nMarkers,
                        QColor *fillColor, QColor *strokeColor,
                        Qt::PenStyle *strokeStyle, QString *labelText, QColor *labelColor) const
@@ -1213,7 +1215,7 @@ void KMapWidget::getColorInfos(const KMapSelectionState selectionState,
     // TODO: 'solo' and 'selected' properties have not yet been defined,
     //       therefore use the default colors
     *strokeStyle = Qt::NoPen;
-    switch (selectionState)
+    switch (groupState & KMapSelectedMask)
     {
         case KMapSelectedNone:
             *strokeStyle = Qt::SolidLine;
@@ -1381,8 +1383,7 @@ QString KMapWidget::getZoom()
     return d->cacheZoom;
 }
 
-
-GeoCoordinates::Pair KMapWidget::getSelectionRectangle()
+GeoCoordinates::Pair KMapWidget::getRegionSelection()
 {
     return s->selectionRectangle;
 }
@@ -1396,7 +1397,7 @@ void KMapWidget::slotClustersMoved(const QIntList& clusterIndices, const QPair<i
     GeoCoordinates targetCoordinates = s->clusterList.at(clusterIndex).coordinates;
 
     AbstractMarkerTiler::TileIndex::List movedTileIndices;
-    if (s->clusterList.at(clusterIndex).selectedState==KMapSelectedNone)
+    if (s->clusterList.at(clusterIndex).groupState==KMapSelectedNone)
     {
         // a not-selected marker was moved. update all of its items:
         const KMapCluster& cluster = s->clusterList.at(clusterIndex);
@@ -1628,9 +1629,7 @@ void KMapWidget::slotClustersClicked(const QIntList& clusterIndices)
 
             s->selectionRectangle = newSelection;
             d->currentBackend->setSelectionRectangle(s->selectionRectangle);
-            emit signalNewSelectionFromMap();
-            emit signalNewMapFilter(DatabaseFilter);
-
+            emit(signalRegionSelectionChanged());
         }
     }
     else if ((s->currentMouseMode == MouseModeFilter && s->selectionRectangle.first.hasCoordinates()) || (s->currentMouseMode == MouseModeSelectThumbnail))
@@ -1651,11 +1650,10 @@ void KMapWidget::slotClustersClicked(const QIntList& clusterIndices)
             if (s->currentMouseMode == MouseModeFilter)
             {
                 s->modelBasedFilter = true;
-                emit signalNewMapFilter(ModelFilter);
-                s->markerModel->onIndicesClicked(tileIndices, currentCluster.selectedState, MouseModeFilter);
+                s->markerModel->onIndicesClicked(tileIndices, currentCluster.groupState, MouseModeFilter);
             }
             else
-                s->markerModel->onIndicesClicked(tileIndices, currentCluster.selectedState, MouseModeSelectThumbnail);
+                s->markerModel->onIndicesClicked(tileIndices, currentCluster.groupState, MouseModeSelectThumbnail);
         }
     }
 }
@@ -1779,18 +1777,20 @@ void KMapWidget::setSortKey(const int sortKey)
     slotRequestLazyReclustering();
 }
 
-QPixmap KMapWidget::getDecoratedPixmapForCluster(const int clusterId, const KMapSelectionState* const selectedStateOverride, const int* const countOverride, QPoint* const centerPoint)
+QPixmap KMapWidget::getDecoratedPixmapForCluster(const int clusterId, const KMapGroupState* const selectedStateOverride, const int* const countOverride, QPoint* const centerPoint)
 {
     const int circleRadius = d->thumbnailSize/2;
     KMapCluster& cluster = s->clusterList[clusterId];
 
     int markerCount = cluster.markerCount;
-    KMapSelectionState selectedState = cluster.selectedState;
+    KMapGroupState groupState = cluster.groupState;
     if (selectedStateOverride)
     {
-        selectedState = *selectedStateOverride;
+        groupState = *selectedStateOverride;
         markerCount = *countOverride;
     }
+
+    const KMapGroupState selectedState = groupState & KMapSelectedMask;
 
     // determine the colors:
     QColor       fillColor;
@@ -1806,6 +1806,7 @@ QPixmap KMapWidget::getDecoratedPixmapForCluster(const int clusterId, const KMap
     // determine whether we should use a pixmap or a placeholder
     if (!s->showThumbnails)
     {
+        /// @todo Handle positive filtering and region selection!
         QString pixmapName = fillColor.name().mid(1);
         if (selectedState==KMapSelectedAll)
         {
@@ -1830,6 +1831,7 @@ QPixmap KMapWidget::getDecoratedPixmapForCluster(const int clusterId, const KMap
         return markerPixmap;
     }
 
+    /// @todo This check is strange, there can be no clusters without a markerModel?
     bool displayThumbnail = (s->markerModel != 0);
     if (displayThumbnail)
     {
@@ -1863,6 +1865,35 @@ QPixmap KMapWidget::getDecoratedPixmapForCluster(const int clusterId, const KMap
                 circlePen.setColor(Qt::white);
                 painter.setPen(circlePen);
                 painter.drawRect(0, 0, resultPixmap.size().width()-1, resultPixmap.size().height()-1);
+            }
+
+            KMapGroupState globalState = s->markerModel->getGlobalGroupState();
+
+            if (globalState & (KMapFilteredPositiveMask | KMapRegionSelectedMask))
+            {
+                const bool shouldCrossOut = ((groupState & KMapRegionSelectedMask) == KMapRegionSelectedNone);
+                const bool shouldGrayOut = shouldCrossOut || ((groupState & KMapFilteredPositiveMask) == KMapFilteredPositiveNone);
+
+                if (shouldGrayOut)
+                {
+                    /// @todo Cache the alphaPixmap!
+                    QPixmap alphaPixmap(clusterPixmap.size());
+                    alphaPixmap.fill(QColor::fromRgb(0x80, 0x80, 0x80));
+                    clusterPixmap.setAlphaChannel(alphaPixmap);
+                }
+
+                if (shouldCrossOut)
+                {
+                    // draw a red cross over the pixmap
+                    QPainter clusterPixmapPainter(&clusterPixmap);
+                    QPen redPen(Qt::red);
+                    clusterPixmapPainter.setPen(redPen);
+
+                    const int width = clusterPixmap.size().width();
+                    const int height = clusterPixmap.size().height();
+                    clusterPixmapPainter.drawLine(0, 0, width-1, height-1);
+                    clusterPixmapPainter.drawLine(width-1, 0, 0, height-1);
+                }
             }
 
             painter.drawPixmap(QPoint(1,1), clusterPixmap);
@@ -2025,36 +2056,32 @@ int KMapWidget::getUndecoratedThumbnailSize() const
     return d->thumbnailSize-2;
 }
 
-void KMapWidget::setSelectionStatus(const bool status)
+void KMapWidget::setRegionSelection(const GeoCoordinates::Pair& region)
 {
-    s->hasSelection = status;
-    d->currentBackend->setSelectionStatus(s->hasSelection);
-}
+    const bool isValidRegion = region.first.hasCoordinates();
+    s->selectionRectangle = region;
 
-bool KMapWidget::getSelectionStatus() const
-{
-    //return !s->selectionRectangle.isEmpty();
-    return s->hasSelection;
-}
-
-void KMapWidget::setSelectionCoordinates(const GeoCoordinates::Pair& sel)
-{
-    if (s->currentMouseMode == MouseModeSelection || s->hasSelection)
-        d->currentBackend->setSelectionRectangle(sel);
+    /// @todo We should only notify the backend about a change to the rectangle, because it can access the rectangle via s
+    if (isValidRegion)
+    {
+        d->currentBackend->setSelectionRectangle(region);
+    }
     else
+    {
         d->currentBackend->removeSelectionRectangle();
-    s->selectionRectangle = sel;
+    }
 }
 
-void KMapWidget::clearSelectionRectangle()
+void KMapWidget::clearRegionSelection()
 {
     s->selectionRectangle.first.clear();
 }
 
 void KMapWidget::slotNewSelectionFromMap(const KMap::GeoCoordinates::Pair& sel)
 {
+    /// @todo Should the backend update s on its own?
     s->selectionRectangle      = sel;
-    emit signalNewSelectionFromMap();
+    emit(signalRegionSelectionChanged());
 }
 
 void KMapWidget::slotSetPanMode()
@@ -2072,8 +2099,10 @@ void KMapWidget::slotSetPanMode()
         {
             d->currentBackend->mouseModeChanged(MouseModePan);
 
-            if (!s->hasSelection)
+            if (!s->hasRegionSelection())
+            {
                 d->currentBackend->removeSelectionRectangle();
+            }
         }
         emit signalMouseModeChanged(MouseModePan);
     }
@@ -2196,9 +2225,10 @@ void KMapWidget::slotSetSelectThumbnailMode()
 
 void KMapWidget::slotRemoveCurrentSelection()
 {
-    emit signalRemoveCurrentSelection();
-    clearSelectionRectangle();
+    clearRegionSelection();
     d->currentBackend->removeSelectionRectangle();
+
+    emit(signalRegionSelectionChanged());
 }
 
 void KMapWidget::slotRemoveCurrentFilter()
@@ -2296,7 +2326,7 @@ void KMapWidget::setActive(const bool state)
 
     if (state)
     {
-        if (s->currentMouseMode != MouseModeSelection && !s->hasSelection)
+        if (s->currentMouseMode != MouseModeSelection && !s->hasRegionSelection())
         {
             //d->currentBackend->removeSelectionRectangle();
         }

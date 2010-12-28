@@ -653,10 +653,10 @@ void BackendMarble::marbleCustomPaint(Marble::GeoPainter* painter)
             const KMapCluster& cluster = s->clusterList.at(i);
             GeoCoordinates clusterCoordinates = cluster.coordinates;
             int markerCountOverride = cluster.markerCount;
-            KMapSelectionState selectionStateOverride = cluster.selectedState;
+            KMapGroupState selectionStateOverride = cluster.groupState;
             if (d->haveMouseMovingObject&&(d->mouseMoveClusterIndex>=0))
             {
-                bool movingSelectedMarkers = s->clusterList.at(d->mouseMoveClusterIndex).selectedState!=KMapSelectedNone;
+                bool movingSelectedMarkers = s->clusterList.at(d->mouseMoveClusterIndex).groupState!=KMapSelectedNone;
                 if (movingSelectedMarkers)
                 {
                     markersInMovingCluster+=cluster.markerSelectedCount;
@@ -692,7 +692,7 @@ void BackendMarble::marbleCustomPaint(Marble::GeoPainter* painter)
         const KMapCluster& cluster = s->clusterList.at(d->mouseMoveClusterIndex);
         GeoCoordinates clusterCoordinates = d->mouseMoveObjectCoordinates;
         int markerCountOverride = (markersInMovingCluster>0)?markersInMovingCluster:cluster.markerCount;
-        KMapSelectionState selectionStateOverride = cluster.selectedState;
+        KMapGroupState selectionStateOverride = cluster.groupState;
 
         QPoint clusterPoint;
         if (screenCoordinates(clusterCoordinates, &clusterPoint))
@@ -709,11 +709,11 @@ void BackendMarble::marbleCustomPaint(Marble::GeoPainter* painter)
                                 &markerCountOverride);
 
             QString pixmapName = fillColor.name().mid(1);
-            if (cluster.selectedState==KMapSelectedAll)
+            if (cluster.groupState==KMapSelectedAll)
             {
                 pixmapName+=QLatin1String("-selected" );
             }
-            if (cluster.selectedState==KMapSelectedSome)
+            if (cluster.groupState==KMapSelectedSome)
             {
                 pixmapName+=QLatin1String("-someselected" );
             }
@@ -1454,7 +1454,7 @@ void BackendMarble::setSelectionRectangle(const GeoCoordinates::Pair& searchCoor
 {
     // no need to store anything, we get it from the shared object
 
-    if (d->marbleWidget)
+    if (d->marbleWidget && d->activeState)
     {
         d->marbleWidget->update();
     }
@@ -1465,7 +1465,7 @@ void BackendMarble::removeSelectionRectangle()
     /// @todo the kmapwidget should do that!
     s->selectionRectangle.first.clear();
 
-    if (d->marbleWidget)
+    if (d->marbleWidget && d->activeState)
     {
         d->marbleWidget->update();
     }
@@ -1480,15 +1480,11 @@ void BackendMarble::mouseModeChanged(const MouseModes mouseMode)
         d->firstSelectionPoint.clear();
         d->intermediateSelectionPoint.clear();
 
-        if (d->marbleWidget)
+        if (d->marbleWidget && d->activeState)
         {
             d->marbleWidget->update();
         }
     }
-}
-
-void BackendMarble::setSelectionStatus(const bool /*status*/)
-{
 }
 
 void BackendMarble::centerOn(const Marble::GeoDataLatLonBox& box, const bool useSaneZoomLevel)

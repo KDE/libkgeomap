@@ -47,6 +47,7 @@ private Q_SLOTS:
     void testParseBoundsString();
     void testNormalizeBounds_data();
     void testNormalizeBounds();
+    void testGroupStateComputer();
 };
 
 #endif /* TEST_MODEL_H */

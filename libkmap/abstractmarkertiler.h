@@ -313,11 +313,15 @@ public:
     virtual QVariant bestRepresentativeIndexFromList(const QList<QVariant>& indices, const int sortKey) = 0;
     virtual QPixmap pixmapFromRepresentativeIndex(const QVariant& index, const QSize& size) = 0;
     virtual bool indicesEqual(const QVariant& a, const QVariant& b) const = 0;
-    virtual KMapSelectionState getTileSelectedState(const TileIndex& tileIndex) = 0;
+    virtual KMapGroupState getTileGroupState(const TileIndex& tileIndex) = 0;
+    /**
+     * @todo Make this function pure virtual!
+     */
+    virtual KMapGroupState getGlobalGroupState() { return KMapSelectedNone; };
 
     // these can be implemented if you want to react to actions in kmap
     /// @todo Make currentMouseMode const
-    virtual void onIndicesClicked(const TileIndex::List& tileIndicesList, const KMapSelectionState& groupSelectionState, MouseMode currentMouseMode);
+    virtual void onIndicesClicked(const TileIndex::List& tileIndicesList, const KMapGroupState& groupSelectionState, MouseMode currentMouseMode);
     virtual void onIndicesMoved(const TileIndex::List& tileIndicesList, const GeoCoordinates& targetCoordinates, const QPersistentModelIndex& targetSnapIndex);
 
     virtual void setActive(const bool state) = 0;

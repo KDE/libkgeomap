@@ -1099,10 +1099,6 @@ void BackendGoogleMaps::slotSelectionHasBeenMade(const KMap::GeoCoordinates::Pai
     emit signalSelectionHasBeenMade(searchCoordinates);
 }
 
-void BackendGoogleMaps::setSelectionStatus(const bool /*status*/)
-{
-}
-
 void BackendGoogleMaps::centerOn( const Marble::GeoDataLatLonBox& latLonBox, const bool useSaneZoomLevel)
 {
     /// @todo Buffer this call if there is no widget or if inactive!

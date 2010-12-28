@@ -362,7 +362,7 @@ int ItemMarkerTiler::getTileSelectedCount(const AbstractMarkerTiler::TileIndex& 
     return myTile->selectedCount;
 }
 
-KMapSelectionState ItemMarkerTiler::getTileSelectedState(const AbstractMarkerTiler::TileIndex& tileIndex)
+KMapGroupState ItemMarkerTiler::getTileGroupState(const AbstractMarkerTiler::TileIndex& tileIndex)
 {
     if (isDirty())
     {
@@ -566,7 +566,7 @@ bool ItemMarkerTiler::indicesEqual(const QVariant& a, const QVariant& b) const
     return a.value<QPersistentModelIndex>()==b.value<QPersistentModelIndex>();
 }
 
-void ItemMarkerTiler::onIndicesClicked(const TileIndex::List& tileIndicesList, const KMapSelectionState& groupSelectionState, MouseMode currentMouseMode)
+void ItemMarkerTiler::onIndicesClicked(const TileIndex::List& tileIndicesList, const KMapGroupState& groupSelectionState, MouseMode currentMouseMode)
 {
     QList<QPersistentModelIndex> clickedMarkers;
     for (int i=0; i<tileIndicesList.count(); ++i)

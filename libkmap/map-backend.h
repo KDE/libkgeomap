@@ -101,7 +101,6 @@ public:
 
     const QExplicitlySharedDataPointer<KMapSharedData> s;
 
-    virtual void setSelectionStatus(const bool status) = 0;
     virtual void centerOn(const Marble::GeoDataLatLonBox& box, const bool useSaneZoomLevel = true) = 0;
     virtual void setActive(const bool state) = 0;
 

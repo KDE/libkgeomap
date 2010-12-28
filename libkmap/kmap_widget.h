@@ -114,13 +114,11 @@ public:
     void setShowThumbnails(const bool state);
     //@}
 
-    /// @name Selection rectangle
+    /// @name Region selection
     //@{
-    void setSelectionCoordinates(const GeoCoordinates::Pair& sel);
-    GeoCoordinates::Pair getSelectionRectangle();
-    void clearSelectionRectangle();
-    void setSelectionStatus(const bool status);
-    bool getSelectionStatus() const;
+    void setRegionSelection(const GeoCoordinates::Pair& region);
+    GeoCoordinates::Pair getRegionSelection();
+    void clearRegionSelection();
     //@}
 
     /// @name Miscellaneous
@@ -139,16 +137,16 @@ public:
 
     void getColorInfos(const int clusterIndex, QColor *fillColor, QColor *strokeColor,
                        Qt::PenStyle *strokeStyle, QString *labelText, QColor *labelColor,
-                       const KMapSelectionState* const overrideSelection = 0,
+                       const KMapGroupState* const overrideSelection = 0,
                        const int* const overrideCount = 0) const;
 
-    void getColorInfos(const KMapSelectionState selectionState,
+    void getColorInfos(const KMapGroupState groupState,
                        const int nMarkers,
                        QColor *fillColor, QColor *strokeColor,
                        Qt::PenStyle *strokeStyle, QString *labelText, QColor *labelColor) const;
 
     QString convertZoomToBackendZoom(const QString& someZoom, const QString& targetBackend) const;
-    QPixmap getDecoratedPixmapForCluster(const int clusterId, const KMapSelectionState* const selectedStateOverride, const int* const countOverride, QPoint* const centerPoint);
+    QPixmap getDecoratedPixmapForCluster(const int clusterId, const KMapGroupState* const selectedStateOverride, const int* const countOverride, QPoint* const centerPoint);
     QVariant getClusterRepresentativeMarker(const int clusterIndex, const int sortKey);
     //@}
 
@@ -187,12 +185,10 @@ Q_SIGNALS:
 
     void signalAltitudeLookupReady(const KMap::KMapAltitudeLookup::List& altitudes);
     void signalUngroupedModelChanged(const int index);
-    void signalNewSelectionFromMap();
-    void signalRemoveCurrentSelection();
+    void signalRegionSelectionChanged();
     void signalRemoveCurrentFilter();
     void signalStickyModeChanged();
     void signalMouseModeChanged(const KMap::MouseMode& currentMouseMode);
-    void signalNewMapFilter(const KMap::FilterMode& newFilter);
 
 public:
 

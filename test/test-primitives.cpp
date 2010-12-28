@@ -197,4 +197,81 @@ void TestPrimitives::testNormalizeBounds()
     QTEST(KMapHelperNormalizeBounds(bounds), "nbounds");
 }
 
+void TestPrimitives::testGroupStateComputer()
+{
+    {
+        // test selected state:
+        KMapGroupStateComputer c1;
+        QCOMPARE(c1.getState(), KMapSelectedNone);
+        c1.addSelectedState(KMapSelectedNone);
+        QCOMPARE(c1.getState(), KMapSelectedNone);
+        c1.addSelectedState(KMapSelectedSome);
+        QCOMPARE(c1.getState(), KMapSelectedSome);
+        c1.addSelectedState(KMapSelectedAll);
+        QCOMPARE(c1.getState(), KMapSelectedSome);
+        c1.clear();
+        QCOMPARE(c1.getState(), KMapSelectedNone);
+        c1.addSelectedState(KMapSelectedAll);
+        QCOMPARE(c1.getState(), KMapSelectedAll);
+        c1.addSelectedState(KMapSelectedSome);
+        QCOMPARE(c1.getState(), KMapSelectedSome);
+        c1.clear();
+        QCOMPARE(c1.getState(), KMapSelectedNone);
+        c1.addSelectedState(KMapSelectedAll);
+        QCOMPARE(c1.getState(), KMapSelectedAll);
+        c1.addSelectedState(KMapSelectedNone);
+        QCOMPARE(c1.getState(), KMapSelectedSome);
+    }
+
+    {
+        // test selected state:
+        KMapGroupStateComputer c1;
+        QCOMPARE(c1.getState(), KMapFilteredPositiveNone);
+        c1.addFilteredPositiveState(KMapFilteredPositiveNone);
+        QCOMPARE(c1.getState(), KMapFilteredPositiveNone);
+        c1.addFilteredPositiveState(KMapFilteredPositiveSome);
+        QCOMPARE(c1.getState(), KMapFilteredPositiveSome);
+        c1.addFilteredPositiveState(KMapFilteredPositiveAll);
+        QCOMPARE(c1.getState(), KMapFilteredPositiveSome);
+        c1.clear();
+        QCOMPARE(c1.getState(), KMapFilteredPositiveNone);
+        c1.addFilteredPositiveState(KMapFilteredPositiveAll);
+        QCOMPARE(c1.getState(), KMapFilteredPositiveAll);
+        c1.addFilteredPositiveState(KMapFilteredPositiveSome);
+        QCOMPARE(c1.getState(), KMapFilteredPositiveSome);
+        c1.clear();
+        QCOMPARE(c1.getState(), KMapFilteredPositiveNone);
+        c1.addFilteredPositiveState(KMapFilteredPositiveAll);
+        QCOMPARE(c1.getState(), KMapFilteredPositiveAll);
+        c1.addFilteredPositiveState(KMapFilteredPositiveNone);
+        QCOMPARE(c1.getState(), KMapFilteredPositiveSome);
+    }
+
+    {
+        // test selected state:
+        KMapGroupStateComputer c1;
+        QCOMPARE(c1.getState(), KMapRegionSelectedNone);
+        c1.addRegionSelectedState(KMapRegionSelectedNone);
+        QCOMPARE(c1.getState(), KMapRegionSelectedNone);
+        c1.addRegionSelectedState(KMapRegionSelectedSome);
+        QCOMPARE(c1.getState(), KMapRegionSelectedSome);
+        c1.addRegionSelectedState(KMapRegionSelectedAll);
+        QCOMPARE(c1.getState(), KMapRegionSelectedSome);
+        c1.clear();
+        QCOMPARE(c1.getState(), KMapRegionSelectedNone);
+        c1.addRegionSelectedState(KMapRegionSelectedAll);
+        QCOMPARE(c1.getState(), KMapRegionSelectedAll);
+        c1.addRegionSelectedState(KMapRegionSelectedSome);
+        QCOMPARE(c1.getState(), KMapRegionSelectedSome);
+        c1.clear();
+        QCOMPARE(c1.getState(), KMapRegionSelectedNone);
+        c1.addRegionSelectedState(KMapRegionSelectedAll);
+        QCOMPARE(c1.getState(), KMapRegionSelectedAll);
+        c1.addRegionSelectedState(KMapRegionSelectedNone);
+        QCOMPARE(c1.getState(), KMapRegionSelectedSome);
+    }
+
+    /// @todo Test addState
+}
+
 QTEST_MAIN(TestPrimitives)

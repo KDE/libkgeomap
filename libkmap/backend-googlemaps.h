@@ -90,7 +90,6 @@ public:
     virtual void removeSelectionRectangle();
     virtual void mouseModeChanged(const MouseModes mouseMode);
 
-    virtual void setSelectionStatus(const bool status);
     virtual void centerOn(const Marble::GeoDataLatLonBox& latLonBox, const bool useSaneZoomLevel);
     virtual void setActive(const bool state);
 

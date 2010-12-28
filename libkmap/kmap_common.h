@@ -137,23 +137,24 @@ public:
 
     KMapCluster()
         : tileIndicesList(),
-        markerCount(0),
-        markerSelectedCount(0),
-        coordinates(),
-        pixelPos(),
-        selectedState(KMapSelectedNone),
-        representativeMarkers(),
-        pixmapSize(),
-        pixmapOffset()
+          markerCount(0),
+          markerSelectedCount(0),
+          coordinates(),
+          pixelPos(),
+          groupState(KMapSelectedNone),
+          representativeMarkers(),
+          pixmapSize(),
+          pixmapOffset()
     {
     }
 
+    /// @todo Find a way to store these as usual tile indices to avoid conversions
     QList<QIntList>     tileIndicesList;
     int                 markerCount;
     int                 markerSelectedCount;
     GeoCoordinates      coordinates;
     QPoint              pixelPos;
-    KMapSelectionState  selectedState;
+    KMapGroupState      groupState;
     QMap<int, QVariant> representativeMarkers;
 
     enum PixmapType
@@ -185,7 +186,6 @@ public:
           modificationsAllowed(true),
           selectionRectangle(),
           haveMovingCluster(false),
-          hasSelection(false),
           currentMouseMode(0),
           availableMouseModes(0),
           visibleMouseModes(0),
@@ -216,13 +216,15 @@ public:
     //@{
     GeoCoordinates::Pair      selectionRectangle;
     bool                      haveMovingCluster;
-    bool                      hasSelection;
     MouseModes                currentMouseMode;
     MouseModes                availableMouseModes;
     MouseModes                visibleMouseModes;
     bool                      activeState;
     bool                      modelBasedFilter;
     //@}
+
+    /// @todo De-inline?
+    bool                      hasRegionSelection() const { return selectionRectangle.first.hasCoordinates(); }
 };
 
 // helper functions:

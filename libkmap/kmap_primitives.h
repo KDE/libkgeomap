@@ -95,20 +95,154 @@ enum ExtraAction
 Q_DECLARE_FLAGS(ExtraActions, ExtraAction)
 Q_DECLARE_OPERATORS_FOR_FLAGS(ExtraActions)
 
-enum FilterMode
-{
-    DatabaseFilter = 1,
-    ModelFilter    = 2
-};
-
 typedef QList<int>      QIntList;
 typedef QPair<int, int> QIntPair;
 
-enum KMapSelectionState
+/**
+ * @brief Representation of possible tile or cluster states
+ *
+ * The idea is that a group consists of more than one object.
+ * Thus the resulting state is that either none of the objects,
+ * some or all of them have a certain state. The constants for each
+ * state are set up such that they can be logically or'ed: If a group
+ * has the state ___All, and another the state ___Some, the bit
+ * representing ___Some is always propagated along. You only have to
+ * make sure that once you reach an object with ___None, and the computed
+ * state is ___All, to set the ___Some bit.
+ *
+ * KMapSelected___: An object is selected.
+ * KMapFilteredPositive___: An object was highlighted by a filter. This usually
+ *                          means that not-positively-filtered objects should be hidden.
+ * KMapRegionSelected___: An object is inside a region of interest on the map.
+ */
+enum KMapGroupStateEnum
 {
-    KMapSelectedNone = 0,
-    KMapSelectedSome = 1,
-    KMapSelectedAll  = 2
+    KMapSelectedMask = 0x03 << 0,
+    KMapSelectedNone = 0x00 << 0,
+    KMapSelectedSome = 0x03 << 0,
+    KMapSelectedAll  = 0x02 << 0,
+
+    KMapFilteredPositiveMask = 0x03 << 2,
+    KMapFilteredPositiveNone = 0x00 << 2,
+    KMapFilteredPositiveSome = 0x03 << 2,
+    KMapFilteredPositiveAll  = 0x02 << 2,
+
+    KMapRegionSelectedMask = 0x03 << 4,
+    KMapRegionSelectedNone = 0x00 << 4,
+    KMapRegionSelectedSome = 0x03 << 4,
+    KMapRegionSelectedAll  = 0x02 << 4
+};
+
+/// @todo KMapGroupState -> KMapGroupStates?
+Q_DECLARE_FLAGS(KMapGroupState, KMapGroupStateEnum)
+Q_DECLARE_OPERATORS_FOR_FLAGS(KMapGroupState)
+
+class KMapGroupStateComputer
+{
+private:
+
+    KMapGroupState m_state;
+    KMapGroupState m_stateMask;
+
+public:
+
+    /// @todo Make member functions non-inline?
+
+    KMapGroupStateComputer()
+    : m_state(KMapSelectedNone),
+      m_stateMask(KMapSelectedNone)
+    {
+    }
+
+    KMapGroupState getState() const
+    {
+        return m_state;
+    }
+
+    void clear()
+    {
+        m_state = KMapSelectedNone;
+        m_stateMask = KMapSelectedNone;
+    }
+
+    void addState(const KMapGroupState state)
+    {
+        addSelectedState(state);
+        addFilteredPositiveState(state);
+        addRegionSelectedState(state);
+    }
+
+    void addSelectedState(const KMapGroupState state)
+    {
+        if (!(m_stateMask & KMapSelectedMask))
+        {
+            m_state|= state;
+            m_stateMask|= KMapSelectedMask;
+        }
+        else
+        {
+            if ((state&KMapSelectedMask)==KMapSelectedAll)
+            {
+                m_state|=KMapSelectedAll;
+            }
+            else if ((m_state&KMapSelectedMask)==KMapSelectedAll)
+            {
+                m_state|=KMapSelectedSome;
+            }
+            else
+            {
+                m_state|=state;
+            }
+        }
+    }
+
+    void addFilteredPositiveState(const KMapGroupState state)
+    {
+        if (!(m_stateMask & KMapFilteredPositiveMask))
+        {
+            m_state|= state;
+            m_stateMask|= KMapFilteredPositiveMask;
+        }
+        else
+        {
+            if ((state&KMapFilteredPositiveMask)==KMapFilteredPositiveAll)
+            {
+                m_state|=KMapFilteredPositiveAll;
+            }
+            else if ((m_state&KMapFilteredPositiveMask)==KMapFilteredPositiveAll)
+            {
+                m_state|=KMapFilteredPositiveSome;
+            }
+            else
+            {
+                m_state|=state;
+            }
+        }
+    }
+
+    void addRegionSelectedState(const KMapGroupState state)
+    {
+        if (!(m_stateMask & KMapRegionSelectedMask))
+        {
+            m_state|= state;
+            m_stateMask|= KMapRegionSelectedMask;
+        }
+        else
+        {
+            if ((state&KMapRegionSelectedMask)==KMapRegionSelectedAll)
+            {
+                m_state|=KMapRegionSelectedAll;
+            }
+            else if ((m_state&KMapRegionSelectedMask)==KMapRegionSelectedAll)
+            {
+                m_state|=KMapRegionSelectedSome;
+            }
+            else
+            {
+                m_state|=state;
+            }
+        }
+    }
 };
 
 // primitives for altitude lookup:
