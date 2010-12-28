@@ -1857,7 +1857,7 @@ QPixmap KMapWidget::getDecoratedPixmapForCluster(const int clusterId, const KMap
 
             // apparently, pixmaps have to be filled before painting in them, otherwise we get
             // some weird artefacts
-            resultPixmap.fill(QColor::fromRgb(0x00, 0x00, 0x00));
+            resultPixmap.fill(QColor::fromRgb(0xff, 0xff, 0xff));
             QPainter painter(&resultPixmap);
             painter.setRenderHint(QPainter::Antialiasing);
 
