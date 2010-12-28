@@ -1854,6 +1854,10 @@ QPixmap KMapWidget::getDecoratedPixmapForCluster(const int clusterId, const KMap
         if (!clusterPixmap.isNull())
         {
             QPixmap resultPixmap(clusterPixmap.size()+QSize(2,2));
+
+            // apparently, pixmaps have to be filled before painting in them, otherwise we get
+            // some weird artefacts
+            resultPixmap.fill(QColor::fromRgb(0x00, 0x00, 0x00));
             QPainter painter(&resultPixmap);
             painter.setRenderHint(QPainter::Antialiasing);
 
@@ -1880,6 +1884,17 @@ QPixmap KMapWidget::getDecoratedPixmapForCluster(const int clusterId, const KMap
                     QPixmap alphaPixmap(clusterPixmap.size());
                     alphaPixmap.fill(QColor::fromRgb(0x80, 0x80, 0x80));
                     clusterPixmap.setAlphaChannel(alphaPixmap);
+
+                    // draw a blue cross over the pixmap
+                    /// @todo this is just for debugging!!!
+                    QPainter clusterPixmapPainter(&clusterPixmap);
+                    QPen redPen(Qt::blue);
+                    clusterPixmapPainter.setPen(redPen);
+
+                    const int width = clusterPixmap.size().width();
+                    const int height = clusterPixmap.size().height();
+                    clusterPixmapPainter.drawLine(0, 0, width-1, height-1);
+                    clusterPixmapPainter.drawLine(width-1, 0, 0, height-1);
                 }
 
                 if (shouldCrossOut)
