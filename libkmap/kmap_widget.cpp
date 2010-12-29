@@ -1876,7 +1876,11 @@ QPixmap KMapWidget::getDecoratedPixmapForCluster(const int clusterId, const KMap
             if (globalState & (KMapFilteredPositiveMask | KMapRegionSelectedMask))
             {
                 const bool shouldCrossOut = ((groupState & KMapRegionSelectedMask) == KMapRegionSelectedNone);
-                const bool shouldGrayOut = shouldCrossOut || ((groupState & KMapFilteredPositiveMask) == KMapFilteredPositiveNone);
+                bool shouldGrayOut = shouldCrossOut;
+                if ((!shouldGrayOut) && (globalState & KMapFilteredPositiveMask))
+                {
+                    shouldGrayOut = ((groupState & KMapFilteredPositiveMask) == KMapFilteredPositiveNone);
+                }
 
                 if (shouldGrayOut)
                 {
