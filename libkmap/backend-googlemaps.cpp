@@ -1051,24 +1051,21 @@ bool BackendGoogleMaps::eventFilter(QObject* object, QEvent* event)
     return false;
 }
 
-void BackendGoogleMaps::setSelectionRectangle(const GeoCoordinates::Pair& searchCoordinates)
-{
-    if (!d->htmlWidgetWrapper)
-    {
-        return;
-    }
-
-    d->htmlWidget->setSelectionRectangle(searchCoordinates);
-}
-
-void BackendGoogleMaps::removeSelectionRectangle()
+void BackendGoogleMaps::regionSelectionChanged()
 {
     if (!d->htmlWidget)
     {
         return;
     }
 
-    d->htmlWidget->removeSelectionRectangle();
+    if (s->hasRegionSelection())
+    {
+        d->htmlWidget->setSelectionRectangle(s->selectionRectangle);
+    }
+    else
+    {
+        d->htmlWidget->removeSelectionRectangle();
+    }
 }
 
 void BackendGoogleMaps::mouseModeChanged()

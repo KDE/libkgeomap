@@ -98,8 +98,7 @@ public:
     void setShowOverviewMap(const bool state);
     void setShowScaleBar(const bool state);
 
-    virtual void setSelectionRectangle(const GeoCoordinates::Pair& searchCoordinates);
-    virtual void removeSelectionRectangle();
+    virtual void regionSelectionChanged();
     virtual void mouseModeChanged();
 
     virtual void centerOn(const Marble::GeoDataLatLonBox& box, const bool useSaneZoomLevel); 

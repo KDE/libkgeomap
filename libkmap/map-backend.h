@@ -95,8 +95,7 @@ public:
 
     virtual void updateActionAvailability() = 0;
 
-    virtual void setSelectionRectangle(const GeoCoordinates::Pair& searchCorrdinates) = 0;
-    virtual void removeSelectionRectangle() = 0;
+    virtual void regionSelectionChanged() = 0;
     virtual void mouseModeChanged() = 0;
 
     const QExplicitlySharedDataPointer<KMapSharedData> s;

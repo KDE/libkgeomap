@@ -219,7 +219,7 @@ protected Q_SLOTS:
     /// @name Mouse modes
     //@{
     void slotMouseModeChanged(QAction* triggeredAction);
-    void slotRemoveCurrentSelection();
+    void slotRemoveCurrentRegionSelection();
     //@}
 
 private:

@@ -144,12 +144,13 @@ public:
         markerGroupingRadius(KMapMinMarkerGroupingRadius),
         actionIncreaseThumbnailSize(0),
         actionDecreaseThumbnailSize(0),
-        actionSetSelectionMode(0),
+        actionRemoveCurrentRegionSelection(0),
+        actionSetRegionSelectionMode(0),
         actionSetPanMode(0),
-        actionSetZoomMode(0),
-        actionSetFilterDatabaseMode(0),
-        actionSetFilterModelMode(0),
-        actionRemoveFilterMode(0),
+        actionSetZoomIntoGroupMode(0),
+        actionSetRegionSelectionFromIconMode(0),
+        actionSetFilterMode(0),
+        actionRemoveFilter(0),
         actionSetSelectThumbnailMode(0),
         thumbnailTimer(0),
         thumbnailTimerCount(0),
@@ -199,13 +200,13 @@ public:
     KHBox*                  hBoxForAdditionalControlWidgetItems;
 
     QActionGroup*           mouseModeActionGroup;
-    KAction*                actionRemoveCurrentSelection;
-    KAction*                actionSetSelectionMode;
+    KAction*                actionRemoveCurrentRegionSelection;
+    KAction*                actionSetRegionSelectionMode;
     KAction*                actionSetPanMode;
-    KAction*                actionSetZoomMode;
-    KAction*                actionSetFilterDatabaseMode;
-    KAction*                actionSetFilterModelMode;
-    KAction*                actionRemoveFilterMode;
+    KAction*                actionSetZoomIntoGroupMode;
+    KAction*                actionSetRegionSelectionFromIconMode;
+    KAction*                actionSetFilterMode;
+    KAction*                actionRemoveFilter;
     KAction*                actionSetSelectThumbnailMode;
     QToolButton*            setPanModeButton;
     QToolButton*            setSelectionModeButton;
@@ -301,19 +302,19 @@ void KMapWidget::createActions()
     d->actionDecreaseThumbnailSize = new KAction(i18n("T-"), this);
     d->actionDecreaseThumbnailSize->setToolTip(i18n("Decrease the thumbnail size on the map"));
 
-    d->actionRemoveCurrentSelection = new KAction(this);
-    //d->actionRemoveCurrentSelection->setEnabled(false);
-    d->actionRemoveCurrentSelection->setIcon(SmallIcon( QLatin1String("edit-clear" )));
-    d->actionRemoveCurrentSelection->setToolTip(i18n("Remove the current region selection"));
+    d->actionRemoveCurrentRegionSelection = new KAction(this);
+    //d->actionRemoveCurrentRegionSelection->setEnabled(false);
+    d->actionRemoveCurrentRegionSelection->setIcon(SmallIcon( QLatin1String("edit-clear" )));
+    d->actionRemoveCurrentRegionSelection->setToolTip(i18n("Remove the current region selection"));
 
     d->mouseModeActionGroup = new QActionGroup(this);
     d->mouseModeActionGroup->setExclusive(true);
 
-    d->actionSetSelectionMode = new KAction(d->mouseModeActionGroup);
-    d->actionSetSelectionMode->setCheckable(true);
-    d->actionSetSelectionMode->setIcon(SmallIcon( QLatin1String("select-rectangular" )));
-    d->actionSetSelectionMode->setToolTip(i18n("Select images by drawing a rectangle"));
-    d->actionSetSelectionMode->setData(QVariant::fromValue<KMap::MouseModes>(MouseModeRegionSelection));
+    d->actionSetRegionSelectionMode = new KAction(d->mouseModeActionGroup);
+    d->actionSetRegionSelectionMode->setCheckable(true);
+    d->actionSetRegionSelectionMode->setIcon(SmallIcon( QLatin1String("select-rectangular" )));
+    d->actionSetRegionSelectionMode->setToolTip(i18n("Select images by drawing a rectangle"));
+    d->actionSetRegionSelectionMode->setData(QVariant::fromValue<KMap::MouseModes>(MouseModeRegionSelection));
 
     d->actionSetPanMode = new KAction(d->mouseModeActionGroup);
     d->actionSetPanMode->setCheckable(true);
@@ -322,26 +323,26 @@ void KMapWidget::createActions()
     d->actionSetPanMode->setChecked(true);
     d->actionSetPanMode->setData(QVariant::fromValue<KMap::MouseModes>(MouseModePan));
 
-    d->actionSetZoomMode = new KAction(d->mouseModeActionGroup);
-    d->actionSetZoomMode->setCheckable(true);
-    d->actionSetZoomMode->setToolTip(i18n("Zoom into a group"));
-    d->actionSetZoomMode->setIcon(SmallIcon( QLatin1String("page-zoom" )));
-    d->actionSetZoomMode->setData(QVariant::fromValue<KMap::MouseModes>(MouseModeZoomIntoGroup));
+    d->actionSetZoomIntoGroupMode = new KAction(d->mouseModeActionGroup);
+    d->actionSetZoomIntoGroupMode->setCheckable(true);
+    d->actionSetZoomIntoGroupMode->setToolTip(i18n("Zoom into a group"));
+    d->actionSetZoomIntoGroupMode->setIcon(SmallIcon( QLatin1String("page-zoom" )));
+    d->actionSetZoomIntoGroupMode->setData(QVariant::fromValue<KMap::MouseModes>(MouseModeZoomIntoGroup));
 
-    d->actionSetFilterDatabaseMode = new KAction(d->mouseModeActionGroup);
-    d->actionSetFilterDatabaseMode->setCheckable(true);
-    d->actionSetFilterDatabaseMode->setToolTip(i18n("Filter images"));
-    d->actionSetFilterDatabaseMode->setIcon(SmallIcon( QLatin1String("view-filter" )));
-    d->actionSetFilterDatabaseMode->setData(QVariant::fromValue<KMap::MouseModes>(MouseModeRegionSelectionFromIcon));
+    d->actionSetRegionSelectionFromIconMode = new KAction(d->mouseModeActionGroup);
+    d->actionSetRegionSelectionFromIconMode->setCheckable(true);
+    d->actionSetRegionSelectionFromIconMode->setToolTip(i18n("Filter images"));
+    d->actionSetRegionSelectionFromIconMode->setIcon(SmallIcon( QLatin1String("view-filter" )));
+    d->actionSetRegionSelectionFromIconMode->setData(QVariant::fromValue<KMap::MouseModes>(MouseModeRegionSelectionFromIcon));
 
-    d->actionSetFilterModelMode = new KAction(i18n("F"), d->mouseModeActionGroup);
-    d->actionSetFilterModelMode->setCheckable(true);
-    d->actionSetFilterModelMode->setToolTip(i18n("Filter images inside the region selection"));
-    d->actionSetFilterModelMode->setData(QVariant::fromValue<KMap::MouseModes>(MouseModeFilter));
+    d->actionSetFilterMode = new KAction(i18n("F"), d->mouseModeActionGroup);
+    d->actionSetFilterMode->setCheckable(true);
+    d->actionSetFilterMode->setToolTip(i18n("Filter images inside the region selection"));
+    d->actionSetFilterMode->setData(QVariant::fromValue<KMap::MouseModes>(MouseModeFilter));
 
-    d->actionRemoveFilterMode = new KAction(this);
-    d->actionRemoveFilterMode->setToolTip(i18n("Remove the current filter"));
-    d->actionRemoveFilterMode->setIcon(SmallIcon( QLatin1String("window-close" )));
+    d->actionRemoveFilter = new KAction(this);
+    d->actionRemoveFilter->setToolTip(i18n("Remove the current filter"));
+    d->actionRemoveFilter->setIcon(SmallIcon( QLatin1String("window-close" )));
 
     d->actionSetSelectThumbnailMode = new KAction(d->mouseModeActionGroup);
     d->actionSetSelectThumbnailMode->setCheckable(true);
@@ -374,11 +375,11 @@ void KMapWidget::createActions()
     connect(d->mouseModeActionGroup, SIGNAL(triggered(QAction*)),
             this, SLOT(slotMouseModeChanged(QAction*)));
 
-    connect(d->actionRemoveFilterMode, SIGNAL(triggered()),
+    connect(d->actionRemoveFilter, SIGNAL(triggered()),
             this, SIGNAL(signalRemoveCurrentFilter()));
 
-    connect(d->actionRemoveCurrentSelection, SIGNAL(triggered()),
-            this, SLOT(slotRemoveCurrentSelection()));
+    connect(d->actionRemoveCurrentRegionSelection, SIGNAL(triggered()),
+            this, SLOT(slotRemoveCurrentRegionSelection()));
 
 }
 
@@ -536,14 +537,7 @@ void KMapWidget::applyCacheToBackend()
     // TODO: only do this if the zoom was changed!
     setZoom(d->cacheZoom);
     d->currentBackend->mouseModeChanged();
-    if (s->selectionRectangle.first.hasCoordinates())
-    {
-        d->currentBackend->setSelectionRectangle(s->selectionRectangle);
-    }
-    else
-    {
-        d->currentBackend->removeSelectionRectangle();
-    }
+    d->currentBackend->regionSelectionChanged();
 }
 
 void KMapWidget::saveBackendToCache()
@@ -770,22 +764,22 @@ QWidget* KMapWidget::getControlWidget()
         d->setPanModeButton->setDefaultAction(d->actionSetPanMode);
 
         d->setSelectionModeButton = new QToolButton(d->mouseModesHolder);
-        d->setSelectionModeButton->setDefaultAction(d->actionSetSelectionMode);
+        d->setSelectionModeButton->setDefaultAction(d->actionSetRegionSelectionMode);
 
         d->removeCurrentSelectionButton = new QToolButton(d->mouseModesHolder);
-        d->removeCurrentSelectionButton->setDefaultAction(d->actionRemoveCurrentSelection);
+        d->removeCurrentSelectionButton->setDefaultAction(d->actionRemoveCurrentRegionSelection);
 
         d->setZoomModeButton = new QToolButton(d->mouseModesHolder);
-        d->setZoomModeButton->setDefaultAction(d->actionSetZoomMode);
+        d->setZoomModeButton->setDefaultAction(d->actionSetZoomIntoGroupMode);
 
         d->setFilterDatabaseModeButton = new QToolButton(d->mouseModesHolder);
-        d->setFilterDatabaseModeButton->setDefaultAction(d->actionSetFilterDatabaseMode);
+        d->setFilterDatabaseModeButton->setDefaultAction(d->actionSetRegionSelectionFromIconMode);
 
         d->setFilterModelModeButton = new QToolButton(d->mouseModesHolder);
-        d->setFilterModelModeButton->setDefaultAction(d->actionSetFilterModelMode);
+        d->setFilterModelModeButton->setDefaultAction(d->actionSetFilterMode);
 
         d->removeFilterModeButton = new QToolButton(d->mouseModesHolder);
-        d->removeFilterModeButton->setDefaultAction(d->actionRemoveFilterMode);
+        d->removeFilterModeButton->setDefaultAction(d->actionRemoveFilter);
 
         d->setSelectThumbnailMode = new QToolButton(d->mouseModesHolder);
         d->setSelectThumbnailMode->setDefaultAction(d->actionSetSelectThumbnailMode);
@@ -840,13 +834,13 @@ void KMapWidget::slotUpdateActionsEnabled()
     // TODO: define an upper limit!
     d->actionIncreaseThumbnailSize->setEnabled(s->showThumbnails);
 
-    d->actionSetSelectionMode->setEnabled(s->availableMouseModes.testFlag(MouseModeRegionSelection));
-    d->actionRemoveCurrentSelection->setEnabled(s->availableMouseModes.testFlag(MouseModeRegionSelection));
+    d->actionSetRegionSelectionMode->setEnabled(s->availableMouseModes.testFlag(MouseModeRegionSelection));
+    d->actionRemoveCurrentRegionSelection->setEnabled(s->availableMouseModes.testFlag(MouseModeRegionSelection));
     d->actionSetPanMode->setEnabled(s->availableMouseModes.testFlag(MouseModePan));
-    d->actionSetZoomMode->setEnabled(s->availableMouseModes.testFlag(MouseModeZoomIntoGroup));
-    d->actionSetFilterDatabaseMode->setEnabled(s->availableMouseModes.testFlag(MouseModeRegionSelectionFromIcon));
-    d->actionSetFilterModelMode->setEnabled(s->availableMouseModes.testFlag(MouseModeFilter));
-    d->actionRemoveFilterMode->setEnabled(s->availableMouseModes.testFlag(MouseModeRegionSelectionFromIcon));
+    d->actionSetZoomIntoGroupMode->setEnabled(s->availableMouseModes.testFlag(MouseModeZoomIntoGroup));
+    d->actionSetRegionSelectionFromIconMode->setEnabled(s->availableMouseModes.testFlag(MouseModeRegionSelectionFromIcon));
+    d->actionSetFilterMode->setEnabled(s->availableMouseModes.testFlag(MouseModeFilter));
+    d->actionRemoveFilter->setEnabled(s->availableMouseModes.testFlag(MouseModeRegionSelectionFromIcon));
     d->actionSetSelectThumbnailMode->setEnabled(s->availableMouseModes.testFlag(MouseModeSelectThumbnail));
 
     d->actionStickyMode->setEnabled(d->availableExtraActions.testFlag(ExtraActionSticky));
@@ -1621,7 +1615,7 @@ void KMapWidget::slotClustersClicked(const QIntList& clusterIndices)
                 );
 
             s->selectionRectangle = newSelection;
-            d->currentBackend->setSelectionRectangle(s->selectionRectangle);
+            d->currentBackend->regionSelectionChanged();
             emit(signalRegionSelectionChanged());
         }
     }
@@ -2074,20 +2068,14 @@ void KMapWidget::setRegionSelection(const GeoCoordinates::Pair& region)
     const bool isValidRegion = region.first.hasCoordinates();
     s->selectionRectangle = region;
 
-    /// @todo We should only notify the backend about a change to the rectangle, because it can access the rectangle via s
-    if (isValidRegion)
-    {
-        d->currentBackend->setSelectionRectangle(region);
-    }
-    else
-    {
-        d->currentBackend->removeSelectionRectangle();
-    }
+    d->currentBackend->regionSelectionChanged();
 }
 
 void KMapWidget::clearRegionSelection()
 {
     s->selectionRectangle.first.clear();
+
+    d->currentBackend->regionSelectionChanged();
 }
 
 void KMapWidget::slotNewSelectionFromMap(const KMap::GeoCoordinates::Pair& sel)
@@ -2097,10 +2085,10 @@ void KMapWidget::slotNewSelectionFromMap(const KMap::GeoCoordinates::Pair& sel)
     emit(signalRegionSelectionChanged());
 }
 
-void KMapWidget::slotRemoveCurrentSelection()
+void KMapWidget::slotRemoveCurrentRegionSelection()
 {
     clearRegionSelection();
-    d->currentBackend->removeSelectionRectangle();
+    d->currentBackend->regionSelectionChanged();
 
     emit(signalRegionSelectionChanged());
 }

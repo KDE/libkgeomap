@@ -1450,21 +1450,8 @@ bool BackendMarble::findSnapPoint(const QPoint& actualPoint, QPoint* const snapP
     return foundSnapPoint;
 }
 
-void BackendMarble::setSelectionRectangle(const GeoCoordinates::Pair& searchCoordinates)
+void BackendMarble::regionSelectionChanged()
 {
-    // no need to store anything, we get it from the shared object
-
-    if (d->marbleWidget && d->activeState)
-    {
-        d->marbleWidget->update();
-    }
-}
-
-void BackendMarble::removeSelectionRectangle()
-{
-    /// @todo the kmapwidget should do that!
-    s->selectionRectangle.first.clear();
-
     if (d->marbleWidget && d->activeState)
     {
         d->marbleWidget->update();
