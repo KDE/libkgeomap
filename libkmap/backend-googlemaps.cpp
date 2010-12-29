@@ -1071,27 +1071,15 @@ void BackendGoogleMaps::removeSelectionRectangle()
     d->htmlWidget->removeSelectionRectangle();
 }
 
-void BackendGoogleMaps::mouseModeChanged(const MouseModes mouseMode)
+void BackendGoogleMaps::mouseModeChanged()
 {
     if (!d->htmlWidget)
     {
         return;
     }
 
-    d->htmlWidget->mouseModeChanged(mouseMode);
-/*
-    if (mouseMode == MouseModeSelection)
-    {
-       // d->htmlWidget->runScript(QLatin1String("selectionModeStatus(true)"));
-        d->htmlWidget->mouseModeChanged(true);
-    }
-    else //MousePan
-    {
-       // d->htmlWidget->runScript(QLatin1String("selectionModeStatus(false)"));
-        d->htmlWidget->mouseModeChanged(false);
-    }
-*/
-
+    /// @todo Does htmlwidget read this value from s->currentMouseMode on its own?
+    d->htmlWidget->mouseModeChanged(s->currentMouseMode);
 }
 
 void BackendGoogleMaps::slotSelectionHasBeenMade(const KMap::GeoCoordinates::Pair& searchCoordinates)

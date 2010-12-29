@@ -259,5 +259,6 @@ public:
 } /* namespace KMap */
 
 Q_DECLARE_METATYPE(KMap::KMapAltitudeLookup)
+Q_DECLARE_METATYPE(KMap::MouseModes)
 
 #endif /* KMAP_PRIMITIVES_H */

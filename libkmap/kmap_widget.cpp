@@ -198,6 +198,7 @@ public:
     KAction*                actionDecreaseThumbnailSize;
     KHBox*                  hBoxForAdditionalControlWidgetItems;
 
+    QActionGroup*           mouseModeActionGroup;
     KAction*                actionRemoveCurrentSelection;
     KAction*                actionSetSelectionMode;
     KAction*                actionSetPanMode;
@@ -206,7 +207,6 @@ public:
     KAction*                actionSetFilterModelMode;
     KAction*                actionRemoveFilterMode;
     KAction*                actionSetSelectThumbnailMode;
-    MouseModes              currentMouseMode;
     QToolButton*            setPanModeButton;
     QToolButton*            setSelectionModeButton;
     QToolButton*            removeCurrentSelectionButton;
@@ -306,39 +306,48 @@ void KMapWidget::createActions()
     d->actionRemoveCurrentSelection->setIcon(SmallIcon( QLatin1String("edit-clear" )));
     d->actionRemoveCurrentSelection->setToolTip(i18n("Remove the current region selection"));
 
-    d->actionSetSelectionMode = new KAction(this);
+    d->mouseModeActionGroup = new QActionGroup(this);
+    d->mouseModeActionGroup->setExclusive(true);
+
+    d->actionSetSelectionMode = new KAction(d->mouseModeActionGroup);
     d->actionSetSelectionMode->setCheckable(true);
     d->actionSetSelectionMode->setIcon(SmallIcon( QLatin1String("select-rectangular" )));
     d->actionSetSelectionMode->setToolTip(i18n("Select images by drawing a rectangle"));
+    d->actionSetSelectionMode->setData(QVariant::fromValue<KMap::MouseModes>(MouseModeSelection));
 
-    d->actionSetPanMode = new KAction(this);
+    d->actionSetPanMode = new KAction(d->mouseModeActionGroup);
     d->actionSetPanMode->setCheckable(true);
     d->actionSetPanMode->setToolTip(i18n("Pan mode"));
     d->actionSetPanMode->setIcon(SmallIcon( QLatin1String("transform-move" )));
     d->actionSetPanMode->setChecked(true);
+    d->actionSetPanMode->setData(QVariant::fromValue<KMap::MouseModes>(MouseModePan));
 
-    d->actionSetZoomMode = new KAction(this);
+    d->actionSetZoomMode = new KAction(d->mouseModeActionGroup);
     d->actionSetZoomMode->setCheckable(true);
     d->actionSetZoomMode->setToolTip(i18n("Zoom into a group"));
     d->actionSetZoomMode->setIcon(SmallIcon( QLatin1String("page-zoom" )));
+    d->actionSetZoomMode->setData(QVariant::fromValue<KMap::MouseModes>(MouseModeZoom));
 
-    d->actionSetFilterDatabaseMode = new KAction(this);
+    d->actionSetFilterDatabaseMode = new KAction(d->mouseModeActionGroup);
     d->actionSetFilterDatabaseMode->setCheckable(true);
     d->actionSetFilterDatabaseMode->setToolTip(i18n("Filter images"));
     d->actionSetFilterDatabaseMode->setIcon(SmallIcon( QLatin1String("view-filter" )));
+    d->actionSetFilterDatabaseMode->setData(QVariant::fromValue<KMap::MouseModes>(MouseModeSelectionFromIcon));
 
-    d->actionSetFilterModelMode = new KAction(i18n("F"), this);
+    d->actionSetFilterModelMode = new KAction(i18n("F"), d->mouseModeActionGroup);
     d->actionSetFilterModelMode->setCheckable(true);
     d->actionSetFilterModelMode->setToolTip(i18n("Filter images inside the region selection"));
+    d->actionSetFilterModelMode->setData(QVariant::fromValue<KMap::MouseModes>(MouseModeFilter));
 
     d->actionRemoveFilterMode = new KAction(this);
     d->actionRemoveFilterMode->setToolTip(i18n("Remove the current filter"));
     d->actionRemoveFilterMode->setIcon(SmallIcon( QLatin1String("window-close" )));
 
-    d->actionSetSelectThumbnailMode = new KAction(this);
+    d->actionSetSelectThumbnailMode = new KAction(d->mouseModeActionGroup);
     d->actionSetSelectThumbnailMode->setCheckable(true);
     d->actionSetSelectThumbnailMode->setToolTip(i18n("Select images"));
     d->actionSetSelectThumbnailMode->setIcon(SmallIcon( QLatin1String("edit-select" )));
+    d->actionSetSelectThumbnailMode->setData(QVariant::fromValue<KMap::MouseModes>(MouseModeSelectThumbnail));
 
     d->actionStickyMode = new KAction(this);
     d->actionStickyMode->setCheckable(true);
@@ -362,26 +371,11 @@ void KMapWidget::createActions()
     connect(d->actionShowNumbersOnItems, SIGNAL(changed()),
             this, SLOT(slotItemDisplaySettingsChanged()));
 
-    connect(d->actionSetSelectionMode, SIGNAL(changed()),
-            this, SLOT(slotSetSelectionMode()));
-
-    connect(d->actionSetPanMode, SIGNAL(changed()),
-            this, SLOT(slotSetPanMode()));
-
-    connect(d->actionSetZoomMode, SIGNAL(changed()),
-            this, SLOT(slotSetZoomMode()));
-
-    connect(d->actionSetFilterDatabaseMode, SIGNAL(changed()),
-            this, SLOT(slotSetFilterDatabaseMode()));
-
-    connect(d->actionSetFilterModelMode, SIGNAL(changed()),
-            this, SLOT(slotSetFilterModelMode()));
+    connect(d->mouseModeActionGroup, SIGNAL(triggered(QAction*)),
+            this, SLOT(slotMouseModeChanged(QAction*)));
 
     connect(d->actionRemoveFilterMode, SIGNAL(triggered()),
             this, SIGNAL(signalRemoveCurrentFilter()));
-
-    connect(d->actionSetSelectThumbnailMode, SIGNAL(changed()),
-            this, SLOT(slotSetSelectThumbnailMode()));
 
     connect(d->actionRemoveCurrentSelection, SIGNAL(triggered()),
             this, SLOT(slotRemoveCurrentSelection()));
@@ -541,7 +535,7 @@ void KMapWidget::applyCacheToBackend()
     setCenter(d->cacheCenterCoordinate);
     // TODO: only do this if the zoom was changed!
     setZoom(d->cacheZoom);
-    d->currentBackend->mouseModeChanged(s->currentMouseMode);
+    d->currentBackend->mouseModeChanged();
     if (s->selectionRectangle.first.hasCoordinates())
     {
         d->currentBackend->setSelectionRectangle(s->selectionRectangle);
@@ -678,6 +672,8 @@ void KMapWidget::readSettingsFromGroup(const KConfigGroup* const group)
 
     d->actionStickyMode->setChecked(group->readEntry("Sticky Mode State", d->actionStickyMode->isChecked()));
     slotUpdateActionsEnabled();
+
+    /// @todo Read the mouse mode
 }
 
 void KMapWidget::rebuildConfigurationMenu()
@@ -2101,145 +2097,6 @@ void KMapWidget::slotNewSelectionFromMap(const KMap::GeoCoordinates::Pair& sel)
     emit(signalRegionSelectionChanged());
 }
 
-void KMapWidget::slotSetPanMode()
-{
-    if (d->actionSetPanMode->isChecked())
-    {
-        s->currentMouseMode = MouseModePan;
-        d->actionSetSelectionMode->setChecked(false);
-        d->actionSetZoomMode->setChecked(false);
-        d->actionSetFilterDatabaseMode->setChecked(false);
-        d->actionSetFilterModelMode->setChecked(false);
-        d->actionSetSelectThumbnailMode->setChecked(false);
-
-        if (d->currentBackend)
-        {
-            d->currentBackend->mouseModeChanged(MouseModePan);
-
-            if (!s->hasRegionSelection())
-            {
-                d->currentBackend->removeSelectionRectangle();
-            }
-        }
-        emit signalMouseModeChanged(MouseModePan);
-    }
-    else
-    {
-        if (s->currentMouseMode == MouseModePan)
-            d->actionSetPanMode->setChecked(true);
-    }
-}
-
-void KMapWidget::slotSetSelectionMode()
-{
-    if (d->actionSetSelectionMode->isChecked())
-    {
-        s->currentMouseMode = MouseModeSelection;
-        d->actionSetPanMode->setChecked(false);
-        d->actionSetZoomMode->setChecked(false);
-        d->actionSetFilterDatabaseMode->setChecked(false);
-        d->actionSetFilterModelMode->setChecked(false);
-        d->actionSetSelectThumbnailMode->setChecked(false);
-
-        d->currentBackend->mouseModeChanged(MouseModeSelection);
-        emit signalMouseModeChanged(MouseModeSelection);
-    }
-    else
-    {
-        if (s->currentMouseMode == MouseModeSelection)
-            d->actionSetSelectionMode->setChecked(true);
-    }
-}
-
-
-void KMapWidget::slotSetZoomMode()
-{
-    if (d->actionSetZoomMode->isChecked())
-    {
-        s->currentMouseMode = MouseModeZoom;
-        d->actionSetPanMode->setChecked(false);
-        d->actionSetSelectionMode->setChecked(false);
-        d->actionSetFilterDatabaseMode->setChecked(false);
-        d->actionSetFilterModelMode->setChecked(false);
-        d->actionSetSelectThumbnailMode->setChecked(false);
-
-        d->currentBackend->mouseModeChanged(MouseModeZoom);
-        emit signalMouseModeChanged(MouseModeZoom);
-    }
-    else
-    {
-        if (s->currentMouseMode == MouseModeZoom)
-            d->actionSetZoomMode->setChecked(true);
-    }
-}
-
-void KMapWidget::slotSetFilterDatabaseMode()
-{
-    if (d->actionSetFilterDatabaseMode->isChecked())
-    {
-        s->currentMouseMode = MouseModeSelectionFromIcon;
-        d->actionSetPanMode->setChecked(false);
-        d->actionSetSelectionMode->setChecked(false);
-        d->actionSetZoomMode->setChecked(false);
-        d->actionSetSelectThumbnailMode->setChecked(false);
-        d->actionSetFilterModelMode->setChecked(false);
-
-        d->currentBackend->mouseModeChanged(MouseModeSelectionFromIcon);
-        emit signalMouseModeChanged(MouseModeSelectionFromIcon);
-    }
-    else
-    {
-        if (s->currentMouseMode == MouseModeSelectionFromIcon)
-        {
-            d->actionSetFilterDatabaseMode->setChecked(true);
-        }
-    }
-}
-
-void KMapWidget::slotSetFilterModelMode()
-{
-    if (d->actionSetFilterModelMode->isChecked())
-    {
-        s->currentMouseMode = MouseModeFilter;
-        d->actionSetPanMode->setChecked(false);
-        d->actionSetSelectionMode->setChecked(false);
-        d->actionSetZoomMode->setChecked(false);
-        d->actionSetSelectThumbnailMode->setChecked(false);
-        d->actionSetFilterDatabaseMode->setChecked(false);
-
-        d->currentBackend->mouseModeChanged(MouseModeFilter);
-        emit signalMouseModeChanged(MouseModeFilter);
-    }
-    else
-    {
-        if (s->currentMouseMode == MouseModeFilter)
-        {
-            d->actionSetFilterModelMode->setChecked(true);
-        }
-    }
-}
-
-void KMapWidget::slotSetSelectThumbnailMode()
-{
-    if (d->actionSetSelectThumbnailMode->isChecked())
-    {
-        s->currentMouseMode = MouseModeSelectThumbnail;
-        d->actionSetPanMode->setChecked(false);
-        d->actionSetSelectionMode->setChecked(false);
-        d->actionSetZoomMode->setChecked(false);
-        d->actionSetFilterDatabaseMode->setChecked(false);
-        d->actionSetFilterModelMode->setChecked(false);
-
-        d->currentBackend->mouseModeChanged(MouseModeSelectThumbnail);
-        emit signalMouseModeChanged(MouseModeSelectThumbnail);
-    }
-    else
-    {
-        if (s->currentMouseMode == MouseModeSelectThumbnail)
-            d->actionSetSelectThumbnailMode->setChecked(true);
-    }
-}
-
 void KMapWidget::slotRemoveCurrentSelection()
 {
     clearRegionSelection();
@@ -2327,14 +2184,6 @@ void KMapWidget::setActive(const bool state)
 {
     const bool oldState = s->activeState;
     s->activeState = state;
-
-    if (state)
-    {
-        if (s->currentMouseMode != MouseModeSelection && !s->hasRegionSelection())
-        {
-            //d->currentBackend->removeSelectionRectangle();
-        }
-    }
 
     if (d->currentBackend)
     {
@@ -2530,6 +2379,30 @@ void KMapWidget::removeMapWidgetFromFrame()
     }
 
     d->stackedLayout->setCurrentIndex(0);
+}
+
+void KMapWidget::slotMouseModeChanged(QAction* triggeredAction)
+{
+    // determine the new mouse mode:
+    const QVariant triggeredActionData = triggeredAction->data();
+    const MouseModes newMouseMode = triggeredActionData.value<KMap::MouseModes>();
+
+    if (newMouseMode==s->currentMouseMode)
+    {
+        return;
+    }
+
+    // store the new mouse mode:
+    s->currentMouseMode = newMouseMode;
+
+    if (d->currentBackend)
+    {
+        d->currentBackend->mouseModeChanged();
+    }
+
+    emit(signalMouseModeChanged(s->currentMouseMode));
+
+    /// @todo Update action availability?
 }
 
 } /* namespace KMap */

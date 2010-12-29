@@ -1471,10 +1471,8 @@ void BackendMarble::removeSelectionRectangle()
     }
 }
 
-void BackendMarble::mouseModeChanged(const MouseModes mouseMode)
+void BackendMarble::mouseModeChanged()
 {
-    // we don't store the mouse mode here, we always read it from the shared object
-
     if (s->currentMouseMode != MouseModeSelection)
     {
         d->firstSelectionPoint.clear();

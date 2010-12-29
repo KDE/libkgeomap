@@ -168,18 +168,6 @@ public Q_SLOTS:
     void slotStickyModeChanged();
     //@}
 
-    /// @name Mouse modes
-    //@{
-    void slotSetPanMode();
-    void slotSetZoomMode();
-    void slotSetFilterDatabaseMode();
-    void slotSetFilterModelMode();
-    void slotSetSelectThumbnailMode();
-    void slotSetSelectionMode();
-    void slotRemoveCurrentSelection();
-    //@}
-
-
 Q_SIGNALS:
 
     void signalAltitudeLookupReady(const KMap::KMapAltitudeLookup::List& altitudes);
@@ -187,7 +175,7 @@ Q_SIGNALS:
     void signalRegionSelectionChanged();
     void signalRemoveCurrentFilter();
     void signalStickyModeChanged();
-    void signalMouseModeChanged(const KMap::MouseMode& currentMouseMode);
+    void signalMouseModeChanged(const KMap::MouseModes& currentMouseMode);
 
 public:
 
@@ -227,6 +215,12 @@ protected Q_SLOTS:
     void slotItemDisplaySettingsChanged();
     void slotUngroupedModelChanged();
     void slotNewSelectionFromMap(const KMap::GeoCoordinates::Pair& sel);
+
+    /// @name Mouse modes
+    //@{
+    void slotMouseModeChanged(QAction* triggeredAction);
+    void slotRemoveCurrentSelection();
+    //@}
 
 private:
 
