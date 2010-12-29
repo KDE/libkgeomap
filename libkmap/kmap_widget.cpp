@@ -376,12 +376,9 @@ void KMapWidget::createActions()
 
     connect(d->actionSetFilterModelMode, SIGNAL(changed()),
             this, SLOT(slotSetFilterModelMode()));
-/*
+
     connect(d->actionRemoveFilterMode, SIGNAL(triggered()),
             this, SIGNAL(signalRemoveCurrentFilter()));
-*/
-    connect(d->actionRemoveFilterMode, SIGNAL(triggered()),
-            this, SLOT(slotRemoveCurrentFilter()));
 
     connect(d->actionSetSelectThumbnailMode, SIGNAL(changed()),
             this, SLOT(slotSetSelectThumbnailMode()));
@@ -1620,7 +1617,6 @@ void KMapWidget::slotClustersClicked(const QIntList& clusterIndices)
         }
         else
         {
-            s->modelBasedFilter = false;
             const GeoCoordinates::Pair newSelection(
                     GeoCoordinates(latLonBox.north(Marble::GeoDataCoordinates::Degree),
                                 latLonBox.west(Marble::GeoDataCoordinates::Degree)),
@@ -1650,11 +1646,12 @@ void KMapWidget::slotClustersClicked(const QIntList& clusterIndices)
             }
             if (s->currentMouseMode == MouseModeFilter)
             {
-                s->modelBasedFilter = true;
                 s->markerModel->onIndicesClicked(tileIndices, currentCluster.groupState, MouseModeFilter);
             }
             else
+            {
                 s->markerModel->onIndicesClicked(tileIndices, currentCluster.groupState, MouseModeSelectThumbnail);
+            }
         }
     }
 }
@@ -2249,19 +2246,6 @@ void KMapWidget::slotRemoveCurrentSelection()
     d->currentBackend->removeSelectionRectangle();
 
     emit(signalRegionSelectionChanged());
-}
-
-void KMapWidget::slotRemoveCurrentFilter()
-{
-    if (s->modelBasedFilter)
-    {
-         emit signalRemoveCurrentFilter();
-         s->modelBasedFilter = false;
-    }
-    else
-    {
-         slotRemoveCurrentSelection();
-    }
 }
 
 void KMapWidget::slotUngroupedModelChanged()

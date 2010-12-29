@@ -177,7 +177,6 @@ public Q_SLOTS:
     void slotSetSelectThumbnailMode();
     void slotSetSelectionMode();
     void slotRemoveCurrentSelection();
-    void slotRemoveCurrentFilter();
     //@}
 
 

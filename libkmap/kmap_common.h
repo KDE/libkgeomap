@@ -189,8 +189,7 @@ public:
           currentMouseMode(0),
           availableMouseModes(0),
           visibleMouseModes(0),
-          activeState(false),
-          modelBasedFilter(false)
+          activeState(false)
     {
     }
 
@@ -220,7 +219,6 @@ public:
     MouseModes                availableMouseModes;
     MouseModes                visibleMouseModes;
     bool                      activeState;
-    bool                      modelBasedFilter;
     //@}
 
     /// @todo De-inline?
