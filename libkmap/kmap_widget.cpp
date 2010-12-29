@@ -313,7 +313,7 @@ void KMapWidget::createActions()
     d->actionSetSelectionMode->setCheckable(true);
     d->actionSetSelectionMode->setIcon(SmallIcon( QLatin1String("select-rectangular" )));
     d->actionSetSelectionMode->setToolTip(i18n("Select images by drawing a rectangle"));
-    d->actionSetSelectionMode->setData(QVariant::fromValue<KMap::MouseModes>(MouseModeSelection));
+    d->actionSetSelectionMode->setData(QVariant::fromValue<KMap::MouseModes>(MouseModeRegionSelection));
 
     d->actionSetPanMode = new KAction(d->mouseModeActionGroup);
     d->actionSetPanMode->setCheckable(true);
@@ -326,13 +326,13 @@ void KMapWidget::createActions()
     d->actionSetZoomMode->setCheckable(true);
     d->actionSetZoomMode->setToolTip(i18n("Zoom into a group"));
     d->actionSetZoomMode->setIcon(SmallIcon( QLatin1String("page-zoom" )));
-    d->actionSetZoomMode->setData(QVariant::fromValue<KMap::MouseModes>(MouseModeZoom));
+    d->actionSetZoomMode->setData(QVariant::fromValue<KMap::MouseModes>(MouseModeZoomIntoGroup));
 
     d->actionSetFilterDatabaseMode = new KAction(d->mouseModeActionGroup);
     d->actionSetFilterDatabaseMode->setCheckable(true);
     d->actionSetFilterDatabaseMode->setToolTip(i18n("Filter images"));
     d->actionSetFilterDatabaseMode->setIcon(SmallIcon( QLatin1String("view-filter" )));
-    d->actionSetFilterDatabaseMode->setData(QVariant::fromValue<KMap::MouseModes>(MouseModeSelectionFromIcon));
+    d->actionSetFilterDatabaseMode->setData(QVariant::fromValue<KMap::MouseModes>(MouseModeRegionSelectionFromIcon));
 
     d->actionSetFilterModelMode = new KAction(i18n("F"), d->mouseModeActionGroup);
     d->actionSetFilterModelMode->setCheckable(true);
@@ -840,13 +840,13 @@ void KMapWidget::slotUpdateActionsEnabled()
     // TODO: define an upper limit!
     d->actionIncreaseThumbnailSize->setEnabled(s->showThumbnails);
 
-    d->actionSetSelectionMode->setEnabled(s->availableMouseModes.testFlag(MouseModeSelection));
-    d->actionRemoveCurrentSelection->setEnabled(s->availableMouseModes.testFlag(MouseModeSelection));
+    d->actionSetSelectionMode->setEnabled(s->availableMouseModes.testFlag(MouseModeRegionSelection));
+    d->actionRemoveCurrentSelection->setEnabled(s->availableMouseModes.testFlag(MouseModeRegionSelection));
     d->actionSetPanMode->setEnabled(s->availableMouseModes.testFlag(MouseModePan));
-    d->actionSetZoomMode->setEnabled(s->availableMouseModes.testFlag(MouseModeZoom));
-    d->actionSetFilterDatabaseMode->setEnabled(s->availableMouseModes.testFlag(MouseModeSelectionFromIcon));
+    d->actionSetZoomMode->setEnabled(s->availableMouseModes.testFlag(MouseModeZoomIntoGroup));
+    d->actionSetFilterDatabaseMode->setEnabled(s->availableMouseModes.testFlag(MouseModeRegionSelectionFromIcon));
     d->actionSetFilterModelMode->setEnabled(s->availableMouseModes.testFlag(MouseModeFilter));
-    d->actionRemoveFilterMode->setEnabled(s->availableMouseModes.testFlag(MouseModeSelectionFromIcon));
+    d->actionRemoveFilterMode->setEnabled(s->availableMouseModes.testFlag(MouseModeRegionSelectionFromIcon));
     d->actionSetSelectThumbnailMode->setEnabled(s->availableMouseModes.testFlag(MouseModeSelectThumbnail));
 
     d->actionStickyMode->setEnabled(d->availableExtraActions.testFlag(ExtraActionSticky));
@@ -1551,7 +1551,7 @@ void KMapWidget::slotClustersClicked(const QIntList& clusterIndices)
 
     int maxTileLevel = 0;
 
-    if ((s->currentMouseMode == MouseModeZoom) || (s->currentMouseMode == MouseModeSelectionFromIcon)) // && !s->selectionRectangle.first.hasCoordinates()))
+    if ((s->currentMouseMode == MouseModeZoomIntoGroup) || (s->currentMouseMode == MouseModeRegionSelectionFromIcon)) // && !s->selectionRectangle.first.hasCoordinates()))
     {
         Marble::GeoDataLineString tileString;
 
@@ -1607,7 +1607,7 @@ void KMapWidget::slotClustersClicked(const QIntList& clusterIndices)
             latLonBox.setEast((latLonBox.east(Marble::GeoDataCoordinates::Degree)+0.0001), Marble::GeoDataCoordinates::Degree);
             latLonBox.setSouth((latLonBox.south(Marble::GeoDataCoordinates::Degree)-0.0001), Marble::GeoDataCoordinates::Degree);
       //  }
-        if (s->currentMouseMode == MouseModeZoom)
+        if (s->currentMouseMode == MouseModeZoomIntoGroup)
         {
             d->currentBackend->centerOn(latLonBox);
         }
@@ -2232,13 +2232,13 @@ void KMapWidget::setVisibleMouseModes(const MouseModes mouseModes)
     {
         d->mouseModesHolder->setVisible(s->visibleMouseModes);
 
-        d->setSelectionModeButton->setVisible(s->visibleMouseModes.testFlag(MouseModeSelection));
-        d->removeCurrentSelectionButton->setVisible(s->visibleMouseModes.testFlag(MouseModeSelection));
+        d->setSelectionModeButton->setVisible(s->visibleMouseModes.testFlag(MouseModeRegionSelection));
+        d->removeCurrentSelectionButton->setVisible(s->visibleMouseModes.testFlag(MouseModeRegionSelection));
         d->setPanModeButton->setVisible(s->visibleMouseModes.testFlag(MouseModePan));
-        d->setZoomModeButton->setVisible(s->visibleMouseModes.testFlag(MouseModeZoom));
-        d->setFilterDatabaseModeButton->setVisible(s->visibleMouseModes.testFlag(MouseModeSelectionFromIcon));
+        d->setZoomModeButton->setVisible(s->visibleMouseModes.testFlag(MouseModeZoomIntoGroup));
+        d->setFilterDatabaseModeButton->setVisible(s->visibleMouseModes.testFlag(MouseModeRegionSelectionFromIcon));
         d->setFilterModelModeButton->setVisible(s->visibleMouseModes.testFlag(MouseModeFilter));
-        d->removeFilterModeButton->setVisible(s->visibleMouseModes.testFlag(MouseModeSelectionFromIcon));
+        d->removeFilterModeButton->setVisible(s->visibleMouseModes.testFlag(MouseModeRegionSelectionFromIcon));
         d->setSelectThumbnailMode->setVisible(s->visibleMouseModes.testFlag(MouseModeSelectThumbnail));
     }
 }

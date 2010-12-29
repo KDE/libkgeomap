@@ -1018,7 +1018,7 @@ bool BackendMarble::eventFilter(QObject *object, QEvent *event)
     QMouseEvent* const mouseEvent = static_cast<QMouseEvent*>(event);
     bool doFilterEvent = false;
 
-    if (s->currentMouseMode == MouseModeSelection)
+    if (s->currentMouseMode == MouseModeRegionSelection)
     {
         if (   ( event->type() == QEvent::MouseButtonPress )
             && ( mouseEvent->button()==Qt::LeftButton ) )
@@ -1473,7 +1473,7 @@ void BackendMarble::removeSelectionRectangle()
 
 void BackendMarble::mouseModeChanged()
 {
-    if (s->currentMouseMode != MouseModeSelection)
+    if (s->currentMouseMode != MouseModeRegionSelection)
     {
         d->firstSelectionPoint.clear();
         d->intermediateSelectionPoint.clear();

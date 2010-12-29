@@ -125,7 +125,7 @@ void HTMLWidget::khtmlMousePressEvent(khtml::MousePressEvent* e)
 
 void HTMLWidget::khtmlMouseReleaseEvent(khtml::MouseReleaseEvent* e)
 {
-    if (s->currentMouseMode == MouseModeSelection)
+    if (s->currentMouseMode == MouseModeRegionSelection)
     {
         if (!d->firstSelectionPoint.hasCoordinates())
         {
@@ -195,7 +195,7 @@ void HTMLWidget::khtmlMouseReleaseEvent(khtml::MouseReleaseEvent* e)
 
 void HTMLWidget::khtmlMouseMoveEvent(khtml::MouseMoveEvent *e)
 {
-    if (   s->currentMouseMode == MouseModeSelection
+    if (   s->currentMouseMode == MouseModeRegionSelection
         && d->firstSelectionPoint.hasCoordinates() )
     {
         runScript2Coordinates( QString::fromLatin1("wmwPixelToLatLng(%1, %2);")
@@ -325,7 +325,7 @@ void HTMLWidget::removeSelectionRectangle()
 
 void HTMLWidget::mouseModeChanged(const MouseModes mouseMode)
 {
-    const bool inSelectionMode = (mouseMode == MouseModeSelection);
+    const bool inSelectionMode = (mouseMode == MouseModeRegionSelection);
 
     if (inSelectionMode)
     {
