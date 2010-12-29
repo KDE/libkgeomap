@@ -304,22 +304,22 @@ void KMapWidget::createActions()
     d->actionRemoveCurrentSelection = new KAction(this);
     //d->actionRemoveCurrentSelection->setEnabled(false);
     d->actionRemoveCurrentSelection->setIcon(SmallIcon( QLatin1String("edit-clear" )));
-    d->actionRemoveCurrentSelection->setToolTip(i18n("Removes the current region selection."));
+    d->actionRemoveCurrentSelection->setToolTip(i18n("Remove the current region selection"));
 
     d->actionSetSelectionMode = new KAction(this);
     d->actionSetSelectionMode->setCheckable(true);
     d->actionSetSelectionMode->setIcon(SmallIcon( QLatin1String("select-rectangular" )));
-    d->actionSetSelectionMode->setToolTip(i18n("Select images by drawing a rectangle."));
+    d->actionSetSelectionMode->setToolTip(i18n("Select images by drawing a rectangle"));
 
     d->actionSetPanMode = new KAction(this);
     d->actionSetPanMode->setCheckable(true);
-    d->actionSetPanMode->setToolTip(i18n("Pan mode."));
+    d->actionSetPanMode->setToolTip(i18n("Pan mode"));
     d->actionSetPanMode->setIcon(SmallIcon( QLatin1String("transform-move" )));
     d->actionSetPanMode->setChecked(true);
 
     d->actionSetZoomMode = new KAction(this);
     d->actionSetZoomMode->setCheckable(true);
-    d->actionSetZoomMode->setToolTip(i18n("Zoom into a group."));
+    d->actionSetZoomMode->setToolTip(i18n("Zoom into a group"));
     d->actionSetZoomMode->setIcon(SmallIcon( QLatin1String("page-zoom" )));
 
     d->actionSetFilterDatabaseMode = new KAction(this);
@@ -329,7 +329,7 @@ void KMapWidget::createActions()
 
     d->actionSetFilterModelMode = new KAction(i18n("F"), this);
     d->actionSetFilterModelMode->setCheckable(true);
-    d->actionSetFilterModelMode->setToolTip(i18n("Filter images inside selection"));
+    d->actionSetFilterModelMode->setToolTip(i18n("Filter images inside the region selection"));
 
     d->actionRemoveFilterMode = new KAction(this);
     d->actionRemoveFilterMode->setToolTip(i18n("Remove the current filter"));
@@ -343,6 +343,7 @@ void KMapWidget::createActions()
     d->actionStickyMode = new KAction(this);
     d->actionStickyMode->setCheckable(true);
     d->actionStickyMode->setToolTip(i18n("Lock the map position"));
+
     connect(d->actionStickyMode, SIGNAL(triggered(const bool)),
             this, SLOT(slotStickyModeChanged()));
 
