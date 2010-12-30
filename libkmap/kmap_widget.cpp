@@ -705,6 +705,8 @@ void KMapWidget::rebuildConfigurationMenu()
         d->configurationMenu->addAction(d->actionPreviewGroupedItems);
         d->configurationMenu->addAction(d->actionShowNumbersOnItems);
     }
+
+    slotUpdateActionsEnabled();
 }
 
 KAction* KMapWidget::getControlAction(const QString& actionName)
@@ -2197,7 +2199,7 @@ void KMapWidget::setActive(const bool state)
             }
         }
     }
-    
+
     if (state && !oldState && d->clustersDirty)
     {
         slotRequestLazyReclustering();
