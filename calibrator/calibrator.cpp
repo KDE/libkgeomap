@@ -157,7 +157,7 @@ Calibrator::Calibrator()
 
     d->sbLevel = new QSpinBox(this);
     d->sbLevel->setMinimum(1);
-    d->sbLevel->setMaximum(KMap::AbstractMarkerTiler::TileIndex::MaxLevel);
+    d->sbLevel->setMaximum(KMap::TileIndex::MaxLevel);
     QLabel* const labelsbLevel = new QLabel(i18n("Level:"), this);
     labelsbLevel->setBuddy(d->sbLevel);
 
@@ -248,7 +248,7 @@ void Calibrator::updateMarkers()
     d->model->clear();
 
     const int newLevel = d->sbLevel->value();
-    const int Tiling = KMap::AbstractMarkerTiler::TileIndex::Tiling;
+    const int Tiling = KMap::TileIndex::Tiling;
 
     // add markers in all four corners and in the middle of the edges:
     typedef QPair<int, int> QIntPair;
@@ -288,7 +288,7 @@ void Calibrator::updateMarkers()
         const int level0Index = currentPair.first;
         const int followingIndex = currentPair.second;
 
-        KMap::AbstractMarkerTiler::TileIndex markerIndex;
+        KMap::TileIndex markerIndex;
         markerIndex.appendLinearIndex(level0Index);
 
         for (int level = 1; level < newLevel-2; level++)
@@ -306,12 +306,12 @@ void Calibrator::updateMarkers()
                     const int newLinIndex = followingIndex + i + j*Tiling;
                     if ((newLinIndex>=0)&&(newLinIndex<Tiling*Tiling))
                     {
-                        KMap::AbstractMarkerTiler::TileIndex newIndex = markerIndex;
+                        KMap::TileIndex newIndex = markerIndex;
                         newIndex.appendLinearIndex(newLinIndex);
                         addMarkerAt(newIndex.toCoordinates());
 //                         for (int corner = 1; corner<=4; ++corner)
 //                         {
-//                             addMarkerAt(newIndex.toCoordinates(KMap::AbstractMarkerTiler::TileIndex::CornerPosition(corner)));
+//                             addMarkerAt(newIndex.toCoordinates(KMap::TileIndex::CornerPosition(corner)));
 //                         }
                     }
                 }

@@ -868,10 +868,10 @@ int BackendGoogleMaps::getMarkerModelLevel()
     else if (currentZoom==22) { tileLevel = 9; }
     else
     {
-        tileLevel = AbstractMarkerTiler::TileIndex::MaxLevel-1;
+        tileLevel = TileIndex::MaxLevel-1;
     }
 
-    KMAP_ASSERT(tileLevel <= AbstractMarkerTiler::TileIndex::MaxLevel-1);
+    KMAP_ASSERT(tileLevel <= TileIndex::MaxLevel-1);
 
     return tileLevel;
 }

@@ -108,7 +108,7 @@ void ItemMarkerTiler::setMarkerModelHelper(ModelHelper* const modelHelper)
     setDirty();
 }
 
-QVariant ItemMarkerTiler::getTileRepresentativeMarker(const AbstractMarkerTiler::TileIndex& tileIndex, const int sortKey)
+QVariant ItemMarkerTiler::getTileRepresentativeMarker(const TileIndex& tileIndex, const int sortKey)
 {
     const QList<QPersistentModelIndex> modelIndices = getTileMarkerIndices(tileIndex);
     if (modelIndices.isEmpty())
@@ -324,7 +324,7 @@ void ItemMarkerTiler::removeMarkerIndexFromGrid(const QModelIndex& markerIndex, 
     }
 }
 
-int ItemMarkerTiler::getTileMarkerCount(const AbstractMarkerTiler::TileIndex& tileIndex)
+int ItemMarkerTiler::getTileMarkerCount(const TileIndex& tileIndex)
 {
     if (isDirty())
     {
@@ -343,7 +343,7 @@ int ItemMarkerTiler::getTileMarkerCount(const AbstractMarkerTiler::TileIndex& ti
     return myTile->markerIndices.count();
 }
 
-int ItemMarkerTiler::getTileSelectedCount(const AbstractMarkerTiler::TileIndex& tileIndex)
+int ItemMarkerTiler::getTileSelectedCount(const TileIndex& tileIndex)
 {
     if (isDirty())
     {
@@ -362,7 +362,7 @@ int ItemMarkerTiler::getTileSelectedCount(const AbstractMarkerTiler::TileIndex& 
     return myTile->selectedCount;
 }
 
-KMapGroupState ItemMarkerTiler::getTileGroupState(const AbstractMarkerTiler::TileIndex& tileIndex)
+KMapGroupState ItemMarkerTiler::getTileGroupState(const TileIndex& tileIndex)
 {
     if (isDirty())
     {
@@ -391,7 +391,7 @@ KMapGroupState ItemMarkerTiler::getTileGroupState(const AbstractMarkerTiler::Til
     return KMapSelectedSome;
 }
 
-AbstractMarkerTiler::Tile* ItemMarkerTiler::getTile(const AbstractMarkerTiler::TileIndex& tileIndex, const bool stopIfEmpty)
+AbstractMarkerTiler::Tile* ItemMarkerTiler::getTile(const TileIndex& tileIndex, const bool stopIfEmpty)
 {
     if (isDirty())
     {
@@ -463,7 +463,7 @@ AbstractMarkerTiler::Tile* ItemMarkerTiler::getTile(const AbstractMarkerTiler::T
     return tile;
 }
 
-QList<QPersistentModelIndex> ItemMarkerTiler::getTileMarkerIndices(const AbstractMarkerTiler::TileIndex& tileIndex)
+QList<QPersistentModelIndex> ItemMarkerTiler::getTileMarkerIndices(const TileIndex& tileIndex)
 {
     if (isDirty())
     {
@@ -571,7 +571,7 @@ void ItemMarkerTiler::onIndicesClicked(const TileIndex::List& tileIndicesList, c
     QList<QPersistentModelIndex> clickedMarkers;
     for (int i=0; i<tileIndicesList.count(); ++i)
     {
-        const AbstractMarkerTiler::TileIndex tileIndex = tileIndicesList.at(i);
+        const TileIndex tileIndex = tileIndicesList.at(i);
 
         clickedMarkers << getTileMarkerIndices(tileIndex);
     }
@@ -620,7 +620,7 @@ void ItemMarkerTiler::onIndicesMoved(const TileIndex::List& tileIndicesList, con
         // only the tiles in tileIndicesList were moved
         for (int i=0; i<tileIndicesList.count(); ++i)
         {
-            const AbstractMarkerTiler::TileIndex tileIndex = tileIndicesList.at(i);
+            const TileIndex tileIndex = tileIndicesList.at(i);
 
             movedMarkers << getTileMarkerIndices(tileIndex);
         }

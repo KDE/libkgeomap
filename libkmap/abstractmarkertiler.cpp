@@ -85,11 +85,11 @@ public:
     AbstractMarkerTiler*                                                          model;
     int                                                                           level;
 
-    QList<QPair<AbstractMarkerTiler::TileIndex, AbstractMarkerTiler::TileIndex> > boundsList;
+    QList<QPair<TileIndex, TileIndex> > boundsList;
 
-    AbstractMarkerTiler::TileIndex                                                startIndex;
-    AbstractMarkerTiler::TileIndex                                                endIndex;
-    AbstractMarkerTiler::TileIndex                                                currentIndex;
+    TileIndex                                                startIndex;
+    TileIndex                                                endIndex;
+    TileIndex                                                currentIndex;
 
     bool                                                                          atEnd;
     bool                                                                          atStartOfLevel;
@@ -184,7 +184,7 @@ bool AbstractMarkerTiler::NonEmptyIterator::initializeNextBounds()
     return d->atEnd;
 }
 
-AbstractMarkerTiler::TileIndex AbstractMarkerTiler::NonEmptyIterator::nextIndex()
+TileIndex AbstractMarkerTiler::NonEmptyIterator::nextIndex()
 {
     if (d->atEnd)
     {
@@ -366,7 +366,7 @@ AbstractMarkerTiler::TileIndex AbstractMarkerTiler::NonEmptyIterator::nextIndex(
     }
 }
 
-AbstractMarkerTiler::TileIndex AbstractMarkerTiler::NonEmptyIterator::currentIndex() const
+TileIndex AbstractMarkerTiler::NonEmptyIterator::currentIndex() const
 {
     return d->currentIndex;
 }
@@ -381,7 +381,7 @@ AbstractMarkerTiler* AbstractMarkerTiler::NonEmptyIterator::model() const
     return d->model;
 }
 
-AbstractMarkerTiler::TileIndex AbstractMarkerTiler::TileIndex::fromCoordinates(const KMap::GeoCoordinates& coordinate,
+TileIndex TileIndex::fromCoordinates(const KMap::GeoCoordinates& coordinate,
                                                                                const int getLevel)
 {
     KMAP_ASSERT(getLevel<=MaxLevel);
@@ -447,7 +447,7 @@ AbstractMarkerTiler::TileIndex AbstractMarkerTiler::TileIndex::fromCoordinates(c
     return resultIndex;
 }
 
-GeoCoordinates AbstractMarkerTiler::TileIndex::toCoordinates() const
+GeoCoordinates TileIndex::toCoordinates() const
 {
     // TODO: safeguards against rounding errors!
     qreal tileLatBL     = -90.0;
@@ -478,7 +478,7 @@ GeoCoordinates AbstractMarkerTiler::TileIndex::toCoordinates() const
 }
 
 
-GeoCoordinates AbstractMarkerTiler::TileIndex::toCoordinates(const CornerPosition ofCorner) const
+GeoCoordinates TileIndex::toCoordinates(const CornerPosition ofCorner) const
 {
     // TODO: safeguards against rounding errors!
     qreal tileLatBL     = -90.0;

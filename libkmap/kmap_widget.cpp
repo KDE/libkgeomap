@@ -923,9 +923,9 @@ void KMapWidget::updateClusters()
     const QSize mapSize  = d->currentBackend->mapSize();
     const int gridWidth  = mapSize.width();
     const int gridHeight = mapSize.height();
-    QVector<QList<AbstractMarkerTiler::TileIndex> > pixelNonEmptyTileIndexGrid(gridWidth*gridHeight, QList<AbstractMarkerTiler::TileIndex>());
+    QVector<QList<TileIndex> > pixelNonEmptyTileIndexGrid(gridWidth*gridHeight, QList<TileIndex>());
     QVector<int> pixelCountGrid(gridWidth*gridHeight, 0);
-    QList<QPair<QPoint, QPair<int, QList<AbstractMarkerTiler::TileIndex> > > > leftOverList;
+    QList<QPair<QPoint, QPair<int, QList<TileIndex> > > > leftOverList;
 
     // TODO: iterate only over the visible part of the map
     int debugCountNonEmptyTiles = 0;
@@ -937,7 +937,7 @@ void KMapWidget::updateClusters()
 
     for (AbstractMarkerTiler::NonEmptyIterator tileIterator(s->markerModel, markerLevel, mapBounds); !tileIterator.atEnd(); tileIterator.nextIndex())
     {
-        const AbstractMarkerTiler::TileIndex tileIndex = tileIterator.currentIndex();
+        const TileIndex tileIndex = tileIterator.currentIndex();
 
         // find out where the tile is on the map:
         const GeoCoordinates tileCoordinate = tileIndex.toCoordinates();
@@ -1022,7 +1022,7 @@ void KMapWidget::updateClusters()
                 if (tooClose)
                 {
                     // move markers into leftover list
-                    leftOverList << QPair<QPoint, QPair<int, QList<AbstractMarkerTiler::TileIndex> > >(QPoint(x,y), QPair<int, QList<AbstractMarkerTiler::TileIndex> >(pixelCountGrid.at(index), pixelNonEmptyTileIndexGrid.at(index)));
+                    leftOverList << QPair<QPoint, QPair<int, QList<TileIndex> > >(QPoint(x,y), QPair<int, QList<TileIndex> >(pixelCountGrid.at(index), pixelNonEmptyTileIndexGrid.at(index)));
                     pixelCountGrid[index] = 0;
                     pixelNonEmptyTileIndexGrid[index].clear();
                     nonEmptyPixelIndices[pixelGridMetaIndex] = -1;
@@ -1044,7 +1044,7 @@ void KMapWidget::updateClusters()
         KMapCluster cluster;
         cluster.coordinates = clusterCoordinates;
         cluster.pixelPos = QPoint(markerX, markerY);
-        cluster.tileIndicesList = AbstractMarkerTiler::TileIndex::listToIntListList(pixelNonEmptyTileIndexGrid.at(markerX+markerY*gridWidth));
+        cluster.tileIndicesList = pixelNonEmptyTileIndexGrid.at(markerX+markerY*gridWidth);
         cluster.markerCount = pixelCountGrid.at(markerX+markerY*gridWidth);
 
         // mark the pixel as done:
@@ -1066,7 +1066,7 @@ void KMapWidget::updateClusters()
             for (int indexY = yStart; indexY <= yEnd; ++indexY)
             {
                 const int index = indexX + indexY*gridWidth;
-                cluster.tileIndicesList << AbstractMarkerTiler::TileIndex::listToIntListList(pixelNonEmptyTileIndexGrid.at(index));
+                cluster.tileIndicesList << pixelNonEmptyTileIndexGrid.at(index);
                 pixelNonEmptyTileIndexGrid[index].clear();
                 cluster.markerCount+= pixelCountGrid.at(index);
                 pixelCountGrid[index] = 0;
@@ -1079,7 +1079,7 @@ void KMapWidget::updateClusters()
     }
 
     // now move all leftover markers into clusters:
-    for (QList<QPair<QPoint, QPair<int, QList<AbstractMarkerTiler::TileIndex> > > >::const_iterator it = leftOverList.constBegin();
+    for (QList<QPair<QPoint, QPair<int, QList<TileIndex> > > >::const_iterator it = leftOverList.constBegin();
          it!=leftOverList.constEnd(); ++it)
     {
         const QPoint markerPosition = it->first;
@@ -1100,7 +1100,7 @@ void KMapWidget::updateClusters()
         if (closestIndex>=0)
         {
             s->clusterList[closestIndex].markerCount+= it->second.first;
-            s->clusterList[closestIndex].tileIndicesList << AbstractMarkerTiler::TileIndex::listToIntListList(it->second.second);
+            s->clusterList[closestIndex].tileIndicesList << it->second.second;
         }
     }
 
@@ -1115,8 +1115,7 @@ void KMapWidget::updateClusters()
                 (iTile<cluster.tileIndicesList.count());
                 ++iTile)
         {
-            const AbstractMarkerTiler::TileIndex tileIndex =
-                AbstractMarkerTiler::TileIndex::fromIntList(cluster.tileIndicesList.at(iTile));
+            const TileIndex tileIndex = cluster.tileIndicesList.at(iTile);
 
             const KMapGroupState tileGroupState = s->markerModel->getTileGroupState(tileIndex);
             clusterStateComputer.addState(tileGroupState);
@@ -1384,14 +1383,14 @@ void KMapWidget::slotClustersMoved(const QIntList& clusterIndices, const QPair<i
     int clusterIndex = clusterIndices.first();
     GeoCoordinates targetCoordinates = s->clusterList.at(clusterIndex).coordinates;
 
-    AbstractMarkerTiler::TileIndex::List movedTileIndices;
+    TileIndex::List movedTileIndices;
     if (s->clusterList.at(clusterIndex).groupState==KMapSelectedNone)
     {
         // a not-selected marker was moved. update all of its items:
         const KMapCluster& cluster = s->clusterList.at(clusterIndex);
         for (int i=0; i<cluster.tileIndicesList.count(); ++i)
         {
-            const AbstractMarkerTiler::TileIndex tileIndex = AbstractMarkerTiler::TileIndex::fromIntList(cluster.tileIndicesList.at(i));
+            const TileIndex tileIndex = cluster.tileIndicesList.at(i);
 
             movedTileIndices <<tileIndex;
         }
@@ -1556,20 +1555,19 @@ void KMapWidget::slotClustersClicked(const QIntList& clusterIndices)
 
             for (int j=0; j<currentCluster.tileIndicesList.count(); ++j)
             {
-                const AbstractMarkerTiler::TileIndex& currentTileIndex =
-                    AbstractMarkerTiler::TileIndex::fromIntList(currentCluster.tileIndicesList.at(j));
+                const TileIndex& currentTileIndex = currentCluster.tileIndicesList.at(j);
                 for (int corner=1; corner<=4; ++corner)
                 {
                     GeoCoordinates currentTileCoordinate;
 
                     if (corner == 1)
-                        currentTileCoordinate = currentTileIndex.toCoordinates(AbstractMarkerTiler::TileIndex::CornerNW);
+                        currentTileCoordinate = currentTileIndex.toCoordinates(TileIndex::CornerNW);
                     else if (corner == 2)
-                        currentTileCoordinate = currentTileIndex.toCoordinates(AbstractMarkerTiler::TileIndex::CornerSW);
+                        currentTileCoordinate = currentTileIndex.toCoordinates(TileIndex::CornerSW);
                     else if (corner == 3)
-                        currentTileCoordinate = currentTileIndex.toCoordinates(AbstractMarkerTiler::TileIndex::CornerNE);
+                        currentTileCoordinate = currentTileIndex.toCoordinates(TileIndex::CornerNE);
                     else if (corner == 4)
-                        currentTileCoordinate = currentTileIndex.toCoordinates(AbstractMarkerTiler::TileIndex::CornerSE);
+                        currentTileCoordinate = currentTileIndex.toCoordinates(TileIndex::CornerSE);
 
                     const Marble::GeoDataCoordinates tileCoordinate(currentTileCoordinate.lon(),
                                                                     currentTileCoordinate.lat(),
@@ -1628,10 +1626,10 @@ void KMapWidget::slotClustersClicked(const QIntList& clusterIndices)
             const KMapCluster currentCluster = s->clusterList.at(clusterIndex);
 
             /// @todo use a consistent format for tile indices
-            AbstractMarkerTiler::TileIndex::List tileIndices;
+            TileIndex::List tileIndices;
             for (int j=0; j<currentCluster.tileIndicesList.count(); ++j)
             {
-                const AbstractMarkerTiler::TileIndex& currentTileIndex = AbstractMarkerTiler::TileIndex::fromIntList(currentCluster.tileIndicesList.at(j));
+                const TileIndex& currentTileIndex = currentCluster.tileIndicesList.at(j);
                 tileIndices << currentTileIndex;
             }
             if (s->currentMouseMode == MouseModeFilter)
@@ -1728,7 +1726,7 @@ QVariant KMapWidget::getClusterRepresentativeMarker(const int clusterIndex, cons
     QList<QVariant> repIndices;
     for (int i=0; i<cluster.tileIndicesList.count(); ++i)
     {
-        repIndices <<  s->markerModel->getTileRepresentativeMarker(AbstractMarkerTiler::TileIndex::fromIntList(cluster.tileIndicesList.at(i)), sortKey);
+        repIndices <<  s->markerModel->getTileRepresentativeMarker(cluster.tileIndicesList.at(i), sortKey);
     }
 
     const QVariant clusterRepresentative = s->markerModel->bestRepresentativeIndexFromList(repIndices, sortKey);
@@ -2065,7 +2063,6 @@ int KMapWidget::getUndecoratedThumbnailSize() const
 
 void KMapWidget::setRegionSelection(const GeoCoordinates::Pair& region)
 {
-    const bool isValidRegion = region.first.hasCoordinates();
     s->selectionRectangle = region;
 
     d->currentBackend->regionSelectionChanged();
@@ -2296,9 +2293,9 @@ void KMapWidget::adjustBoundariesToGroupedMarkers(const bool useSaneZoomLevel)
     Marble::GeoDataLineString tileString;
 
     // TODO: not sure that this is the best way to find the bounding box of all items
-    for (AbstractMarkerTiler::NonEmptyIterator tileIterator(s->markerModel, AbstractMarkerTiler::TileIndex::MaxLevel); !tileIterator.atEnd(); tileIterator.nextIndex())
+    for (AbstractMarkerTiler::NonEmptyIterator tileIterator(s->markerModel, TileIndex::MaxLevel); !tileIterator.atEnd(); tileIterator.nextIndex())
     {
-        const AbstractMarkerTiler::TileIndex tileIndex = tileIterator.currentIndex();
+        const TileIndex tileIndex = tileIterator.currentIndex();
         for(int corner=1; corner<=4; corner++)
         {
             GeoCoordinates currentTileCoordinate = tileIndex.toCoordinates();

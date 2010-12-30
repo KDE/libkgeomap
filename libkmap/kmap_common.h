@@ -42,6 +42,7 @@
 // libkmap includes
 
 #include "kmap_primitives.h"
+#include "kmap_tileindex.h"
 
 namespace KMap
 {
@@ -148,8 +149,7 @@ public:
     {
     }
 
-    /// @todo Find a way to store these as usual tile indices to avoid conversions
-    QList<QIntList>     tileIndicesList;
+    QList<TileIndex>    tileIndicesList;
     int                 markerCount;
     int                 markerSelectedCount;
     GeoCoordinates      coordinates;
