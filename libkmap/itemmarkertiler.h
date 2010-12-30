@@ -106,6 +106,7 @@ public:
     virtual QPixmap pixmapFromRepresentativeIndex(const QVariant& index, const QSize& size);
     virtual bool indicesEqual(const QVariant& a, const QVariant& b) const;
     virtual KMapGroupState getTileGroupState(const TileIndex& tileIndex);
+    virtual KMapGroupState getGlobalGroupState();
 
     virtual void onIndicesClicked(const TileIndex::List& tileIndicesList, const KMapGroupState& groupSelectionState, MouseMode currentMouseMode);
     virtual void onIndicesMoved(const TileIndex::List& tileIndicesList, const GeoCoordinates& targetCoordinates,

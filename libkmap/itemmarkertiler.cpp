@@ -660,4 +660,17 @@ AbstractMarkerTiler::Flags ItemMarkerTiler::tilerFlags() const
     return resultFlags;
 }
 
+KMapGroupState ItemMarkerTiler::getGlobalGroupState()
+{
+    if (d->selectionModel)
+    {
+        if (d->selectionModel->hasSelection())
+        {
+            return KMapSelectedMask;
+        }
+    }
+
+    return KMapSelectedNone;
+}
+
 } // namespace KMap

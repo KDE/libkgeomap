@@ -155,10 +155,7 @@ public:
     virtual QPixmap pixmapFromRepresentativeIndex(const QVariant& index, const QSize& size) = 0;
     virtual bool indicesEqual(const QVariant& a, const QVariant& b) const = 0;
     virtual KMapGroupState getTileGroupState(const TileIndex& tileIndex) = 0;
-    /**
-     * @todo Make this function pure virtual!
-     */
-    virtual KMapGroupState getGlobalGroupState() { return KMapSelectedNone; };
+    virtual KMapGroupState getGlobalGroupState() = 0;
 
     // these can be implemented if you want to react to actions in kmap
     /// @todo Make currentMouseMode const
