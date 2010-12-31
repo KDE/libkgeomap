@@ -1201,9 +1201,8 @@ void KMapWidget::getColorInfos(const KMapGroupState groupState,
     }
     *labelColor = QColor(Qt::black);
 
-    // TODO: 'solo' and 'selected' properties have not yet been defined,
-    //       therefore use the default colors
     *strokeStyle = Qt::NoPen;
+    /// @todo On my system, digikam uses QColor(67, 172, 232) as the selection color. Or should we just use blue?
     switch (groupState & KMapSelectedMask)
     {
         case KMapSelectedNone:
@@ -1212,14 +1211,15 @@ void KMapWidget::getColorInfos(const KMapGroupState groupState,
             break;
         case KMapSelectedSome:
             *strokeStyle = Qt::DotLine;
-            *strokeColor = QColor(Qt::blue);
+            *strokeColor = QColor(Qt::blue);//67, 172, 232);
             break;
         case KMapSelectedAll:
             *strokeStyle = Qt::SolidLine;
-            *strokeColor = QColor(Qt::blue);
+            *strokeColor = QColor(Qt::blue);//67, 172, 232);
             break;
     }
 
+    /// @todo These are the fill colors for the circles, for cases in which only some or all of the images are positively filtered. Filtering is implemented in libkmap, but the code here has not been adapted yet.
     QColor fillAll, fillSome, fillNone;
     if (nMarkers>=100)
     {
@@ -1253,7 +1253,7 @@ void KMapWidget::getColorInfos(const KMapGroupState groupState,
     }
 
     *fillColor = fillAll;
-//     switch (solo)
+//     switch (groupState)
 //     {
 //         case PartialAll:
 //             *fillColor = fillAll;
@@ -1767,7 +1767,6 @@ void KMapWidget::setSortKey(const int sortKey)
 
 QPixmap KMapWidget::getDecoratedPixmapForCluster(const int clusterId, const KMapGroupState* const selectedStateOverride, const int* const countOverride, QPoint* const centerPoint)
 {
-    const int circleRadius = d->thumbnailSize/2;
     KMapCluster& cluster = s->clusterList[clusterId];
 
     int markerCount = cluster.markerCount;
@@ -1780,7 +1779,7 @@ QPixmap KMapWidget::getDecoratedPixmapForCluster(const int clusterId, const KMap
 
     const KMapGroupState selectedState = groupState & KMapSelectedMask;
 
-    // determine the colors:
+    // first determine all the color and style values
     QColor       fillColor;
     QColor       strokeColor;
     Qt::PenStyle strokeStyle;
@@ -1843,73 +1842,80 @@ QPixmap KMapWidget::getDecoratedPixmapForCluster(const int clusterId, const KMap
         {
             QPixmap resultPixmap(clusterPixmap.size()+QSize(2,2));
 
-            // apparently, pixmaps have to be filled before painting in them, otherwise we get
-            // some weird artefacts
+            // we may draw with partially transparent pixmaps later, so make sure we have a defined
+            // background color
             resultPixmap.fill(QColor::fromRgb(0xff, 0xff, 0xff));
             QPainter painter(&resultPixmap);
-            painter.setRenderHint(QPainter::Antialiasing);
+//             painter.setRenderHint(QPainter::Antialiasing);
 
-            QPen circlePen;
-            circlePen.setWidth(1);
-            if (strokeStyle!=Qt::SolidLine)
-            {
-                // paint a white border around the image
-                circlePen.setColor(Qt::white);
-                painter.setPen(circlePen);
-                painter.drawRect(0, 0, resultPixmap.size().width()-1, resultPixmap.size().height()-1);
-            }
+            const int borderWidth = (groupState&KMapSelectedSome) ? 2 : 1;
+            QPen borderPen;
+            borderPen.setWidth(borderWidth);
+            borderPen.setJoinStyle(Qt::MiterJoin);
 
             KMapGroupState globalState = s->markerModel->getGlobalGroupState();
 
-            if (globalState & (KMapFilteredPositiveMask | KMapRegionSelectedMask))
+            /// @todo What about partially in the region or positively filtered?
+            const bool clusterIsNotInRegionSelection =
+                   (globalState & KMapRegionSelectedMask)
+                && ( (groupState & KMapRegionSelectedMask) == KMapRegionSelectedNone );
+            const bool clusterIsNotPositivelyFiltered =
+                   (globalState & KMapFilteredPositiveMask)
+                && ( (groupState & KMapFilteredPositiveMask) == KMapFilteredPositiveNone );
+
+            const bool shouldGrayOut = clusterIsNotInRegionSelection || clusterIsNotPositivelyFiltered;
+            const bool shouldCrossOut = clusterIsNotInRegionSelection;
+
+            if (shouldGrayOut)
             {
-                const bool shouldCrossOut = ((groupState & KMapRegionSelectedMask) == KMapRegionSelectedNone);
-                bool shouldGrayOut = shouldCrossOut;
-                if ((!shouldGrayOut) && (globalState & KMapFilteredPositiveMask))
-                {
-                    shouldGrayOut = ((groupState & KMapFilteredPositiveMask) == KMapFilteredPositiveNone);
-                }
-
-                if (shouldGrayOut)
-                {
-                    /// @todo Cache the alphaPixmap!
-                    QPixmap alphaPixmap(clusterPixmap.size());
-                    alphaPixmap.fill(QColor::fromRgb(0x80, 0x80, 0x80));
-                    clusterPixmap.setAlphaChannel(alphaPixmap);
-
-                    // draw a blue cross over the pixmap
-                    /// @todo this is just for debugging!!!
-                    QPainter clusterPixmapPainter(&clusterPixmap);
-                    QPen redPen(Qt::blue);
-                    clusterPixmapPainter.setPen(redPen);
-
-                    const int width = clusterPixmap.size().width();
-                    const int height = clusterPixmap.size().height();
-                    clusterPixmapPainter.drawLine(0, 0, width-1, height-1);
-                    clusterPixmapPainter.drawLine(width-1, 0, 0, height-1);
-                }
-
-                if (shouldCrossOut)
-                {
-                    // draw a red cross over the pixmap
-                    QPainter clusterPixmapPainter(&clusterPixmap);
-                    QPen redPen(Qt::red);
-                    clusterPixmapPainter.setPen(redPen);
-
-                    const int width = clusterPixmap.size().width();
-                    const int height = clusterPixmap.size().height();
-                    clusterPixmapPainter.drawLine(0, 0, width-1, height-1);
-                    clusterPixmapPainter.drawLine(width-1, 0, 0, height-1);
-                }
+                /// @todo Cache the alphaPixmap!
+                QPixmap alphaPixmap(clusterPixmap.size());
+                alphaPixmap.fill(QColor::fromRgb(0x80, 0x80, 0x80));
+                clusterPixmap.setAlphaChannel(alphaPixmap);
             }
 
             painter.drawPixmap(QPoint(1,1), clusterPixmap);
 
+            if (shouldGrayOut || shouldCrossOut)
+            {
+                // draw a red cross above the pixmap
+                QPen crossPen(Qt::red);
+
+                if (!shouldCrossOut)
+                {
+                    /// @todo Maybe we should also do a cross for not positively filtered images?
+                    crossPen.setColor(Qt::blue);
+                }
+
+                crossPen.setWidth(2);
+                painter.setPen(crossPen);
+
+                const int width = resultPixmap.size().width();
+                const int height = resultPixmap.size().height();
+                painter.drawLine(0, 0, width-1, height-1);
+                painter.drawLine(width-1, 0, 0, height-1);
+            }
+
+            
+            if (strokeStyle!=Qt::SolidLine)
+            {
+                // paint a white border around the image
+                borderPen.setColor(Qt::white);
+                painter.setPen(borderPen);
+                painter.drawRect(
+                        borderWidth-1, borderWidth-1,
+                        resultPixmap.size().width()-borderWidth, resultPixmap.size().height()-borderWidth
+                    );
+            }
+
             // now draw the selection border
-            circlePen.setColor(strokeColor);
-            circlePen.setStyle(strokeStyle);
-            painter.setPen(circlePen);
-            painter.drawRect(0, 0, resultPixmap.size().width()-1, resultPixmap.size().height()-1);
+            borderPen.setColor(strokeColor);
+            borderPen.setStyle(strokeStyle);
+            painter.setPen(borderPen);
+            painter.drawRect(
+                    borderWidth-1, borderWidth-1,
+                    resultPixmap.size().width()-borderWidth, resultPixmap.size().height()-borderWidth
+                );
 
             if (s->showNumbersOnItems)
             {
@@ -1948,6 +1954,7 @@ QPixmap KMapWidget::getDecoratedPixmapForCluster(const int clusterId, const KMap
     }
 
     // we do not have a thumbnail, draw the circle instead:
+    const int circleRadius = d->thumbnailSize/2;
     QPen circlePen;
     circlePen.setColor(strokeColor);
     circlePen.setStyle(strokeStyle);
