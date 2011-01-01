@@ -1728,7 +1728,7 @@ QVariant KMapWidget::getClusterRepresentativeMarker(const int clusterIndex, cons
     QList<QVariant> repIndices;
     for (int i=0; i<cluster.tileIndicesList.count(); ++i)
     {
-        repIndices <<  s->markerModel->getTileRepresentativeMarker(cluster.tileIndicesList.at(i), sortKey);
+        repIndices << s->markerModel->getTileRepresentativeMarker(cluster.tileIndicesList.at(i), sortKey);
     }
 
     const QVariant clusterRepresentative = s->markerModel->bestRepresentativeIndexFromList(repIndices, sortKey);
