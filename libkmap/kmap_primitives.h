@@ -29,9 +29,9 @@
 
 // Qt includes
 
-#include <QPersistentModelIndex>
-#include <QString>
-#include <QVariant>
+#include <QtCore/QPersistentModelIndex>
+#include <QtCore/QString>
+#include <QtCore/QVariant>
 
 // Kde includes
 

@@ -46,7 +46,7 @@ class BMWidget : public Marble::MarbleWidget
 
 public:
 
-    BMWidget(BackendMarble* const pMarbleBackend, QWidget* const parent = 0);
+    explicit BMWidget(BackendMarble* const pMarbleBackend, QWidget* const parent = 0);
     virtual ~BMWidget();
 
 protected:

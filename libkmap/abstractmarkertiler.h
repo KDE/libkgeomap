@@ -29,9 +29,9 @@
 
 // Qt includes
 
-#include <QBitArray>
-#include <QObject>
-#include <QPoint>
+#include <QtCore/QBitArray>
+#include <QtCore/QObject>
+#include <QtCore/QPoint>
 
 // local includes
 

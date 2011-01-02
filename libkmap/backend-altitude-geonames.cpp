@@ -184,7 +184,7 @@ void BackendAltitudeGeonames::slotResult(KJob* kJob)
             QStringList altitudes = QString(QLatin1String( myJob.data )).split(QRegExp( QLatin1String("\\s+" ) ) );
 
             int jobIndex = 0;
-            foreach(const QString altitudeString, altitudes)
+            foreach(const QString& altitudeString, altitudes)
             {
                 bool haveAltitude = false;
                 qreal altitude = altitudeString.toFloat(&haveAltitude);

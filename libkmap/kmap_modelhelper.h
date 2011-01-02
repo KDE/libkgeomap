@@ -29,12 +29,12 @@
 
 // Qt includes
 
-#include <QAbstractItemModel>
-#include <QItemSelectionModel>
-#include <QPersistentModelIndex>
-#include <QPixmap>
-#include <QPoint>
-#include <QString>
+#include <QtCore/QAbstractItemModel>
+#include <QtGui/QItemSelectionModel>
+#include <QtCore/QPersistentModelIndex>
+#include <QtGui/QPixmap>
+#include <QtCore/QPoint>
+#include <QtCore/QString>
 
 // Kde includes
 

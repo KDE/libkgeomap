@@ -29,8 +29,8 @@
 
 // Qt includes
 
-#include <QWidget>
-#include <QStringList>
+#include <QtGui/QWidget>
+#include <QtCore/QStringList>
 
 // local includes
 

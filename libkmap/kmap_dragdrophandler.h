@@ -27,9 +27,6 @@
 #ifndef KMAP_DRAGDROPHANDLER_H
 #define KMAP_DRAGDROPHANDLER_H
 
-// Qt includes
-
-
 // local includes
 
 #include "kmap_primitives.h"

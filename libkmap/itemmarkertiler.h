@@ -28,10 +28,14 @@
 #ifndef ITEMMARKERTILER_H
 #define ITEMMARKERTILER_H
 
+// Qt includes
+
+#include <QtGui/QItemSelection>
+
 // local includes
 
 #include "abstractmarkertiler.h"
-#include <QItemSelection>
+
 
 namespace KMap
 {
@@ -89,7 +93,7 @@ public:
         }
     };
 
-    ItemMarkerTiler(ModelHelper* const modelHelper, QObject* const parent = 0);
+    explicit ItemMarkerTiler(ModelHelper* const modelHelper, QObject* const parent = 0);
     virtual ~ItemMarkerTiler();
 
     virtual Flags tilerFlags() const;
