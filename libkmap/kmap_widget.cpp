@@ -1588,7 +1588,7 @@ void KMapWidget::slotClustersClicked(const QIntList& clusterIndices)
 
 /*        if (maxTileLevel != 0)
         {
-            //increase the selection boundaries with 0.1 degrees because some thumbnails aren't catched by selection
+            //increase the selection boundaries with 0.1 degrees because some thumbnails aren't caught by selection
             latLonBox.setWest((latLonBox.west(Marble::GeoDataCoordinates::Degree)-(0.1/maxTileLevel)), Marble::GeoDataCoordinates::Degree);
             latLonBox.setNorth((latLonBox.north(Marble::GeoDataCoordinates::Degree)+(0.1/maxTileLevel)), Marble::GeoDataCoordinates::Degree);
             latLonBox.setEast((latLonBox.east(Marble::GeoDataCoordinates::Degree)+(0.1/maxTileLevel)), Marble::GeoDataCoordinates::Degree);

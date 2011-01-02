@@ -442,7 +442,7 @@ void BackendOSM::setZoom(const QString& newZoom)
 {
     // zoom settings for OSM are basically the same as for Google Maps, so just re-use the prefix
     const QString myZoomString = s->worldMapWidget->convertZoomToBackendZoom(newZoom, "googlemaps");
-    KMAP_ASSERT(myZoomString.startsWith("googlemaps:"));
+    KMAP_ASSERT(myZoomString.startsWith(QLatin1String("googlemaps:")));
 
     const int myZoom = myZoomString.mid(QLatin1String("googlemaps:").length()).toInt();
     kDebug()<<myZoom;

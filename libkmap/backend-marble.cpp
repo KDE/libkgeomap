@@ -342,7 +342,7 @@ void BackendMarble::createActions()
 
     KAction* const actionSpherical = new KAction(d->actionGroupProjection);
     actionSpherical->setCheckable(true);
-    actionSpherical->setText(i18n("Spherical"));
+    actionSpherical->setText(i18nc("Spherical projection", "Spherical"));
     actionSpherical->setData(QLatin1String("spherical" ));
 
     KAction* const actionMercator = new KAction(d->actionGroupProjection);
