@@ -127,7 +127,7 @@ public:
         currentBackendName(),
         stackedLayout(0),
         cacheCenterCoordinate(52.0,6.0),
-        cacheZoom(QLatin1String("marble:900" )),
+        cacheZoom(QLatin1String("marble:900")),
         configurationMenu(0),
         actionGroupBackendSelection(0),
         actionZoomIn(0),
@@ -259,13 +259,13 @@ KMapWidget::KMapWidget(QWidget* const parent)
 void KMapWidget::createActions()
 {
     d->actionZoomIn = new KAction(this);
-    d->actionZoomIn->setIcon(SmallIcon( QLatin1String("zoom-in" )));
+    d->actionZoomIn->setIcon(SmallIcon( QLatin1String("zoom-in") ));
     d->actionZoomIn->setToolTip(i18n("Zoom in"));
     connect(d->actionZoomIn, SIGNAL(triggered()),
             this, SLOT(slotZoomIn()));
 
     d->actionZoomOut = new KAction(this);
-    d->actionZoomOut->setIcon(SmallIcon( QLatin1String("zoom-out" )));
+    d->actionZoomOut->setIcon(SmallIcon( QLatin1String("zoom-out") ));
     d->actionZoomOut->setToolTip(i18n("Zoom out"));
     connect(d->actionZoomOut, SIGNAL(triggered()),
             this, SLOT(slotZoomOut()));
@@ -304,7 +304,7 @@ void KMapWidget::createActions()
 
     d->actionRemoveCurrentRegionSelection = new KAction(this);
     //d->actionRemoveCurrentRegionSelection->setEnabled(false);
-    d->actionRemoveCurrentRegionSelection->setIcon(SmallIcon( QLatin1String("edit-clear" )));
+    d->actionRemoveCurrentRegionSelection->setIcon(SmallIcon( QLatin1String("edit-clear") ));
     d->actionRemoveCurrentRegionSelection->setToolTip(i18n("Remove the current region selection"));
 
     d->mouseModeActionGroup = new QActionGroup(this);
@@ -312,27 +312,27 @@ void KMapWidget::createActions()
 
     d->actionSetRegionSelectionMode = new KAction(d->mouseModeActionGroup);
     d->actionSetRegionSelectionMode->setCheckable(true);
-    d->actionSetRegionSelectionMode->setIcon(SmallIcon( QLatin1String("select-rectangular" )));
+    d->actionSetRegionSelectionMode->setIcon(SmallIcon( QLatin1String("select-rectangular") ));
     d->actionSetRegionSelectionMode->setToolTip(i18n("Select images by drawing a rectangle"));
     d->actionSetRegionSelectionMode->setData(QVariant::fromValue<KMap::MouseModes>(MouseModeRegionSelection));
 
     d->actionSetPanMode = new KAction(d->mouseModeActionGroup);
     d->actionSetPanMode->setCheckable(true);
     d->actionSetPanMode->setToolTip(i18n("Pan mode"));
-    d->actionSetPanMode->setIcon(SmallIcon( QLatin1String("transform-move" )));
+    d->actionSetPanMode->setIcon(SmallIcon( QLatin1String("transform-move") ));
     d->actionSetPanMode->setChecked(true);
     d->actionSetPanMode->setData(QVariant::fromValue<KMap::MouseModes>(MouseModePan));
 
     d->actionSetZoomIntoGroupMode = new KAction(d->mouseModeActionGroup);
     d->actionSetZoomIntoGroupMode->setCheckable(true);
     d->actionSetZoomIntoGroupMode->setToolTip(i18n("Zoom into a group"));
-    d->actionSetZoomIntoGroupMode->setIcon(SmallIcon( QLatin1String("page-zoom" )));
+    d->actionSetZoomIntoGroupMode->setIcon(SmallIcon( QLatin1String("page-zoom") ));
     d->actionSetZoomIntoGroupMode->setData(QVariant::fromValue<KMap::MouseModes>(MouseModeZoomIntoGroup));
 
     d->actionSetRegionSelectionFromIconMode = new KAction(d->mouseModeActionGroup);
     d->actionSetRegionSelectionFromIconMode->setCheckable(true);
     d->actionSetRegionSelectionFromIconMode->setToolTip(i18n("Filter images"));
-    d->actionSetRegionSelectionFromIconMode->setIcon(SmallIcon( QLatin1String("view-filter" )));
+    d->actionSetRegionSelectionFromIconMode->setIcon(SmallIcon( QLatin1String("view-filter") ));
     d->actionSetRegionSelectionFromIconMode->setData(QVariant::fromValue<KMap::MouseModes>(MouseModeRegionSelectionFromIcon));
 
     d->actionSetFilterMode = new KAction(i18n("F"), d->mouseModeActionGroup);
@@ -342,12 +342,12 @@ void KMapWidget::createActions()
 
     d->actionRemoveFilter = new KAction(this);
     d->actionRemoveFilter->setToolTip(i18n("Remove the current filter"));
-    d->actionRemoveFilter->setIcon(SmallIcon( QLatin1String("window-close" )));
+    d->actionRemoveFilter->setIcon(SmallIcon( QLatin1String("window-close") ));
 
     d->actionSetSelectThumbnailMode = new KAction(d->mouseModeActionGroup);
     d->actionSetSelectThumbnailMode->setCheckable(true);
     d->actionSetSelectThumbnailMode->setToolTip(i18n("Select images"));
-    d->actionSetSelectThumbnailMode->setIcon(SmallIcon( QLatin1String("edit-select" )));
+    d->actionSetSelectThumbnailMode->setIcon(SmallIcon( QLatin1String("edit-select") ));
     d->actionSetSelectThumbnailMode->setData(QVariant::fromValue<KMap::MouseModes>(MouseModeSelectThumbnail));
 
     d->actionStickyMode = new KAction(this);
@@ -490,8 +490,10 @@ bool KMapWidget::setBackend(const QString& backendName)
             connect(d->currentBackend, SIGNAL(signalClustersClicked(const QIntList&)),
                     this, SLOT(slotClustersClicked(const QIntList&)));
 
-            // TODO: this connection is queued because otherwise QAbstractItemModel::itemSelected does not
-            //       reflect the true state. Maybe monitor another signal instead?
+            /**
+             * @todo This connection is queued because otherwise QAbstractItemModel::itemSelected does not
+             *       reflect the true state. Maybe monitor another signal instead?
+             */
             connect(this, SIGNAL(signalUngroupedModelChanged(const int)),
                     d->currentBackend, SLOT(slotUngroupedModelChanged(const int)), Qt::QueuedConnection);
 
@@ -534,7 +536,7 @@ void KMapWidget::applyCacheToBackend()
         return;
 
     setCenter(d->cacheCenterCoordinate);
-    // TODO: only do this if the zoom was changed!
+    /// @todo Only do this if the zoom was changed!
     setZoom(d->cacheZoom);
     d->currentBackend->mouseModeChanged();
     d->currentBackend->regionSelectionChanged();
@@ -712,11 +714,11 @@ void KMapWidget::rebuildConfigurationMenu()
 KAction* KMapWidget::getControlAction(const QString& actionName)
 {
     kDebug()<<actionName;
-    if (actionName==QLatin1String("zoomin" ))
+    if (actionName==QLatin1String("zoomin"))
     {
         return d->actionZoomIn;
     }
-    else if (actionName==QLatin1String("zoomout" ))
+    else if (actionName==QLatin1String("zoomout"))
     {
         return d->actionZoomOut;
     }
@@ -735,7 +737,7 @@ QWidget* KMapWidget::getControlWidget()
 
         QToolButton* const configurationButton = new QToolButton(d->controlWidget);
         configurationButton->setToolTip(i18n("Map settings"));
-        configurationButton->setIcon(SmallIcon( QLatin1String("applications-internet" )));
+        configurationButton->setIcon(SmallIcon( QLatin1String("applications-internet") ));
         configurationButton->setMenu(d->configurationMenu);
         configurationButton->setPopupMode(QToolButton::InstantPopup);
 
@@ -833,7 +835,7 @@ void KMapWidget::slotUpdateActionsEnabled()
     }
 
     d->actionDecreaseThumbnailSize->setEnabled((s->showThumbnails)&&(d->thumbnailSize>KMapMinThumbnailSize));
-    // TODO: define an upper limit!
+    /// @todo Define an upper limit for the thumbnail size!
     d->actionIncreaseThumbnailSize->setEnabled(s->showThumbnails);
 
     d->actionSetRegionSelectionMode->setEnabled(s->availableMouseModes.testFlag(MouseModeRegionSelection));
@@ -847,7 +849,7 @@ void KMapWidget::slotUpdateActionsEnabled()
 
     d->actionStickyMode->setEnabled(d->availableExtraActions.testFlag(ExtraActionSticky));
 
-    // TODO: cache the icons somewhere?
+    /// @todo Only set the icons if they have to be changed!
     d->actionStickyMode->setIcon(SmallIcon( QLatin1String( d->actionStickyMode->isChecked()?"object-locked":"object-unlocked" )));
     d->actionShowThumbnails->setIcon(d->actionShowThumbnails->isChecked()?SmallIcon( QLatin1String("folder-image") ):KMapGlobalObject::instance()->getMarkerPixmap(QLatin1String("marker-icon-16x16" )));
 }
@@ -929,13 +931,15 @@ void KMapWidget::updateClusters()
     QVector<int> pixelCountGrid(gridWidth*gridHeight, 0);
     QList<QPair<QPoint, QPair<int, QList<TileIndex> > > > leftOverList;
 
-    // TODO: iterate only over the visible part of the map
+    /// @todo Iterate only over the visible part of the map
     int debugCountNonEmptyTiles = 0;
     int debugTilesSearched = 0;
 
-    //TODO: this is good here?
+    /// @todo Review this
     for(int i = 0; i < mapBounds.count(); ++i)
+    {
         s->markerModel->prepareTiles(mapBounds.at(i).first, mapBounds.at(i).second, markerLevel);
+    }
 
     for (AbstractMarkerTiler::NonEmptyIterator tileIterator(s->markerModel, markerLevel, mapBounds); !tileIterator.atEnd(); tileIterator.nextIndex())
     {
@@ -962,7 +966,7 @@ void KMapWidget::updateClusters()
 //         kDebug()<<QString::fromLatin1("pixel at: %1, %2 (%3): %4 markers").arg(tilePoint.x()).arg(tilePoint.y()).arg(linearIndex).arg(pixelCountGrid[linearIndex]);
     }
 
-    // TODO: cleanup this list every ... iterations in the next loop, too
+    /// @todo Cleanup this list every ... iterations in the next loop, too
     QIntList nonEmptyPixelIndices;
 
     for (int i=0; i<gridWidth*gridHeight; ++i)
@@ -989,7 +993,7 @@ void KMapWidget::updateClusters()
 
             if (pixelCountGrid.at(index)==0)
             {
-                // TODO: also remove this entry from the list to speed up the loop!
+                /// @todo Also remove this entry from the list to speed up the loop!
                 nonEmptyPixelIndices[pixelGridMetaIndex] = -1;
                 continue;
             }
@@ -1004,7 +1008,7 @@ void KMapWidget::updateClusters()
                 // only use this as a candidate for a cluster if it is not too close to another cluster:
                 bool tooClose = false;
 
-                // TODO: check the cluster that was a problem last time first:
+                /// @todo Check the cluster that was a problem last time first:
 //                 if (lastTooCloseClusterIndex<s->clusterList.size())
 //                 {
 //                     tooClose = QPointSquareDistance(s->clusterList.at(lastTooCloseClusterIndex).pixelPos, markerPosition) < pow(ClusterGridSizeScreen/2, 2);
@@ -1157,10 +1161,10 @@ void KMapWidget::getColorInfos(const int clusterIndex, QColor *fillColor, QColor
                                     const KMapGroupState* const overrideSelection,
                                     const int* const overrideCount) const
 {
-    // TODO: call the new getColorInfos function!
+    /// @todo Call the new getColorInfos function!
     const KMapCluster& cluster = s->clusterList.at(clusterIndex);
 
-    // TODO: check that this number is already valid!
+    /// @todo Check that this number is already valid!
     const int nMarkers = overrideCount ? *overrideCount : cluster.markerCount;
 
     getColorInfos(overrideSelection?*overrideSelection:cluster.groupState,
@@ -1179,12 +1183,12 @@ void KMapWidget::getColorInfos(const KMapGroupState groupState,
     }
     else if ((nMarkers>=1000)&&(nMarkers<=1950))
     {
-        // TODO: use KDE-versions instead
+        /// @todo Use KDE-versions instead
         *labelText = QString::fromLatin1("%L1k").arg(qreal(nMarkers)/1000.0, 0, 'f', 1);
     }
     else if ((nMarkers>=1951)&&(nMarkers<19500))
     {
-        // TODO: use KDE-versions instead
+        /// @todo Use KDE-versions instead
         *labelText = QString::fromLatin1("%L1k").arg(qreal(nMarkers)/1000.0, 0, 'f', 0);
     }
     else
@@ -1313,7 +1317,7 @@ QString KMapWidget::convertZoomToBackendZoom(const QString& someZoom, const QStr
         else if (sourceZoom==17) { targetZoom = 3180; }
         else if (sourceZoom==18) { targetZoom = 3295; }
         else if (sourceZoom==19) { targetZoom = 3450; }
-        else { targetZoom = 3500; } // TODO: find values for level 20 and up
+        else { targetZoom = 3500; } /// @todo Find values for level 20 and up
     }
 
     if (targetBackend==QLatin1String("googlemaps" ))
@@ -1338,7 +1342,7 @@ QString KMapWidget::convertZoomToBackendZoom(const QString& someZoom, const QStr
         else if (sourceZoom<=3180) { targetZoom = 17; }
         else if (sourceZoom<=3295) { targetZoom = 18; }
         else if (sourceZoom<=3450) { targetZoom = 19; }
-        else { targetZoom = 20; } // TODO: find values for level 20 and up
+        else { targetZoom = 20; } /// @todo Find values for level 20 and up
     }
 
     KMAP_ASSERT(targetZoom>=0);
@@ -1405,8 +1409,10 @@ void KMapWidget::slotClustersMoved(const QIntList& clusterIndices, const QPair<i
 
     s->markerModel->onIndicesMoved(movedTileIndices, targetCoordinates, snapTarget.second);
 
-    // TODO: clusters are marked as dirty by slotClustersNeedUpdating which is called
-    // while we update the model
+    /**
+     * @todo Clusters are marked as dirty by slotClustersNeedUpdating
+     * which is called while we update the model
+     */
 }
 
 bool KMapWidget::queryAltitudes(const KMapAltitudeLookup::List& queryItems, const QString& backendName)
@@ -1546,7 +1552,7 @@ void KMapWidget::slotClustersClicked(const QIntList& clusterIndices)
 
     int maxTileLevel = 0;
 
-    if ((s->currentMouseMode == MouseModeZoomIntoGroup) || (s->currentMouseMode == MouseModeRegionSelectionFromIcon)) // && !s->selectionRectangle.first.hasCoordinates()))
+    if ((s->currentMouseMode == MouseModeZoomIntoGroup) || (s->currentMouseMode == MouseModeRegionSelectionFromIcon))
     {
         Marble::GeoDataLineString tileString;
 
@@ -1586,6 +1592,7 @@ void KMapWidget::slotClustersClicked(const QIntList& clusterIndices)
 
         Marble::GeoDataLatLonBox latLonBox = Marble::GeoDataLatLonBox::fromLineString(tileString);
 
+        /// @todo Review this section
 /*        if (maxTileLevel != 0)
         {
             //increase the selection boundaries with 0.1 degrees because some thumbnails aren't caught by selection
@@ -1621,7 +1628,7 @@ void KMapWidget::slotClustersClicked(const QIntList& clusterIndices)
     }
     else if ((s->currentMouseMode == MouseModeFilter && s->selectionRectangle.first.hasCoordinates()) || (s->currentMouseMode == MouseModeSelectThumbnail))
     {
-    // update the selection state of the clusters
+        // update the selection state of the clusters
         for (int i=0; i<clusterIndices.count(); ++i)
         {
             const int clusterIndex = clusterIndices.at(i);
@@ -1668,9 +1675,11 @@ void KMapWidget::dragEnterEvent(QDragEnterEvent* event)
 //         d->currentBackend->updateDragDropMarker(event->pos(), dragData);
 }
 
-void KMapWidget::dragMoveEvent(QDragMoveEvent* /*event*/)
+void KMapWidget::dragMoveEvent(QDragMoveEvent* event)
 {
-    // TODO: update the position of the drag marker if it is to be shown
+    Q_UNUSED(event);
+
+    /// @todo update the position of the drag marker if it is to be shown
 //     if (!dragData->haveDragPixmap)
 //         d->currentBackend->updateDragDropMarkerPosition(event->pos());
 }
@@ -1744,9 +1753,9 @@ void KMapWidget::slotItemDisplaySettingsChanged()
     s->previewGroupedItems = d->actionPreviewGroupedItems->isChecked();
     s->showNumbersOnItems = d->actionShowNumbersOnItems->isChecked();
 
-    // TODO: update action availability?
+    /// @todo Update action availability?
 
-    // TODO: we just need to update the display, no need to recluster?
+    /// @todo We just need to update the display, no need to recluster?
     slotRequestLazyReclustering();
 }
 
@@ -1762,6 +1771,7 @@ void KMapWidget::setSortKey(const int sortKey)
     s->sortKey = sortKey;
 
     // this is probably faster than writing a function that changes all the clusters icons...
+    /// @todo We just need to update the display, no need to recluster?
     slotRequestLazyReclustering();
 }
 
@@ -1797,11 +1807,11 @@ QPixmap KMapWidget::getDecoratedPixmapForCluster(const int clusterId, const KMap
         QString pixmapName = fillColor.name().mid(1);
         if (selectedState==KMapSelectedAll)
         {
-            pixmapName+=QLatin1String("-selected" );
+            pixmapName+=QLatin1String("-selected");
         }
         if (selectedState==KMapSelectedSome)
         {
-            pixmapName+=QLatin1String("-someselected" );
+            pixmapName+=QLatin1String("-someselected");
         }
         const QPixmap& markerPixmap = KMapGlobalObject::instance()->getMarkerPixmap(pixmapName);
 
@@ -1966,7 +1976,7 @@ QPixmap KMapWidget::getDecoratedPixmapForCluster(const int clusterId, const KMap
 
     const int pixmapDiameter = 2*(circleRadius+1);
     QPixmap circlePixmap(pixmapDiameter, pixmapDiameter);
-    // TODO: cache this somehow
+    /// @todo cache this somehow
     circlePixmap.fill(QColor(0,0,0,0));
 
     QPainter circlePainter(&circlePixmap);
@@ -1998,7 +2008,7 @@ void KMapWidget::setThumnailSize(const int newThumbnailSize)
     // make sure the grouping radius is larger than the thumbnail size
     if (2*d->thumbnailGroupingRadius < newThumbnailSize)
     {
-        // TODO: more straightforward way for this?
+        /// @todo more straightforward way for this?
         d->thumbnailGroupingRadius = newThumbnailSize/2 + newThumbnailSize%2;
     }
 
@@ -2301,7 +2311,7 @@ void KMapWidget::adjustBoundariesToGroupedMarkers(const bool useSaneZoomLevel)
 
     Marble::GeoDataLineString tileString;
 
-    // TODO: not sure that this is the best way to find the bounding box of all items
+    /// @todo not sure that this is the best way to find the bounding box of all items
     for (AbstractMarkerTiler::NonEmptyIterator tileIterator(s->markerModel, TileIndex::MaxLevel); !tileIterator.atEnd(); tileIterator.nextIndex())
     {
         const TileIndex tileIndex = tileIterator.currentIndex();
@@ -2320,7 +2330,7 @@ void KMapWidget::adjustBoundariesToGroupedMarkers(const bool useSaneZoomLevel)
 
     Marble::GeoDataLatLonBox latLonBox = Marble::GeoDataLatLonBox::fromLineString(tileString);
 
-    // TODO: use a sane zoom level
+    /// @todo use a sane zoom level
     d->currentBackend->centerOn(latLonBox, useSaneZoomLevel);
 }
 
