@@ -212,8 +212,8 @@ public:
     QToolButton*            setSelectionModeButton;
     QToolButton*            removeCurrentSelectionButton;
     QToolButton*            setZoomModeButton;
-    QToolButton*            setFilterDatabaseModeButton;
-    QToolButton*            setFilterModelModeButton;
+    QToolButton*            setRegionSelectionFromIconModeButton;
+    QToolButton*            setFilterModeButton;
     QToolButton*            removeFilterModeButton;
     QToolButton*            setSelectThumbnailMode;
 
@@ -331,13 +331,14 @@ void KMapWidget::createActions()
 
     d->actionSetRegionSelectionFromIconMode = new KAction(d->mouseModeActionGroup);
     d->actionSetRegionSelectionFromIconMode->setCheckable(true);
-    d->actionSetRegionSelectionFromIconMode->setToolTip(i18n("Filter images"));
-    d->actionSetRegionSelectionFromIconMode->setIcon(SmallIcon( QLatin1String("view-filter") ));
+    d->actionSetRegionSelectionFromIconMode->setToolTip(i18n("Create a region selection from a thumbnail"));
+    d->actionSetRegionSelectionFromIconMode->setIcon(SmallIcon( QLatin1String("edit-node") ));
     d->actionSetRegionSelectionFromIconMode->setData(QVariant::fromValue<KMap::MouseModes>(MouseModeRegionSelectionFromIcon));
 
-    d->actionSetFilterMode = new KAction(i18n("F"), d->mouseModeActionGroup);
+    d->actionSetFilterMode = new KAction(d->mouseModeActionGroup);
     d->actionSetFilterMode->setCheckable(true);
-    d->actionSetFilterMode->setToolTip(i18n("Filter images inside the region selection"));
+    d->actionSetFilterMode->setToolTip(i18n("Filter images"));
+    d->actionSetFilterMode->setIcon(SmallIcon( QLatin1String("view-filter") ));
     d->actionSetFilterMode->setData(QVariant::fromValue<KMap::MouseModes>(MouseModeFilter));
 
     d->actionRemoveFilter = new KAction(this);
@@ -770,17 +771,17 @@ QWidget* KMapWidget::getControlWidget()
         d->setSelectionModeButton = new QToolButton(d->mouseModesHolder);
         d->setSelectionModeButton->setDefaultAction(d->actionSetRegionSelectionMode);
 
+        d->setRegionSelectionFromIconModeButton = new QToolButton(d->mouseModesHolder);
+        d->setRegionSelectionFromIconModeButton->setDefaultAction(d->actionSetRegionSelectionFromIconMode);
+
         d->removeCurrentSelectionButton = new QToolButton(d->mouseModesHolder);
         d->removeCurrentSelectionButton->setDefaultAction(d->actionRemoveCurrentRegionSelection);
 
         d->setZoomModeButton = new QToolButton(d->mouseModesHolder);
         d->setZoomModeButton->setDefaultAction(d->actionSetZoomIntoGroupMode);
 
-        d->setFilterDatabaseModeButton = new QToolButton(d->mouseModesHolder);
-        d->setFilterDatabaseModeButton->setDefaultAction(d->actionSetRegionSelectionFromIconMode);
-
-        d->setFilterModelModeButton = new QToolButton(d->mouseModesHolder);
-        d->setFilterModelModeButton->setDefaultAction(d->actionSetFilterMode);
+        d->setFilterModeButton = new QToolButton(d->mouseModesHolder);
+        d->setFilterModeButton->setDefaultAction(d->actionSetFilterMode);
 
         d->removeFilterModeButton = new QToolButton(d->mouseModesHolder);
         d->removeFilterModeButton->setDefaultAction(d->actionRemoveFilter);
@@ -2240,8 +2241,8 @@ void KMapWidget::setVisibleMouseModes(const MouseModes mouseModes)
         d->removeCurrentSelectionButton->setVisible(s->visibleMouseModes.testFlag(MouseModeRegionSelection));
         d->setPanModeButton->setVisible(s->visibleMouseModes.testFlag(MouseModePan));
         d->setZoomModeButton->setVisible(s->visibleMouseModes.testFlag(MouseModeZoomIntoGroup));
-        d->setFilterDatabaseModeButton->setVisible(s->visibleMouseModes.testFlag(MouseModeRegionSelectionFromIcon));
-        d->setFilterModelModeButton->setVisible(s->visibleMouseModes.testFlag(MouseModeFilter));
+        d->setRegionSelectionFromIconModeButton->setVisible(s->visibleMouseModes.testFlag(MouseModeRegionSelectionFromIcon));
+        d->setFilterModeButton->setVisible(s->visibleMouseModes.testFlag(MouseModeFilter));
         d->removeFilterModeButton->setVisible(s->visibleMouseModes.testFlag(MouseModeRegionSelectionFromIcon));
         d->setSelectThumbnailMode->setVisible(s->visibleMouseModes.testFlag(MouseModeSelectThumbnail));
     }
