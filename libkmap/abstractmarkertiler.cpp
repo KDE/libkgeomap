@@ -559,7 +559,7 @@ AbstractMarkerTiler::Tile* AbstractMarkerTiler::resetRootTile()
 {
     tileDelete(d->rootTile);
     d->rootTile = tileNew();
-    d->rootTile->prepareForChildren(QIntPair(TileIndex::Tiling, TileIndex::Tiling));
+    d->rootTile->prepareForChildren();
 
     return d->rootTile;
 }

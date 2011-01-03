@@ -74,25 +74,46 @@ public:
         {
         }
 
-        void prepareForChildren(const QPair<int, int>& childCount)
+        static int maxChildCount()
         {
-            prepareForChildren(childCount.first*childCount.second);
+            return TileIndex::Tiling * TileIndex::Tiling;
         }
 
-        void prepareForChildren(const int childCount)
+        void prepareForChildren()
         {
-            childrenMask.resize(childCount);
-            children = QVector<Tile*>(childCount, 0);
+            if (!children.isEmpty())
+            {
+                return;
+            }
+
+            childrenMask.resize(maxChildCount());
+            children = QVector<Tile*>(maxChildCount(), 0);
+        }
+
+        Tile* getChild(const int linearIndex)
+        {
+            prepareForChildren();
+
+            if (!childrenMask.testBit(linearIndex))
+            {
+                return 0;
+            }
+
+            return children.at(linearIndex);
         }
 
         void addChild(const int linearIndex, Tile* const tilePointer = 0)
         {
+            prepareForChildren();
+
             childrenMask.setBit(linearIndex);
             children[linearIndex] = tilePointer;
         }
 
         bool childValid(const int linearIndex)
         {
+            prepareForChildren();
+
             return childrenMask.testBit(linearIndex);
         }
 

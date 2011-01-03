@@ -408,7 +408,7 @@ AbstractMarkerTiler::Tile* ItemMarkerTiler::getTile(const TileIndex& tileIndex, 
         MyTile* childTile = 0;
         if (tile->children.isEmpty())
         {
-            tile->prepareForChildren(QIntPair(TileIndex::Tiling, TileIndex::Tiling));
+            tile->prepareForChildren();
 
             // if there are any markers in the tile,
             // we have to sort them into the child tiles:
