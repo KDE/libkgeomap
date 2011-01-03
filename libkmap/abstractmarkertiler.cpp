@@ -606,7 +606,6 @@ void AbstractMarkerTiler::tileDeleteChildren(AbstractMarkerTiler::Tile* const ti
         tileDelete(tilec);
     }
     tile->children.clear();
-    tile->childrenMask.clear();
 }
 
 void AbstractMarkerTiler::tileDeleteChild(AbstractMarkerTiler::Tile* const parentTile, AbstractMarkerTiler::Tile* const childTile, const int knownLinearIndex)

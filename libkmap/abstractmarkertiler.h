@@ -64,7 +64,6 @@ public:
 
         Tile()
             : children(),
-              childrenMask(),
               selectedCount(0),
               markerCount(0)
         {
@@ -86,18 +85,12 @@ public:
                 return;
             }
 
-            childrenMask.resize(maxChildCount());
             children = QVector<Tile*>(maxChildCount(), 0);
         }
 
         Tile* getChild(const int linearIndex)
         {
             prepareForChildren();
-
-            if (!childrenMask.testBit(linearIndex))
-            {
-                return 0;
-            }
 
             return children.at(linearIndex);
         }
@@ -106,21 +99,12 @@ public:
         {
             prepareForChildren();
 
-            childrenMask.setBit(linearIndex);
             children[linearIndex] = tilePointer;
-        }
-
-        bool childValid(const int linearIndex)
-        {
-            prepareForChildren();
-
-            return childrenMask.testBit(linearIndex);
         }
 
     public:
 
         QVector<Tile*> children;
-        QBitArray      childrenMask;
         int            selectedCount;
         int            markerCount;
     };
