@@ -63,9 +63,7 @@ public:
     public:
 
         Tile()
-            : children(),
-              selectedCount(0),
-              markerCount(0)
+            : children()
         {
         }
 
@@ -151,10 +149,6 @@ public:
     private:
 
         QVector<Tile*> children;
-
-    public:
-        int            selectedCount;
-        int            markerCount;
 
     };
 

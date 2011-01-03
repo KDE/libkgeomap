@@ -53,7 +53,8 @@ public:
     public:
         MyTile()
         : Tile(),
-          markerIndices()
+          markerIndices(),
+          selectedCount(0)
         {
         }
 
@@ -62,6 +63,7 @@ public:
         }
 
         QList<QPersistentModelIndex> markerIndices;
+        int selectedCount;
 
         void removeMarkerIndexOrInvalidIndex(const QModelIndex& indexToRemove)
         {
@@ -77,14 +79,12 @@ public:
                 if ( !currentIndex.isValid() )
                 {
                     markerIndices.takeAt(i);
-                    markerCount = markerIndices.count();
                     continue;
                 }
 
                 if ( currentIndex == indexToRemove )
                 {
                     markerIndices.takeAt(i);
-                    markerCount = markerIndices.count();
                     return;
                 }
 
