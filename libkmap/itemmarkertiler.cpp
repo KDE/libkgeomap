@@ -164,7 +164,7 @@ void ItemMarkerTiler::slotSelectionChanged(const QItemSelection& selected, const
 //                 kDebug()<<l<<tileIndex<<myTile->selectedCount;
                 KMAP_ASSERT(myTile->selectedCount <= myTile->markerIndices.count());
 
-                if (myTile->children.isEmpty())
+                if (myTile->childrenEmpty())
                     break;
             }
         }
@@ -190,7 +190,7 @@ void ItemMarkerTiler::slotSelectionChanged(const QItemSelection& selected, const
                 myTile->selectedCount--;
                 KMAP_ASSERT(myTile->selectedCount >= 0);
 
-                if (myTile->children.isEmpty())
+                if (myTile->childrenEmpty())
                     break;
             }
         }
@@ -406,7 +406,7 @@ AbstractMarkerTiler::Tile* ItemMarkerTiler::getTile(const TileIndex& tileIndex, 
         const int currentIndex = tileIndex.linearIndex(level);
 
         MyTile* childTile = 0;
-        if (tile->children.isEmpty())
+        if (tile->childrenEmpty())
         {
             tile->prepareForChildren();
 
@@ -427,7 +427,7 @@ AbstractMarkerTiler::Tile* ItemMarkerTiler::getTile(const TileIndex& tileIndex, 
                     const TileIndex markerTileIndex = TileIndex::fromCoordinates(currentMarkerCoordinates, level);
                     const int newTileIndex = markerTileIndex.toIntList().last();
 
-                    MyTile* newTile = static_cast<MyTile*>(tile->children.at(newTileIndex));
+                    MyTile* newTile = static_cast<MyTile*>(tile->getChild(newTileIndex));
                     if (newTile==0)
                     {
                         newTile = static_cast<MyTile*>(tileNew());
@@ -444,7 +444,7 @@ AbstractMarkerTiler::Tile* ItemMarkerTiler::getTile(const TileIndex& tileIndex, 
                 }
             }
         }
-        childTile = static_cast<MyTile*>(tile->children.at(currentIndex));
+        childTile = static_cast<MyTile*>(tile->getChild(currentIndex));
 
         if (childTile==0)
         {
@@ -514,12 +514,12 @@ void ItemMarkerTiler::addMarkerIndexToGrid(const QPersistentModelIndex& markerIn
         }
 
         // does the tile have any children?
-        if (currentTile->children.isEmpty())
+        if (currentTile->childrenEmpty())
             break;
 
         // the tile has children. make sure the tile for our marker exists:
         const int nextIndex = tileIndex.linearIndex(l);
-        MyTile* nextTile = static_cast<MyTile*>(currentTile->children.at(nextIndex));
+        MyTile* nextTile = static_cast<MyTile*>(currentTile->getChild(nextIndex));
         if (nextTile==0)
         {
             // we have to create the tile:

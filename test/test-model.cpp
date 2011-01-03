@@ -137,7 +137,7 @@ void TestModel::testAddMarkers1()
         const TileIndex tileIndex = TileIndex::fromCoordinates(coord_50_60, l);
         ItemMarkerTiler::Tile* const myTile = mm.getTile(tileIndex, true);
         QVERIFY(myTile != 0);
-        QVERIFY(myTile->children.count()==0);
+        QVERIFY(myTile->childrenEmpty());
         QVERIFY(mm.getTileMarkerCount(tileIndex) == 1);
     }
 
@@ -203,7 +203,7 @@ void TestModel::testMoveMarkers1()
         const TileIndex tileIndex = TileIndex::fromCoordinates(coord_1_2, l);
         ItemMarkerTiler::Tile* const myTile = mm.getTile(tileIndex, true);
         QVERIFY(myTile != 0);
-        QCOMPARE(myTile->children.count(), 0);
+        QVERIFY(myTile->childrenEmpty());
         QCOMPARE(mm.getTileMarkerCount(tileIndex), 1);
     }
 
@@ -222,7 +222,7 @@ void TestModel::testMoveMarkers1()
         tileIndex = TileIndex::fromCoordinates(coord_50_60, l);
         ItemMarkerTiler::Tile* const myTile = mm.getTile(tileIndex, true);
         QVERIFY(myTile != 0);
-        QVERIFY(myTile->children.isEmpty());
+        QVERIFY(myTile->childrenEmpty());
         QVERIFY(mm.getTileMarkerCount(tileIndex) == 1);
     }
 
@@ -249,7 +249,7 @@ void TestModel::testMoveMarkers2()
         const TileIndex tileIndex = TileIndex::fromCoordinates(coord_1_2, l);
         ItemMarkerTiler::Tile* const myTile = mm.getTile(tileIndex, true);
         QVERIFY(myTile != 0);
-        QVERIFY(myTile->children.count()==0);
+        QVERIFY(myTile->childrenEmpty());
         QVERIFY(mm.getTileMarkerCount(tileIndex) == 2);
     }
     QStandardItem* const item3 = MakeItemAt(coord_50_60);
@@ -260,7 +260,7 @@ void TestModel::testMoveMarkers2()
         const TileIndex tileIndex = TileIndex::fromCoordinates(coord_50_60, l);
         ItemMarkerTiler::Tile* const myTile = mm.getTile(tileIndex, true);
         QVERIFY(myTile != 0);
-        QVERIFY(myTile->children.count()==0);
+        QVERIFY(myTile->childrenEmpty());
         QVERIFY(mm.getTileMarkerCount(tileIndex) == 1);
     }
 
@@ -282,7 +282,7 @@ void TestModel::testMoveMarkers2()
         QVERIFY(myTile != 0);
         if (l>fillLevel)
         {
-            QVERIFY(myTile->children.isEmpty());
+            QVERIFY(myTile->childrenEmpty());
         }
         QVERIFY(mm.getTileMarkerCount(tileIndex) == 2);
     }

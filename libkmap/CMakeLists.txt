@@ -38,6 +38,7 @@ SET(widget_sources
     kmap_common.cpp
     kmap_dragdrophandler.cpp
     kmap_modelhelper.cpp
+    kmap_tileindex.cpp
     map-backend.cpp
     html_widget.cpp
     abstractmarkertiler.cpp

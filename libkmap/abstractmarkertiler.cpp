@@ -381,162 +381,6 @@ AbstractMarkerTiler* AbstractMarkerTiler::NonEmptyIterator::model() const
     return d->model;
 }
 
-TileIndex TileIndex::fromCoordinates(const KMap::GeoCoordinates& coordinate,
-                                                                               const int getLevel)
-{
-    KMAP_ASSERT(getLevel<=MaxLevel);
-
-    if (!coordinate.hasCoordinates())
-        return TileIndex();
-
-    qreal tileLatBL     = -90.0;
-    qreal tileLonBL     = -180.0;
-    qreal tileLatHeight = 180.0;
-    qreal tileLonWidth  = 360.0;
-
-    TileIndex resultIndex;
-    for (int l = 0; l <= getLevel; ++l)
-    {
-        // how many tiles at this level?
-        const qreal latDivisor = TileIndex::Tiling;
-        const qreal lonDivisor = TileIndex::Tiling;
-
-        const qreal dLat       = tileLatHeight / latDivisor;
-        const qreal dLon       = tileLonWidth / lonDivisor;
-
-        int latIndex           = int( (coordinate.lat() - tileLatBL ) / dLat );
-        int lonIndex           = int( (coordinate.lon() - tileLonBL ) / dLon );
-
-        // protect against invalid indices due to rounding errors
-        bool haveRoundingErrors = false;
-        if (latIndex<0)
-        {
-            haveRoundingErrors = true;
-            latIndex = 0;
-        }
-        if (lonIndex<0)
-        {
-            haveRoundingErrors = true;
-            lonIndex = 0;
-        }
-        if (latIndex>=latDivisor)
-        {
-            haveRoundingErrors = true;
-            latIndex = latDivisor-1;
-        }
-        if (lonIndex>=lonDivisor)
-        {
-            haveRoundingErrors = true;
-            lonIndex = lonDivisor-1;
-        }
-        if (haveRoundingErrors)
-        {
-//             kDebug() << QString::fromLatin1("Rounding errors at level %1!").arg(l);
-        }
-
-        resultIndex.appendLatLonIndex(latIndex, lonIndex);
-
-        // update the start position for the next tile:
-        // TODO: rounding errors
-        tileLatBL     += latIndex*dLat;
-        tileLonBL     += lonIndex*dLon;
-        tileLatHeight /= latDivisor;
-        tileLonWidth  /= lonDivisor;
-    }
-
-    return resultIndex;
-}
-
-GeoCoordinates TileIndex::toCoordinates() const
-{
-    // TODO: safeguards against rounding errors!
-    qreal tileLatBL     = -90.0;
-    qreal tileLonBL     = -180.0;
-    qreal tileLatHeight = 180.0;
-    qreal tileLonWidth  = 360.0;
-
-    for (int l = 0; l < m_indicesCount; ++l)
-    {
-        // how many tiles are at this level?
-        const qreal latDivisor = TileIndex::Tiling;
-        const qreal lonDivisor = TileIndex::Tiling;
-
-        const qreal dLat       = tileLatHeight / latDivisor;
-        const qreal dLon       = tileLonWidth / lonDivisor;
-
-        const int latIndex     = indexLat(l);
-        const int lonIndex     = indexLon(l);
-
-        // update the start position for the next tile:
-        tileLatBL     += latIndex*dLat;
-        tileLonBL     += lonIndex*dLon;
-        tileLatHeight /= latDivisor;
-        tileLonWidth  /= lonDivisor;
-    }
-
-    return GeoCoordinates(tileLatBL, tileLonBL);
-}
-
-
-GeoCoordinates TileIndex::toCoordinates(const CornerPosition ofCorner) const
-{
-    // TODO: safeguards against rounding errors!
-    qreal tileLatBL     = -90.0;
-    qreal tileLonBL     = -180.0;
-    qreal tileLatHeight = 180.0;
-    qreal tileLonWidth  = 360.0;
-
-    for (int l = 0; l < m_indicesCount; ++l)
-    {
-        // how many tiles are at this level?
-        const qreal latDivisor = TileIndex::Tiling;
-        const qreal lonDivisor = TileIndex::Tiling;
-
-        const qreal dLat       = tileLatHeight / latDivisor;
-        const qreal dLon       = tileLonWidth / lonDivisor;
-
-        const int latIndex     = indexLat(l);
-        const int lonIndex     = indexLon(l);
-
-        // update the start position for the next tile:
-        if (l+1 >= m_indicesCount)
-        {
-            if (ofCorner == CornerNW)
-            {
-                tileLatBL += latIndex*dLat;
-                tileLonBL += lonIndex*dLon;
-            }
-            else if (ofCorner == CornerSW)
-            {
-                tileLatBL += (latIndex+1)*dLat;
-                tileLonBL += lonIndex*dLon;
-            }
-            else if (ofCorner == CornerNE)
-            {
-                tileLatBL += latIndex*dLat;
-                tileLonBL += (lonIndex+1)*dLon;
-            }
-            else if (ofCorner == CornerSE)
-            {
-                tileLatBL += (latIndex+1)*dLat;
-                tileLonBL += (lonIndex+1)*dLon;
-            }
-        }
-        else
-        {
-            // update the start position for the next tile:
-            tileLatBL     += latIndex*dLat;
-            tileLonBL     += lonIndex*dLon;
-        }
-
-        tileLatHeight /= latDivisor;
-        tileLonWidth  /= lonDivisor;
-    }
-
-    return GeoCoordinates(tileLatBL, tileLonBL);
-}
-
-
 bool AbstractMarkerTiler::isDirty() const
 {
     return d->isDirty;
@@ -601,11 +445,11 @@ void AbstractMarkerTiler::tileDeleteChildren(AbstractMarkerTiler::Tile* const ti
     if (!tile)
         return;
 
-    foreach(Tile* tilec, tile->children)
+    QVector<Tile*> tileChildren = tile->takeChildren();
+    foreach(Tile* tilec, tileChildren)
     {
         tileDelete(tilec);
     }
-    tile->children.clear();
 }
 
 void AbstractMarkerTiler::tileDeleteChild(AbstractMarkerTiler::Tile* const parentTile, AbstractMarkerTiler::Tile* const childTile, const int knownLinearIndex)
@@ -613,9 +457,9 @@ void AbstractMarkerTiler::tileDeleteChild(AbstractMarkerTiler::Tile* const paren
     int tileIndex = knownLinearIndex;
     if (tileIndex < 0)
     {
-        tileIndex = parentTile->children.indexOf(childTile);
+        tileIndex = parentTile->indexOfChildTile(childTile);
     }
-    parentTile->children.replace(tileIndex, 0);
+    parentTile->clearChild(tileIndex);
 
     tileDelete(childTile);
 }

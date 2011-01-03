@@ -90,16 +90,60 @@ public:
 
         Tile* getChild(const int linearIndex)
         {
-            prepareForChildren();
+            if (children.isEmpty())
+            {
+                return 0;
+            }
 
             return children.at(linearIndex);
         }
 
-        void addChild(const int linearIndex, Tile* const tilePointer = 0)
+        void addChild(const int linearIndex, Tile* const tilePointer)
         {
+            if ((tilePointer!=0)&&children.isEmpty())
+            {
+                return;
+            }
+
             prepareForChildren();
 
             children[linearIndex] = tilePointer;
+        }
+
+        /**
+         * @brief Sets the pointer to a child tile to zero, but you have to delete the tile by yourself!
+         */
+        void clearChild(const int linearIndex)
+        {
+            if (children.isEmpty())
+            {
+                return;
+            }
+
+            children[linearIndex] = 0;
+        }
+
+        int indexOfChildTile(Tile* const tile)
+        {
+            return children.indexOf(tile);
+        }
+
+        bool childrenEmpty() const
+        {
+            return children.isEmpty();
+        }
+
+        /**
+         * @brief Take away the list of children, only to be used for deleting them.
+         *
+         * @todo Make this function protected.
+         *
+         */
+        QVector<Tile*> takeChildren()
+        {
+            QVector<Tile*> childrenCopy = children;
+            children.clear();
+            return childrenCopy;
         }
 
     public:
