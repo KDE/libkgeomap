@@ -7,7 +7,7 @@
  * @date   2010-07-17
  * @brief  A marker tiler operating on item models
  *
- * @author Copyright (C) 2010 by Michael G. Hansen
+ * @author Copyright (C) 2010, 2011 by Michael G. Hansen
  *         <a href="mailto:mike at mghansen dot de">mike at mghansen dot de</a>
  * @author Copyright (C) 2010 by Gilles Caulier
  *         <a href="mailto:caulier dot gilles at gmail dot com">caulier dot gilles at gmail dot com</a>
@@ -46,52 +46,11 @@ class KMAP_EXPORT ItemMarkerTiler : public AbstractMarkerTiler
 {
     Q_OBJECT
 
+private:
+
+    class MyTile;
+
 public:
-
-    class MyTile : public Tile
-    {
-    public:
-        MyTile()
-        : Tile(),
-          markerIndices(),
-          selectedCount(0)
-        {
-        }
-
-        ~MyTile()
-        {
-        }
-
-        QList<QPersistentModelIndex> markerIndices;
-        int selectedCount;
-
-        void removeMarkerIndexOrInvalidIndex(const QModelIndex& indexToRemove)
-        {
-            int i=0;
-            while (i<markerIndices.count())
-            {
-                const QPersistentModelIndex& currentIndex = markerIndices.at(i);
-
-                // NOTE: this function is usually called after the model has sent
-                //       an aboutToRemove-signal. It is possible that the persistent
-                //       marker index became invalid before the caller received the signal.
-                //       we remove any invalid indices as we find them.
-                if ( !currentIndex.isValid() )
-                {
-                    markerIndices.takeAt(i);
-                    continue;
-                }
-
-                if ( currentIndex == indexToRemove )
-                {
-                    markerIndices.takeAt(i);
-                    return;
-                }
-
-                ++i;
-            }
-        }
-    };
 
     explicit ItemMarkerTiler(ModelHelper* const modelHelper, QObject* const parent = 0);
     virtual ~ItemMarkerTiler();

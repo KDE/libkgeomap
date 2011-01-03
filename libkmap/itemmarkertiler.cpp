@@ -33,6 +33,53 @@
 namespace KMap
 {
 
+class ItemMarkerTiler::MyTile : public Tile
+{
+public:
+    MyTile()
+    : Tile(),
+        markerIndices(),
+        selectedCount(0)
+    {
+    }
+
+    ~MyTile()
+    {
+    }
+
+    QList<QPersistentModelIndex> markerIndices;
+    int selectedCount;
+
+    void removeMarkerIndexOrInvalidIndex(const QModelIndex& indexToRemove);
+};
+
+void ItemMarkerTiler::MyTile::removeMarkerIndexOrInvalidIndex(const QModelIndex& indexToRemove)
+{
+    int i=0;
+    while (i<markerIndices.count())
+    {
+        const QPersistentModelIndex& currentIndex = markerIndices.at(i);
+
+        // NOTE: this function is usually called after the model has sent
+        //       an aboutToRemove-signal. It is possible that the persistent
+        //       marker index became invalid before the caller received the signal.
+        //       we remove any invalid indices as we find them.
+        if ( !currentIndex.isValid() )
+        {
+            markerIndices.takeAt(i);
+            continue;
+        }
+
+        if ( currentIndex == indexToRemove )
+        {
+            markerIndices.takeAt(i);
+            return;
+        }
+
+        ++i;
+    }
+}
+
 class ItemMarkerTiler::ItemMarkerTilerPrivate
 {
 public:
