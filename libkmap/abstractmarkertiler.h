@@ -7,7 +7,7 @@
  * @date   2009-12-01
  * @brief  An abstract base class for tiling of markers
  *
- * @author Copyright (C) 2009-2010 by Michael G. Hansen
+ * @author Copyright (C) 2009-2011 by Michael G. Hansen
  *         <a href="mailto:mike at mghansen dot de">mike at mghansen dot de</a>
  * @author Copyright (C) 2010 by Gilles Caulier
  *         <a href="mailto:caulier dot gilles at gmail dot com">caulier dot gilles at gmail dot com</a>
@@ -78,16 +78,6 @@ public:
             return TileIndex::Tiling * TileIndex::Tiling;
         }
 
-        void prepareForChildren()
-        {
-            if (!children.isEmpty())
-            {
-                return;
-            }
-
-            children = QVector<Tile*>(maxChildCount(), 0);
-        }
-
         Tile* getChild(const int linearIndex)
         {
             if (children.isEmpty())
@@ -100,7 +90,7 @@ public:
 
         void addChild(const int linearIndex, Tile* const tilePointer)
         {
-            if ((tilePointer!=0)&&children.isEmpty())
+            if ( (tilePointer==0) && children.isEmpty() )
             {
                 return;
             }
@@ -146,11 +136,26 @@ public:
             return childrenCopy;
         }
 
-    public:
+    private:
+
+        void prepareForChildren()
+        {
+            if (!children.isEmpty())
+            {
+                return;
+            }
+
+            children = QVector<Tile*>(maxChildCount(), 0);
+        }
+
+    private:
 
         QVector<Tile*> children;
+
+    public:
         int            selectedCount;
         int            markerCount;
+
     };
 
 public:

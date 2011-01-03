@@ -7,7 +7,7 @@
  * @date   2009-12-01
  * @brief  An abstract base class for tiling of markers
  *
- * @author Copyright (C) 2009-2010 by Michael G. Hansen
+ * @author Copyright (C) 2009-2011 by Michael G. Hansen
  *         <a href="mailto:mike at mghansen dot de">mike at mghansen dot de</a>
  * @author Copyright (C) 2010 by Gilles Caulier
  *         <a href="mailto:caulier dot gilles at gmail dot com">caulier dot gilles at gmail dot com</a>
@@ -403,7 +403,6 @@ AbstractMarkerTiler::Tile* AbstractMarkerTiler::resetRootTile()
 {
     tileDelete(d->rootTile);
     d->rootTile = tileNew();
-    d->rootTile->prepareForChildren();
 
     return d->rootTile;
 }

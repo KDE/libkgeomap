@@ -6,7 +6,7 @@
  * @date   2010-01-16
  * @brief  test for the model holding markers
  *
- * @author Copyright (C) 2010 by Michael G. Hansen
+ * @author Copyright (C) 2010, 2011 by Michael G. Hansen
  *         <a href="mailto:mike at mghansen dot de">mike at mghansen dot de</a>
  *
  * This program is free software; you can redistribute it

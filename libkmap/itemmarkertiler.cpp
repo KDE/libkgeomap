@@ -7,7 +7,7 @@
  * @date   2010-07-17
  * @brief  A marker tiler operating on item models
  *
- * @author Copyright (C) 2010 by Michael G. Hansen
+ * @author Copyright (C) 2010, 2011 by Michael G. Hansen
  *         <a href="mailto:mike at mghansen dot de">mike at mghansen dot de</a>
  * @author Copyright (C) 2010 by Gilles Caulier
  *         <a href="mailto:caulier dot gilles at gmail dot com">caulier dot gilles at gmail dot com</a>
@@ -408,8 +408,6 @@ AbstractMarkerTiler::Tile* ItemMarkerTiler::getTile(const TileIndex& tileIndex, 
         MyTile* childTile = 0;
         if (tile->childrenEmpty())
         {
-            tile->prepareForChildren();
-
             // if there are any markers in the tile,
             // we have to sort them into the child tiles:
             if (!tile->markerIndices.isEmpty())
