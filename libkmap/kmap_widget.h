@@ -7,7 +7,7 @@
  * @date   2009-12-01
  * @brief  world map widget library
  *
- * @author Copyright (C) 2009-2010 by Michael G. Hansen
+ * @author Copyright (C) 2009-2011 by Michael G. Hansen
  *         <a href="mailto:mike at mghansen dot de">mike at mghansen dot de</a>
  * @author Copyright (C) 2010 by Gilles Caulier
  *         <a href="mailto:caulier dot gilles at gmail dot com">caulier dot gilles at gmail dot com</a>
@@ -189,6 +189,7 @@ public:
 
 protected:
 
+    bool currentBackendReady() const;
     void applyCacheToBackend();
     void saveBackendToCache();
     void rebuildConfigurationMenu();
@@ -204,7 +205,7 @@ protected:
 
 protected Q_SLOTS:
 
-    void slotBackendReady(const QString& backendName);
+    void slotBackendReadyChanged(const QString& backendName);
     void slotChangeBackend(QAction* action);
     void slotBackendZoomChanged(const QString& newZoom);
     void slotClustersMoved(const QIntList& clusterIndices, const QPair<int, QModelIndex>& snapTarget);

@@ -7,7 +7,7 @@
  * @date   2009-12-01
  * @brief  Google-Maps-backend for KMap
  *
- * @author Copyright (C) 2009-2010 by Michael G. Hansen
+ * @author Copyright (C) 2009-2011 by Michael G. Hansen
  *         <a href="mailto:mike at mghansen dot de">mike at mghansen dot de</a>
  * @author Copyright (C) 2010 by Gilles Caulier
  *         <a href="mailto:caulier dot gilles at gmail dot com">caulier dot gilles at gmail dot com</a>
@@ -270,7 +270,7 @@ void BackendGoogleMaps::slotHTMLInitialized()
     setShowScaleControl(d->cacheShowNavigationControl);
     setCenter(d->cacheCenter);
     d->htmlWidget->runScript(QString::fromLatin1("wmwSetZoom(%1);").arg(d->cacheZoom));
-    emit(signalBackendReady(backendName()));
+    emit(signalBackendReadyChanged(backendName()));
 }
 
 void BackendGoogleMaps::zoomIn()
@@ -1162,7 +1162,8 @@ void BackendGoogleMaps::releaseWidget(KMapInternalWidgetInfo* const info)
     info->currentOwner = 0;
     info->state = KMapInternalWidgetInfo::InternalWidgetReleased;
 
-    /// @todo Tell the KMapWidget to remove the widget
+    d->isReady = false;
+    emit(signalBackendReadyChanged(backendName()));
 }
 
 void BackendGoogleMaps::mapWidgetDocked(const bool state)

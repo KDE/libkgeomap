@@ -7,7 +7,7 @@
  * @date   2009-12-01
  * @brief  world map widget library
  *
- * @author Copyright (C) 2009-2010 by Michael G. Hansen
+ * @author Copyright (C) 2009-2011 by Michael G. Hansen
  *         <a href="mailto:mike at mghansen dot de">mike at mghansen dot de</a>
  * @author Copyright (C) 2010 by Gilles Caulier
  *         <a href="mailto:caulier dot gilles at gmail dot com">caulier dot gilles at gmail dot com</a>
@@ -123,7 +123,6 @@ public:
       : loadedAltitudeBackends(),
         loadedBackends(),
         currentBackend(0),
-        currentBackendReady(false),
         currentBackendName(),
         stackedLayout(0),
         cacheCenterCoordinate(52.0,6.0),
@@ -166,7 +165,6 @@ public:
     QList<AltitudeBackend*> loadedAltitudeBackends;
     QList<MapBackend*>      loadedBackends;
     MapBackend*             currentBackend;
-    bool                    currentBackendReady;
     QString                 currentBackendName;
     QStackedLayout*         stackedLayout;
 
@@ -443,8 +441,8 @@ bool KMapWidget::setBackend(const QString& backendName)
     {
         d->currentBackend->setActive(false);
 
-        disconnect(d->currentBackend, SIGNAL(signalBackendReady(const QString&)),
-                this, SLOT(slotBackendReady(const QString&)));
+        disconnect(d->currentBackend, SIGNAL(signalBackendReadyChanged(const QString&)),
+                this, SLOT(slotBackendReadyChanged(const QString&)));
 
         disconnect(d->currentBackend, SIGNAL(signalZoomChanged(const QString&)),
                 this, SLOT(slotBackendZoomChanged(const QString&)));
@@ -477,10 +475,9 @@ bool KMapWidget::setBackend(const QString& backendName)
             kDebug() << QString::fromLatin1("setting backend %1").arg(backendName);
             d->currentBackend = backend;
             d->currentBackendName = backendName;
-            d->currentBackendReady = false;
 
-            connect(d->currentBackend, SIGNAL(signalBackendReady(const QString&)),
-                    this, SLOT(slotBackendReady(const QString&)));
+            connect(d->currentBackend, SIGNAL(signalBackendReadyChanged(const QString&)),
+                    this, SLOT(slotBackendReadyChanged(const QString&)));
 
             connect(d->currentBackend, SIGNAL(signalZoomChanged(const QString&)),
                     this, SLOT(slotBackendZoomChanged(const QString&)));
@@ -514,7 +511,7 @@ bool KMapWidget::setBackend(const QString& backendName)
                 // call this slot manually in case the backend was ready right away:
                 if (d->currentBackend->isReady())
                 {
-                    slotBackendReady(d->currentBackendName);
+                    slotBackendReadyChanged(d->currentBackendName);
                 }
                 else
                 {
@@ -533,7 +530,7 @@ bool KMapWidget::setBackend(const QString& backendName)
 
 void KMapWidget::applyCacheToBackend()
 {
-    if (!d->currentBackendReady)
+    if (!currentBackendReady())
         return;
 
     setCenter(d->cacheCenterCoordinate);
@@ -545,7 +542,7 @@ void KMapWidget::applyCacheToBackend()
 
 void KMapWidget::saveBackendToCache()
 {
-    if (!d->currentBackendReady)
+    if (!currentBackendReady())
         return;
 
     d->cacheCenterCoordinate   = getCenter();
@@ -554,8 +551,10 @@ void KMapWidget::saveBackendToCache()
 
 GeoCoordinates KMapWidget::getCenter() const
 {
-    if (!d->currentBackendReady)
-        return GeoCoordinates();
+    if (!currentBackendReady())
+    {
+        return d->cacheCenterCoordinate;
+    }
 
     return d->currentBackend->getCenter();
 }
@@ -564,19 +563,26 @@ void KMapWidget::setCenter(const GeoCoordinates& coordinate)
 {
     d->cacheCenterCoordinate = coordinate;
 
-    if (!d->currentBackendReady)
+    if (!currentBackendReady())
+    {
         return;
+    }
 
     d->currentBackend->setCenter(coordinate);
 }
 
-void KMapWidget::slotBackendReady(const QString& backendName)
+void KMapWidget::slotBackendReadyChanged(const QString& backendName)
 {
     kDebug()<<QString::fromLatin1("backend %1 is ready!").arg(backendName);
     if (backendName != d->currentBackendName)
+    {
         return;
+    }
 
-    d->currentBackendReady = true;
+    if (!currentBackendReady())
+    {
+        return;
+    }
 
     applyCacheToBackend();
 
@@ -626,6 +632,7 @@ void KMapWidget::saveSettingsToGroup(KConfigGroup* const group)
     group->writeEntry("Thumbnail Grouping Radius", d->thumbnailGroupingRadius);
     group->writeEntry("Marker Grouping Radius", d->markerGroupingRadius);
     group->writeEntry("Show Thumbnails", s->showThumbnails);
+
     if (d->visibleExtraActions.testFlag(ExtraActionSticky))
     {
         group->writeEntry("Sticky Mode State", d->actionStickyMode->isChecked());
@@ -641,7 +648,9 @@ void KMapWidget::readSettingsFromGroup(const KConfigGroup* const group)
 {
     KMAP_ASSERT(group != 0);
     if (!group)
+    {
         return;
+    }
 
     setBackend(group->readEntry("Backend", "marble"));
 
@@ -690,7 +699,7 @@ void KMapWidget::rebuildConfigurationMenu()
         d->configurationMenu->addAction(backendAction);
     }
 
-    if (d->currentBackendReady)
+    if (currentBackendReady())
     {
         d->currentBackend->addActionsToConfigurationMenu(d->configurationMenu);
     }
@@ -813,7 +822,7 @@ QWidget* KMapWidget::getControlWidget()
 
 void KMapWidget::slotZoomIn()
 {
-    if (!d->currentBackendReady)
+    if (!currentBackendReady())
         return;
 
     d->currentBackend->zoomIn();
@@ -821,7 +830,7 @@ void KMapWidget::slotZoomIn()
 
 void KMapWidget::slotZoomOut()
 {
-    if (!d->currentBackendReady)
+    if (!currentBackendReady())
         return;
 
     d->currentBackend->zoomOut();
@@ -868,7 +877,7 @@ void KMapWidget::slotChangeBackend(QAction* action)
 
 void KMapWidget::updateMarkers()
 {
-    if (!d->currentBackendReady)
+    if (!currentBackendReady())
         return;
 
     // tell the backend to update the markers
@@ -901,7 +910,7 @@ void KMapWidget::updateClusters()
 
     s->clusterList.clear();
 
-    if (!d->currentBackendReady)
+    if (!currentBackendReady())
         return;
 
     const int markerLevel = d->currentBackend->getMarkerModelLevel();
@@ -1140,7 +1149,7 @@ void KMapWidget::updateClusters()
 
 void KMapWidget::slotClustersNeedUpdating()
 {
-    if (d->currentBackendReady)
+    if (currentBackendReady())
     {
         d->currentBackend->slotClustersNeedUpdating();
     }
@@ -1361,7 +1370,7 @@ void KMapWidget::setZoom(const QString& newZoom)
 {
     d->cacheZoom = newZoom;
 
-    if (d->currentBackendReady)
+    if (currentBackendReady())
     {
         d->currentBackend->setZoom(d->cacheZoom);
     }
@@ -1369,7 +1378,7 @@ void KMapWidget::setZoom(const QString& newZoom)
 
 QString KMapWidget::getZoom()
 {
-    if (d->currentBackendReady)
+    if (currentBackendReady())
     {
         d->cacheZoom = d->currentBackend->getZoom();
     }
@@ -2209,7 +2218,7 @@ void KMapWidget::setActive(const bool state)
             // call this slot manually in case the backend was ready right away:
             if (d->currentBackend->isReady())
             {
-                slotBackendReady(d->currentBackendName);
+                slotBackendReadyChanged(d->currentBackendName);
             }
             else
             {
@@ -2408,6 +2417,16 @@ void KMapWidget::slotMouseModeChanged(QAction* triggeredAction)
     emit(signalMouseModeChanged(s->currentMouseMode));
 
     /// @todo Update action availability?
+}
+
+bool KMapWidget::currentBackendReady() const
+{
+    if (!d->currentBackend)
+    {
+        return false;
+    }
+
+    return d->currentBackend->isReady();
 }
 
 } /* namespace KMap */

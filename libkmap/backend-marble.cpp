@@ -7,7 +7,7 @@
  * @date   2009-12-08
  * @brief  Marble-backend for KMap
  *
- * @author Copyright (C) 2009-2010 by Michael G. Hansen
+ * @author Copyright (C) 2009-2011 by Michael G. Hansen
  *         <a href="mailto:mike at mghansen dot de">mike at mghansen dot de</a>
  * @author Copyright (C) 2010 by Gilles Caulier
  *         <a href="mailto:caulier dot gilles at gmail dot com">caulier dot gilles at gmail dot com</a>
@@ -239,7 +239,7 @@ QWidget* BackendMarble::mapWidget()
         /// @todo Do this only if we are set active!
         setMapTheme(d->cacheMapTheme);
 
-        emit(signalBackendReady(backendName()));
+        emit(signalBackendReadyChanged(backendName()));
     }
 
     return d->marbleWidget;
@@ -268,11 +268,16 @@ void BackendMarble::releaseWidget(KMapInternalWidgetInfo* const info)
     d->bmLayer = 0;
 #endif /* KMAP_MARBLE_ADD_LAYER */
 
-    /// @todo Tell the KMapWidget to remove the widget
+    emit(signalBackendReadyChanged(backendName()));
 }
 
 GeoCoordinates BackendMarble::getCenter() const
 {
+    if (!d->marbleWidget)
+    {
+        return GeoCoordinates();
+    }
+
     return GeoCoordinates(d->marbleWidget->centerLatitude(), d->marbleWidget->centerLongitude());
 }
 
