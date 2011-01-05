@@ -239,7 +239,7 @@ QWidget* BackendMarble::mapWidget()
 
         // set a backend first
         /// @todo Do this only if we are set active!
-        setMapTheme(d->cacheMapTheme);
+        applyCacheToWidget();
 
         emit(signalBackendReadyChanged(backendName()));
     }
@@ -486,8 +486,8 @@ void BackendMarble::saveSettingsToGroup(KConfigGroup* const group)
     if (!group)
         return;
 
-    group->writeEntry("Marble Map Theme", getMapTheme());
-    group->writeEntry("Marble Projection", getProjection());
+    group->writeEntry("Marble Map Theme", d->cacheMapTheme);
+    group->writeEntry("Marble Projection", d->cacheProjection);
     group->writeEntry("Marble Show Scale Bar", d->cacheShowScaleBar);
     group->writeEntry("Marble Show Compass", d->cacheShowCompass);
     group->writeEntry("Marble Show Overview Map", d->cacheShowOverviewMap);
@@ -499,8 +499,8 @@ void BackendMarble::readSettingsFromGroup(const KConfigGroup* const group)
     if (!group)
         return;
 
-    setMapTheme(group->readEntry("Marble Map Theme", "atlas"));
-    setProjection(group->readEntry("Marble Projection", "mercator"));
+    setMapTheme(group->readEntry("Marble Map Theme", d->cacheMapTheme));
+    setProjection(group->readEntry("Marble Projection", d->cacheProjection));
     setShowScaleBar(group->readEntry("Marble Show Scale Bar", d->cacheShowScaleBar));
     setShowCompass(group->readEntry("Marble Show Compass", d->cacheShowCompass));
     setShowOverviewMap(group->readEntry("Marble Show Overview Map", d->cacheShowOverviewMap));
@@ -784,22 +784,23 @@ void BackendMarble::marbleCustomPaint(Marble::GeoPainter* painter)
 
 QString BackendMarble::getProjection() const
 {
+    /// @todo Do we actually need to read out the projection from the widget???
     if (d->marbleWidget)
     {
         const Marble::Projection currentProjection = d->marbleWidget->projection();
         switch (currentProjection)
         {
         case Marble::Equirectangular:
-            d->cacheProjection = QLatin1String("equirectangular" );
+            d->cacheProjection = QLatin1String("equirectangular");
             break;
 
         case Marble::Mercator:
-            d->cacheProjection = QLatin1String("mercator" );
+            d->cacheProjection = QLatin1String("mercator");
             break;
 
         default:
         case Marble::Spherical:
-            d->cacheProjection = QLatin1String("spherical" );
+            d->cacheProjection = QLatin1String("spherical");
             break;
         }
     }
@@ -1382,7 +1383,7 @@ void BackendMarble::updateActionAvailability()
     const QList<QAction*> projectionActions = d->actionGroupProjection->actions();
     for (int i=0; i<projectionActions.size(); ++i)
     {
-        projectionActions.at(i)->setChecked(projectionActions.at(i)->data().toString()==getProjection());
+        projectionActions.at(i)->setChecked(projectionActions.at(i)->data().toString()==d->cacheProjection);
     }
 
     d->actionShowCompass->setChecked(d->cacheShowCompass);
@@ -1542,7 +1543,7 @@ void BackendMarble::setActive(const bool state)
             info.currentOwner = this;
             info.backendName = backendName();
             info.state = d->widgetIsDocked ? KMapInternalWidgetInfo::InternalWidgetStillDocked : KMapInternalWidgetInfo::InternalWidgetUndocked;
-            
+
             BMInternalWidgetInfo intInfo;
 #ifdef KMAP_MARBLE_ADD_LAYER
             intInfo.bmLayer = d->bmLayer;
@@ -1631,6 +1632,21 @@ void BackendMarble::deleteInfoFunction(KMapInternalWidgetInfo* const info)
 #endif
 
     delete info->widget.data();
+}
+
+void BackendMarble::applyCacheToWidget()
+{
+    /// @todo Do this only when the widget is active!
+    if (!d->marbleWidget)
+    {
+        return;
+    }
+
+    setMapTheme(d->cacheMapTheme);
+    setProjection(d->cacheProjection);
+    setShowCompass(d->cacheShowCompass);
+    setShowOverviewMap(d->cacheShowOverviewMap);
+    setShowScaleBar(d->cacheShowScaleBar);
 }
 
 } /* namespace KMap */
