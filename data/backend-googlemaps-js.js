@@ -593,12 +593,22 @@ function setTemporarySelectionRectangle(west, north, east, south)
 
 function removeSelectionRectangle()
 {
+    if (!selectionRectangle)
+    {
+        return;
+    }
+
     selectionRectangle.setMap(null);
     selectionRectangle = null;
 }
 
 function removeTemporarySelectionRectangle()
 {
+    if (!temporarySelectionRectangle)
+    {
+        return;
+    }
+
     temporarySelectionRectangle.setMap(null);
     temporarySelectionRectangle = null;
 
