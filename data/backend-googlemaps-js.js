@@ -3,7 +3,7 @@
  * Date        : 2010-02-05
  * Description : JavaScript part of the GoogleMaps-backend for WorldMapWidget2
  *
- * Copyright (C) 2010 by Michael G. Hansen <mike at mghansen dot de>
+ * Copyright (C) 2010, 2011 by Michael G. Hansen <mike at mghansen dot de>
  *
  * This program is free software; you can redistribute it
  * and/or modify it under the terms of the GNU General
@@ -42,13 +42,13 @@ ProjectionHelper.prototype = new google.maps.OverlayView();
 ProjectionHelper.prototype.draw = function() { }
 var projectionHelper = null;
 
-function wmwPostEventString(eventString)
+function kmapPostEventString(eventString)
 {
     eventBuffer.push(eventString);
     window.status = '(event)';
 }
 
-function wmwReadEventStrings()
+function kmapReadEventStrings()
 {
     var eventBufferString = eventBuffer.join('|');
     eventBuffer = new Array();
@@ -57,27 +57,27 @@ function wmwReadEventStrings()
     return eventBufferString;
 }
 
-function wmwDebugOut(someString)
+function kmapDebugOut(someString)
 {
-    wmwPostEventString('do'+someString);
+    kmapPostEventString('do'+someString);
 }
 
-function wmwSetZoom(zoomvalue)
+function kmapSetZoom(zoomvalue)
 {
     map.setZoom(zoomvalue);
 }
 
-function wmwGetZoom()
+function kmapGetZoom()
 {
     return map.getZoom();
 }
 
-function wmwGetMaxZoom()
+function kmapGetMaxZoom()
 {
     return map.mapTypes[map.getMapTypeId()].maxZoom;
 }
 
-function wmwGetMinZoom()
+function kmapGetMinZoom()
 {
     var minZoom = map.mapTypes[map.getMapTypeId()].minZoom;
     if (minZoom==null)
@@ -87,39 +87,39 @@ function wmwGetMinZoom()
     return minZoom;
 }
 
-function wmwZoomIn()
+function kmapZoomIn()
 {
     map.setZoom(map.getZoom()+1);
 }
 
-function wmwZoomOut()
+function kmapZoomOut()
 {
     map.setZoom(map.getZoom()-1);
 }
 
-function wmwSetCenter(lat, lon)
+function kmapSetCenter(lat, lon)
 {
     var latlng = new google.maps.LatLng(lat, lon);
     map.setCenter(latlng);
 }
 
-function wmwGetCenter()
+function kmapGetCenter()
 {
     var latlngString = map.getCenter().toUrlValue(12);
     return latlngString;
 }
 
-function wmwGetBounds()
+function kmapGetBounds()
 {
     return map.getBounds().toString();
 }
 
-function wmwSetIsInEditMode(state)
+function kmapSetIsInEditMode(state)
 {
     isInEditMode = state;
 }
 
-function wmwLatLngToPoint(latLng)
+function kmapLatLngToPoint(latLng)
 {
     //      There is an offset in fromLatLngToDivPixel once the map has been panned
     var myPoint = projectionHelper.getProjection().fromLatLngToDivPixel(latLng);
@@ -131,7 +131,7 @@ function wmwLatLngToPoint(latLng)
     return new google.maps.Point(pointX, pointY);
 }
 
-function wmwLatLngToPixel(lat, lon)
+function kmapLatLngToPixel(lat, lon)
 {
     //      There is an offset in fromLatLngToDivPixel once the map has been panned
     var latlng = new google.maps.LatLng(lat, lon);
@@ -145,7 +145,7 @@ function wmwLatLngToPixel(lat, lon)
 //         return projectionHelper.getProjection().fromLatLngToDivPixel(latlng).toString();
 }
 
-function wmwPixelToLatLngObject(x, y)
+function kmapPixelToLatLngObject(x, y)
 {
     //      There is an offset in fromDivPixelToLatLng once the map has been panned
     var centerPoint = projectionHelper.getProjection().fromLatLngToDivPixel(map.getCenter());
@@ -157,13 +157,13 @@ function wmwPixelToLatLngObject(x, y)
     return projectionHelper.getProjection().fromDivPixelToLatLng(point);
 }
 
-function wmwPixelToLatLng(x, y)
+function kmapPixelToLatLng(x, y)
 {
-    return wmwPixelToLatLngObject(x, y).toUrlValue(12);
+    return kmapPixelToLatLngObject(x, y).toUrlValue(12);
 }
 
 // parameter: "SATELLITE"/"ROADMAP"/"HYBRID"/"TERRAIN"
-function wmwSetMapType(newMapType)
+function kmapSetMapType(newMapType)
 {
     if (newMapType == "SATELLITE") { map.setMapTypeId(google.maps.MapTypeId.SATELLITE); }
     if (newMapType == "ROADMAP")   { map.setMapTypeId(google.maps.MapTypeId.ROADMAP); }
@@ -171,7 +171,7 @@ function wmwSetMapType(newMapType)
     if (newMapType == "TERRAIN")   { map.setMapTypeId(google.maps.MapTypeId.TERRAIN); }
 }
 
-function wmwGetMapType()
+function kmapGetMapType()
 {
     var myMapType = map.getMapTypeId();
     if (myMapType == google.maps.MapTypeId.SATELLITE) { return "SATELLITE"; }
@@ -181,7 +181,7 @@ function wmwGetMapType()
     return "";
 }
 
-function wmwSetShowMapTypeControl(state)
+function kmapSetShowMapTypeControl(state)
 {
     var myOptions = {
             mapTypeControl: state
@@ -189,7 +189,7 @@ function wmwSetShowMapTypeControl(state)
     map.setOptions(myOptions);
 }
 
-function wmwSetShowNavigationControl(state)
+function kmapSetShowNavigationControl(state)
 {
     var myOptions = {
             navigationControl: state
@@ -197,7 +197,7 @@ function wmwSetShowNavigationControl(state)
     map.setOptions(myOptions);
 }
 
-function wmwSetShowScaleControl(state)
+function kmapSetShowScaleControl(state)
 {
     var myOptions = {
             scaleControl: state
@@ -205,7 +205,7 @@ function wmwSetShowScaleControl(state)
     map.setOptions(myOptions);
 }
 
-function wmwClearMarkers(mid)
+function kmapClearMarkers(mid)
 {
     for (var i in markerList[mid])
     {
@@ -214,7 +214,7 @@ function wmwClearMarkers(mid)
     markerList[mid] = new Object();
 }
 
-function wmwSetMarkerPixmap(mid, id, pixmapWidth, pixmapHeight, xOffset, yOffset, pixmapurl)
+function kmapSetMarkerPixmap(mid, id, pixmapWidth, pixmapHeight, xOffset, yOffset, pixmapurl)
 {
     var pixmapSize = new google.maps.Size(pixmapWidth, pixmapHeight);
     var pixmapOrigin = new google.maps.Point(0, 0);
@@ -223,7 +223,7 @@ function wmwSetMarkerPixmap(mid, id, pixmapWidth, pixmapHeight, xOffset, yOffset
     markerList[mid][id].marker.setIcon(markerImage);
 }
 
-function wmwAddMarker(mid, id, lat, lon, setDraggable, setSnaps)
+function kmapAddMarker(mid, id, lat, lon, setDraggable, setSnaps)
 {
     var latlng = new google.maps.LatLng(lat, lon);
     var marker = new google.maps.Marker({
@@ -236,7 +236,7 @@ function wmwAddMarker(mid, id, lat, lon, setDraggable, setSnaps)
 
     google.maps.event.addListener(marker, 'dragend', function()
         {
-            wmwPostEventString('mm'+id.toString());
+            kmapPostEventString('mm'+id.toString());
         });
     if (!markerList[mid])
     {
@@ -248,7 +248,7 @@ function wmwAddMarker(mid, id, lat, lon, setDraggable, setSnaps)
         };
 }
 
-function wmwGetMarkerPosition(mid,id)
+function kmapGetMarkerPosition(mid,id)
 {
     var latlngString;
     if (markerList[mid.toString()][id.toString()])
@@ -258,7 +258,7 @@ function wmwGetMarkerPosition(mid,id)
     return latlngString;
 }
 
-function wmwClearClusters()
+function kmapClearClusters()
 {
     for (var i in clusterList)
     {
@@ -268,7 +268,7 @@ function wmwClearClusters()
     clusterDataList = new Object();
 }
 
-function wmwGetPixmapName(markerCount, markerSelectedCount)
+function kmapGetPixmapName(markerCount, markerSelectedCount)
 {
     var colorCode;
     if (markerCount>=100)
@@ -302,7 +302,7 @@ function wmwGetPixmapName(markerCount, markerSelectedCount)
     return colorCode;
 }
 
-function wmwSetClusterPixmap(id, pixmapWidth, pixmapHeight, xOffset, yOffset, pixmapurl)
+function kmapSetClusterPixmap(id, pixmapWidth, pixmapHeight, xOffset, yOffset, pixmapurl)
 {
     var pixmapSize = new google.maps.Size(pixmapWidth, pixmapHeight);
     var pixmapOrigin = new google.maps.Point(0, 0);
@@ -311,11 +311,11 @@ function wmwSetClusterPixmap(id, pixmapWidth, pixmapHeight, xOffset, yOffset, pi
     clusterList[id].setIcon(markerImage);
 }
 
-function wmwAddCluster(id, lat, lon, setDraggable, markerCount, markerSelectedCount)
+function kmapAddCluster(id, lat, lon, setDraggable, markerCount, markerSelectedCount)
 {
     var latlng = new google.maps.LatLng(lat, lon);
     var clusterIcon;
-    var colorCode = wmwGetPixmapName(markerCount, markerSelectedCount);
+    var colorCode = kmapGetPixmapName(markerCount, markerSelectedCount);
     if (isInEditMode)
     {
         clusterIcon = new google.maps.MarkerImage('marker-'+colorCode+'.png', new google.maps.Size(20, 32));
@@ -359,14 +359,14 @@ function wmwAddCluster(id, lat, lon, setDraggable, markerCount, markerSelectedCo
 
                     if (i!=id)
                     {
-                        var colorCode = wmwGetPixmapName(newMarkerCount, 0);
+                        var colorCode = kmapGetPixmapName(newMarkerCount, 0);
                         var clusterIcon = new google.maps.MarkerImage('marker-'+colorCode+'.png', new google.maps.Size(20, 32));
                         clusterList[i].setOptions({ icon: clusterIcon, title: newMarkerCount.toString() });
                     }
                 }
             }
             // adjust the moving marker
-            var colorCode = wmwGetPixmapName(newSelectedCount, newSelectedCount);
+            var colorCode = kmapGetPixmapName(newSelectedCount, newSelectedCount);
             var clusterIcon = new google.maps.MarkerImage('marker-'+colorCode+'.png', new google.maps.Size(20, 32));
             clusterList[id].setOptions({ icon: clusterIcon, title: newSelectedCount.toString()});
 
@@ -374,7 +374,7 @@ function wmwAddCluster(id, lat, lon, setDraggable, markerCount, markerSelectedCo
             var leftOverMarkerCount=movingClusterData.MarkerCount-movingClusterData.MarkerSelectedCount;
             if (leftOverMarkerCount>0)
             {
-                var colorCode = wmwGetPixmapName(leftOverMarkerCount, 0);
+                var colorCode = kmapGetPixmapName(leftOverMarkerCount, 0);
                 var clusterIcon = new google.maps.MarkerImage('marker-'+colorCode+'.png', new google.maps.Size(20, 32));
                 var leftOverMarker = new google.maps.Marker({
                         position: latlng,
@@ -389,12 +389,12 @@ function wmwAddCluster(id, lat, lon, setDraggable, markerCount, markerSelectedCo
     google.maps.event.addListener(marker, 'drag', function(e)
         {
             // get the pixel position:
-            var clusterPoint = wmwLatLngToPoint(e.latLng);
+            var clusterPoint = kmapLatLngToPoint(e.latLng);
             // now iterate through all markers to which we can snap
             var minDistSquared=-1;
             var minMid;
             var minId;
-            wmwDebugOut('drag');
+            kmapDebugOut('drag');
             for (var mid in markerList)
             {
                 for (var id in markerList[mid])
@@ -404,7 +404,7 @@ function wmwAddCluster(id, lat, lon, setDraggable, markerCount, markerSelectedCo
                         continue;
                     }
 
-                    var markerPoint = wmwLatLngToPoint(markerList[mid][id].marker.getPosition());
+                    var markerPoint = kmapLatLngToPoint(markerList[mid][id].marker.getPosition());
                     var distanceSquared = (clusterPoint.x-markerPoint.x)*(clusterPoint.x-markerPoint.x) + (clusterPoint.y-markerPoint.y)*(clusterPoint.y-markerPoint.y);
                     if ((distanceSquared<=100)&&((minDistSquared<0)||(distanceSquared<minDistSquared)))
                     {
@@ -431,16 +431,16 @@ function wmwAddCluster(id, lat, lon, setDraggable, markerCount, markerSelectedCo
         {
             if (dragSnappingToMid>=0)
             {
-                wmwPostEventString('cs'+id.toString()+'/'+dragSnappingToMid.toString()+'/'+dragSnappingToId.toString());
+                kmapPostEventString('cs'+id.toString()+'/'+dragSnappingToMid.toString()+'/'+dragSnappingToId.toString());
             }
             else
             {
-                wmwPostEventString('cm'+id.toString());
+                kmapPostEventString('cm'+id.toString());
             }
         });
     google.maps.event.addListener(marker, 'click', function()
         {
-            wmwPostEventString('cc'+id.toString());
+            kmapPostEventString('cc'+id.toString());
         });
     
     clusterList[id] = marker;
@@ -450,7 +450,7 @@ function wmwAddCluster(id, lat, lon, setDraggable, markerCount, markerSelectedCo
     clusterDataList[id]=clusterData;
 }
 
-function wmwGetClusterPosition(id)
+function kmapGetClusterPosition(id)
 {
     var latlngString;
     if (clusterList[id.toString()])
@@ -460,12 +460,12 @@ function wmwGetClusterPosition(id)
     return latlngString;
 }
 
-function wmwWidgetResized(newWidth, newHeight)
+function kmapWidgetResized(newWidth, newHeight)
 {
     document.getElementById('map_canvas').style.height=newHeight.toString()+'px';
 }
 
-function wmwRemoveDragMarker()
+function kmapRemoveDragMarker()
 {
     if (dragMarker)
     {
@@ -474,19 +474,19 @@ function wmwRemoveDragMarker()
     }
 }
 
-function wmwMoveDragMarker(x, y)
+function kmapMoveDragMarker(x, y)
 {
     if (dragMarker)
     {
-        dragMarker.setPosition(wmwPixelToLatLngObject(x ,y));
+        dragMarker.setPosition(kmapPixelToLatLngObject(x ,y));
     }
 }
 
-function wmwSetDragMarker(x, y, markerCount, markerSelectedCount)
+function kmapSetDragMarker(x, y, markerCount, markerSelectedCount)
 {
-    wmwRemoveDragMarker();
-    var latlng = wmwPixelToLatLngObject(x, y);
-    var colorCode = wmwGetPixmapName(markerCount, markerSelectedCount);
+    kmapRemoveDragMarker();
+    var latlng = kmapPixelToLatLngObject(x, y);
+    var colorCode = kmapGetPixmapName(markerCount, markerSelectedCount);
     var clusterIcon = new google.maps.MarkerImage('marker-'+colorCode+'.png', new google.maps.Size(20, 32));
     dragMarker = new google.maps.Marker({
             position: latlng,
@@ -495,7 +495,7 @@ function wmwSetDragMarker(x, y, markerCount, markerSelectedCount)
         });
 }
 
-function updateSelectionRectangleColor()
+function kmapUpdateSelectionRectangleColor()
 {
     if (selectionRectangle == null)
     {
@@ -520,7 +520,7 @@ function updateSelectionRectangleColor()
     }
 }
 
-function setSelectionRectangle(west, north, east, south)
+function kmapSetSelectionRectangle(west, north, east, south)
 {
     var firstSelectionPoint = new google.maps.LatLng(south,west,true);
     var secondSelectionPoint = new google.maps.LatLng(north,east,true);
@@ -552,11 +552,11 @@ function setSelectionRectangle(west, north, east, south)
                 });
     }
 
-    updateSelectionRectangleColor();
+    kmapUpdateSelectionRectangleColor();
 }
 
 
-function setTemporarySelectionRectangle(west, north, east, south)
+function kmapSetTemporarySelectionRectangle(west, north, east, south)
 {
     var firstPoint = new google.maps.LatLng(south,west,true);
     var secondPoint = new google.maps.LatLng(north,east,true);
@@ -588,10 +588,10 @@ function setTemporarySelectionRectangle(west, north, east, south)
                 });
     }
 
-    updateSelectionRectangleColor();
+    kmapUpdateSelectionRectangleColor();
 }
 
-function removeSelectionRectangle()
+function kmapRemoveSelectionRectangle()
 {
     if (!selectionRectangle)
     {
@@ -602,7 +602,7 @@ function removeSelectionRectangle()
     selectionRectangle = null;
 }
 
-function removeTemporarySelectionRectangle()
+function kmapRemoveTemporarySelectionRectangle()
 {
     if (!temporarySelectionRectangle)
     {
@@ -612,20 +612,20 @@ function removeTemporarySelectionRectangle()
     temporarySelectionRectangle.setMap(null);
     temporarySelectionRectangle = null;
 
-    updateSelectionRectangleColor();
+    kmapUpdateSelectionRectangleColor();
 }
 
-function selectionModeStatus(state)
+function kmapSelectionModeStatus(state)
 {
     map.draggable = !state;
 
     if (!state)
     {
-        removeTemporarySelectionRectangle();
+        kmapRemoveTemporarySelectionRectangle();
     }
 }
 
-function setMapBoundaries(west, north, east, south, useSaneZoomLevel)
+function kmapSetMapBoundaries(west, north, east, south, useSaneZoomLevel)
 {
     firstPoint = new google.maps.LatLng(south, west, true);
     secondPoint = new google.maps.LatLng(north, east, true);
@@ -640,7 +640,7 @@ function setMapBoundaries(west, north, east, south, useSaneZoomLevel)
 }
 
 
-function initialize()
+function kmapInitialize()
 {
     var latlng = new google.maps.LatLng(52.0, 6.0);
     var myOptions = {
@@ -653,7 +653,7 @@ function initialize()
     map = new google.maps.Map(mapDiv, myOptions);
     google.maps.event.addListener(map, 'maptypeid_changed', function()
         {
-            wmwPostEventString('MT'+wmwGetMapType());
+            kmapPostEventString('MT'+kmapGetMapType());
         });
 
     //google.maps.event.clearListeners(map, 'dragstart');
@@ -663,14 +663,14 @@ function initialize()
 
     //  these are too heavy on the performance. monitor 'idle' event only for now:
     //       google.maps.event.addListener(map, 'bounds_changed', function() {
-    //           wmwPostEventString('MB');
+    //           kmapPostEventString('MB');
     //       });
     //       google.maps.event.addListener(map, 'zoom_changed', function() {
-    //           wmwPostEventString('ZC');
+    //           kmapPostEventString('ZC');
     //       });
     google.maps.event.addListener(map, 'idle', function()
         {
-            wmwPostEventString('id');
+            kmapPostEventString('id');
         });
     // source: http://taapps-javalibs.blogspot.com/2009/10/google-map-v3how-to-use-overlayviews.html
     projectionHelper = new ProjectionHelper(map);

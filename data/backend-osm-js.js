@@ -3,7 +3,7 @@
  * Date        : 2010-02-05
  * Description : JavaScript part of the OpenStreetMap-backend for WorldMapWidget2
  *
- * Copyright (C) 2010 by Michael G. Hansen <mike at mghansen dot de>
+ * Copyright (C) 2010, 2011 by Michael G. Hansen <mike at mghansen dot de>
  *
  * This program is free software; you can redistribute it
  * and/or modify it under the terms of the GNU General
@@ -29,84 +29,84 @@ for (var layerColorIndex in layerColors) {
     eval('var vectorLayersClusters'+layerColors[layerColorIndex]+';');
 }
 
-function wmwLonLat2Projection(lonLat) {
+function kmapLonLat2Projection(lonLat) {
     return lonLat.transform(new OpenLayers.Projection('EPSG:4326'), map.getProjectionObject());
 }
-function wmwLonLatFromProjection(lonLat) {
+function kmapLonLatFromProjection(lonLat) {
     return lonLat.clone().transform(map.getProjectionObject(), new OpenLayers.Projection('EPSG:4326'));
 }
-function wmwLonLat2String(lonLat) {
+function kmapLonLat2String(lonLat) {
     return lonLat.lat.toString()+','+lonLat.lon.toString();
 }
-function wmwProjectedLonLat2String(lonLat) {
-    var myLonLat = wmwLonLatFromProjection(lonLat);
-    return wmwLonLat2String(myLonLat);
+function kmapProjectedLonLat2String(lonLat) {
+    var myLonLat = kmapLonLatFromProjection(lonLat);
+    return kmapLonLat2String(myLonLat);
 }
-function wmwPostEventString(eventString) {
+function kmapPostEventString(eventString) {
     eventBuffer.push(eventString);
     window.status = '(event)';
 }
-function wmwReadEventStrings() {
+function kmapReadEventStrings() {
     var eventBufferString = eventBuffer.join('|');
     eventBuffer = new Array();
     // let the application know that there are no more events waiting:
     window.status = '()';
     return eventBufferString;
 }
-function wmwDebugOut(someString) {
-    if (typeof wmwDebugHook == 'function') {
-        wmwDebugHook(someString);
+function kmapDebugOut(someString) {
+    if (typeof kmapDebugHook == 'function') {
+        kmapDebugHook(someString);
     } else {
-        wmwPostEventString('do'+someString);
+        kmapPostEventString('do'+someString);
     }
 }
-function wmwSetZoom(zoomvalue) {
+function kmapSetZoom(zoomvalue) {
     map.zoomTo(zoomvalue);
 }
-function wmwGetZoom() {
+function kmapGetZoom() {
     return map.getZoom();
 }
-function wmwZoomIn() {
+function kmapZoomIn() {
     map.zoomIn();
 }
-function wmwZoomOut() {
+function kmapZoomOut() {
     map.zoomOut();
 }
-function wmwSetCenter(lat, lon) {
+function kmapSetCenter(lat, lon) {
     var lonLat = new OpenLayers.LonLat(lon, lat);
-    map.setCenter(wmwLonLat2Projection(lonLat), 2);
+    map.setCenter(kmapLonLat2Projection(lonLat), 2);
 }
-function wmwGetCenter() {
-    var lonLat = wmwLonLatFromProjection(map.getCenter());
-    return wmwLonLat2String(lonLat);
+function kmapGetCenter() {
+    var lonLat = kmapLonLatFromProjection(map.getCenter());
+    return kmapLonLat2String(lonLat);
 }
-function wmwGetBounds() {
+function kmapGetBounds() {
     var mapBounds = mapLayer.getExtent();
     mapBounds.transform(map.getProjectionObject(),new OpenLayers.Projection('EPSG:4326'));
 
     return '(('+mapBounds.bottom+','+mapBounds.left+'),('+mapBounds.top+','+mapBounds.right+'))';
 }
-function wmwLatLngToPixel(lat, lon) {
+function kmapLatLngToPixel(lat, lon) {
     // TODO: do we need to transform the lonlat???
-    var myPixel = map.getPixelFromLonLat(wmwLonLat2Projection(new OpenLayers.LonLat(lon, lat)));
+    var myPixel = map.getPixelFromLonLat(kmapLonLat2Projection(new OpenLayers.LonLat(lon, lat)));
     return '('+myPixel.x.toString()+','+myPixel.y.toString()+')';
 }
-function wmwPixelToLatLng(x, y) {
+function kmapPixelToLatLng(x, y) {
     // TODO: do we need to transform the lonlat???
-    var myLonLat = wmwLonLatFromProjection(map.getLonLatFromPixel(new OpenLayers.Pixel(x, y)));
-    return wmwLonLat2String(myLonLat);
+    var myLonLat = kmapLonLatFromProjection(map.getLonLatFromPixel(new OpenLayers.Pixel(x, y)));
+    return kmapLonLat2String(myLonLat);
 }
-function wmwClearMarkers() {
+function kmapClearMarkers() {
     for (var i in markerList) {
         vectorLayerMarkers.removeFeatures(markerList[i]);
         markerList[i].destroy();
     }
     markerList = new Object();
 }
-function wmwGetMapBounds() {
+function kmapGetMapBounds() {
 }
-function wmwAddMarker(id, lat, lon, setDraggable) {
-    var projectedLonLat = wmwLonLat2Projection(new OpenLayers.LonLat(lon, lat));
+function kmapAddMarker(id, lat, lon, setDraggable) {
+    var projectedLonLat = kmapLonLat2Projection(new OpenLayers.LonLat(lon, lat));
 
     var myVectorMarker = new OpenLayers.Feature.Vector(
             new OpenLayers.Geometry.Point(projectedLonLat.lon, projectedLonLat.lat)
@@ -114,7 +114,7 @@ function wmwAddMarker(id, lat, lon, setDraggable) {
     vectorLayerMarkers.addFeatures(myVectorMarker);
     markerList[id.toString()] = myVectorMarker;
 }
-function wmwGetMarkerPosition(id) {
+function kmapGetMarkerPosition(id) {
     var latlngString;
     if (markerList[id.toString()]) {
         var markerClone = markerList[id.toString()].clone();
@@ -125,7 +125,7 @@ function wmwGetMarkerPosition(id) {
     }
     return latlngString;
 }
-function wmwClearClusters() {
+function kmapClearClusters() {
     for (var layerColorIndex in layerColors) {
         eval('vectorLayersClusters'+layerColors[layerColorIndex]+'.removeFeatures(vectorLayersClusters'+layerColors[layerColorIndex]+'.features);');
     }
@@ -134,8 +134,8 @@ function wmwClearClusters() {
     }
     clusterList = new Object();
 }
-function wmwAddCluster(id, lat, lon, setDraggable, clusterColor, labelText) {
-    var projectedLonLat = wmwLonLat2Projection(new OpenLayers.LonLat(lon, lat));
+function kmapAddCluster(id, lat, lon, setDraggable, clusterColor, labelText) {
+    var projectedLonLat = kmapLonLat2Projection(new OpenLayers.LonLat(lon, lat));
 
     var myVectorMarker = new OpenLayers.Feature.Vector(
             new OpenLayers.Geometry.Point(projectedLonLat.lon, projectedLonLat.lat)
@@ -149,7 +149,7 @@ function wmwAddCluster(id, lat, lon, setDraggable, clusterColor, labelText) {
     eval('vectorLayersClusters'+clusterColor+'.addFeatures(myVectorMarker);');
     clusterList[id.toString()] = myVectorMarker;
 }
-function wmwGetClusterPosition(id) {
+function kmapGetClusterPosition(id) {
     var latlngString;
     if (clusterList[id.toString()]) {
         var clusterClone = clusterList[id.toString()].clone();
@@ -160,10 +160,10 @@ function wmwGetClusterPosition(id) {
     }
     return latlngString;
 }
-function wmwWidgetResized(newWidth, newHeight) {
+function kmapWidgetResized(newWidth, newHeight) {
     document.getElementById('map_canvas').style.height=newHeight.toString()+'px';
 }
-function initialize() {
+function kmapInitialize() {
     map = new OpenLayers.Map("map_canvas", {
         controls:[
             new OpenLayers.Control.Navigation(),
@@ -202,14 +202,14 @@ function initialize() {
             for (id in markerList) {
                 if (markerList[id] == feature) {
                     // marker moved
-                    wmwPostEventString('mm'+id);
+                    kmapPostEventString('mm'+id);
                     return;
                 }
             }
             for (id in clusterList) {
                 if (clusterList[id] == feature) {
                     // marker moved
-                    wmwPostEventString('cm'+id);
+                    kmapPostEventString('cm'+id);
                     return;
                 }
             }
@@ -217,11 +217,11 @@ function initialize() {
     map.addControl(dragFeature);
     dragFeature.activate();
 
-    wmwSetCenter(52.0, 6.0);
+    kmapSetCenter(52.0, 6.0);
 
     map.events.register('moveend', map, function() {
-        wmwPostEventString('id');
+        kmapPostEventString('id');
     } );
 
-    wmwDebugOut('OSM initialize done');
+    kmapDebugOut('OSM initialize done');
 }

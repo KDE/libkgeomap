@@ -24,16 +24,16 @@ function runMyScript() {
         debugTextField.value = 'Result: '+result+'\n'+debugTextField.value;
     }
 }
-function wmwDebugHook(debugString) {
+function kmapDebugHook(debugString) {
     debugTextField.value = debugString + '\n' + debugTextField.value;
 }
 function clearDebugTextField() {
     debugTextField.value = '';
 }
 function initializeBackend() {
-    wmwDebugHook("-- Backend loaded! Calling initialize");
-    initialize();
-    wmwDebugHook("-- Initialize called!");
+    kmapDebugHook("-- Backend loaded! Calling kmapInitialize");
+    kmapInitialize();
+    kmapDebugHook("-- kmapInitialize called!");
 
     debugInitialized = true;
 
@@ -44,7 +44,7 @@ function initializeBackend() {
 function loadNextJavaScriptFile() {
 
     if (lastLoadedScript!='') {
-        wmwDebugHook('-- Loaded: '+lastLoadedScript);
+        kmapDebugHook('-- Loaded: '+lastLoadedScript);
         lastLoadedScript = '';
     }
 
@@ -65,7 +65,7 @@ function loadNextJavaScriptFile() {
         scriptObject.setAttribute("onload", "loadNextJavaScriptFile();");
     }
 
-    wmwDebugHook("-- Loading: "+scriptUrl);
+    kmapDebugHook("-- Loading: "+scriptUrl);
     lastLoadedScript = scriptUrl;
     var theHeader = document.getElementsByTagName("head").item(0);
     theHeader.appendChild(scriptObject);
@@ -75,7 +75,7 @@ function handleApiReady() {
 }
 function loadBackendCode(backendName) {
 
-    wmwDebugHook('-- Loading backend ' + backendName);
+    kmapDebugHook('-- Loading backend ' + backendName);
 
     if (backendName=='osm') {
         scriptUrls.push('http://www.openlayers.org/api/OpenLayers.js');
