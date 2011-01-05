@@ -77,6 +77,7 @@ public:
     QWidget* getControlWidget();
     void addWidgetToControlWidget(QWidget* const newWidget);
     void setSortOptionsMenu(QMenu* const sortMenu);
+    void setMouseMode(const MouseModes mouseMode);
     void setAvailableMouseModes(const MouseModes mouseModes);
     void setVisibleMouseModes(const MouseModes mouseModes);
     void setAllowModifications(const bool state);

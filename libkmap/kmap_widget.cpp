@@ -530,8 +530,10 @@ bool KMapWidget::setBackend(const QString& backendName)
 
 void KMapWidget::applyCacheToBackend()
 {
-    if (!currentBackendReady())
+    if ( (!currentBackendReady()) || (!s->activeState) )
+    {
         return;
+    }
 
     setCenter(d->cacheCenterCoordinate);
     /// @todo Only do this if the zoom was changed!
@@ -632,6 +634,7 @@ void KMapWidget::saveSettingsToGroup(KConfigGroup* const group)
     group->writeEntry("Thumbnail Grouping Radius", d->thumbnailGroupingRadius);
     group->writeEntry("Marker Grouping Radius", d->markerGroupingRadius);
     group->writeEntry("Show Thumbnails", s->showThumbnails);
+    group->writeEntry("Mouse Mode", int(s->currentMouseMode));
 
     if (d->visibleExtraActions.testFlag(ExtraActionSticky))
     {
@@ -654,13 +657,7 @@ void KMapWidget::readSettingsFromGroup(const KConfigGroup* const group)
 
     setBackend(group->readEntry("Backend", "marble"));
 
-    const GeoCoordinates centerDefault = GeoCoordinates(52.0, 6.0);
-    const QString centerGeoUrl = group->readEntry("Center", centerDefault.geoUrl());
-    bool centerGeoUrlValid = false;
-    const GeoCoordinates centerCoordinate = GeoCoordinates::fromGeoUrl(centerGeoUrl, &centerGeoUrlValid);
-    setCenter(centerGeoUrlValid ? centerCoordinate : centerDefault);
-    setZoom(group->readEntry("Zoom", d->cacheZoom));
-
+    // Options concerning the display of markers
     d->actionPreviewSingleItems->setChecked(group->readEntry("Preview Single Items", true));
     d->actionPreviewGroupedItems->setChecked(group->readEntry("Preview Grouped Items", true));
     d->actionShowNumbersOnItems->setChecked(group->readEntry("Show numbers on items", true));
@@ -670,16 +667,26 @@ void KMapWidget::readSettingsFromGroup(const KConfigGroup* const group)
     setMarkerGroupingRadius(group->readEntry("Edit Grouping Radius", KMapMinMarkerGroupingRadius));
     s->showThumbnails = group->readEntry("Show Thumbnails", false);
     d->actionShowThumbnails->setChecked(s->showThumbnails);
+    d->actionStickyMode->setChecked(group->readEntry("Sticky Mode State", d->actionStickyMode->isChecked()));
 
+    // let the backends load their settings
     for (int i=0; i<d->loadedBackends.size(); ++i)
     {
         d->loadedBackends.at(i)->readSettingsFromGroup(group);
     }
 
-    d->actionStickyMode->setChecked(group->readEntry("Sticky Mode State", d->actionStickyMode->isChecked()));
-    slotUpdateActionsEnabled();
+    // current map state
+    const GeoCoordinates centerDefault = GeoCoordinates(52.0, 6.0);
+    const QString centerGeoUrl = group->readEntry("Center", centerDefault.geoUrl());
+    bool centerGeoUrlValid = false;
+    const GeoCoordinates centerCoordinate = GeoCoordinates::fromGeoUrl(centerGeoUrl, &centerGeoUrlValid);
+    d->cacheCenterCoordinate = centerGeoUrlValid ? centerCoordinate : centerDefault;
+    d->cacheZoom = group->readEntry("Zoom", d->cacheZoom);
+    s->currentMouseMode = MouseModes(group->readEntry("Mouse Mode", int(s->currentMouseMode)));
 
-    /// @todo Read the mouse mode
+    // propagate the loaded values to the map, if appropriate
+    applyCacheToBackend();
+    slotUpdateActionsEnabled();
 }
 
 void KMapWidget::rebuildConfigurationMenu()
@@ -862,6 +869,17 @@ void KMapWidget::slotUpdateActionsEnabled()
     /// @todo Only set the icons if they have to be changed!
     d->actionStickyMode->setIcon(SmallIcon( QLatin1String( d->actionStickyMode->isChecked()?"object-locked":"object-unlocked" )));
     d->actionShowThumbnails->setIcon(d->actionShowThumbnails->isChecked()?SmallIcon( QLatin1String("folder-image") ):KMapGlobalObject::instance()->getMarkerPixmap(QLatin1String("marker-icon-16x16" )));
+
+    // make sure the action for the current mouse mode is checked
+    const QList<QAction*> mouseModeActions = d->mouseModeActionGroup->actions();
+    foreach (QAction* const action, mouseModeActions)
+    {
+        if (action->data().value<MouseModes>()==s->currentMouseMode)
+        {
+            action->setChecked(true);
+            break;
+        }
+    }
 }
 
 void KMapWidget::slotChangeBackend(QAction* action)
@@ -2427,6 +2445,18 @@ bool KMapWidget::currentBackendReady() const
     }
 
     return d->currentBackend->isReady();
+}
+
+void KMapWidget::setMouseMode(const MouseModes mouseMode)
+{
+    s->currentMouseMode = mouseMode;
+
+    if (currentBackendReady())
+    {
+        d->currentBackend->mouseModeChanged();
+    }
+
+    slotUpdateActionsEnabled();
 }
 
 } /* namespace KMap */
