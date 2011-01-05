@@ -7,7 +7,7 @@
  * @date   2009-12-08
  * @brief  Marble-backend for KMap
  *
- * @author Copyright (C) 2009-2010 by Michael G. Hansen
+ * @author Copyright (C) 2009-2011 by Michael G. Hansen
  *         <a href="mailto:mike at mghansen dot de">mike at mghansen dot de</a>
  * @author Copyright (C) 2010 by Gilles Caulier
  *         <a href="mailto:caulier dot gilles at gmail dot com">caulier dot gilles at gmail dot com</a>
@@ -125,7 +125,7 @@ protected Q_SLOTS:
     void slotMapThemeActionTriggered(QAction* action);
     void slotProjectionActionTriggered(QAction* action);
     void slotFloatSettingsTriggered(QAction* action);
-    void slotMarbleZoomChanged(int newZoom);
+    void slotMarbleZoomChanged();
 
 private:
 

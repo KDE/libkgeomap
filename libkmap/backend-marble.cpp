@@ -74,7 +74,7 @@ public:
 
 } /* KMap */
 
-Q_DECLARE_METATYPE(KMap::BMInternalWidgetInfo)
+Q_DECLARE_METATYPE(KMap::BMInternalWidgetInfo);
 
 namespace KMap
 {
@@ -111,7 +111,8 @@ public:
         firstSelectionScreenPoint(),
         firstSelectionPoint(),
         activeState(false),
-        widgetIsDocked(false)
+        widgetIsDocked(false),
+        blockingZoomWhileChangingTheme(false)
     {
     }
 
@@ -149,6 +150,7 @@ public:
     GeoCoordinates         intermediateSelectionPoint;
     bool                   activeState;
     bool                   widgetIsDocked;
+    bool                   blockingZoomWhileChangingTheme;
 
 #ifdef KMAP_MARBLE_ADD_LAYER
     BMLayer*               bmLayer;
@@ -233,7 +235,7 @@ QWidget* BackendMarble::mapWidget()
         d->marbleWidget->installEventFilter(this);
 
         connect(d->marbleWidget, SIGNAL(zoomChanged(int)),
-                this, SLOT(slotMarbleZoomChanged(int)));
+                this, SLOT(slotMarbleZoomChanged()));
 
         // set a backend first
         /// @todo Do this only if we are set active!
@@ -437,6 +439,10 @@ void BackendMarble::setMapTheme(const QString& newMapTheme)
         return;
     }
 
+    // Changing the map theme changes the zoom - we want to try to keep the zoom constant
+    d->blockingZoomWhileChangingTheme = true;
+    // Remember the zoom from the cache. The zoom of the widget may not have been set yet!
+    const int oldMarbleZoom = d->cacheZoom;
     if (newMapTheme == QLatin1String("atlas"))
     {
         d->marbleWidget->setMapThemeId(QLatin1String("earth/srtm/srtm.dgml" ));
@@ -451,12 +457,25 @@ void BackendMarble::setMapTheme(const QString& newMapTheme)
     setShowCompass(d->cacheShowCompass);
     setShowOverviewMap(d->cacheShowOverviewMap);
 
-    // make sure the zoom level is okay
-    if ( (d->marbleWidget->zoom()>d->marbleWidget->maximumZoom()) ||
-         (d->marbleWidget->zoom()<d->marbleWidget->minimumZoom()) )
+    // make sure the zoom level is within the allowed range
+    int targetZoomLevel = oldMarbleZoom;
+    if (oldMarbleZoom > d->marbleWidget->maximumZoom())
     {
-        d->marbleWidget->zoomView(d->marbleWidget->maximumZoom());
+        targetZoomLevel = d->marbleWidget->maximumZoom();
     }
+    else if (oldMarbleZoom < d->marbleWidget->minimumZoom())
+    {
+        targetZoomLevel = d->marbleWidget->minimumZoom();
+    }
+
+    if (targetZoomLevel!=oldMarbleZoom)
+    {
+        // our zoom level had to be adjusted, therefore unblock
+        // the signal now to allow the change to propagate
+        d->blockingZoomWhileChangingTheme = false;
+    }
+    d->marbleWidget->zoomView(targetZoomLevel);
+    d->blockingZoomWhileChangingTheme = false;
 
     updateActionAvailability();
 }
@@ -889,9 +908,13 @@ QSize BackendMarble::mapSize() const
     return d->marbleWidget->map()->size();
 }
 
-void BackendMarble::slotMarbleZoomChanged(int newZoom)
+void BackendMarble::slotMarbleZoomChanged()
 {
-    Q_UNUSED(newZoom);
+    // ignore the zoom change while changing the map theme
+    if (d->blockingZoomWhileChangingTheme)
+    {
+        return;
+    }
 
     const QString newZoomString = getZoom();
 
@@ -907,8 +930,7 @@ void BackendMarble::setZoom(const QString& newZoom)
     KMAP_ASSERT(myZoomString.startsWith(QLatin1String("marble:" )));
 
     const int myZoom = myZoomString.mid(QString::fromLatin1("marble:").length()).toInt();
-    kDebug()<<myZoom;
-
+ 
     d->cacheZoom = myZoom;
     d->marbleWidget->zoomView(myZoom);
 }
@@ -1490,8 +1512,8 @@ void BackendMarble::centerOn(const Marble::GeoDataLatLonBox& box, const bool use
     d->marbleWidget->centerOn(box, false);
 
     // simple check to see whether the zoom level is now too high
-    // TODO: for very small boxes, Marbles zoom becomes -2billion. Catch this case here.
-    // TODO: determine a more sane zoom level to stop at and handle the useSaneZoomLevel parameter
+    /// @todo for very small boxes, Marbles zoom becomes -2billion. Catch this case here.
+    /// @todo determine a more sane zoom level to stop at and handle the useSaneZoomLevel parameter
     int maxZoomLevel = d->marbleWidget->maximumZoom();
     if (useSaneZoomLevel)
     {

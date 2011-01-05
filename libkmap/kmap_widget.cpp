@@ -730,7 +730,7 @@ void KMapWidget::rebuildConfigurationMenu()
 
 KAction* KMapWidget::getControlAction(const QString& actionName)
 {
-    kDebug()<<actionName;
+//     kDebug()<<actionName;
     if (actionName==QLatin1String("zoomin"))
     {
         return d->actionZoomIn;
