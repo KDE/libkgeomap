@@ -1542,6 +1542,7 @@ void KMapWidget::slotShowThumbnailsChanged()
 {
     s->showThumbnails = d->actionShowThumbnails->isChecked();
 
+    rebuildConfigurationMenu();
     slotUpdateActionsEnabled();
     slotRequestLazyReclustering();
 }
