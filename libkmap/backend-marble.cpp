@@ -1503,8 +1503,6 @@ void BackendMarble::mouseModeChanged()
 
 void BackendMarble::centerOn(const Marble::GeoDataLatLonBox& box, const bool useSaneZoomLevel)
 {
-    Q_UNUSED(useSaneZoomLevel)
-
     if (!d->marbleWidget)
     {
         return;

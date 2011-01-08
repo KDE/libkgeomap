@@ -428,13 +428,15 @@ QStringList KMapWidget::availableBackends() const
 bool KMapWidget::setBackend(const QString& backendName)
 {
     if (backendName == d->currentBackendName)
+    {
         return true;
+    }
+
+    saveBackendToCache();
 
     // switch to the placeholder widget:
     setShowPlaceholderWidget(true);
     removeMapWidgetFromFrame();
-
-    saveBackendToCache();
 
     // disconnect signals from old backend:
     if (d->currentBackend)
@@ -537,6 +539,7 @@ void KMapWidget::applyCacheToBackend()
 
     setCenter(d->cacheCenterCoordinate);
     /// @todo Only do this if the zoom was changed!
+    kDebug()<<d->cacheZoom;
     setZoom(d->cacheZoom);
     d->currentBackend->mouseModeChanged();
     d->currentBackend->regionSelectionChanged();
@@ -545,7 +548,9 @@ void KMapWidget::applyCacheToBackend()
 void KMapWidget::saveBackendToCache()
 {
     if (!currentBackendReady())
+    {
         return;
+    }
 
     d->cacheCenterCoordinate   = getCenter();
     d->cacheZoom               = getZoom();
@@ -1380,7 +1385,6 @@ QString KMapWidget::convertZoomToBackendZoom(const QString& someZoom, const QStr
 
 void KMapWidget::slotBackendZoomChanged(const QString& newZoom)
 {
-    kDebug()<<newZoom;
     d->cacheZoom = newZoom;
 }
 
@@ -2335,8 +2339,10 @@ void KMapWidget::setAllowModifications(const bool state)
  */
 void KMapWidget::adjustBoundariesToGroupedMarkers(const bool useSaneZoomLevel)
 {
-    if ( (!s->activeState) || (!s->markerModel) || (!d->currentBackend) )
+    if ( (!s->activeState) || (!s->markerModel) || (!currentBackendReady()) )
+    {
         return;
+    }
 
     Marble::GeoDataLineString tileString;
 
@@ -2346,7 +2352,7 @@ void KMapWidget::adjustBoundariesToGroupedMarkers(const bool useSaneZoomLevel)
         const TileIndex tileIndex = tileIterator.currentIndex();
         for(int corner=1; corner<=4; corner++)
         {
-            GeoCoordinates currentTileCoordinate = tileIndex.toCoordinates();
+            const GeoCoordinates currentTileCoordinate = tileIndex.toCoordinates(TileIndex::CornerPosition(corner));
 
             const Marble::GeoDataCoordinates tileCoordinate(currentTileCoordinate.lon(),
                                                             currentTileCoordinate.lat(),
@@ -2357,7 +2363,7 @@ void KMapWidget::adjustBoundariesToGroupedMarkers(const bool useSaneZoomLevel)
         }
     }
 
-    Marble::GeoDataLatLonBox latLonBox = Marble::GeoDataLatLonBox::fromLineString(tileString);
+    const Marble::GeoDataLatLonBox latLonBox = Marble::GeoDataLatLonBox::fromLineString(tileString);
 
     /// @todo use a sane zoom level
     d->currentBackend->centerOn(latLonBox, useSaneZoomLevel);
