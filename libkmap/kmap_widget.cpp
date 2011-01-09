@@ -670,7 +670,7 @@ void KMapWidget::readSettingsFromGroup(const KConfigGroup* const group)
     setThumnailSize(group->readEntry("Thumbnail Size", 2*KMapMinThumbnailSize));
     setThumbnailGroupingRadius(group->readEntry("Thumbnail Grouping Radius", 2*KMapMinThumbnailGroupingRadius));
     setMarkerGroupingRadius(group->readEntry("Edit Grouping Radius", KMapMinMarkerGroupingRadius));
-    s->showThumbnails = group->readEntry("Show Thumbnails", false);
+    s->showThumbnails = group->readEntry("Show Thumbnails", s->showThumbnails);
     d->actionShowThumbnails->setChecked(s->showThumbnails);
     d->actionStickyMode->setChecked(group->readEntry("Sticky Mode State", d->actionStickyMode->isChecked()));
 
@@ -1542,13 +1542,18 @@ void KMapWidget::setGroupedModel(AbstractMarkerTiler* const markerModel)
     slotRequestLazyReclustering();
 }
 
-void KMapWidget::slotShowThumbnailsChanged()
+void KMapWidget::setShowThumbnails(const bool state)
 {
-    s->showThumbnails = d->actionShowThumbnails->isChecked();
+    s->showThumbnails = state;
 
     rebuildConfigurationMenu();
     slotUpdateActionsEnabled();
     slotRequestLazyReclustering();
+}
+
+void KMapWidget::slotShowThumbnailsChanged()
+{
+    setShowThumbnails(d->actionShowThumbnails->isChecked());
 }
 
 /**
