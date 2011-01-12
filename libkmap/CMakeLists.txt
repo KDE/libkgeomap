@@ -46,6 +46,7 @@ SET(widget_sources
     altitude-backend.cpp
     backend-altitude-geonames.cpp
     placeholderwidget.cpp
+    tilegrouper.cpp
    )
 
 SET(backend_marble_sources

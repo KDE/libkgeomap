@@ -7,7 +7,7 @@
  * @date   2010-07-14
  * @brief  Common internal data structures for libkmap
  *
- * @author Copyright (C) 2010 by Michael G. Hansen
+ * @author Copyright (C) 2010, 2011 by Michael G. Hansen
  *         <a href="mailto:mike at mghansen dot de">mike at mghansen dot de</a>
  * @author Copyright (C) 2010 by Gilles Caulier
  *         <a href="mailto:caulier dot gilles at gmail dot com">caulier dot gilles at gmail dot com</a>
@@ -51,6 +51,7 @@ class AbstractMarkerTiler;
 class KMapWidget;
 class MapBackend;
 class ModelHelper;
+class TileGrouper;
 
 /**
  * @brief Class to hold information about map widgets stored in the KMapGlobalObject
@@ -169,6 +170,24 @@ public:
     QPoint pixmapOffset;
 };
 
+/// @todo Move these somewhere else
+const int KMapMinMarkerGroupingRadius        = 1;
+const int KMapMinThumbnailGroupingRadius     = 15;
+const int KMapMinThumbnailSize               = KMapMinThumbnailGroupingRadius * 2;
+
+/**
+ * @brief Helper function, returns the square of the distance between two points
+ * @todo Move this function somewhere else
+ *
+ * @param a Point a
+ * @param b Point b
+ * @return Square of the distance between a and b
+ */
+inline int QPointSquareDistance(const QPoint& a, const QPoint& b)
+{
+    return (a.x()-b.x())*(a.x()-b.x()) + (a.y()-b.y())*(a.y()-b.y());
+}
+
 class KMapSharedData : public QSharedData
 {
 public:
@@ -176,9 +195,13 @@ public:
     KMapSharedData()
         : QSharedData(),
           worldMapWidget(0),
+          tileGrouper(0),
           markerModel(0),
           clusterList(),
           showThumbnails(true),
+          thumbnailSize(KMapMinThumbnailSize),
+          thumbnailGroupingRadius(KMapMinThumbnailGroupingRadius),
+          markerGroupingRadius(KMapMinMarkerGroupingRadius),
           previewSingleItems(true),
           previewGroupedItems(true),
           showNumbersOnItems(true),
@@ -196,6 +219,7 @@ public:
     /// @name Objects
     //@{
     KMapWidget*               worldMapWidget;
+    TileGrouper*              tileGrouper;
     AbstractMarkerTiler*      markerModel;
     KMapCluster::List         clusterList;
     QList<ModelHelper*>       ungroupedModels;
@@ -204,6 +228,9 @@ public:
     /// @name Display options
     //@{
     bool                      showThumbnails;
+    int                       thumbnailSize;
+    int                       thumbnailGroupingRadius;
+    int                       markerGroupingRadius;
     bool                      previewSingleItems;
     bool                      previewGroupedItems;
     bool                      showNumbersOnItems;
