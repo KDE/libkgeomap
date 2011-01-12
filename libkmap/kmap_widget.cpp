@@ -53,23 +53,22 @@
 
 // Marbel Widget includes
 
-#include <marble/global.h>
 #include <marble/GeoDataLineString.h>
+#include <marble/global.h>
 
 // local includes
 
-#include "kmap_common.h"
-// #include "backend-osm.h"
-#include "backend-marble.h"
-#include "backend-googlemaps.h"
-#include "backend-altitude-geonames.h"
 #include "abstractmarkertiler.h"
-#include "map-backend.h"
+#include "backend-altitude-geonames.h"
+#include "backend-googlemaps.h"
+#include "backend-marble.h"
+// #include "backend-osm.h"
+#include "kmap_common.h"
 #include "kmap_dragdrophandler.h"
-#include "version.h"
 #include "kmap_modelhelper.h"
 #include "placeholderwidget.h"
 #include "tilegrouper.h"
+#include "version.h"
 
 namespace KMap
 {
