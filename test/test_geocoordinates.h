@@ -3,10 +3,10 @@
  * This file is a part of digiKam project
  * <a href="http://www.digikam.org">http://www.digikam.org</a>
  *
- * @date   2010-02-07
- * @brief  test for the simple datatypes and helper functions
+ * @date   2011-01-12
+ * @brief  Test for the GeoCoordinates class
  *
- * @author Copyright (C) 2010 by Michael G. Hansen
+ * @author Copyright (C) 2011 by Michael G. Hansen
  *         <a href="mailto:mike at mghansen dot de">mike at mghansen dot de</a>
  *
  * This program is free software; you can redistribute it
@@ -21,20 +21,18 @@
  *
  * ============================================================ */
 
-#ifndef TEST_MODEL_H
-#define TEST_MODEL_H
+#ifndef TEST_GEOCOORDINATES_H
+#define TEST_GEOCOORDINATES_H
 
 // Qt includes
 
 #include <QtTest/QtTest>
 
-// KDE includes
-
 // local includes
 
-#include "kmap_primitives.h"
+#include "kmap_geocoordinates.h"
 
-class TestPrimitives : public QObject
+class TestGeoCoordinates : public QObject
 {
     Q_OBJECT
 
@@ -42,12 +40,8 @@ private Q_SLOTS:
 
     void testNoOp();
     void testGeoCoordinates();
-    void testParseLatLonString();
-    void testParseXYStringToPoint();
-    void testParseBoundsString();
-    void testNormalizeBounds_data();
-    void testNormalizeBounds();
-    void testGroupStateComputer();
+    void testMovable();
+
 };
 
-#endif /* TEST_MODEL_H */
+#endif /* TEST_GEOCOORDINATES_H */

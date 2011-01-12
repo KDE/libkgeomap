@@ -63,7 +63,7 @@ public:
 
     inline TileIndex()
         : m_indicesCount(0),
-            m_indices()
+          m_indices()
     {
     }
 
@@ -220,5 +220,6 @@ inline QDebug operator<<(QDebug debugOut, const KMap::TileIndex& tileIndex)
     return debugOut;
 }
 
+Q_DECLARE_TYPEINFO(KMap::TileIndex, Q_MOVABLE_TYPE);
 
 #endif /* KMAP_TILEINDEX_H */

@@ -6,7 +6,7 @@
  * @date   2010-01-16
  * @brief  test for the model holding markers
  *
- * @author Copyright (C) 2010 by Michael G. Hansen
+ * @author Copyright (C) 2010, 2011 by Michael G. Hansen
  *         <a href="mailto:mike at mghansen dot de">mike at mghansen dot de</a>
  *
  * This program is free software; you can redistribute it
@@ -21,8 +21,8 @@
  *
  * ============================================================ */
 
-#ifndef TEST_MODEL_H
-#define TEST_MODEL_H
+#ifndef TEST_ITEMMARKERTILER_H
+#define TEST_ITEMMARKERTILER_H
 
 // Qt includes
 
@@ -53,7 +53,7 @@ private:
     QItemSelectionModel* const m_itemSelectionModel;
 };
 
-class TestModel : public QObject
+class TestItemMarkerTiler : public QObject
 {
     Q_OBJECT
 
@@ -75,4 +75,4 @@ private Q_SLOTS:
     void benchmarkIteratorWholeWorld();
 };
 
-#endif /* TEST_MODEL_H */
+#endif /* TEST_ITEMMARKERTILER_H */

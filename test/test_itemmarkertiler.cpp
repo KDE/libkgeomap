@@ -21,7 +21,7 @@
  *
  * ============================================================ */
 
-#include "test-model.moc"
+#include "test_itemmarkertiler.moc"
 
 // Qt includes
 
@@ -99,14 +99,12 @@ int CountMarkersInIterator(ItemMarkerTiler::NonEmptyIterator* const it)
     return markerCount;
 }
 
-void TestModel::testNoOp()
+void TestItemMarkerTiler::testNoOp()
 {
 }
 
-void TestModel::testIndices()
+void TestItemMarkerTiler::testIndices()
 {
-    QScopedPointer<QStandardItemModel> itemModel(new QStandardItemModel());
-    ItemMarkerTiler mm(new MarkerModelHelper(itemModel.data(), 0));
     const int maxLevel = TileIndex::MaxLevel;
 
     for (int l = 0; l<=maxLevel; ++l)
@@ -116,7 +114,7 @@ void TestModel::testIndices()
     }
 }
 
-void TestModel::testAddMarkers1()
+void TestItemMarkerTiler::testAddMarkers1()
 {
     QScopedPointer<QStandardItemModel> itemModel(new QStandardItemModel());
     ItemMarkerTiler mm(new MarkerModelHelper(itemModel.data(), 0));
@@ -153,7 +151,7 @@ void TestModel::testAddMarkers1()
     }
 }
 
-void TestModel::testRemoveMarkers2()
+void TestItemMarkerTiler::testRemoveMarkers2()
 {
     QScopedPointer<QStandardItemModel> itemModel(new QStandardItemModel());
     ItemMarkerTiler mm(new MarkerModelHelper(itemModel.data(), 0));
@@ -184,7 +182,7 @@ void TestModel::testRemoveMarkers2()
     }
 }
 
-void TestModel::testMoveMarkers1()
+void TestItemMarkerTiler::testMoveMarkers1()
 {
     QScopedPointer<QStandardItemModel> itemModel(new QStandardItemModel());
     ItemMarkerTiler mm(new MarkerModelHelper(itemModel.data(), 0));
@@ -229,7 +227,7 @@ void TestModel::testMoveMarkers1()
 //     mm.clear();
 }
 
-void TestModel::testMoveMarkers2()
+void TestItemMarkerTiler::testMoveMarkers2()
 {
     QScopedPointer<QStandardItemModel> itemModel(new QStandardItemModel());
     ItemMarkerTiler mm(new MarkerModelHelper(itemModel.data(), 0));
@@ -290,7 +288,7 @@ void TestModel::testMoveMarkers2()
 //     mm.clear();
 }
 
-void TestModel::testIteratorWholeWorldNoBackingModel()
+void TestItemMarkerTiler::testIteratorWholeWorldNoBackingModel()
 {
     QScopedPointer<QStandardItemModel> itemModel(new QStandardItemModel());
     ItemMarkerTiler mm(new MarkerModelHelper(itemModel.data(), 0));
@@ -303,7 +301,7 @@ void TestModel::testIteratorWholeWorldNoBackingModel()
     }
 }
 
-void TestModel::testIteratorWholeWorld()
+void TestItemMarkerTiler::testIteratorWholeWorld()
 {
     QScopedPointer<QStandardItemModel> itemModel(new QStandardItemModel());
     ItemMarkerTiler mm(new MarkerModelHelper(itemModel.data(), 0));
@@ -325,7 +323,7 @@ void TestModel::testIteratorWholeWorld()
     }
 }
 
-void TestModel::testIteratorPartial1()
+void TestItemMarkerTiler::testIteratorPartial1()
 {
     QScopedPointer<QStandardItemModel> itemModel(new QStandardItemModel());
     ItemMarkerTiler mm(new MarkerModelHelper(itemModel.data(), 0));
@@ -391,7 +389,7 @@ void TestModel::testIteratorPartial1()
     }
 }
 
-void TestModel::testIteratorPartial2()
+void TestItemMarkerTiler::testIteratorPartial2()
 {
     QScopedPointer<QStandardItemModel> itemModel(new QStandardItemModel());
     ItemMarkerTiler mm(new MarkerModelHelper(itemModel.data(), 0));
@@ -418,7 +416,7 @@ void TestModel::testIteratorPartial2()
     }
 }
 
-void TestModel::testRemoveMarkers1()
+void TestItemMarkerTiler::testRemoveMarkers1()
 {
     QScopedPointer<QStandardItemModel> itemModel(new QStandardItemModel());
     ItemMarkerTiler mm(new MarkerModelHelper(itemModel.data(), 0));
@@ -460,7 +458,7 @@ void TestModel::testRemoveMarkers1()
 /**
  * @brief Make sure that items which are in the model before it is given to the tiled model are found by the tile model
  */
-void TestModel::testPreExistingMarkers()
+void TestItemMarkerTiler::testPreExistingMarkers()
 {
     QScopedPointer<QStandardItemModel> itemModel(new QStandardItemModel());
     itemModel->appendRow(MakeItemAt(coord_50_60));
@@ -476,7 +474,7 @@ void TestModel::testPreExistingMarkers()
     }
 }
 
-void TestModel::testSelectionState1()
+void TestItemMarkerTiler::testSelectionState1()
 {
     QScopedPointer<QStandardItemModel> itemModel(new QStandardItemModel());
     QItemSelectionModel* const selectionModel = new QItemSelectionModel(itemModel.data());
@@ -613,7 +611,7 @@ void TestModel::testSelectionState1()
     //       this is currently implemented by simply setting the tiles as dirty
 }
 
-void TestModel::benchmarkIteratorWholeWorld()
+void TestItemMarkerTiler::benchmarkIteratorWholeWorld()
 {
     return;
 //     QBENCHMARK
@@ -651,4 +649,4 @@ void TestModel::benchmarkIteratorWholeWorld()
     }
 }
 
-QTEST_MAIN(TestModel)
+QTEST_MAIN(TestItemMarkerTiler)

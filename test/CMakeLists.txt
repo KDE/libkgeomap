@@ -8,7 +8,7 @@
 #
 # @author Copyright (C) 2010 by Gilles Caulier
 #         <a href="mailto:caulier dot gilles at gmail dot com">caulier dot gilles at gmail dot com</a>
-# @author Copyright (C) 2009-2010 by Michael G. Hansen
+# @author Copyright (C) 2009-2011 by Michael G. Hansen
 #         <a href="mailto:mike at mghansen dot de">mike at mghansen dot de</a>
 #
 # This program is free software; you can redistribute it
@@ -31,20 +31,35 @@ IF(KDE4_BUILD_TESTS)
     ENABLE_TESTING()
 
     # test the marker model
-    SET(test_model_sources
-        test-model.cpp
+    SET(test_itemmarkertiler_sources
+        test_itemmarkertiler.cpp
        )
-    KDE4_ADD_EXECUTABLE(kmap_test_model ${test_model_sources})
-    TARGET_LINK_LIBRARIES(kmap_test_model kmap ${QT_QTTEST_LIBRARY})
-    ADD_TEST(kmap_test_model ${EXECUTABLE_OUTPUT_PATH}/kmap_test_model)
+    KDE4_ADD_EXECUTABLE(kmap_test_itemmarkertiler ${test_itemmarkertiler_sources})
+    TARGET_LINK_LIBRARIES(kmap_test_itemmarkertiler kmap ${QT_QTTEST_LIBRARY})
+    ADD_TEST(kmap_test_itemmarkertiler ${EXECUTABLE_OUTPUT_PATH}/kmap_test_itemmarkertiler)
 
-    # test the marker model
+    # test the primitive datatypes and helper functions
     SET(test_primitives_sources
-        test-primitives.cpp
+        test_primitives.cpp
        )
     KDE4_ADD_EXECUTABLE(kmap_test_primitives ${test_primitives_sources})
     TARGET_LINK_LIBRARIES(kmap_test_primitives kmap ${QT_QTTEST_LIBRARY})
     ADD_TEST(kmap_test_primitives ${EXECUTABLE_OUTPUT_PATH}/kmap_test_primitives)
 
+    # test the GeoCoordinates class
+    SET(test_geocoordinates_sources
+        test_geocoordinates.cpp
+       )
+    KDE4_ADD_EXECUTABLE(kmap_test_geocoordinates ${test_geocoordinates_sources})
+    TARGET_LINK_LIBRARIES(kmap_test_geocoordinates kmap ${QT_QTTEST_LIBRARY})
+    ADD_TEST(kmap_test_geocoordinates ${EXECUTABLE_OUTPUT_PATH}/kmap_test_geocoordinates)
+
+    # test the TileIndex class
+    SET(test_tileindex_sources
+        test_tileindex.cpp
+       )
+    KDE4_ADD_EXECUTABLE(kmap_test_tileindex ${test_tileindex_sources})
+    TARGET_LINK_LIBRARIES(kmap_test_tileindex kmap ${QT_QTTEST_LIBRARY})
+    ADD_TEST(kmap_test_tileindex ${EXECUTABLE_OUTPUT_PATH}/kmap_test_tileindex)
 ENDIF(KDE4_BUILD_TESTS)
 

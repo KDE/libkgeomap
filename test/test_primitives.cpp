@@ -6,7 +6,7 @@
  * @date   2010-02-07
  * @brief  test for the simple datatypes and helper functions
  *
- * @author Copyright (C) 2010 by Michael G. Hansen
+ * @author Copyright (C) 2010, 2011 by Michael G. Hansen
  *         <a href="mailto:mike at mghansen dot de">mike at mghansen dot de</a>
  *
  * This program is free software; you can redistribute it
@@ -21,7 +21,9 @@
  *
  * ============================================================ */
 
-#include "test-primitives.moc"
+#include "test_primitives.moc"
+
+// local includes
 
 #include "../libkmap/kmap_common.h"
 
@@ -29,21 +31,6 @@ using namespace KMap;
 
 void TestPrimitives::testNoOp()
 {
-}
-
-void TestPrimitives::testGeoCoordinates()
-{
-    GeoCoordinates coord1(52.0, 6.0);
-    QVERIFY(coord1.hasCoordinates());
-    QCOMPARE(coord1.geoUrl(), QLatin1String("geo:52,6"));
-
-    GeoCoordinates coord2(52.0, 6.0);
-    GeoCoordinates coord3(53.0, 6.0);
-    QVERIFY(coord1==coord2);
-    QVERIFY(!(coord1==coord3));
-
-    GeoCoordinates coord4 = GeoCoordinates(52.0, 6.0);
-    QVERIFY(coord1==coord4);
 }
 
 void TestPrimitives::testParseLatLonString()
@@ -71,7 +58,7 @@ void TestPrimitives::testParseLatLonString()
     QVERIFY(KMapHelperParseLatLonString(QLatin1String("52.5,-6.5"), &coordinate));
     QCOMPARE(coordinate.geoUrl(), QLatin1String("geo:52.5,-6.5"));
 
-    QVERIFY(!KMapHelperParseLatLonString(QLatin1String("" ), 0));
+    QVERIFY(!KMapHelperParseLatLonString(QLatin1String(""), 0));
     QVERIFY(!KMapHelperParseLatLonString(QLatin1String("52.6"), 0));
     QVERIFY(!KMapHelperParseLatLonString(QLatin1String("52.6,"), 0));
     QVERIFY(!KMapHelperParseLatLonString(QLatin1String(",6"), 0));
@@ -100,7 +87,7 @@ void TestPrimitives::testParseXYStringToPoint()
     QVERIFY(KMapHelperParseXYStringToPoint(QLatin1String("  ( 52, 6 )  "), &point));
     QCOMPARE(point, QPoint(52,6));
 
-    QVERIFY(!KMapHelperParseXYStringToPoint(QLatin1String("" ), 0));
+    QVERIFY(!KMapHelperParseXYStringToPoint(QLatin1String(""), 0));
     QVERIFY(!KMapHelperParseXYStringToPoint(QLatin1String("()"), 0));
     QVERIFY(!KMapHelperParseXYStringToPoint(QLatin1String("(52)"), 0));
     QVERIFY(!KMapHelperParseXYStringToPoint(QLatin1String("(52,6a)"), 0));
@@ -176,8 +163,8 @@ void TestPrimitives::testNormalizeBounds_data()
 
     // these ones should be split:
     QTest::newRow("cross_date_1")
-    << GeoCoordinates::makePair(10, 20, 15, -170)
-    << ( GeoCoordinates::PairList()
+        << GeoCoordinates::makePair(10, 20, 15, -170)
+        << ( GeoCoordinates::PairList()
             << GeoCoordinates::makePair(10, -180, 15, -170)
             << GeoCoordinates::makePair(10, 20, 15, 180)
         );

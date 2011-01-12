@@ -241,8 +241,10 @@ inline bool operator==(const KMap::GeoCoordinates& a, const KMap::GeoCoordinates
         ( a.hasAltitude() ? ( a.alt() == b.alt() ) : true );
 }
 
+Q_DECLARE_TYPEINFO(KMap::GeoCoordinates, Q_MOVABLE_TYPE);
 Q_DECLARE_METATYPE(KMap::GeoCoordinates)
 Q_DECLARE_METATYPE(KMap::GeoCoordinates::Pair)
 Q_DECLARE_METATYPE(KMap::GeoCoordinates::PairList)
+
 
 #endif /* KMAP_GEOCOORDINATES_H */
