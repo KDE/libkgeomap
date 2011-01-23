@@ -42,7 +42,7 @@ public:
 
     }
 
-    bool    clustersDirty;
+    bool        clustersDirty;
     MapBackend* currentBackend;
 };
 
@@ -59,6 +59,11 @@ TileGrouper::~TileGrouper()
 void TileGrouper::setClustersDirty()
 {
     d->clustersDirty = true;
+}
+
+bool TileGrouper::getClustersDirty() const
+{
+    return d->clustersDirty;
 }
 
 void TileGrouper::setCurrentBackend(MapBackend* const backend)
@@ -79,7 +84,9 @@ bool TileGrouper::currentBackendReady()
 void TileGrouper::updateClusters()
 {
     if (!s->markerModel)
+    {
         return;
+    }
 
     if (s->haveMovingCluster)
     {
@@ -87,11 +94,15 @@ void TileGrouper::updateClusters()
         return;
     }
 
+    if (!currentBackendReady())
+    {
+        return;
+    }
+
     if (!d->clustersDirty)
     {
        return;
-   }
-
+    }
     d->clustersDirty = false;
 
     // constants for clusters
@@ -103,9 +114,6 @@ void TileGrouper::updateClusters()
 //     kDebug()<<"updateClusters starting...";
 
     s->clusterList.clear();
-
-    if (!currentBackendReady())
-        return;
 
     const int markerLevel = d->currentBackend->getMarkerModelLevel();
     QList<QPair<GeoCoordinates, GeoCoordinates> > mapBounds = d->currentBackend->getNormalizedBounds();

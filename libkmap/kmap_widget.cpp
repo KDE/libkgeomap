@@ -119,7 +119,6 @@ public:
         mouseModesHolder(0),
         controlWidget(0),
         lazyReclusteringRequested(false),
-        clustersDirty(false),
         dragDropHandler(0),
         sortMenu(0),
         actionIncreaseThumbnailSize(0),
@@ -166,7 +165,6 @@ public:
     KAction*                actionShowNumbersOnItems;
 
     bool                    lazyReclusteringRequested;
-    bool                    clustersDirty;
 
     DragDropHandler*        dragDropHandler;
 
@@ -881,7 +879,9 @@ void KMapWidget::slotChangeBackend(QAction* action)
 void KMapWidget::updateMarkers()
 {
     if (!currentBackendReady())
+    {
         return;
+    }
 
     // tell the backend to update the markers
     d->currentBackend->updateMarkers();
@@ -1288,7 +1288,7 @@ void KMapWidget::slotRequestLazyReclustering()
     if (d->lazyReclusteringRequested)
         return;
 
-    d->clustersDirty = true;
+    s->tileGrouper->setClustersDirty();
     if (s->activeState)
     {
         d->lazyReclusteringRequested = true;
@@ -1478,7 +1478,7 @@ void KMapWidget::dragLeaveEvent(QDragLeaveEvent* event)
 
 void KMapWidget::markClustersAsDirty()
 {
-    d->clustersDirty = true;
+    s->tileGrouper->setClustersDirty();
 }
 
 void KMapWidget::setDragDropHandler(DragDropHandler* const dragDropHandler)
@@ -1979,7 +1979,7 @@ void KMapWidget::setActive(const bool state)
         }
     }
 
-    if (state && !oldState && d->clustersDirty)
+    if (state && !oldState && s->tileGrouper->getClustersDirty())
     {
         slotRequestLazyReclustering();
     }

@@ -44,6 +44,7 @@ public:
     ~TileGrouper();
 
     void setClustersDirty();
+    bool getClustersDirty() const;
     void updateClusters();
     void setCurrentBackend(MapBackend* const backend);
 
