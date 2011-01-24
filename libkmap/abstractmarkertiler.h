@@ -207,8 +207,10 @@ public:
 
     // these can be implemented if you want to react to actions in kmap
     /// @todo Make currentMouseMode const
-    virtual void onIndicesClicked(const TileIndex::List& tileIndicesList, const KMapGroupState& groupSelectionState, MouseMode currentMouseMode);
-    virtual void onIndicesMoved(const TileIndex::List& tileIndicesList, const GeoCoordinates& targetCoordinates, const QPersistentModelIndex& targetSnapIndex);
+    virtual void onIndicesClicked(const TileIndex::List& tileIndicesList, const QVariant& representativeIndex,
+                                  const KMapGroupState& groupSelectionState, const MouseModes currentMouseMode);
+    virtual void onIndicesMoved(const TileIndex::List& tileIndicesList, const GeoCoordinates& targetCoordinates,
+                                const QPersistentModelIndex& targetSnapIndex);
 
     virtual void setActive(const bool state) = 0;
     Tile* rootTile();

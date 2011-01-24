@@ -611,7 +611,8 @@ bool ItemMarkerTiler::indicesEqual(const QVariant& a, const QVariant& b) const
     return a.value<QPersistentModelIndex>()==b.value<QPersistentModelIndex>();
 }
 
-void ItemMarkerTiler::onIndicesClicked(const TileIndex::List& tileIndicesList, const KMapGroupState& groupSelectionState, MouseMode currentMouseMode)
+void ItemMarkerTiler::onIndicesClicked(const TileIndex::List& tileIndicesList, const QVariant& representativeIndex,
+                                       const KMapGroupState& groupSelectionState, const MouseModes currentMouseMode)
 {
     QList<QPersistentModelIndex> clickedMarkers;
     for (int i=0; i<tileIndicesList.count(); ++i)
@@ -620,30 +621,45 @@ void ItemMarkerTiler::onIndicesClicked(const TileIndex::List& tileIndicesList, c
 
         clickedMarkers << getTileMarkerIndices(tileIndex);
     }
-    if (currentMouseMode == MouseModeSelectThumbnail)
+
+    const QPersistentModelIndex representativeModelIndex = representativeIndex.value<QPersistentModelIndex>();
+
+    if (currentMouseMode == MouseModeSelectThumbnail && d->selectionModel)
     {
-        const bool doSelect = groupSelectionState!=KMapSelectedAll;
-        if (d->selectionModel)
+        const bool doSelect = (groupSelectionState & KMapSelectedMask) != KMapSelectedAll;
+
+        const QItemSelectionModel::SelectionFlags selectionFlags =
+                  (doSelect ? QItemSelectionModel::Select : QItemSelectionModel::Deselect)
+                | QItemSelectionModel::Rows;
+
+        for (int i=0; i<clickedMarkers.count(); ++i)
         {
-            for (int i=0; i<clickedMarkers.count(); ++i)
+            if (d->selectionModel->isSelected(clickedMarkers.at(i))!=doSelect)
             {
-                if (d->selectionModel->isSelected(clickedMarkers.at(i))!=doSelect)
-                {
-                    d->selectionModel->select(clickedMarkers.at(i), (doSelect ? QItemSelectionModel::Select : QItemSelectionModel::Deselect) | QItemSelectionModel::Rows);
-                }
+                d->selectionModel->select(clickedMarkers.at(i), selectionFlags);
             }
         }
 
-    // TODO: when do we report the clicks to the modelHelper?
-    //d->modelHelper->onIndicesClicked(clickedMarkers);
+        if (representativeModelIndex.isValid())
+        {
+            d->selectionModel->setCurrentIndex(representativeModelIndex, selectionFlags);
+        }
+
+        /**
+         * @todo When do we report the clicks to the modelHelper?
+         *       Or do we only report selection changes to the selection model?
+         */
+        //d->modelHelper->onIndicesClicked(clickedMarkers);
     }
     else if (currentMouseMode == MouseModeFilter)
     {
+        /// @todo Also forward the representative index in this call
         d->modelHelper->onIndicesClicked(clickedMarkers);
     }
 }
 
-void ItemMarkerTiler::onIndicesMoved(const TileIndex::List& tileIndicesList, const GeoCoordinates& targetCoordinates, const QPersistentModelIndex& targetSnapIndex)
+void ItemMarkerTiler::onIndicesMoved(const TileIndex::List& tileIndicesList, const GeoCoordinates& targetCoordinates,
+                                     const QPersistentModelIndex& targetSnapIndex)
 {
     QList<QPersistentModelIndex> movedMarkers;
     if (tileIndicesList.isEmpty())

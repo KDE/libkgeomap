@@ -1319,14 +1319,18 @@ void KMapWidget::slotLazyReclusteringRequestCallBack()
     slotClustersNeedUpdating();
 }
 
+/**
+ * @todo Clicking on several clusters at once is not actually possible
+ */
 void KMapWidget::slotClustersClicked(const QIntList& clusterIndices)
 {
     kDebug()<<clusterIndices;
 
-    int maxTileLevel = 0;
-
-    if ((s->currentMouseMode == MouseModeZoomIntoGroup) || (s->currentMouseMode == MouseModeRegionSelectionFromIcon))
+    if (   (s->currentMouseMode == MouseModeZoomIntoGroup)
+        || (s->currentMouseMode == MouseModeRegionSelectionFromIcon) )
     {
+        int maxTileLevel = 0;
+
         Marble::GeoDataLineString tileString;
 
         for (int i=0; i<clusterIndices.count(); ++i)
@@ -1356,7 +1360,9 @@ void KMapWidget::slotClustersClicked(const QIntList& clusterIndices)
                                                                     Marble::GeoDataCoordinates::Degree);
 
                     if (maxTileLevel < currentTileIndex.level())
+                    {
                         maxTileLevel = currentTileIndex.level();
+                    }
 
                     tileString.append(tileCoordinate);
                 }
@@ -1383,6 +1389,7 @@ void KMapWidget::slotClustersClicked(const QIntList& clusterIndices)
       //  }
         if (s->currentMouseMode == MouseModeZoomIntoGroup)
         {
+            /// @todo Very small latLonBoxes can crash Marble
             d->currentBackend->centerOn(latLonBox);
         }
         else
@@ -1399,29 +1406,22 @@ void KMapWidget::slotClustersClicked(const QIntList& clusterIndices)
             emit(signalRegionSelectionChanged());
         }
     }
-    else if ((s->currentMouseMode == MouseModeFilter && s->selectionRectangle.first.hasCoordinates()) || (s->currentMouseMode == MouseModeSelectThumbnail))
+    else if (   (s->currentMouseMode == MouseModeFilter && s->selectionRectangle.first.hasCoordinates())
+             || (s->currentMouseMode == MouseModeSelectThumbnail) )
     {
-        // update the selection state of the clusters
+        // update the selection and filtering state of the clusters
         for (int i=0; i<clusterIndices.count(); ++i)
         {
             const int clusterIndex = clusterIndices.at(i);
             const KMapCluster currentCluster = s->clusterList.at(clusterIndex);
 
-            /// @todo use a consistent format for tile indices
-            TileIndex::List tileIndices;
-            for (int j=0; j<currentCluster.tileIndicesList.count(); ++j)
-            {
-                const TileIndex& currentTileIndex = currentCluster.tileIndicesList.at(j);
-                tileIndices << currentTileIndex;
-            }
-            if (s->currentMouseMode == MouseModeFilter)
-            {
-                s->markerModel->onIndicesClicked(tileIndices, currentCluster.groupState, MouseModeFilter);
-            }
-            else
-            {
-                s->markerModel->onIndicesClicked(tileIndices, currentCluster.groupState, MouseModeSelectThumbnail);
-            }
+            const TileIndex::List tileIndices = currentCluster.tileIndicesList;
+
+            /// @todo Isn't this cached in the cluster?
+            const QVariant representativeIndex = getClusterRepresentativeMarker(clusterIndex, s->sortKey);
+
+            s->markerModel->onIndicesClicked(tileIndices, representativeIndex,
+                                             currentCluster.groupState, s->currentMouseMode);
         }
     }
 }

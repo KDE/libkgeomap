@@ -407,7 +407,8 @@ AbstractMarkerTiler::Tile* AbstractMarkerTiler::resetRootTile()
     return d->rootTile;
 }
 
-void AbstractMarkerTiler::onIndicesClicked(const TileIndex::List& tileIndicesList, const KMapGroupState& groupSelectionState, MouseMode currentMouseMode)
+void AbstractMarkerTiler::onIndicesClicked(const TileIndex::List& tileIndicesList, const QVariant& representativeIndex,
+                                           const KMapGroupState& groupSelectionState, const MouseModes currentMouseMode)
 {
     Q_UNUSED(tileIndicesList);
     Q_UNUSED(groupSelectionState);
