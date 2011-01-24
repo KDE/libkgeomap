@@ -713,7 +713,6 @@ void KMapWidget::rebuildConfigurationMenu()
 
 KAction* KMapWidget::getControlAction(const QString& actionName)
 {
-//     kDebug()<<actionName;
     if (actionName==QLatin1String("zoomin"))
     {
         return d->actionZoomIn;
@@ -721,6 +720,18 @@ KAction* KMapWidget::getControlAction(const QString& actionName)
     else if (actionName==QLatin1String("zoomout"))
     {
         return d->actionZoomOut;
+    }
+    else if (actionName==QLatin1String("mousemode-regionselectionmode"))
+    {
+        return d->actionSetRegionSelectionMode;
+    }
+    else if (actionName==QLatin1String("mousemode-removecurrentregionselection"))
+    {
+        return d->actionRemoveCurrentRegionSelection;
+    }
+    else if (actionName==QLatin1String("mousemode-regionselectionfromiconmode"))
+    {
+        return d->actionSetRegionSelectionFromIconMode;
     }
 
     return 0;

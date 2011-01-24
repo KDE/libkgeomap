@@ -89,7 +89,7 @@ public:
     void setEnabledExtraActions(const ExtraActions actions);
     //@}
 
-    ///@name Map related functions
+    /// @name Map related functions
     //@{
     QStringList availableBackends() const;
     bool setBackend(const QString& backendName);
