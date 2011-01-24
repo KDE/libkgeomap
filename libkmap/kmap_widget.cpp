@@ -2015,7 +2015,7 @@ void KMapWidget::setVisibleMouseModes(const MouseModes mouseModes)
         d->setZoomModeButton->setVisible(s->visibleMouseModes.testFlag(MouseModeZoomIntoGroup));
         d->setRegionSelectionFromIconModeButton->setVisible(s->visibleMouseModes.testFlag(MouseModeRegionSelectionFromIcon));
         d->setFilterModeButton->setVisible(s->visibleMouseModes.testFlag(MouseModeFilter));
-        d->removeFilterModeButton->setVisible(s->visibleMouseModes.testFlag(MouseModeRegionSelectionFromIcon));
+        d->removeFilterModeButton->setVisible(s->visibleMouseModes.testFlag(MouseModeFilter));
         d->setSelectThumbnailMode->setVisible(s->visibleMouseModes.testFlag(MouseModeSelectThumbnail));
     }
 }
