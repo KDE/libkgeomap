@@ -2079,9 +2079,6 @@ void KMapWidget::setAllowModifications(const bool state)
  */
 void KMapWidget::adjustBoundariesToGroupedMarkers(const bool useSaneZoomLevel)
 {
-    /// @todo This causes a deadlock in Marble for regions which are too small, disabled temporarily
-    return;
-
     if ( (!s->activeState) || (!s->markerModel) || (!currentBackendReady()) )
     {
         return;

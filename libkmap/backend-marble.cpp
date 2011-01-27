@@ -1508,11 +1508,26 @@ void BackendMarble::centerOn(const Marble::GeoDataLatLonBox& box, const bool use
         return;
     }
 
-    d->marbleWidget->centerOn(box, false);
+    /**
+     * @todo Boxes with very small width or height (<1e-6 or so) cause a deadlock in Marble in spherical projection.
+     *       So instead, we just center on the center of the box and go to maximum zoom. This does not
+     *       yet handle the case of only width or height being too small though.
+     */
+    const bool boxTooSmall = qMin(box.width(), box.height()) < 0.000001;
+    if (boxTooSmall)
+    {
+        d->marbleWidget->centerOn(box.center());
+        d->marbleWidget->zoomView(
+                useSaneZoomLevel ? qMin(3400, d->marbleWidget->maximumZoom()) : d->marbleWidget->maximumZoom()
+            );
+    }
+    else
+    {
+        d->marbleWidget->centerOn(box, false);
+    }
 
     // simple check to see whether the zoom level is now too high
     /// @todo for very small boxes, Marbles zoom becomes -2billion. Catch this case here.
-    /// @todo determine a more sane zoom level to stop at and handle the useSaneZoomLevel parameter
     int maxZoomLevel = d->marbleWidget->maximumZoom();
     if (useSaneZoomLevel)
     {
