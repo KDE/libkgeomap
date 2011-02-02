@@ -93,6 +93,7 @@ INSTALL(FILES libkmap_export.h
               kmap_primitives.h
               kmap_modelhelper.h
               kmap_geocoordinates.h
+              kmap_tileindex.h
               altitude-backend.h
               abstractmarkertiler.h
               itemmarkertiler.h
