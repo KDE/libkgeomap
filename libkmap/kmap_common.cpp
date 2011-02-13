@@ -42,7 +42,7 @@ public:
     KMapGlobalObject object;
 };
 
-K_GLOBAL_STATIC(KMapGlobalObjectCreator, kmapGlobalObjectCreator);
+K_GLOBAL_STATIC(KMapGlobalObjectCreator, kmapGlobalObjectCreator)
 
 class KMapGlobalObject::Private
 {

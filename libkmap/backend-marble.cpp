@@ -74,7 +74,7 @@ public:
 
 } /* KMap */
 
-Q_DECLARE_METATYPE(KMap::BMInternalWidgetInfo);
+Q_DECLARE_METATYPE(KMap::BMInternalWidgetInfo)
 
 namespace KMap
 {
