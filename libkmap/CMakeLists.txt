@@ -32,6 +32,7 @@ IF(${HAVE_VALGRIND})
 ENDIF(${HAVE_VALGRIND})
 
 CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/version.h.cmake ${CMAKE_CURRENT_BINARY_DIR}/version.h)
+CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/version.cmake.cmake ${CMAKE_CURRENT_BINARY_DIR}/version.cmake)
 
 SET(widget_sources
     kmap_widget.cpp
@@ -98,5 +99,6 @@ INSTALL(FILES libkmap_export.h
               abstractmarkertiler.h
               itemmarkertiler.h
               ${CMAKE_CURRENT_BINARY_DIR}/version.h
+              ${CMAKE_CURRENT_BINARY_DIR}/version.cmake
         DESTINATION ${INCLUDE_INSTALL_DIR}/libkmap COMPONENT Devel
        )

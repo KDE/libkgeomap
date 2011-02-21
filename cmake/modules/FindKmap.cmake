@@ -55,6 +55,12 @@ ELSE (KMAP_INCLUDE_DIR AND KMAP_LIBRARIES AND KMAP_DEFINITIONS)
     SET(KMAP_FOUND TRUE)
     MARK_AS_ADVANCED(KMAP_INCLUDE_DIR KMAP_LIBRARIES KMAP_DEFINITIONS)
 
+    # try to find version information
+    if (EXISTS "${CMAKE_BINARY_DIR}/${KMAP_LOCAL_DIR}/libkmap/version.cmake")
+      include ("${CMAKE_BINARY_DIR}/${KMAP_LOCAL_DIR}/libkmap/version.cmake")
+      message (STATUS "libkmap: Found version ${KMAP_LOCAL_DIR}")
+    endif (EXISTS "${CMAKE_BINARY_DIR}/${KMAP_LOCAL_DIR}/libkmap/version.cmake")
+
   ELSE(KMAP_LOCAL_FOUND)
     IF(NOT WIN32) 
       MESSAGE(STATUS "Check Kmap library using pkg-config...")
@@ -104,6 +110,12 @@ ELSE (KMAP_INCLUDE_DIR AND KMAP_LIBRARIES AND KMAP_DEFINITIONS)
           IF (NOT Kmap_FIND_QUIETLY)
               MESSAGE(STATUS "Found libkmap: ${KMAP_LIBRARIES}")
           ENDIF (NOT Kmap_FIND_QUIETLY)
+
+         # try to find version information
+         if (EXISTS "${KMAP_INCLUDE_DIR}/libkmap/version.cmake")
+           include ("${KMAP_INCLUDE_DIR}/libkmap/version.cmake")
+           message (STATUS "libkmap: Found version ${KMAP_LIB_VERSION}")
+         endif (EXISTS "${KMAP_INCLUDE_DIR}/libkmap/version.cmake")
       ELSE (KMAP_FOUND)
           IF (Kmap_FIND_REQUIRED)
               IF (NOT KMAP_INCLUDE_DIR)
