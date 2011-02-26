@@ -1,134 +1,158 @@
-# - Try to find the KMap library
+# Try to find the KMap library
 #
-# If you have put a local version of libkmap into your source tree,
-# set KMAP_LOCAL_DIR to the relative path to the local directory.
+# Parameters:
+#  KMAP_LOCAL_DIR - If you have put a local version of libkmap into
+#                   your source tree, set KMAP_LOCAL_DIR to the
+#                   relative path from the root of your source tree
+#                   to the libkmap local directory.
 #
 # Once done this will define
 #
-#  KMAP_FOUND - system has libkmap
-#  KMAP_INCLUDE_DIR - the libkmap include directory
+#  KMAP_FOUND - System has libkmap
+#  KMAP_INCLUDE_DIR - The libkmap include directory/directories (for #include <libkmap/...> style)
 #  KMAP_LIBRARIES - Link these to use libkmap
 #  KMAP_DEFINITIONS - Compiler switches required for using libkmap
+#  KMAP_VERSION - Version of libkmap which was found
 #
-
 # Copyright (c) 2010, Gilles Caulier, <caulier.gilles@gmail.com>
+# Copyright (c) 2011, Michael G. Hansen, <mike@mghansen.de>
 #
 # Redistribution and use is allowed according to the terms of the BSD license.
 # For details see the accompanying COPYING-CMAKE-SCRIPTS file.
 
-IF (KMAP_INCLUDE_DIR AND KMAP_LIBRARIES AND KMAP_DEFINITIONS)
+# Kmap_FIND_QUIETLY and Kmap_FIND_REQUIRED may be defined by CMake.
 
-  MESSAGE(STATUS "Found Kmap library in cache: ${KMAP_LIBRARIES}")
+if (KMAP_INCLUDE_DIR AND KMAP_LIBRARIES AND KMAP_DEFINITIONS AND KMAP_VERSION)
+
+  if (NOT Kmap_FIND_QUIETLY)
+    message(STATUS "Found Kmap library in cache: ${KMAP_LIBRARIES}")
+  endif (NOT Kmap_FIND_QUIETLY)
 
   # in cache already
-  SET(KMAP_FOUND TRUE)
+  set(KMAP_FOUND TRUE)
 
-ELSE (KMAP_INCLUDE_DIR AND KMAP_LIBRARIES AND KMAP_DEFINITIONS)
+else (KMAP_INCLUDE_DIR AND KMAP_LIBRARIES AND KMAP_DEFINITIONS AND KMAP_VERSION)
 
-  MESSAGE(STATUS "Check Kmap library in local sub-folder...")
+  if (NOT Kmap_FIND_QUIETLY)
+    message(STATUS "Check for Kmap library in local sub-folder...")
+  endif (NOT Kmap_FIND_QUIETLY)
 
-  # Check if library is not in local sub-folder
+  # Check for a local version of the library.
+  if (KMAP_LOCAL_DIR)
+    find_file(KMAP_LOCAL_FOUND libkmap/version.h.cmake ${CMAKE_SOURCE_DIR}/${KMAP_LOCAL_DIR} NO_DEFAULT_PATH)
+    if (NOT KMAP_LOCAL_FOUND)
+      message(WARNING "KMAP_LOCAL_DIR specified as \"${KMAP_LOCAL_DIR}\" but libkmap could not be found there.")
+    endif (NOT KMAP_LOCAL_FOUND)
+  else (KMAP_LOCAL_DIR)
+    find_file(KMAP_LOCAL_FOUND libkmap/version.h.cmake ${CMAKE_SOURCE_DIR}/libkmap NO_DEFAULT_PATH)
+    if (KMAP_LOCAL_FOUND)
+      set(KMAP_LOCAL_DIR libkmap)
+    endif (KMAP_LOCAL_FOUND)
+    find_file(KMAP_LOCAL_FOUND libkmap/version.h.cmake ${CMAKE_SOURCE_DIR}/libs/libkmap NO_DEFAULT_PATH)
+    if (KMAP_LOCAL_FOUND)
+      set(KMAP_LOCAL_DIR libs/libkmap)
+    endif (KMAP_LOCAL_FOUND)
+  endif (KMAP_LOCAL_DIR)
 
-  IF (KMAP_LOCAL_DIR)
-   SET(KMAP_LOCAL_FOUND TRUE)
-  ELSE (KMAP_LOCAL_DIR)
-    FIND_FILE(KMAP_LOCAL_FOUND libkmap/version.h.cmake ${CMAKE_SOURCE_DIR}/libkmap ${CMAKE_SOURCE_DIR}/libs/libkmap NO_DEFAULT_PATH)
-
-    IF (KMAP_LOCAL_FOUND)
-      FIND_FILE(KMAP_LOCAL_FOUND_IN_LIBS libkmap/version.h.cmake ${CMAKE_SOURCE_DIR}/libs/libkmap NO_DEFAULT_PATH)
-        IF (KMAP_LOCAL_FOUND_IN_LIBS)
-          SET(KMAP_LOCAL_DIR libs/libkmap)
-        ELSE (KMAP_LOCAL_FOUND_IN_LIBS)
-          SET(KMAP_LOCAL_DIR libkmap)
-        ENDIF (KMAP_LOCAL_DIR)
-    ENDIF (KMAP_LOCAL_FOUND)
-  ENDIF (KMAP_LOCAL_DIR)
-
-  IF (KMAP_LOCAL_FOUND)
-
-    # we need two include directories: because the version.h file is put into the build directory
+  if (KMAP_LOCAL_FOUND)
+    # We need two include directories: because the version.h file is put into the build directory
     # TODO KMAP_INCLUDE_DIR sounds like it should contain only one directory...
-    SET(KMAP_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/${KMAP_LOCAL_DIR} ${CMAKE_BINARY_DIR}/${KMAP_LOCAL_DIR})
-    SET(KMAP_DEFINITIONS "-I${CMAKE_SOURCE_DIR}/${KMAP_LOCAL_DIR}" "-I${CMAKE_BINARY_DIR}/${KMAP_LOCAL_DIR}")
-    SET(KMAP_LIBRARIES kmap)
-    MESSAGE(STATUS "Found Kmap library in local sub-folder: ${CMAKE_SOURCE_DIR}/${KMAP_LOCAL_DIR}")
-    SET(KMAP_FOUND TRUE)
-    MARK_AS_ADVANCED(KMAP_INCLUDE_DIR KMAP_LIBRARIES KMAP_DEFINITIONS)
+    set(KMAP_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/${KMAP_LOCAL_DIR} ${CMAKE_BINARY_DIR}/${KMAP_LOCAL_DIR})
+    set(KMAP_DEFINITIONS "-I${CMAKE_SOURCE_DIR}/${KMAP_LOCAL_DIR}" "-I${CMAKE_BINARY_DIR}/${KMAP_LOCAL_DIR}")
+    set(KMAP_LIBRARIES kmap)
+    if (NOT Kmap_FIND_QUIETLY)
+      message(STATUS "Found Kmap library in local sub-folder: ${CMAKE_SOURCE_DIR}/${KMAP_LOCAL_DIR}")
+    endif (NOT Kmap_FIND_QUIETLY)
+    set(KMAP_FOUND TRUE)
+    mark_as_advanced(KMAP_INCLUDE_DIR KMAP_LIBRARIES KMAP_DEFINITIONS KMAP_FOUND)
 
-    # try to find version information
-    if (EXISTS "${CMAKE_BINARY_DIR}/${KMAP_LOCAL_DIR}/libkmap/version.cmake")
-      include ("${CMAKE_BINARY_DIR}/${KMAP_LOCAL_DIR}/libkmap/version.cmake")
-      message (STATUS "libkmap: Found version ${KMAP_LOCAL_DIR}")
-    endif (EXISTS "${CMAKE_BINARY_DIR}/${KMAP_LOCAL_DIR}/libkmap/version.cmake")
+    set(kmap_version_h_filename "${CMAKE_BINARY_DIR}/${KMAP_LOCAL_DIR}/libkmap/version.h")
 
-  ELSE(KMAP_LOCAL_FOUND)
-    IF(NOT WIN32) 
-      MESSAGE(STATUS "Check Kmap library using pkg-config...")
+  else (KMAP_LOCAL_FOUND)
+    if (NOT WIN32)
+      if (NOT Kmap_FIND_QUIETLY)
+        message(STATUS "Check Kmap library using pkg-config...")
+      endif (NOT Kmap_FIND_QUIETLY)
 
-      # use pkg-config to get the directories and then use these values
-      # in the FIND_PATH() and FIND_LIBRARY() calls
-      INCLUDE(UsePkgConfig)
+      # use FindPkgConfig to get the directories and then use these values
+      # in the find_path() and find_library() calls
+      include(FindPkgConfig)
 
-      PKGCONFIG(libkmap _KMAPIncDir _KMAPLinkDir _KMAPLinkFlags _KMAPCflags)
+      pkg_search_module(KMAP libkmap)
 
-      IF(_KMAPLinkFlags)
-        # query pkg-config asking for a libkmap >= 0.1.0
-        EXEC_PROGRAM(${PKGCONFIG_EXECUTABLE} ARGS --atleast-version=0.1.0 libkmap RETURN_VALUE _return_VALUE OUTPUT_VARIABLE _pkgconfigDevNull )
-        IF(_return_VALUE STREQUAL "0")
-            MESSAGE(STATUS "Found libkmap release >= 0.1.0")
-            SET(KMAP_VERSION_GOOD_FOUND TRUE)
-        ELSE(_return_VALUE STREQUAL "0")
-            MESSAGE(STATUS "Found libkmap release < 0.1.0, too old")
-            SET(KMAP_VERSION_GOOD_FOUND FALSE)
-            SET(KMAP_FOUND FALSE)
-        ENDIF(_return_VALUE STREQUAL "0")
-      ELSE(_KMAPLinkFlags)
-        SET(KMAP_VERSION_GOOD_FOUND FALSE)
-        SET(KMAP_FOUND FALSE)
-      ENDIF(_KMAPLinkFlags)
-    ELSE(NOT WIN32)
-      SET(KMAP_VERSION_GOOD_FOUND TRUE)
-    ENDIF(NOT WIN32)
+      if (KMAP_FOUND)
+        # make sure the version is >= 0.1.0
+        # TODO: WHY?
+        if (KMAP_VERSION VERSION_LESS 0.1.0)
+          message(STATUS "Found libkmap release < 0.1.0, too old")
+          set(KMAP_VERSION_GOOD_FOUND FALSE)
+          set(KMAP_FOUND FALSE)
+        else (KMAP_VERSION VERSION_LESS 0.1.0)
+          if (NOT Kmap_FIND_QUIETLY)
+            message(STATUS "Found libkmap release ${KMAP_VERSION}")
+          endif (NOT Kmap_FIND_QUIETLY)
+          set(KMAP_VERSION_GOOD_FOUND TRUE)
+        endif (KMAP_VERSION VERSION_LESS 0.1.0)
+      else (KMAP_FOUND)
+        set(KMAP_VERSION_GOOD_FOUND FALSE)
+      endif (KMAP_FOUND)
+    else (NOT WIN32)
+      # TODO: Why do we just assume the version is good?
+      set(KMAP_VERSION_GOOD_FOUND TRUE)
+    endif (NOT WIN32)
 
-    IF(KMAP_VERSION_GOOD_FOUND)
-        SET(KMAP_DEFINITIONS "${_KMAPCflags}")
+    if (KMAP_VERSION_GOOD_FOUND)
+      set(KMAP_DEFINITIONS "${KMAP_CFLAGS}")
 
-        FIND_PATH(KMAP_INCLUDE_DIR libkmap/version.h
-        ${_KMAPIncDir}
-        )
+      find_path(KMAP_INCLUDE_DIR libkmap/version.h ${KMAP_INCLUDEDIR})
+      set(kmap_version_h_filename "${KMAP_INCLUDE_DIR}/libkmap/version.h")
 
-        FIND_LIBRARY(KMAP_LIBRARIES NAMES kmap
-        PATHS
-        ${_KMAPLinkDir}
-        )
+      find_library(KMAP_LIBRARIES NAMES kmap PATHS ${KMAP_LIBDIR})
 
-        IF (KMAP_INCLUDE_DIR AND KMAP_LIBRARIES)
-            SET(KMAP_FOUND TRUE)
-        ENDIF (KMAP_INCLUDE_DIR AND KMAP_LIBRARIES)
-      ENDIF(KMAP_VERSION_GOOD_FOUND) 
-      IF (KMAP_FOUND)
-          IF (NOT Kmap_FIND_QUIETLY)
-              MESSAGE(STATUS "Found libkmap: ${KMAP_LIBRARIES}")
-          ENDIF (NOT Kmap_FIND_QUIETLY)
+      if (KMAP_INCLUDE_DIR AND KMAP_LIBRARIES)
+        set(KMAP_FOUND TRUE)
+      else (KMAP_INCLUDE_DIR AND KMAP_LIBRARIES)
+        set(KMAP_FOUND FALSE)
+      endif (KMAP_INCLUDE_DIR AND KMAP_LIBRARIES)
+    endif (KMAP_VERSION_GOOD_FOUND)
 
-         # try to find version information
-         if (EXISTS "${KMAP_INCLUDE_DIR}/libkmap/version.cmake")
-           include ("${KMAP_INCLUDE_DIR}/libkmap/version.cmake")
-           message (STATUS "libkmap: Found version ${KMAP_LIB_VERSION}")
-         endif (EXISTS "${KMAP_INCLUDE_DIR}/libkmap/version.cmake")
-      ELSE (KMAP_FOUND)
-          IF (Kmap_FIND_REQUIRED)
-              IF (NOT KMAP_INCLUDE_DIR)
-                  MESSAGE(FATAL_ERROR "Could NOT find libkmap header files")
-              ENDIF (NOT KMAP_INCLUDE_DIR)
-              IF (NOT KMAP_LIBRARIES)
-                  MESSAGE(FATAL_ERROR "Could NOT find libkmap library")
-              ENDIF (NOT KMAP_LIBRARIES)
-          ENDIF (Kmap_FIND_REQUIRED)
-      ENDIF (KMAP_FOUND)
+    if (KMAP_FOUND)
+      if (NOT Kmap_FIND_QUIETLY)
+        message(STATUS "Found libkmap: ${KMAP_LIBRARIES}")
+      endif (NOT Kmap_FIND_QUIETLY)
+    else (KMAP_FOUND)
+      if (Kmap_FIND_REQUIRED)
+        if (NOT KMAP_INCLUDE_DIR)
+          message(FATAL_ERROR "Could NOT find libkmap header files.")
+        else(NOT KMAP_INCLUDE_DIR)
+          message(FATAL_ERROR "Could NOT find libkmap library.")
+        endif (NOT KMAP_INCLUDE_DIR)
+      endif (Kmap_FIND_REQUIRED)
+    endif (KMAP_FOUND)
 
-    MARK_AS_ADVANCED(KMAP_INCLUDE_DIR KMAP_LIBRARIES KMAP_DEFINITIONS)
+  endif (KMAP_LOCAL_FOUND)
 
-  ENDIF(KMAP_LOCAL_FOUND)
+  if (KMAP_FOUND)
+    # Find the version information, unless that was reported by pkg_search_module.
+    if (NOT KMAP_VERSION)
+      file(READ "${kmap_version_h_filename}" kmap_version_h_content)
+      # This is the line we are trying to find: static const char kmap_version[] = "1.22.4-beta_5+dfsg";
+      string(REGEX REPLACE ".*char +kmap_version\\[\\] += +\"([^\"]+)\".*" "\\1" KMAP_VERSION "${kmap_version_h_content}")
+      unset(kmap_version_h_content)
+      mark_as_advanced(KMAP_VERSION)
 
-ENDIF (KMAP_INCLUDE_DIR AND KMAP_LIBRARIES AND KMAP_DEFINITIONS)
+    endif (NOT KMAP_VERSION)
+    unset(kmap_version_h_filename)
+  endif (KMAP_FOUND)
+
+  if (KMAP_FOUND)
+    mark_as_advanced(KMAP_INCLUDE_DIR KMAP_LIBRARIES KMAP_DEFINITIONS KMAP_VERSION)
+  else (KMAP_FOUND)
+    # The library was not found, reset all related variables.
+    unset(KMAP_INCLUDE_DIR)
+    unset(KMAP_LIBRARIES)
+    unset(KMAP_DEFINITIONS)
+    unset(KMAP_VERSION)
+  endif (KMAP_FOUND)
+
+endif (KMAP_INCLUDE_DIR AND KMAP_LIBRARIES AND KMAP_DEFINITIONS AND KMAP_VERSION)
