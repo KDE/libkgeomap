@@ -64,7 +64,6 @@ else (KMAP_INCLUDE_DIR AND KMAP_LIBRARIES AND KMAP_DEFINITIONS AND KMAP_VERSION)
       message(STATUS "Found Kmap library in local sub-folder: ${CMAKE_SOURCE_DIR}/${KMAP_LOCAL_DIR}")
     endif (NOT Kmap_FIND_QUIETLY)
     set(KMAP_FOUND TRUE)
-    mark_as_advanced(KMAP_INCLUDE_DIR KMAP_LIBRARIES KMAP_DEFINITIONS KMAP_FOUND)
 
     set(kmap_version_h_filename "${CMAKE_BINARY_DIR}/${KMAP_LOCAL_DIR}/libkmap/version.h")
 
@@ -139,14 +138,13 @@ else (KMAP_INCLUDE_DIR AND KMAP_LIBRARIES AND KMAP_DEFINITIONS AND KMAP_VERSION)
       # This is the line we are trying to find: static const char kmap_version[] = "1.22.4-beta_5+dfsg";
       string(REGEX REPLACE ".*char +kmap_version\\[\\] += +\"([^\"]+)\".*" "\\1" KMAP_VERSION "${kmap_version_h_content}")
       unset(kmap_version_h_content)
-      mark_as_advanced(KMAP_VERSION)
 
     endif (NOT KMAP_VERSION)
     unset(kmap_version_h_filename)
   endif (KMAP_FOUND)
 
   if (KMAP_FOUND)
-    mark_as_advanced(KMAP_INCLUDE_DIR KMAP_LIBRARIES KMAP_DEFINITIONS KMAP_VERSION)
+    mark_as_advanced(KMAP_INCLUDE_DIR KMAP_LIBRARIES KMAP_DEFINITIONS KMAP_VERSION KMAP_FOUND)
   else (KMAP_FOUND)
     # The library was not found, reset all related variables.
     unset(KMAP_INCLUDE_DIR)
