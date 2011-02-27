@@ -98,6 +98,5 @@ INSTALL(FILES libkmap_export.h
               abstractmarkertiler.h
               itemmarkertiler.h
               ${CMAKE_CURRENT_BINARY_DIR}/version.h
-              ${CMAKE_CURRENT_BINARY_DIR}/version.cmake
         DESTINATION ${INCLUDE_INSTALL_DIR}/libkmap COMPONENT Devel
        )
