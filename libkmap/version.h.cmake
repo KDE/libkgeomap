@@ -24,6 +24,7 @@
 #ifndef KMAP_VERSION_H
 #define KMAP_VERSION_H
 
+// Before changing the line below, make sure that FindKmap.cmake can still parse it
 static const char kmap_version[] = "${KMAP_LIB_VERSION_STRING}";
 
 #define KMAP_VERSION ${KMAP_LIB_VERSION_ID}
