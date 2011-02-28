@@ -158,7 +158,7 @@ Calibrator::Calibrator()
     d->sbLevel = new QSpinBox(this);
     d->sbLevel->setMinimum(1);
     d->sbLevel->setMaximum(KMap::TileIndex::MaxLevel);
-    QLabel* const labelsbLevel = new QLabel(i18n("Level:"), this);
+    QLabel* const labelsbLevel = new QLabel(i18nc("Tile level", "Level:"), this);
     labelsbLevel->setBuddy(d->sbLevel);
 
     d->zoomDisplay = new QLineEdit(this);
@@ -344,7 +344,7 @@ void Calibrator::slotAddMapWidget()
     boxLayout->addWidget(mapWidget);
     boxLayout->addWidget(mapWidget->getControlWidget());
 
-    QAction* const activateMapAction = new QAction(i18n("Active"), mapWidget);
+    QAction* const activateMapAction = new QAction(i18nc("Set the widget active", "Active"), mapWidget);
     activateMapAction->setData(QVariant::fromValue<void*>(mapWidget));
     activateMapAction->setCheckable(true);
     QToolButton* const toolButton = new QToolButton(mapWidget);

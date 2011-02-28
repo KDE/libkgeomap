@@ -40,7 +40,7 @@ class CalibratorModelHelper : public KMap::ModelHelper
 Q_OBJECT
 
 public:
-    CalibratorModelHelper(QStandardItemModel* const model, QObject* const parent = 0);
+    explicit CalibratorModelHelper(QStandardItemModel* const model, QObject* const parent = 0);
     ~CalibratorModelHelper();
 
     // these are necessary for grouped and ungrouped models

@@ -70,7 +70,7 @@ class MainWindow : public KMainWindow
 
 public:
 
-    MainWindow(KCmdLineArgs* const cmdLineArgs, QWidget* const parent = 0);
+    explicit MainWindow(KCmdLineArgs* const cmdLineArgs, QWidget* const parent = 0);
     ~MainWindow();
 
 public Q_SLOTS:
