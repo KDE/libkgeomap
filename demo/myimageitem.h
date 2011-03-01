@@ -29,9 +29,9 @@
 #include <QTreeWidgetItem>
 #include <QPersistentModelIndex>
 
-// Local includes
+// libkmap includes
 
-#include "kmap_primitives.h"
+#include "libkmap/kmap_primitives.h"
 
 const int RoleMyData      = Qt::UserRole+0;
 const int RoleCoordinates = Qt::UserRole+1;

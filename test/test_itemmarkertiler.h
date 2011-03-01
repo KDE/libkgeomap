@@ -31,7 +31,7 @@
 // local includes
 
 #include "itemmarkertiler.h"
-#include "kmap_modelhelper.h"
+#include "modelhelper.h"
 
 class MarkerModelHelper : public KMap::ModelHelper
 {

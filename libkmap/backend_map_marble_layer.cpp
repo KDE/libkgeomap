@@ -4,10 +4,10 @@
  * This file is a part of digiKam project
  * <a href="http://www.digikam.org">http://www.digikam.org</a>
  *
- * @date   2010-02-13
- * @brief  geonames.org based altitude lookup backend
+ * @date   2009-12-08
+ * @brief  Internal part of the Marble-backend for KMap
  *
- * @author Copyright (C) 2010 by Michael G. Hansen
+ * @author Copyright (C) 2009-2010 by Michael G. Hansen
  *         <a href="mailto:mike at mghansen dot de">mike at mghansen dot de</a>
  * @author Copyright (C) 2010 by Gilles Caulier
  *         <a href="mailto:caulier dot gilles at gmail dot com">caulier dot gilles at gmail dot com</a>
@@ -24,50 +24,50 @@
  *
  * ============================================================ */
 
-#ifndef BACKEND_ALTITUDE_GEONAMES_H
-#define BACKEND_ALTITUDE_GEONAMES_H
+#include "backend_map_marble_layer.h"
 
-// Local includes
+// KDE includes
 
-#include "altitude-backend.h"
+#include <marble/GeoPainter.h>
 
-/// @cond false
-namespace KIO
-{
-    class Job;
-}
-/// @endcond
+// local includes
 
-class KJob;
+#include "backend_map_marble.h"
 
 namespace KMap
 {
 
-class BackendAltitudeGeonames : public AltitudeBackend
+BMLayer::BMLayer(BackendMarble* const pMarbleBackend)
+       : marbleBackend(pMarbleBackend)
 {
-    Q_OBJECT
+}
 
-public:
+BMLayer::~BMLayer()
+{
+}
 
-    BackendAltitudeGeonames(const QExplicitlySharedDataPointer<KMapSharedData>& sharedData, QObject* const parent);
-    virtual ~BackendAltitudeGeonames();
+bool BMLayer::render(Marble::GeoPainter* painter, Marble::ViewportParams* viewport,
+                     const QString& renderPos, Marble::GeoSceneLayer* layer)
+{
+    if (marbleBackend && (renderPos == QLatin1String("HOVERS_ABOVE_SURFACE")))
+    {
+        marbleBackend->marbleCustomPaint(painter);
+        return true;
+    }
 
-    virtual QString backendName() const;
-    virtual QString backendHumanName() const;
+    return false;
+}
 
-    virtual bool queryAltitudes(const KMapAltitudeLookup::List& queryItems);
+QStringList BMLayer::renderPosition () const
+{
+    QStringList layerNames;
+    layerNames << QLatin1String("HOVERS_ABOVE_SURFACE" );
+    return layerNames;
+}
 
-private Q_SLOTS:
-
-    void slotData(KIO::Job* kioJob, const QByteArray& data);
-    void slotResult(KJob* kJob);
-
-private:
-
-    class BackendAltitudeGeonamesPrivate;
-    BackendAltitudeGeonamesPrivate* const d;
-};
+void BMLayer::setBackend(BackendMarble* const pMarbleBackend)
+{
+    marbleBackend = pMarbleBackend;
+}
 
 } /* namespace KMap */
-
-#endif /* BACKEND_ALTITUDE_GEONAMES_H */

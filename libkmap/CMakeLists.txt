@@ -34,44 +34,44 @@ ENDIF(${HAVE_VALGRIND})
 CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/version.h.cmake ${CMAKE_CURRENT_BINARY_DIR}/version.h)
 
 SET(widget_sources
+    abstractmarkertiler.cpp
+    backend_altitude.cpp
+    backend_altitude_geonames.cpp
+    backend_map.cpp
+    dragdrophandler.cpp
+    html_widget.cpp
+    itemmarkertiler.cpp
     kmap_widget.cpp
     kmap_common.cpp
-    kmap_dragdrophandler.cpp
-    kmap_modelhelper.cpp
-    kmap_tileindex.cpp
-    map-backend.cpp
-    html_widget.cpp
-    abstractmarkertiler.cpp
-    itemmarkertiler.cpp
-    altitude-backend.cpp
-    backend-altitude-geonames.cpp
+    modelhelper.cpp
     placeholderwidget.cpp
     tilegrouper.cpp
+    tileindex.cpp
    )
 
-SET(backend_marble_sources
-    backend-marble.cpp
+SET(backend_map_marble_sources
+    backend_map_marble.cpp
    )
 
 IF (${KDE_VERSION} VERSION_GREATER "4.4.66")
     ADD_DEFINITIONS(-DKMAP_MARBLE_ADD_LAYER)
-    SET( backend_marble_sources ${backend_marble_sources} backend-marble-layer.cpp )
+    SET( backend_map_marble_sources ${backend_map_marble_sources} backend_map_marble_layer.cpp )
 ELSE (${KDE_VERSION} VERSION_GREATER "4.4.66")
-    SET( backend_marble_sources ${backend_marble_sources} backend-marble-subwidget.cpp )
+    SET( backend_map_marble_sources ${backend_map_marble_sources} backend_map_marble_subwidget.cpp )
 ENDIF (${KDE_VERSION} VERSION_GREATER "4.4.66")
 
-SET(backend_googlemaps_sources
-    backend-googlemaps.cpp
+SET(backend_map_googlemaps_sources
+    backend_map_googlemaps.cpp
    )
 
-SET(backend_osm_sources
-    #backend-osm.cpp
+SET(backend_map_osm_sources
+    #backend_map_osm.cpp
    )
 
 KDE4_ADD_LIBRARY(kmap SHARED ${widget_sources} 
-                             ${backend_marble_sources}
-                             ${backend_googlemaps_sources}
-                             ${backend_osm_sources}
+                             ${backend_map_marble_sources}
+                             ${backend_map_googlemaps_sources}
+                             ${backend_map_osm_sources}
                 )
 
 TARGET_LINK_LIBRARIES(kmap ${QT_QTGUI_LIBRARY}
@@ -88,15 +88,15 @@ SET_TARGET_PROPERTIES(kmap PROPERTIES VERSION ${KMAP_LIB_SO_VERSION_STRING}
 INSTALL(TARGETS kmap ${INSTALL_TARGETS_DEFAULT_ARGS})
 
 INSTALL(FILES libkmap_export.h
-              kmap_widget.h
-              kmap_dragdrophandler.h
-              kmap_primitives.h
-              kmap_modelhelper.h
-              kmap_geocoordinates.h
-              kmap_tileindex.h
-              altitude-backend.h
               abstractmarkertiler.h
+              backend_altitude.h
+              dragdrophandler.h
+              geocoordinates.h
               itemmarkertiler.h
+              kmap_primitives.h
+              kmap_widget.h
+              modelhelper.h
+              tileindex.h
               ${CMAKE_CURRENT_BINARY_DIR}/version.h
         DESTINATION ${INCLUDE_INSTALL_DIR}/libkmap COMPONENT Devel
        )

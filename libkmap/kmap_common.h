@@ -42,7 +42,7 @@
 // libkmap includes
 
 #include "kmap_primitives.h"
-#include "kmap_tileindex.h"
+#include "tileindex.h"
 
 namespace KMap
 {

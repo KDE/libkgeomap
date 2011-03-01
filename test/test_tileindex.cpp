@@ -25,7 +25,7 @@
 
 // local includes
 
-#include "kmap_tileindex.h"
+#include "tileindex.h"
 
 using namespace KMap;
 

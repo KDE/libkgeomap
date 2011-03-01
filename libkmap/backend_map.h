@@ -24,8 +24,8 @@
  *
  * ============================================================ */
 
-#ifndef MAP_BACKEND_H
-#define MAP_BACKEND_H
+#ifndef BACKEND_MAP_H
+#define BACKEND_MAP_H
 
 // Qt includes
 
@@ -121,4 +121,4 @@ Q_SIGNALS:
 
 } /* namespace KMap */
 
-#endif /* MAP_BACKEND_H */
+#endif /* BACKEND_MAP_H */

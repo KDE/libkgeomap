@@ -4,10 +4,10 @@
  * This file is a part of digiKam project
  * <a href="http://www.digikam.org">http://www.digikam.org</a>
  *
- * @date   2009-12-08
- * @brief  Internal part of the Marble-backend for KMap
+ * @date   2010-02-13
+ * @brief  Base class for altitude lookup backends
  *
- * @author Copyright (C) 2009-2010 by Michael G. Hansen
+ * @author Copyright (C) 2010 by Michael G. Hansen
  *         <a href="mailto:mike at mghansen dot de">mike at mghansen dot de</a>
  * @author Copyright (C) 2010 by Gilles Caulier
  *         <a href="mailto:caulier dot gilles at gmail dot com">caulier dot gilles at gmail dot com</a>
@@ -24,49 +24,18 @@
  *
  * ============================================================ */
 
-#ifndef BACKEND_MARBLE_LAYER_H
-#define BACKEND_MARBLE_LAYER_H
-
-// Qt includes
-
-#include <QPointer>
-
-// KDE includes
-
-#include <marble/LayerInterface.h>
-
-/// @cond false
-namespace Marble
-{
-    class GeoPainter;
-    class ViewportParams;
-    class GeoSceneLayer;
-}
-/// @endcond
+#include "backend_altitude.moc"
 
 namespace KMap
 {
 
-class BackendMarble;
-
-class BMLayer : public Marble::LayerInterface
+AltitudeBackend::AltitudeBackend(const QExplicitlySharedDataPointer<KMapSharedData>& sharedData, QObject* const parent)
+               : QObject(parent), s(sharedData)
 {
-public:
+}
 
-    BMLayer(BackendMarble* const pMarbleBackend);
-    virtual ~BMLayer();
-
-    virtual bool render(Marble::GeoPainter* painter, Marble::ViewportParams* viewport,
-                        const QString& renderPos = QLatin1String( "NONE"), Marble::GeoSceneLayer* layer = 0);
-    virtual QStringList renderPosition () const;
-
-    void setBackend(BackendMarble* const pMarbleBackend);
-
-private:
-
-    QPointer<BackendMarble> marbleBackend;
-};
+AltitudeBackend::~AltitudeBackend()
+{
+}
 
 } /* namespace KMap */
-
-#endif /* BACKEND_MARBLE_LAYER_H */

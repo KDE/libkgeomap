@@ -24,7 +24,7 @@
  *
  * ============================================================ */
 
-#include "kmap_modelhelper.moc"
+#include "modelhelper.moc"
 
 namespace KMap
 {

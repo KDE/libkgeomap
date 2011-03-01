@@ -23,7 +23,7 @@
 #
 # ============================================================
 
-INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/../libkmap)
+INCLUDE_DIRECTORIES(BEFORE ${CMAKE_CURRENT_SOURCE_DIR}/../ ${CMAKE_CURRENT_BINARY_DIR}/../)
 
 SET(calibrator_sources
         calibrator.cpp
@@ -36,4 +36,5 @@ TARGET_LINK_LIBRARIES(libkmap_calibrator
                         ${KDE4_KDECORE_LIBS}
                         ${KDE4_UI_LIBS}
                         ${KDE4_KPARTS_LIBS}
-                        ${KDE4_KHTML_LIBS})
+                        ${KDE4_KHTML_LIBS}
+                    )

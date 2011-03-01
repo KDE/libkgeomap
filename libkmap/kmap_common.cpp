@@ -29,7 +29,7 @@
 
 // local includes
 
-#include "map-backend.h"
+#include "backend_map.h"
 
 
 namespace KMap

@@ -23,6 +23,10 @@
 
 #include "test_geocoordinates.moc"
 
+// local includes
+
+#include "geocoordinates.h"
+
 using namespace KMap;
 
 void TestGeoCoordinates::testNoOp()

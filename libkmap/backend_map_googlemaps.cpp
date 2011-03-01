@@ -24,7 +24,7 @@
  *
  * ============================================================ */
 
-#include "backend-googlemaps.moc"
+#include "backend_map_googlemaps.moc"
 
 // Qt includes
 
@@ -44,7 +44,7 @@
 #include "html_widget.h"
 #include "kmap_widget.h"
 #include "abstractmarkertiler.h"
-#include "kmap_modelhelper.h"
+#include "modelhelper.h"
 
 namespace KMap
 {

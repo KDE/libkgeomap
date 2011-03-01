@@ -24,12 +24,12 @@
  *
  * ============================================================ */
 
-#ifndef BACKEND_MARBLE_H
-#define BACKEND_MARBLE_H
+#ifndef BACKEND_MAP_MARBLE_H
+#define BACKEND_MAP_MARBLE_H
 
 // local includes
 
-#include "map-backend.h"
+#include "backend_map.h"
 
 /// @cond false
 namespace Marble
@@ -136,4 +136,4 @@ private:
 
 } /* namespace KMap */
 
-#endif /* BACKEND_MARBLE_H */
+#endif /* BACKEND_MAP_MARBLE_H */

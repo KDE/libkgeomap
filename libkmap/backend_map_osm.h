@@ -24,12 +24,12 @@
  *
  * ============================================================ */
 
-#ifndef BACKEND_OSM_H
-#define BACKEND_OSM_H
+#ifndef BACKEND_MAP_OSM_H
+#define BACKEND_MAP_OSM_H
 
 // local includes
 
-#include "map-backend.h"
+#include "backend_map.h"
 
 namespace KMap
 {
@@ -95,4 +95,4 @@ private:
 
 } /* KMap */
 
-#endif /* BACKEND_OSM_H */
+#endif /* BACKEND_MAP_OSM_H */

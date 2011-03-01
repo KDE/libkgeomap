@@ -27,7 +27,7 @@
 // local includes
 
 #include "abstractmarkertiler.h"
-#include "map-backend.h"
+#include "backend_map.h"
 
 namespace KMap
 {

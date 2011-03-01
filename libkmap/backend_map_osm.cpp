@@ -24,7 +24,7 @@
  *
  * ============================================================ */
 
-#include "backend-osm.moc"
+#include "backend_osm.moc"
 
 // Qt includes
 

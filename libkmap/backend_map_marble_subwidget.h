@@ -4,8 +4,8 @@
  * This file is a part of digiKam project
  * <a href="http://www.digikam.org">http://www.digikam.org</a>
  *
- * @date   2009-12-01
- * @brief  Base-class for backends for KMap
+ * @date   2009-12-08
+ * @brief  Internal part of the Marble-backend for KMap
  *
  * @author Copyright (C) 2009-2010 by Michael G. Hansen
  *         <a href="mailto:mike at mghansen dot de">mike at mghansen dot de</a>
@@ -24,24 +24,40 @@
  *
  * ============================================================ */
 
-#include "map-backend.moc"
+#ifndef BACKEND_MAP_MARBLE_SUBWIDGET_H
+#define BACKEND_MAP_MARBLE_SUBWIDGET_H
+
+// Qt includes
+
+#include <QPointer>
+
+// KDE includes
+
+#include <marble/MarbleWidget.h>
 
 namespace KMap
 {
 
-MapBackend::MapBackend(const QExplicitlySharedDataPointer<KMapSharedData>& sharedData, QObject* const parent)
-          : QObject(parent), s(sharedData)
-{
-}
+class BackendMarble;
 
-MapBackend::~MapBackend()
+class BMWidget : public Marble::MarbleWidget
 {
-}
+    Q_OBJECT
 
-void MapBackend::slotThumbnailAvailableForIndex(const QVariant& index, const QPixmap& pixmap)
-{
-    Q_UNUSED(index)
-    Q_UNUSED(pixmap)
-}
+public:
+
+    explicit BMWidget(BackendMarble* const pMarbleBackend, QWidget* const parent = 0);
+    virtual ~BMWidget();
+
+protected:
+
+    virtual void customPaint(Marble::GeoPainter* painter);
+
+private:
+
+    QPointer<BackendMarble> const marbleBackend;
+};
 
 } /* namespace KMap */
+
+#endif /* BACKEND_MAP_MARBLE_SUBWIDGET_H */

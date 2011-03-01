@@ -28,10 +28,6 @@
 
 #include <QtTest/QtTest>
 
-// local includes
-
-#include "kmap_primitives.h"
-
 class TestPrimitives : public QObject
 {
     Q_OBJECT

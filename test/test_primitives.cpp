@@ -25,7 +25,8 @@
 
 // local includes
 
-#include "../libkmap/kmap_common.h"
+#include "kmap_primitives.h"
+#include "kmap_common.h"
 
 using namespace KMap;
 

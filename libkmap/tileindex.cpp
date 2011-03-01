@@ -24,7 +24,7 @@
  *
  * ============================================================ */
 
-#include "kmap_tileindex.h"
+#include "tileindex.h"
 
 namespace KMap
 {

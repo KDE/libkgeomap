@@ -4,10 +4,10 @@
  * This file is a part of digiKam project
  * <a href="http://www.digikam.org">http://www.digikam.org</a>
  *
- * @date   2010-02-13
- * @brief  Base class for altitude lookup backends
+ * @date   2009-12-01
+ * @brief  Base-class for backends for KMap
  *
- * @author Copyright (C) 2010 by Michael G. Hansen
+ * @author Copyright (C) 2009-2010 by Michael G. Hansen
  *         <a href="mailto:mike at mghansen dot de">mike at mghansen dot de</a>
  * @author Copyright (C) 2010 by Gilles Caulier
  *         <a href="mailto:caulier dot gilles at gmail dot com">caulier dot gilles at gmail dot com</a>
@@ -24,18 +24,24 @@
  *
  * ============================================================ */
 
-#include "altitude-backend.moc"
+#include "backend_map.moc"
 
 namespace KMap
 {
 
-AltitudeBackend::AltitudeBackend(const QExplicitlySharedDataPointer<KMapSharedData>& sharedData, QObject* const parent)
-               : QObject(parent), s(sharedData)
+MapBackend::MapBackend(const QExplicitlySharedDataPointer<KMapSharedData>& sharedData, QObject* const parent)
+          : QObject(parent), s(sharedData)
 {
 }
 
-AltitudeBackend::~AltitudeBackend()
+MapBackend::~MapBackend()
 {
+}
+
+void MapBackend::slotThumbnailAvailableForIndex(const QVariant& index, const QPixmap& pixmap)
+{
+    Q_UNUSED(index)
+    Q_UNUSED(pixmap)
 }
 
 } /* namespace KMap */

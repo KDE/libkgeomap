@@ -28,10 +28,6 @@
 
 #include <QtTest/QtTest>
 
-// local includes
-
-#include "kmap_geocoordinates.h"
-
 class TestGeoCoordinates : public QObject
 {
     Q_OBJECT

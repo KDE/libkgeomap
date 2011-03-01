@@ -60,12 +60,15 @@
 #include <libkexiv2/version.h>
 #include <libkexiv2/kexiv2.h>
 
+// libkmap includes
+
+#include "libkmap/kmap_widget.h"
+#include "libkmap/itemmarkertiler.h"
+
 // local includes
 
-#include "kmap_widget.h"
-#include "itemmarkertiler.h"
-#include "mytreewidget.h"
 #include "dragdrophandler.h"
+#include "mytreewidget.h"
 #include "myimageitem.h"
 
 using namespace KMap;

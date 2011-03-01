@@ -28,7 +28,7 @@
 
 // local includes
 
-#include "kmap_modelhelper.h"
+#include "modelhelper.h"
 
 namespace KMap
 {

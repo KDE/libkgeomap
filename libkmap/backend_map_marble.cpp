@@ -24,7 +24,7 @@
  *
  * ============================================================ */
 
-#include "backend-marble.moc"
+#include "backend_map_marble.moc"
 
 // Qt includes
 
@@ -51,14 +51,14 @@
 // local includes
 
 #ifdef KMAP_MARBLE_ADD_LAYER
-#include "backend-marble-layer.h"
+#include "backend_map_marble_layer.h"
 #else
-#include "backend-marble-subwidget.h"
+#include "backend_map_marble_subwidget.h"
 #endif // KMAP_MARBLE_ADD_LAYER
 
 #include "abstractmarkertiler.h"
 #include "kmap_widget.h"
-#include "kmap_modelhelper.h"
+#include "modelhelper.h"
 
 namespace KMap
 {

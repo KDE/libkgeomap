@@ -33,10 +33,10 @@
 #include <kmainwindow.h>
 #include <kurl.h>
 
-// local includes
+// libkmap includes
 
-#include "kmap_primitives.h"
-#include "kmap_modelhelper.h"
+#include "libkmap/kmap_primitives.h"
+#include "libkmap/modelhelper.h"
 
 class KCmdLineArgs;
 

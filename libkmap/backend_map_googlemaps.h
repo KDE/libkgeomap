@@ -24,12 +24,12 @@
  *
  * ============================================================ */
 
-#ifndef BACKEND_GOOGLEMAPS_H
-#define BACKEND_GOOGLEMAPS_H
+#ifndef BACKEND_MAP_GOOGLEMAPS_H
+#define BACKEND_MAP_GOOGLEMAPS_H
 
 // local includes
 
-#include "map-backend.h"
+#include "backend_map.h"
 
 namespace KMap
 {
@@ -127,4 +127,4 @@ private:
 
 } /* namespace KMap */
 
-#endif /* BACKEND_GOOGLEMAPS_H */
+#endif /* BACKEND_MAP_GOOGLEMAPS_H */

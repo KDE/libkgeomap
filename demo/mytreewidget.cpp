@@ -28,9 +28,12 @@
 #include <QApplication>
 #include <QMouseEvent>
 
+// libkmap includes
+
+#include "libkmap/kmap_primitives.h"
+
 // local includes
 
-#include "kmap_primitives.h"
 #include "dragdrophandler.h"
 
 class MyTreeWidgetPrivate

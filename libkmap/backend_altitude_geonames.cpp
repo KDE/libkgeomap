@@ -24,7 +24,7 @@
  *
  * ============================================================ */
 
-#include "backend-altitude-geonames.moc"
+#include "backend_altitude_geonames.moc"
 
 // KDE includes
 

@@ -35,7 +35,7 @@
 
 // local includes
 
-#include "kmap_tileindex.h"
+#include "tileindex.h"
 #include "kmap_primitives.h"
 #include "libkmap_export.h"
 

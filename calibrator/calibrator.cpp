@@ -47,10 +47,10 @@
 
 // local includes
 
-#include "../libkmap/abstractmarkertiler.h"
-#include "../libkmap/itemmarkertiler.h"
-#include "../libkmap/kmap_widget.h"
-#include "../libkmap/version.h"
+#include "libkmap/abstractmarkertiler.h"
+#include "libkmap/itemmarkertiler.h"
+#include "libkmap/kmap_widget.h"
+#include "libkmap/version.h"
 
 const int CoordinatesRole = Qt::UserRole + 1;
 

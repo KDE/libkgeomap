@@ -24,8 +24,8 @@
  *
  * ============================================================ */
 
-#ifndef BACKEND_MARBLE_SUBWIDGET_H
-#define BACKEND_MARBLE_SUBWIDGET_H
+#ifndef BACKEND_MAP_MARBLE_LAYER_H
+#define BACKEND_MAP_MARBLE_LAYER_H
 
 // Qt includes
 
@@ -33,31 +33,40 @@
 
 // KDE includes
 
-#include <marble/MarbleWidget.h>
+#include <marble/LayerInterface.h>
+
+/// @cond false
+namespace Marble
+{
+    class GeoPainter;
+    class ViewportParams;
+    class GeoSceneLayer;
+}
+/// @endcond
 
 namespace KMap
 {
 
 class BackendMarble;
 
-class BMWidget : public Marble::MarbleWidget
+class BMLayer : public Marble::LayerInterface
 {
-    Q_OBJECT
-
 public:
 
-    explicit BMWidget(BackendMarble* const pMarbleBackend, QWidget* const parent = 0);
-    virtual ~BMWidget();
+    BMLayer(BackendMarble* const pMarbleBackend);
+    virtual ~BMLayer();
 
-protected:
+    virtual bool render(Marble::GeoPainter* painter, Marble::ViewportParams* viewport,
+                        const QString& renderPos = QLatin1String( "NONE"), Marble::GeoSceneLayer* layer = 0);
+    virtual QStringList renderPosition () const;
 
-    virtual void customPaint(Marble::GeoPainter* painter);
+    void setBackend(BackendMarble* const pMarbleBackend);
 
 private:
 
-    QPointer<BackendMarble> const marbleBackend;
+    QPointer<BackendMarble> marbleBackend;
 };
 
 } /* namespace KMap */
 
-#endif /* BACKEND_MARBLE_SUBWIDGET_H */
+#endif /* BACKEND_MAP_MARBLE_LAYER_H */

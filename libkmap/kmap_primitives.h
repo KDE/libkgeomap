@@ -41,7 +41,7 @@
 // local includes
 
 #include "libkmap_export.h"
-#include "kmap_geocoordinates.h"
+#include "geocoordinates.h"
 
 Q_DECLARE_METATYPE(QPersistentModelIndex)
 

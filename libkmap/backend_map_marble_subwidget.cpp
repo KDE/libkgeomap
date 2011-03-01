@@ -4,10 +4,10 @@
  * This file is a part of digiKam project
  * <a href="http://www.digikam.org">http://www.digikam.org</a>
  *
- * @date   2010-02-13
- * @brief  Base class for altitude lookup backends
+ * @date   2009-12-08
+ * @brief  Internal part of the Marble-backend for KMap
  *
- * @author Copyright (C) 2010 by Michael G. Hansen
+ * @author Copyright (C) 2009-2010 by Michael G. Hansen
  *         <a href="mailto:mike at mghansen dot de">mike at mghansen dot de</a>
  * @author Copyright (C) 2010 by Gilles Caulier
  *         <a href="mailto:caulier dot gilles at gmail dot com">caulier dot gilles at gmail dot com</a>
@@ -24,39 +24,33 @@
  *
  * ============================================================ */
 
-#ifndef ALTITUDE_BACKEND_H
-#define ALTITUDE_BACKEND_H
+#include "backend_map_marble_subwidget.moc"
 
-// Local includes
+// local includes
 
-#include "kmap_common.h"
+#include "backend_map_marble.h"
 
 namespace KMap
 {
 
-class KMAP_EXPORT AltitudeBackend : public QObject
+BMWidget::BMWidget(BackendMarble* const pMarbleBackend, QWidget* const parent)
+        : Marble::MarbleWidget(parent), marbleBackend(pMarbleBackend)
 {
-    Q_OBJECT
+    KMAP_ASSERT(marbleBackend!=0);
+}
 
-public:
+BMWidget::~BMWidget()
+{
+}
 
-    AltitudeBackend(const QExplicitlySharedDataPointer<KMapSharedData>& sharedData, QObject* const parent);
-    virtual ~AltitudeBackend();
-
-    virtual QString backendName() const = 0;
-    virtual QString backendHumanName() const = 0;
-
-    virtual bool queryAltitudes(const KMapAltitudeLookup::List& queryItems) = 0;
-
-Q_SIGNALS:
-
-    void signalAltitudes(const KMap::KMapAltitudeLookup::List results);
-
-public:
-
-    const QExplicitlySharedDataPointer<KMapSharedData> s;
-};
+void BMWidget::customPaint(Marble::GeoPainter* painter)
+{
+    if (marbleBackend)
+    {
+        marbleBackend->marbleCustomPaint(painter);
+    }
+}
 
 } /* namespace KMap */
 
-#endif /* ALTITUDE_BACKEND_H */
+
