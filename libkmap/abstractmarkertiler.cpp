@@ -407,15 +407,19 @@ AbstractMarkerTiler::Tile* AbstractMarkerTiler::resetRootTile()
     return d->rootTile;
 }
 
-void AbstractMarkerTiler::onIndicesClicked(const TileIndex::List& tileIndicesList, const QVariant& representativeIndex,
-                                           const KMapGroupState& groupSelectionState, const MouseModes currentMouseMode)
+void AbstractMarkerTiler::onIndicesClicked(const TileIndex::List& tileIndicesList,
+                                           const QVariant& representativeIndex,
+                                           const KMapGroupState& groupSelectionState,
+                                           const MouseModes currentMouseMode)
 {
     Q_UNUSED(tileIndicesList);
+    Q_UNUSED(representativeIndex);
     Q_UNUSED(groupSelectionState);
     Q_UNUSED(currentMouseMode);
 }
 
-void AbstractMarkerTiler::onIndicesMoved(const TileIndex::List& tileIndicesList, const GeoCoordinates& targetCoordinates,
+void AbstractMarkerTiler::onIndicesMoved(const TileIndex::List& tileIndicesList,
+                                         const GeoCoordinates& targetCoordinates,
                                          const QPersistentModelIndex& targetSnapIndex)
 {
     Q_UNUSED(tileIndicesList);
