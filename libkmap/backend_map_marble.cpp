@@ -173,8 +173,9 @@ BackendMarble::~BackendMarble()
     {
 #ifdef KMAP_MARBLE_ADD_LAYER
 
-    /// @todo I am not sure this is the exact version where this was changed. If the build fails with the version you have, use the else-part of this.
-#if MARBLE_VERSION>=0x000b00
+#if MARBLE_VERSION>=0x000c00
+        d->marbleWidget->removeLayer(d->bmLayer);
+#elif MARBLE_VERSION>=0x000b00
         d->marbleWidget->map()->removeLayer(d->bmLayer);
 #else
         d->marbleWidget->model()->removeLayer(d->bmLayer);
@@ -220,8 +221,9 @@ QWidget* BackendMarble::mapWidget()
             d->marbleWidget = new Marble::MarbleWidget();
             d->bmLayer = new BMLayer(this);
 
-            /// @todo I am not sure this is the exact version where this was changed. If the build fails with the version you have, use the else-part of this.
-#if MARBLE_VERSION>=0x000b00
+#if MARBLE_VERSION>=0x000c00
+            d->marbleWidget->addLayer(d->bmLayer);
+#elif MARBLE_VERSION>=0x000b00
             d->marbleWidget->map()->addLayer(d->bmLayer);
 #else
             d->marbleWidget->model()->addLayer(d->bmLayer);
@@ -906,7 +908,7 @@ void BackendMarble::updateClusters()
 
 QSize BackendMarble::mapSize() const
 {
-    return d->marbleWidget->map()->size();
+    return d->marbleWidget->size();
 }
 
 void BackendMarble::slotMarbleZoomChanged()
@@ -1002,7 +1004,6 @@ int BackendMarble::getMarkerModelLevel()
 
 GeoCoordinates::PairList BackendMarble::getNormalizedBounds()
 {
-    // TODO: not sure whether this is the exact version where this was changed
 #if MARBLE_VERSION < 0x000b00
     const Marble::GeoDataLatLonAltBox marbleBounds = d->marbleWidget->map()->viewParams()->viewport()->viewLatLonAltBox();
 #else
