@@ -64,8 +64,10 @@ public:
     inline TileIndex()
         : m_indicesCount(0)
     {
-         for (int i=0 ; i < MaxIndexCount ; ++i)
+         for (int i=0; i < MaxIndexCount; ++i)
+         {
              m_indices[i] = 0;
+         }
     }
 
     inline int indexCount() const
@@ -157,7 +159,9 @@ public:
     {
         TileIndex result;
         for (int i=0; i < intList.count(); ++i)
+        {
             result.appendLinearIndex(intList.at(i));
+        }
 
         return result;
     }
@@ -170,7 +174,9 @@ public:
         for (int i=0; i <= upToLevel; ++i)
         {
             if (a.linearIndex(i)!=b.linearIndex(i))
+            {
                 return false;
+            }
         }
 
         return true;
