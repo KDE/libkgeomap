@@ -29,8 +29,12 @@ PROJECT(libkmap)
 MESSAGE(STATUS "----------------------------------------------------------------------------------")
 MESSAGE(STATUS "Starting CMake configuration for: libkmap")
 
+# Always do this BEFORE calling find_package(KDE4)
+SET(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules)
+
 FIND_PACKAGE(Qt4 4.6.0 REQUIRED)
 FIND_PACKAGE(KDE4 REQUIRED)
+
 
 INCLUDE(KDE4Defaults)
 INCLUDE(MacroLibrary)
