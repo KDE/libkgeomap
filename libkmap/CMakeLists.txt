@@ -23,7 +23,7 @@
 #
 # ============================================================
 
-INCLUDE_DIRECTORIES(${LIBMARBLEWIDGET_INCLUDE_DIR})
+INCLUDE_DIRECTORIES(${MARBLE_INCLUDE_DIR})
 
 INCLUDE(CheckIncludeFile)
 CHECK_INCLUDE_FILE("valgrind/valgrind.h" HAVE_VALGRIND)
@@ -79,7 +79,7 @@ TARGET_LINK_LIBRARIES(kmap ${QT_QTGUI_LIBRARY}
                            ${KDE4_UI_LIBS}
                            ${KDE4_KPARTS_LIBS}
                            ${KDE4_KHTML_LIBS}
-                           ${LIBMARBLEWIDGET_LIBRARY}
+                           ${MARBLE_LIBRARIES}
                            )
 
 SET_TARGET_PROPERTIES(kmap PROPERTIES VERSION ${KMAP_LIB_SO_VERSION_STRING}
