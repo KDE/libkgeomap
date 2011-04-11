@@ -88,6 +88,13 @@ void TestPrimitives::testParseXYStringToPoint()
     QVERIFY(KMapHelperParseXYStringToPoint(QLatin1String("  ( 52, 6 )  "), &point));
     QCOMPARE(point, QPoint(52,6));
 
+    // we used to expect integer results, but floats are also possible
+    // BKO 270624
+    QVERIFY(KMapHelperParseXYStringToPoint(QLatin1String("  ( 52.5, 6.5 )  "), &point));
+    QCOMPARE(point, QPoint(52.5,6.5));
+
+    QVERIFY(KMapHelperParseXYStringToPoint("(204.94641003022224, 68.00444002512285)", &point));
+
     QVERIFY(!KMapHelperParseXYStringToPoint(QLatin1String(""), 0));
     QVERIFY(!KMapHelperParseXYStringToPoint(QLatin1String("()"), 0));
     QVERIFY(!KMapHelperParseXYStringToPoint(QLatin1String("(52)"), 0));

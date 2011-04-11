@@ -161,11 +161,11 @@ bool KMapHelperParseLatLonString(const QString& latLonString, GeoCoordinates* co
 }
 
 /**
- * @brief Parse a '(x,y)' string as returned by the JavaScript parts
+ * @brief Parse a '(X.xxx,Y.yyy)' string as returned by the JavaScript parts
  */
 bool KMapHelperParseXYStringToPoint(const QString& xyString, QPoint* const point)
 {
-    // a point is returned as (x, y)
+    // a point is returned as (X.xxx, Y.yyy)
 
     const QString myXYString = xyString.trimmed();
     bool valid = myXYString.startsWith(QLatin1Char( '(' )) && myXYString.endsWith(QLatin1Char( ')' ));
@@ -180,9 +180,11 @@ bool KMapHelperParseXYStringToPoint(const QString& xyString, QPoint* const point
         int ptX = 0;
         int ptY = 0;
 
-        ptX = pointStrings.at(0).toInt(&valid);
+        // we do not actually care about the float part, only about the integer part
+        // but we have to parse floats since this is what the data is
+        ptX = pointStrings.at(0).toFloat(&valid);
         if (valid)
-            ptY = pointStrings.at(1).toInt(&valid);
+            ptY = pointStrings.at(1).toFloat(&valid);
 
         if (valid)
         {

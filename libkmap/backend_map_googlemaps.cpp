@@ -707,12 +707,13 @@ bool BackendGoogleMaps::screenCoordinates(const GeoCoordinates& coordinates, QPo
     if (!d->isReady)
         return false;
 
-    const bool isValid = KMapHelperParseXYStringToPoint(
-            d->htmlWidget->runScript(
+    const QString pointStringResult=d->htmlWidget->runScript(
                 QString::fromLatin1("kmapLatLngToPixel(%1, %2);")
                     .arg(coordinates.latString())
                     .arg(coordinates.lonString())
-                    ).toString(),
+                    ).toString();
+    const bool isValid = KMapHelperParseXYStringToPoint(
+            pointStringResult,
             point);
 
     // TODO: apparently, even points outside the visible area are returned as valid
