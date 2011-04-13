@@ -38,7 +38,15 @@ INCLUDE(MacroOptionalAddSubdirectory)
 INCLUDE(MacroOptionalFindPackage)
 INCLUDE(FindPackageHandleStandardArgs)
 
-FIND_PACKAGE(Marble REQUIRED)
+# Special handling for Marble: support both FindMarbleWidget and FindMarble,
+# assuming FindMarble is the way of the future.
+FIND_PACKAGE(Marble)
+IF (NOT MARBLE_FOUND)
+  FIND_PACKAGE(MarbleWidget REQUIRED)
+  SET(MARBLE_INCLUDE_DIR ${MARBLEWIDGET_INCLUDE_DIR})
+  SET(MARBLE_LIBRARIES ${LIBMARBLEWIDGET_LIBRARY})
+ENDIF (NOT MARBLE_FOUND)
+
 MACRO_OPTIONAL_FIND_PACKAGE(Kexiv2)
 
 ADD_DEFINITIONS(${QT_DEFINITIONS} ${QT_QTDBUS_DEFINITIONS} ${KDE4_DEFINITIONS})
