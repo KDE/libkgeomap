@@ -1024,6 +1024,11 @@ int BackendMarble::getMarkerModelLevel()
 
 GeoCoordinates::PairList BackendMarble::getNormalizedBounds()
 {
+    if (!d->marbleWidget)
+    {
+        return GeoCoordinates::PairList();
+    }
+
 #if MARBLE_VERSION < 0x000b00
     const Marble::GeoDataLatLonAltBox marbleBounds = d->marbleWidget->map()->viewParams()->viewport()->viewLatLonAltBox();
 #else
@@ -1420,9 +1425,16 @@ void BackendMarble::updateActionAvailability()
 
 void BackendMarble::slotThumbnailAvailableForIndex(const QVariant& index, const QPixmap& pixmap)
 {
+    if (!d->marbleWidget)
+    {
+        return;
+    }
+
     kDebug()<<index<<pixmap.size();
     if (pixmap.isNull() || !s->showThumbnails)
+    {
         return;
+    }
 
     // TODO: properly reject pixmaps with the wrong size
     const int expectedThumbnailSize = s->worldMapWidget->getUndecoratedThumbnailSize();
@@ -1435,8 +1447,15 @@ void BackendMarble::slotThumbnailAvailableForIndex(const QVariant& index, const 
     d->marbleWidget->update();
 }
 
-void BackendMarble::slotUngroupedModelChanged(const int /*index*/)
+void BackendMarble::slotUngroupedModelChanged(const int index)
 {
+    Q_UNUSED(index)
+
+    if (!d->marbleWidget)
+    {
+        return;
+    }
+
     d->marbleWidget->update();
 }
 
