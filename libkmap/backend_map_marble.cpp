@@ -486,7 +486,9 @@ void BackendMarble::saveSettingsToGroup(KConfigGroup* const group)
 {
     KMAP_ASSERT(group!=0);
     if (!group)
+    {
         return;
+    }
 
     group->writeEntry("Marble Map Theme", d->cacheMapTheme);
     group->writeEntry("Marble Projection", d->cacheProjection);
@@ -499,7 +501,9 @@ void BackendMarble::readSettingsFromGroup(const KConfigGroup* const group)
 {
     KMAP_ASSERT(group!=0);
     if (!group)
+    {
         return;
+    }
 
     setMapTheme(group->readEntry("Marble Map Theme", d->cacheMapTheme));
     setProjection(group->readEntry("Marble Projection", d->cacheProjection));
@@ -511,7 +515,9 @@ void BackendMarble::readSettingsFromGroup(const KConfigGroup* const group)
 void BackendMarble::updateMarkers()
 {
     if (!d->marbleWidget)
+    {
         return;
+    }
 
     // just redraw, that's it:
     d->marbleWidget->update();
@@ -520,15 +526,21 @@ void BackendMarble::updateMarkers()
 bool BackendMarble::screenCoordinates(const GeoCoordinates& coordinates, QPoint* const point)
 {
     if (!d->marbleWidget)
+    {
         return false;
+    }
 
     if (!coordinates.hasCoordinates())
+    {
         return false;
+    }
 
     qreal x, y;
     const bool isVisible = d->marbleWidget->screenCoordinates(coordinates.lon(), coordinates.lat(), x, y);
     if (!isVisible)
+    {
         return false;
+    }
 
     if (point)
     {
@@ -541,17 +553,23 @@ bool BackendMarble::screenCoordinates(const GeoCoordinates& coordinates, QPoint*
 bool BackendMarble::geoCoordinates(const QPoint& point, GeoCoordinates* const coordinates) const
 {
     if (!d->marbleWidget)
+    {
         return false;
+    }
 
     // apparently, MarbleWidget::GeoCoordinates can return true even if the object is not on the screen
     // check that the point is in the visible range:
     if (!d->marbleWidget->rect().contains(point))
+    {
         return false;
+    }
 
     qreal lat, lon;
     const bool isVisible = d->marbleWidget->geoCoordinates(point.x(), point.y(), lon, lat, Marble::GeoDataCoordinates::Degree);
     if (!isVisible)
+    {
         return false;
+    }
 
     if (coordinates)
     {
@@ -602,7 +620,9 @@ void BackendMarble::GeoPainter_drawPixmapAtCoordinates(Marble::GeoPainter* const
 void BackendMarble::marbleCustomPaint(Marble::GeoPainter* painter)
 {
     if (!d->activeState)
+    {
         return;
+    }
 
     // check whether the parameters of the map changed and we may have to update the clusters:
     if ( (d->clustersDirtyCacheLat != d->marbleWidget->centerLatitude()) ||
@@ -1407,7 +1427,9 @@ void BackendMarble::slotThumbnailAvailableForIndex(const QVariant& index, const 
     // TODO: properly reject pixmaps with the wrong size
     const int expectedThumbnailSize = s->worldMapWidget->getUndecoratedThumbnailSize();
     if ((pixmap.size().height()!=expectedThumbnailSize)&&(pixmap.size().width()!=expectedThumbnailSize))
+    {
         return;
+    }
 
     // re-paint the map
     d->marbleWidget->update();
@@ -1434,7 +1456,9 @@ bool BackendMarble::findSnapPoint(const QPoint& actualPoint, QPoint* const snapP
         // TODO: test for active snapping
         if (   (!modelHelper->modelFlags().testFlag(ModelHelper::FlagVisible))
             || (!modelHelper->modelFlags().testFlag(ModelHelper::FlagSnaps)) )
+        {
             continue;
+        }
 
         // TODO: configurable snapping radius
         const int snapRadiusSquared = 10*10;
@@ -1445,7 +1469,9 @@ bool BackendMarble::findSnapPoint(const QPoint& actualPoint, QPoint* const snapP
             const QModelIndex currentIndex = itemModel->index(row, 0);
             GeoCoordinates currentCoordinates;
             if (!modelHelper->itemCoordinates(currentIndex, &currentCoordinates))
+            {
                 continue;
+            }
 
             QPoint snapMarkerPoint;
             if (!screenCoordinates(currentCoordinates, &snapMarkerPoint))
@@ -1474,13 +1500,19 @@ bool BackendMarble::findSnapPoint(const QPoint& actualPoint, QPoint* const snapP
     if (foundSnapPoint)
     {
         if (snapPoint)
+        {
             *snapPoint = bestSnapPoint;
+        }
 
         if (snapCoordinates)
+        {
             *snapCoordinates = bestSnapCoordinates;
+        }
 
         if (snapTargetIndex)
+        {
             *snapTargetIndex = QPair<int, QModelIndex>(bestSnapUngroupedModel, bestSnapIndex);
+        }
     }
 
     return foundSnapPoint;
@@ -1540,6 +1572,7 @@ void BackendMarble::centerOn(const Marble::GeoDataLatLonBox& box, const bool use
     {
         maxZoomLevel = qMin(maxZoomLevel, 3400);
     }
+
     if ( (d->marbleWidget->zoom()>maxZoomLevel) ||
          (d->marbleWidget->zoom()<d->marbleWidget->minimumZoom()) )
     {
