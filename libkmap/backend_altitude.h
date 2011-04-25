@@ -29,7 +29,7 @@
 
 // Local includes
 
-#include "kmap_common.h"
+#include "kmap_primitives.h"
 
 namespace KMap
 {
