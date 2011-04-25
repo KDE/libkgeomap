@@ -7,7 +7,7 @@
  * @date   2010-02-13
  * @brief  Base class for altitude lookup backends
  *
- * @author Copyright (C) 2010 by Michael G. Hansen
+ * @author Copyright (C) 2010, 2011 by Michael G. Hansen
  *         <a href="mailto:mike at mghansen dot de">mike at mghansen dot de</a>
  * @author Copyright (C) 2010 by Gilles Caulier
  *         <a href="mailto:caulier dot gilles at gmail dot com">caulier dot gilles at gmail dot com</a>
@@ -40,23 +40,32 @@ class KMAP_EXPORT AltitudeBackend : public QObject
 
 public:
 
-    AltitudeBackend(const QExplicitlySharedDataPointer<KMapSharedData>& sharedData, QObject* const parent);
+    class KMAP_EXPORT LookupRequest
+    {
+    public:
+
+        GeoCoordinates                   coordinates;
+        QVariant                         data;
+
+        typedef QList<LookupRequest> List;
+    };
+
+
+    AltitudeBackend(QObject* const parent);
     virtual ~AltitudeBackend();
 
     virtual QString backendName() const = 0;
     virtual QString backendHumanName() const = 0;
 
-    virtual bool queryAltitudes(const KMapAltitudeLookup::List& queryItems) = 0;
+    virtual bool queryAltitudes(const LookupRequest::List& queryItems) = 0;
 
 Q_SIGNALS:
 
-    void signalAltitudes(const KMap::KMapAltitudeLookup::List results);
-
-public:
-
-    const QExplicitlySharedDataPointer<KMapSharedData> s;
+    void signalAltitudes(const KMap::AltitudeBackend::LookupRequest::List& results);
 };
 
 } /* namespace KMap */
+
+Q_DECLARE_METATYPE(KMap::AltitudeBackend::LookupRequest)
 
 #endif /* BACKEND_ALTITUDE_H */

@@ -59,7 +59,6 @@
 // local includes
 
 #include "abstractmarkertiler.h"
-#include "backend_altitude_geonames.h"
 #include "backend_map_googlemaps.h"
 #include "backend_map_marble.h"
 // #include "backend_map_osm.h"
@@ -104,8 +103,7 @@ class KMapWidget::KMapWidgetPrivate
 public:
 
     KMapWidgetPrivate()
-      : loadedAltitudeBackends(),
-        loadedBackends(),
+      : loadedBackends(),
         currentBackend(0),
         currentBackendName(),
         stackedLayout(0),
@@ -142,7 +140,6 @@ public:
     {
     }
 
-    QList<AltitudeBackend*> loadedAltitudeBackends;
     QList<MapBackend*>      loadedBackends;
     MapBackend*             currentBackend;
     QString                 currentBackendName;
@@ -223,11 +220,6 @@ KMapWidget::KMapWidget(QWidget* const parent)
     d->loadedBackends.append(new BackendMarble(s, this));
 //     d->loadedBackends.append(new BackendOSM(s, this));
     createActionsForBackendSelection();
-
-    AltitudeBackend* const geonamesBackend = new BackendAltitudeGeonames(s, this);
-    d->loadedAltitudeBackends.append(geonamesBackend);
-    connect(geonamesBackend, SIGNAL(signalAltitudes(const KMap::KMapAltitudeLookup::List)),
-            this, SIGNAL(signalAltitudeLookupReady(const KMap::KMapAltitudeLookup::List)));
 
     setAcceptDrops(true);
 }
@@ -1180,20 +1172,6 @@ void KMapWidget::slotClustersMoved(const QIntList& clusterIndices, const QPair<i
      * @todo Clusters are marked as dirty by slotClustersNeedUpdating
      * which is called while we update the model
      */
-}
-
-bool KMapWidget::queryAltitudes(const KMapAltitudeLookup::List& queryItems, const QString& backendName)
-{
-    for (int i=0; i<d->loadedAltitudeBackends.count(); ++i)
-    {
-        AltitudeBackend* const altitudeBackend = d->loadedAltitudeBackends.at(i);
-
-        if (altitudeBackend->backendName() == backendName)
-        {
-            return altitudeBackend->queryAltitudes(queryItems);
-        }
-    }
-    return false;
 }
 
 void KMapWidget::addUngroupedModel(ModelHelper* const modelHelper)

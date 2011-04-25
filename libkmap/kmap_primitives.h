@@ -245,20 +245,8 @@ public:
     }
 };
 
-// primitives for altitude lookup:
-class KMAP_EXPORT KMapAltitudeLookup
-{
-public:
-
-    GeoCoordinates                   coordinates;
-    QVariant                         data;
-
-    typedef QList<KMapAltitudeLookup> List;
-};
-
 } /* namespace KMap */
 
-Q_DECLARE_METATYPE(KMap::KMapAltitudeLookup)
 Q_DECLARE_METATYPE(KMap::MouseModes)
 
 #endif /* KMAP_PRIMITIVES_H */

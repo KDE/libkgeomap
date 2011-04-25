@@ -45,9 +45,9 @@ public:
     {
     }
 
-    KMapAltitudeLookup::List lookups;
-    QByteArray              data;
-    KIO::Job*               kioJob;
+    AltitudeBackend::LookupRequest::List    lookups;
+    QByteArray                              data;
+    KIO::Job*                               kioJob;
 };
 
 // --------------------------------------------------------------------------
@@ -66,9 +66,8 @@ public:
 
 // --------------------------------------------------------------------------
 
-BackendAltitudeGeonames::BackendAltitudeGeonames(const QExplicitlySharedDataPointer<KMapSharedData>& sharedData,
-                                                 QObject* const parent)
-                       : AltitudeBackend(sharedData, parent), d(new BackendAltitudeGeonamesPrivate)
+BackendAltitudeGeonames::BackendAltitudeGeonames(QObject* const parent)
+                       : AltitudeBackend(parent), d(new BackendAltitudeGeonamesPrivate)
 {
 }
 
@@ -87,14 +86,14 @@ QString BackendAltitudeGeonames::backendHumanName() const
     return i18n("geonames.org");
 }
 
-bool BackendAltitudeGeonames::queryAltitudes(const KMapAltitudeLookup::List& queryItems)
+bool BackendAltitudeGeonames::queryAltitudes(const LookupRequest::List& queryItems)
 {
     // merge queries with the same coordinates into one query:
-    // TODO: use a QMap instead to speed it up
+    /// @todo Use a QMap instead to speed it up
     QList<MergedAltitudeQueryJobs> mergedJobs;
     for (int i = 0; i<queryItems.count(); ++i)
     {
-        KMapAltitudeLookup query = queryItems.at(i);
+        LookupRequest query = queryItems.at(i);
         query.coordinates.clearAlt();
 
         bool foundIt = false;
@@ -144,8 +143,8 @@ bool BackendAltitudeGeonames::queryAltitudes(const KMapAltitudeLookup::List& que
         jobUrl.addQueryItem(QLatin1String("lats" ), latString);
         jobUrl.addQueryItem(QLatin1String("lngs" ), lonString);
 
-        // TODO: KIO::NoReload ?
-        // TODO: limit the number of concurrent queries
+        /// @todo KIO::NoReload ?
+        /// @todo limit the number of concurrent queries
         newMergedQuery.kioJob = KIO::get(jobUrl, KIO::NoReload, KIO::HideProgressInfo);
         d->jobs << newMergedQuery;
 
@@ -155,6 +154,7 @@ bool BackendAltitudeGeonames::queryAltitudes(const KMapAltitudeLookup::List& que
         connect(newMergedQuery.kioJob, SIGNAL(result(KJob*)),
                 this, SLOT(slotResult(KJob*)));
     }
+
     return false;
 }
 
@@ -187,8 +187,7 @@ void BackendAltitudeGeonames::slotResult(KJob* kJob)
             foreach(const QString& altitudeString, altitudes)
             {
                 bool haveAltitude = false;
-                qreal altitude = altitudeString.toFloat(&haveAltitude);
-                kDebug()<<altitude;
+                const qreal altitude = altitudeString.toFloat(&haveAltitude);
 
                 // -32786 means that geonames.org has no data for these coordinates
                 if (altitude==-32768)
@@ -197,11 +196,12 @@ void BackendAltitudeGeonames::slotResult(KJob* kJob)
                 }
 
                 const GeoCoordinates firstJobCoordinates = myJob.lookups.at(jobIndex).coordinates;
-                kDebug()<<firstJobCoordinates.geoUrl();
                 for (; jobIndex<myJob.lookups.count(); ++jobIndex)
                 {
                     if (!firstJobCoordinates.sameLonLatAs(myJob.lookups.at(jobIndex).coordinates))
+                    {
                         break;
+                    }
 
                     if (haveAltitude)
                     {
@@ -210,12 +210,14 @@ void BackendAltitudeGeonames::slotResult(KJob* kJob)
                 }
 
                 if (jobIndex>=myJob.lookups.count())
+                {
                     break;
+                }
             }
 
             emit(signalAltitudes(myJob.lookups));
 
-            // TODO: who gets to delete the KIO::Job?
+            /// @todo who gets to delete the KIO::Job?
 
             break;
         }

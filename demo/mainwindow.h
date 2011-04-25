@@ -35,6 +35,7 @@
 
 // libkmap includes
 
+#include "libkmap/backend_altitude.h"
 #include "libkmap/kmap_primitives.h"
 #include "libkmap/modelhelper.h"
 
@@ -89,7 +90,7 @@ private Q_SLOTS:
     void slotFutureResultsReadyAt(int startIndex, int endIndex);
     void slotImageLoadingBunchReady();
     void slotMarkersMoved(const QList<QPersistentModelIndex>& markerIndices);
-    void slotAltitudeLookupReady(const KMap::KMapAltitudeLookup::List& altitudes);
+    void slotAltitudeLookupReady(const KMap::AltitudeBackend::LookupRequest::List& altitudes);
     void slotAddImages();
 
 private:

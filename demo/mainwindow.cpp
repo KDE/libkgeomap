@@ -62,6 +62,7 @@
 
 // libkmap includes
 
+#include "libkmap/backend_helper.h"
 #include "libkmap/kmap_widget.h"
 #include "libkmap/itemmarkertiler.h"
 
@@ -134,6 +135,7 @@ public:
     MainWindowPrivate()
       : splitter(0),
         mapWidget(0),
+        altitudeBackend(0),
         treeWidget(0),
         progressBar(0),
         imageLoadingRunningFutures(),
@@ -150,6 +152,7 @@ public:
 
     QSplitter*                          splitter;
     KMapWidget*                         mapWidget;
+    AltitudeBackend*                    altitudeBackend;
     MyTreeWidget*                       treeWidget;
     QPointer<QProgressBar>              progressBar;
     QList<QFuture<MyImageData> >        imageLoadingRunningFutures;
@@ -209,8 +212,10 @@ MainWindow::MainWindow(KCmdLineArgs* const cmdLineArgs, QWidget* const parent)
     d->mapWidget->setVisibleMouseModes(KMap::MouseModePan|KMap::MouseModeZoomIntoGroup|KMap::MouseModeSelectThumbnail);
     d->mapWidget->setAvailableMouseModes(KMap::MouseModePan|KMap::MouseModeZoomIntoGroup|KMap::MouseModeSelectThumbnail);
 
-    connect(d->mapWidget, SIGNAL(signalAltitudeLookupReady(const KMap::KMapAltitudeLookup::List&)),
-            this, SLOT(slotAltitudeLookupReady(const KMap::KMapAltitudeLookup::List&)));
+    d->altitudeBackend = BackendHelper::getAltitudeBackend("geonames", this);
+
+    connect(d->altitudeBackend, SIGNAL(signalAltitudes(const KMap::AltitudeBackend::LookupRequest::List&)),
+            this, SLOT(slotAltitudeLookupReady(const KMap::AltitudeBackend::LookupRequest::List&)));
 
     connect(d->markerModelHelper, SIGNAL(signalMarkersMoved(const QList<QPersistentModelIndex>&)),
             this, SLOT(slotMarkersMoved(const QList<QPersistentModelIndex>&)));
@@ -441,13 +446,13 @@ void MainWindow::slotImageLoadingBunchReady()
 void MainWindow::slotMarkersMoved(const QList<QPersistentModelIndex>& markerIndices)
 {
     // prepare altitude lookups
-    KMapAltitudeLookup::List altitudeQueries;
+    AltitudeBackend::LookupRequest::List altitudeQueries;
     for (int i=0; i<markerIndices.count(); ++i)
     {
         const QPersistentModelIndex currentIndex = markerIndices.at(i);
         const GeoCoordinates newCoordinates = currentIndex.data(RoleCoordinates).value<GeoCoordinates>();
 
-        KMapAltitudeLookup myLookup;
+        AltitudeBackend::LookupRequest myLookup;
         myLookup.coordinates = newCoordinates;
         myLookup.data = QVariant::fromValue(QPersistentModelIndex(currentIndex));
         altitudeQueries << myLookup;
@@ -455,20 +460,22 @@ void MainWindow::slotMarkersMoved(const QList<QPersistentModelIndex>& markerIndi
 
     if (!altitudeQueries.isEmpty())
     {
-        d->mapWidget->queryAltitudes(altitudeQueries, QLatin1String("geonames" ));
+        d->altitudeBackend->queryAltitudes(altitudeQueries);
     }
 }
 
-void MainWindow::slotAltitudeLookupReady(const KMapAltitudeLookup::List& altitudes)
+void MainWindow::slotAltitudeLookupReady(const KMap::AltitudeBackend::LookupRequest::List& altitudes)
 {
     for (int i=0; i<altitudes.count(); ++i)
     {
-        const KMapAltitudeLookup& myLookup = altitudes.at(i);
+        const KMap::AltitudeBackend::LookupRequest& myLookup = altitudes.at(i);
 
         const QPersistentModelIndex markerIndex = myLookup.data.value<QPersistentModelIndex>();
 
         if (!markerIndex.isValid())
+        {
             continue;
+        }
 
         // TODO: why does the index return a const model???
         const QAbstractItemModel* const itemModel = markerIndex.model();

@@ -4,13 +4,11 @@
  * This file is a part of digiKam project
  * <a href="http://www.digikam.org">http://www.digikam.org</a>
  *
- * @date   2010-02-13
- * @brief  Base class for altitude lookup backends
+ * @date   2011-04-25
+ * @brief  Helper class to get backends for lookups
  *
- * @author Copyright (C) 2010, 2011 by Michael G. Hansen
+ * @author Copyright (C) 2011 by Michael G. Hansen
  *         <a href="mailto:mike at mghansen dot de">mike at mghansen dot de</a>
- * @author Copyright (C) 2010 by Gilles Caulier
- *         <a href="mailto:caulier dot gilles at gmail dot com">caulier dot gilles at gmail dot com</a>
  *
  * This program is free software; you can redistribute it
  * and/or modify it under the terms of the GNU General
@@ -24,18 +22,31 @@
  *
  * ============================================================ */
 
-#include "backend_altitude.moc"
+#include "backend_helper.h"
+
+// Local includes
+
+#include "backend_altitude_geonames.h"
 
 namespace KMap
 {
 
-AltitudeBackend::AltitudeBackend(QObject* const parent)
-               : QObject(parent)
+QStringList BackendHelper::getAltitudeBackendNames()
 {
+    QStringList knownBackends;
+    knownBackends << QLatin1String("geonames");
+    return knownBackends;
 }
 
-AltitudeBackend::~AltitudeBackend()
+AltitudeBackend* BackendHelper::getAltitudeBackend(const QString& backendName, QObject* const parent)
 {
+    if (!getAltitudeBackendNames().contains(backendName))
+    {
+        return 0;
+    }
+
+    return new BackendAltitudeGeonames(parent);
 }
 
 } /* namespace KMap */
+

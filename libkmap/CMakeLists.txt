@@ -37,6 +37,7 @@ SET(widget_sources
     abstractmarkertiler.cpp
     backend_altitude.cpp
     backend_altitude_geonames.cpp
+    backend_helper.cpp
     backend_map.cpp
     dragdrophandler.cpp
     html_widget.cpp
@@ -90,6 +91,7 @@ INSTALL(TARGETS kmap ${INSTALL_TARGETS_DEFAULT_ARGS})
 INSTALL(FILES libkmap_export.h
               abstractmarkertiler.h
               backend_altitude.h
+              backend_helper.h
               dragdrophandler.h
               geocoordinates.h
               itemmarkertiler.h

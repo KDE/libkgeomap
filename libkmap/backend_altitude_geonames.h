@@ -7,7 +7,7 @@
  * @date   2010-02-13
  * @brief  geonames.org based altitude lookup backend
  *
- * @author Copyright (C) 2010 by Michael G. Hansen
+ * @author Copyright (C) 2010, 2011 by Michael G. Hansen
  *         <a href="mailto:mike at mghansen dot de">mike at mghansen dot de</a>
  * @author Copyright (C) 2010 by Gilles Caulier
  *         <a href="mailto:caulier dot gilles at gmail dot com">caulier dot gilles at gmail dot com</a>
@@ -36,9 +36,8 @@ namespace KIO
 {
     class Job;
 }
-/// @endcond
-
 class KJob;
+/// @endcond
 
 namespace KMap
 {
@@ -49,13 +48,13 @@ class BackendAltitudeGeonames : public AltitudeBackend
 
 public:
 
-    BackendAltitudeGeonames(const QExplicitlySharedDataPointer<KMapSharedData>& sharedData, QObject* const parent);
+    BackendAltitudeGeonames(QObject* const parent);
     virtual ~BackendAltitudeGeonames();
 
     virtual QString backendName() const;
     virtual QString backendHumanName() const;
 
-    virtual bool queryAltitudes(const KMapAltitudeLookup::List& queryItems);
+    virtual bool queryAltitudes(const LookupRequest::List& queryItems);
 
 private Q_SLOTS:
 
