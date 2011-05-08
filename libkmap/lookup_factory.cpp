@@ -4,8 +4,8 @@
  * This file is a part of digiKam project
  * <a href="http://www.digikam.org">http://www.digikam.org</a>
  *
- * @date   2011-04-25
- * @brief  Helper class to get backends for lookups
+ * @date   2011-05-05
+ * @brief  Factory to create instances of Lookup backends
  *
  * @author Copyright (C) 2011 by Michael G. Hansen
  *         <a href="mailto:mike at mghansen dot de">mike at mghansen dot de</a>
@@ -22,30 +22,23 @@
  *
  * ============================================================ */
 
-#include "backend_helper.h"
+#include "lookup_factory.h"
 
-// Local includes
+// local includes
 
-#include "backend_altitude_geonames.h"
+#include "lookup_altitude_geonames.h"
 
 namespace KMap
 {
 
-QStringList BackendHelper::getAltitudeBackendNames()
+LookupAltitude* LookupFactory::getAltitudeLookup(const QString& backendName, QObject* const parent)
 {
-    QStringList knownBackends;
-    knownBackends << QLatin1String("geonames");
-    return knownBackends;
-}
-
-AltitudeBackend* BackendHelper::getAltitudeBackend(const QString& backendName, QObject* const parent)
-{
-    if (!getAltitudeBackendNames().contains(backendName))
+    if (backendName==QLatin1String("geonames"))
     {
-        return 0;
+        return new LookupAltitudeGeonames(parent);
     }
 
-    return new BackendAltitudeGeonames(parent);
+    return 0;
 }
 
 } /* namespace KMap */

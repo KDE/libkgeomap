@@ -4,8 +4,8 @@
  * This file is a part of digiKam project
  * <a href="http://www.digikam.org">http://www.digikam.org</a>
  *
- * @date   2010-02-13
- * @brief  geonames.org based altitude lookup backend
+ * @date   2011-04-30
+ * @brief  Base class for altitude lookup jobs
  *
  * @author Copyright (C) 2010, 2011 by Michael G. Hansen
  *         <a href="mailto:mike at mghansen dot de">mike at mghansen dot de</a>
@@ -24,49 +24,18 @@
  *
  * ============================================================ */
 
-#ifndef BACKEND_ALTITUDE_GEONAMES_H
-#define BACKEND_ALTITUDE_GEONAMES_H
-
-// Local includes
-
-#include "backend_altitude.h"
-
-/// @cond false
-namespace KIO
-{
-    class Job;
-}
-class KJob;
-/// @endcond
+#include "lookup_altitude.moc"
 
 namespace KMap
 {
 
-class BackendAltitudeGeonames : public AltitudeBackend
+LookupAltitude::LookupAltitude(QObject* const parent)
+ : QObject(parent)
 {
-    Q_OBJECT
+}
 
-public:
-
-    BackendAltitudeGeonames(QObject* const parent);
-    virtual ~BackendAltitudeGeonames();
-
-    virtual QString backendName() const;
-    virtual QString backendHumanName() const;
-
-    virtual bool queryAltitudes(const LookupRequest::List& queryItems);
-
-private Q_SLOTS:
-
-    void slotData(KIO::Job* kioJob, const QByteArray& data);
-    void slotResult(KJob* kJob);
-
-private:
-
-    class BackendAltitudeGeonamesPrivate;
-    BackendAltitudeGeonamesPrivate* const d;
-};
+LookupAltitude::~LookupAltitude()
+{
+}
 
 } /* namespace KMap */
-
-#endif /* BACKEND_ALTITUDE_GEONAMES_H */

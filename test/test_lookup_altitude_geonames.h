@@ -1,11 +1,10 @@
 /** ===========================================================
- * @file
  *
  * This file is a part of digiKam project
  * <a href="http://www.digikam.org">http://www.digikam.org</a>
  *
- * @date   2011-04-25
- * @brief  Helper class to get backends for lookups
+ * @date   2010-05-07
+ * @brief  Test for the geonames based altitude lookup class
  *
  * @author Copyright (C) 2011 by Michael G. Hansen
  *         <a href="mailto:mike at mghansen dot de">mike at mghansen dot de</a>
@@ -22,26 +21,22 @@
  *
  * ============================================================ */
 
-#ifndef BACKEND_HELPER_H
-#define BACKEND_HELPER_H
+#ifndef TEST_LOOKUP_ALTITUDE_GEONAMES_H
+#define TEST_LOOKUP_ALTITUDE_GEONAMES_H
 
-// Local includes
+// Qt includes
 
-#include "kmap_primitives.h"
+#include <QtTest/QtTest>
 
-namespace KMap
+class TestLookupAltitudeGeonames : public QObject
 {
+    Q_OBJECT
 
-class AltitudeBackend;
+private Q_SLOTS:
 
-class KMAP_EXPORT BackendHelper
-{
-public:
-
-    static QStringList getAltitudeBackendNames();
-    static AltitudeBackend* getAltitudeBackend(const QString& backendName, QObject* const parent);
+    void testNoOp();
+    void testSimpleLookup();
+    
 };
 
-} /* namespace KMap */
-
-#endif /* BACKEND_HELPER_H */
+#endif /* TEST_LOOKUP_ALTITUDE_GEONAMES_H */

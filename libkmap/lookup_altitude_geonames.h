@@ -4,8 +4,8 @@
  * This file is a part of digiKam project
  * <a href="http://www.digikam.org">http://www.digikam.org</a>
  *
- * @date   2010-02-13
- * @brief  Base class for altitude lookup backends
+ * @date   2011-04-30
+ * @brief  Class for geonames.org based altitude lookup
  *
  * @author Copyright (C) 2010, 2011 by Michael G. Hansen
  *         <a href="mailto:mike at mghansen dot de">mike at mghansen dot de</a>
@@ -24,48 +24,58 @@
  *
  * ============================================================ */
 
-#ifndef BACKEND_ALTITUDE_H
-#define BACKEND_ALTITUDE_H
+#ifndef LOOKUP_ALTITUDE_GEONAMES_H
+#define LOOKUP_ALTITUDE_GEONAMES_H
 
-// Local includes
+// local includes
 
-#include "kmap_primitives.h"
+#include "lookup_altitude.h"
+
+/// @cond false
+namespace KIO
+{
+    class Job;
+}
+class KJob;
+/// @endcond
 
 namespace KMap
 {
 
-class KMAP_EXPORT AltitudeBackend : public QObject
+class KMAP_EXPORT LookupAltitudeGeonames : public LookupAltitude
 {
     Q_OBJECT
 
 public:
 
-    class KMAP_EXPORT LookupRequest
-    {
-    public:
+    LookupAltitudeGeonames(QObject* const parent);
+    virtual ~LookupAltitudeGeonames();
 
-        GeoCoordinates                   coordinates;
-        QVariant                         data;
+    virtual QString backendName() const;
+    virtual QString backendHumanName() const;
 
-        typedef QList<LookupRequest> List;
-    };
+    virtual void addRequests(const Request::List& requests);
+    virtual Request::List getRequests() const;
+    virtual Request getRequest(const int index) const;
 
+    virtual void startLookup();
+    virtual Status getStatus() const;
+    virtual QString errorMessage() const;
+    virtual void cancel();
 
-    AltitudeBackend(QObject* const parent);
-    virtual ~AltitudeBackend();
+private Q_SLOTS:
 
-    virtual QString backendName() const = 0;
-    virtual QString backendHumanName() const = 0;
+    void slotData(KIO::Job* kioJob, const QByteArray& data);
+    void slotResult(KJob* kJob);
 
-    virtual bool queryAltitudes(const LookupRequest::List& queryItems) = 0;
+private:
 
-Q_SIGNALS:
+    void startNextRequest();
 
-    void signalAltitudes(const KMap::AltitudeBackend::LookupRequest::List& results);
+    class LookupAltitudeGeonamesPrivate;
+    LookupAltitudeGeonamesPrivate* const d;
 };
 
 } /* namespace KMap */
 
-Q_DECLARE_METATYPE(KMap::AltitudeBackend::LookupRequest)
-
-#endif /* BACKEND_ALTITUDE_H */
+#endif /* LOOKUP_ALTITUDE_GEONAMES_H */

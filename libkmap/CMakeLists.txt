@@ -35,15 +35,15 @@ CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/version.h.cmake ${CMAKE_CURRENT_BINAR
 
 SET(widget_sources
     abstractmarkertiler.cpp
-    backend_altitude.cpp
-    backend_altitude_geonames.cpp
-    backend_helper.cpp
     backend_map.cpp
     dragdrophandler.cpp
     html_widget.cpp
     itemmarkertiler.cpp
     kmap_widget.cpp
     kmap_common.cpp
+    lookup_altitude.cpp
+    lookup_altitude_geonames.cpp
+    lookup_factory.cpp
     modelhelper.cpp
     placeholderwidget.cpp
     tilegrouper.cpp
@@ -90,13 +90,13 @@ INSTALL(TARGETS kmap ${INSTALL_TARGETS_DEFAULT_ARGS})
 
 INSTALL(FILES libkmap_export.h
               abstractmarkertiler.h
-              backend_altitude.h
-              backend_helper.h
               dragdrophandler.h
               geocoordinates.h
               itemmarkertiler.h
               kmap_primitives.h
               kmap_widget.h
+              lookup_altitude.h
+              lookup_factory.h
               modelhelper.h
               tileindex.h
               ${CMAKE_CURRENT_BINARY_DIR}/version.h
