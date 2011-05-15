@@ -71,8 +71,7 @@ public:
     virtual KMapGroupState getTileGroupState(const TileIndex& tileIndex);
     virtual KMapGroupState getGlobalGroupState();
 
-    virtual void onIndicesClicked(const TileIndex::List& tileIndicesList, const QVariant& representativeIndex,
-                                  const KMapGroupState& groupSelectionState, const MouseModes currentMouseMode);
+    virtual void onIndicesClicked(const ClickInfo& clickInfo);
     virtual void onIndicesMoved(const TileIndex::List& tileIndicesList, const GeoCoordinates& targetCoordinates,
                                 const QPersistentModelIndex& targetSnapIndex);
 

@@ -1398,8 +1398,12 @@ void KMapWidget::slotClustersClicked(const QIntList& clusterIndices)
             /// @todo Isn't this cached in the cluster?
             const QVariant representativeIndex = getClusterRepresentativeMarker(clusterIndex, s->sortKey);
 
-            s->markerModel->onIndicesClicked(tileIndices, representativeIndex,
-                                             currentCluster.groupState, s->currentMouseMode);
+            AbstractMarkerTiler::ClickInfo clickInfo;
+            clickInfo.tileIndicesList = tileIndices;
+            clickInfo.representativeIndex = representativeIndex;
+            clickInfo.groupSelectionState = currentCluster.groupState;
+            clickInfo.currentMouseMode = s->currentMouseMode;
+            s->markerModel->onIndicesClicked(clickInfo);
         }
     }
 }

@@ -56,6 +56,16 @@ public:
 
     Q_DECLARE_FLAGS(Flags, Flag)
 
+    class ClickInfo
+    {
+    public:
+
+        TileIndex::List tileIndicesList;
+        QVariant representativeIndex;
+        KMapGroupState groupSelectionState;
+        MouseModes currentMouseMode;
+    };
+
 public:
 
     class Tile
@@ -206,9 +216,7 @@ public:
     virtual KMapGroupState getGlobalGroupState() = 0;
 
     // these can be implemented if you want to react to actions in kmap
-    /// @todo Make currentMouseMode const
-    virtual void onIndicesClicked(const TileIndex::List& tileIndicesList, const QVariant& representativeIndex,
-                                  const KMapGroupState& groupSelectionState, const MouseModes currentMouseMode);
+    virtual void onIndicesClicked(const ClickInfo& clickInfo);
     virtual void onIndicesMoved(const TileIndex::List& tileIndicesList, const GeoCoordinates& targetCoordinates,
                                 const QPersistentModelIndex& targetSnapIndex);
 
