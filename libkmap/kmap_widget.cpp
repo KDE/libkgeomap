@@ -725,6 +725,10 @@ KAction* KMapWidget::getControlAction(const QString& actionName)
     {
         return d->actionSetRegionSelectionFromIconMode;
     }
+    else if (actionName==QLatin1String("mousemode-removefilter"))
+    {
+        return d->actionRemoveFilter;
+    }
 
     return 0;
 }
@@ -842,13 +846,26 @@ void KMapWidget::slotUpdateActionsEnabled()
     d->actionIncreaseThumbnailSize->setEnabled(s->showThumbnails);
 
     d->actionSetRegionSelectionMode->setEnabled(s->availableMouseModes.testFlag(MouseModeRegionSelection));
-    d->actionRemoveCurrentRegionSelection->setEnabled(s->availableMouseModes.testFlag(MouseModeRegionSelection));
+    
     d->actionSetPanMode->setEnabled(s->availableMouseModes.testFlag(MouseModePan));
     d->actionSetZoomIntoGroupMode->setEnabled(s->availableMouseModes.testFlag(MouseModeZoomIntoGroup));
     d->actionSetRegionSelectionFromIconMode->setEnabled(s->availableMouseModes.testFlag(MouseModeRegionSelectionFromIcon));
     d->actionSetFilterMode->setEnabled(s->availableMouseModes.testFlag(MouseModeFilter));
-    d->actionRemoveFilter->setEnabled(s->availableMouseModes.testFlag(MouseModeRegionSelectionFromIcon));
     d->actionSetSelectThumbnailMode->setEnabled(s->availableMouseModes.testFlag(MouseModeSelectThumbnail));
+
+    // the 'Remove X' actions are only available if the corresponding X is actually there:
+    bool clearRegionSelectionAvailable = s->availableMouseModes.testFlag(MouseModeRegionSelection);
+    if (clearRegionSelectionAvailable && s->markerModel)
+    {
+        clearRegionSelectionAvailable = s->markerModel->getGlobalGroupState() & KMapRegionSelectedMask;
+    }
+    d->actionRemoveCurrentRegionSelection->setEnabled(clearRegionSelectionAvailable);
+    bool clearFilterAvailable = s->availableMouseModes.testFlag(MouseModeRegionSelectionFromIcon);
+    if (clearFilterAvailable && s->markerModel)
+    {
+        clearFilterAvailable = s->markerModel->getGlobalGroupState() & KMapFilteredPositiveMask;
+    }
+    d->actionRemoveFilter->setEnabled(clearFilterAvailable);
 
     d->actionStickyMode->setEnabled(d->availableExtraActions.testFlag(ExtraActionSticky));
 
@@ -1840,6 +1857,8 @@ void KMapWidget::setRegionSelection(const GeoCoordinates::Pair& region)
     s->selectionRectangle = region;
 
     d->currentBackend->regionSelectionChanged();
+
+    slotUpdateActionsEnabled();
 }
 
 void KMapWidget::clearRegionSelection()
@@ -1847,12 +1866,16 @@ void KMapWidget::clearRegionSelection()
     s->selectionRectangle.first.clear();
 
     d->currentBackend->regionSelectionChanged();
+
+    slotUpdateActionsEnabled();
 }
 
 void KMapWidget::slotNewSelectionFromMap(const KMap::GeoCoordinates::Pair& sel)
 {
     /// @todo Should the backend update s on its own?
     s->selectionRectangle      = sel;
+
+    slotUpdateActionsEnabled();
     emit(signalRegionSelectionChanged());
 }
 
@@ -1861,6 +1884,7 @@ void KMapWidget::slotRemoveCurrentRegionSelection()
     clearRegionSelection();
     d->currentBackend->regionSelectionChanged();
 
+    slotUpdateActionsEnabled();
     emit(signalRegionSelectionChanged());
 }
 
