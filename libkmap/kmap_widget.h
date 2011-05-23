@@ -122,11 +122,6 @@ public:
     void clearRegionSelection();
     //@}
 
-    /// @name Miscellaneous
-    //@{
-    bool queryAltitudes(const KMapAltitudeLookup::List& queryItems, const QString& backendName = QLatin1String( "" ));
-    //@}
-
     /**
      * @name Internal
      * Functions that are only used internally and should be hidden from the public interface
@@ -171,7 +166,6 @@ public Q_SLOTS:
 
 Q_SIGNALS:
 
-    void signalAltitudeLookupReady(const KMap::KMapAltitudeLookup::List& altitudes);
     void signalUngroupedModelChanged(const int index);
     void signalRegionSelectionChanged();
     void signalRemoveCurrentFilter();

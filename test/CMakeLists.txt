@@ -61,5 +61,14 @@ IF(KDE4_BUILD_TESTS)
     KDE4_ADD_EXECUTABLE(kmap_test_tileindex ${test_tileindex_sources})
     TARGET_LINK_LIBRARIES(kmap_test_tileindex kmap ${QT_QTTEST_LIBRARY})
     ADD_TEST(kmap_test_tileindex ${EXECUTABLE_OUTPUT_PATH}/kmap_test_tileindex)
+
+    # test the LookupAltitudeGeonames class
+    SET(test_lookup_altitude_geonames_sources
+        test_lookup_altitude_geonames.cpp
+       )
+    KDE4_ADD_EXECUTABLE(kmap_test_lookup_altitude_geonames ${test_lookup_altitude_geonames_sources})
+    TARGET_LINK_LIBRARIES(kmap_test_lookup_altitude_geonames kmap ${QT_QTTEST_LIBRARY})
+    # do not add this as a test because it only works if there is an internet connection
+#     ADD_TEST(kmap_test_lookup_altitude_geonames ${EXECUTABLE_OUTPUT_PATH}/kmap_test_lookup_altitude_geonames)
 ENDIF(KDE4_BUILD_TESTS)
 

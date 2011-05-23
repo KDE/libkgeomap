@@ -59,7 +59,6 @@
 // local includes
 
 #include "abstractmarkertiler.h"
-#include "backend_altitude_geonames.h"
 #include "backend_map_googlemaps.h"
 #include "backend_map_marble.h"
 // #include "backend_map_osm.h"
@@ -104,8 +103,7 @@ class KMapWidget::KMapWidgetPrivate
 public:
 
     KMapWidgetPrivate()
-      : loadedAltitudeBackends(),
-        loadedBackends(),
+      : loadedBackends(),
         currentBackend(0),
         currentBackendName(),
         stackedLayout(0),
@@ -142,7 +140,6 @@ public:
     {
     }
 
-    QList<AltitudeBackend*> loadedAltitudeBackends;
     QList<MapBackend*>      loadedBackends;
     MapBackend*             currentBackend;
     QString                 currentBackendName;
@@ -223,11 +220,6 @@ KMapWidget::KMapWidget(QWidget* const parent)
     d->loadedBackends.append(new BackendMarble(s, this));
 //     d->loadedBackends.append(new BackendOSM(s, this));
     createActionsForBackendSelection();
-
-    AltitudeBackend* const geonamesBackend = new BackendAltitudeGeonames(s, this);
-    d->loadedAltitudeBackends.append(geonamesBackend);
-    connect(geonamesBackend, SIGNAL(signalAltitudes(const KMap::KMapAltitudeLookup::List)),
-            this, SIGNAL(signalAltitudeLookupReady(const KMap::KMapAltitudeLookup::List)));
 
     setAcceptDrops(true);
 }
@@ -733,6 +725,10 @@ KAction* KMapWidget::getControlAction(const QString& actionName)
     {
         return d->actionSetRegionSelectionFromIconMode;
     }
+    else if (actionName==QLatin1String("mousemode-removefilter"))
+    {
+        return d->actionRemoveFilter;
+    }
 
     return 0;
 }
@@ -850,13 +846,26 @@ void KMapWidget::slotUpdateActionsEnabled()
     d->actionIncreaseThumbnailSize->setEnabled(s->showThumbnails);
 
     d->actionSetRegionSelectionMode->setEnabled(s->availableMouseModes.testFlag(MouseModeRegionSelection));
-    d->actionRemoveCurrentRegionSelection->setEnabled(s->availableMouseModes.testFlag(MouseModeRegionSelection));
+    
     d->actionSetPanMode->setEnabled(s->availableMouseModes.testFlag(MouseModePan));
     d->actionSetZoomIntoGroupMode->setEnabled(s->availableMouseModes.testFlag(MouseModeZoomIntoGroup));
     d->actionSetRegionSelectionFromIconMode->setEnabled(s->availableMouseModes.testFlag(MouseModeRegionSelectionFromIcon));
     d->actionSetFilterMode->setEnabled(s->availableMouseModes.testFlag(MouseModeFilter));
-    d->actionRemoveFilter->setEnabled(s->availableMouseModes.testFlag(MouseModeRegionSelectionFromIcon));
     d->actionSetSelectThumbnailMode->setEnabled(s->availableMouseModes.testFlag(MouseModeSelectThumbnail));
+
+    // the 'Remove X' actions are only available if the corresponding X is actually there:
+    bool clearRegionSelectionAvailable = s->availableMouseModes.testFlag(MouseModeRegionSelection);
+    if (clearRegionSelectionAvailable && s->markerModel)
+    {
+        clearRegionSelectionAvailable = s->markerModel->getGlobalGroupState() & KMapRegionSelectedMask;
+    }
+    d->actionRemoveCurrentRegionSelection->setEnabled(clearRegionSelectionAvailable);
+    bool clearFilterAvailable = s->availableMouseModes.testFlag(MouseModeRegionSelectionFromIcon);
+    if (clearFilterAvailable && s->markerModel)
+    {
+        clearFilterAvailable = s->markerModel->getGlobalGroupState() & KMapFilteredPositiveMask;
+    }
+    d->actionRemoveFilter->setEnabled(clearFilterAvailable);
 
     d->actionStickyMode->setEnabled(d->availableExtraActions.testFlag(ExtraActionSticky));
 
@@ -1182,20 +1191,6 @@ void KMapWidget::slotClustersMoved(const QIntList& clusterIndices, const QPair<i
      */
 }
 
-bool KMapWidget::queryAltitudes(const KMapAltitudeLookup::List& queryItems, const QString& backendName)
-{
-    for (int i=0; i<d->loadedAltitudeBackends.count(); ++i)
-    {
-        AltitudeBackend* const altitudeBackend = d->loadedAltitudeBackends.at(i);
-
-        if (altitudeBackend->backendName() == backendName)
-        {
-            return altitudeBackend->queryAltitudes(queryItems);
-        }
-    }
-    return false;
-}
-
 void KMapWidget::addUngroupedModel(ModelHelper* const modelHelper)
 {
     s->ungroupedModels << modelHelper;
@@ -1420,8 +1415,12 @@ void KMapWidget::slotClustersClicked(const QIntList& clusterIndices)
             /// @todo Isn't this cached in the cluster?
             const QVariant representativeIndex = getClusterRepresentativeMarker(clusterIndex, s->sortKey);
 
-            s->markerModel->onIndicesClicked(tileIndices, representativeIndex,
-                                             currentCluster.groupState, s->currentMouseMode);
+            AbstractMarkerTiler::ClickInfo clickInfo;
+            clickInfo.tileIndicesList = tileIndices;
+            clickInfo.representativeIndex = representativeIndex;
+            clickInfo.groupSelectionState = currentCluster.groupState;
+            clickInfo.currentMouseMode = s->currentMouseMode;
+            s->markerModel->onIndicesClicked(clickInfo);
         }
     }
 }
@@ -1858,6 +1857,8 @@ void KMapWidget::setRegionSelection(const GeoCoordinates::Pair& region)
     s->selectionRectangle = region;
 
     d->currentBackend->regionSelectionChanged();
+
+    slotUpdateActionsEnabled();
 }
 
 void KMapWidget::clearRegionSelection()
@@ -1865,12 +1866,16 @@ void KMapWidget::clearRegionSelection()
     s->selectionRectangle.first.clear();
 
     d->currentBackend->regionSelectionChanged();
+
+    slotUpdateActionsEnabled();
 }
 
 void KMapWidget::slotNewSelectionFromMap(const KMap::GeoCoordinates::Pair& sel)
 {
     /// @todo Should the backend update s on its own?
     s->selectionRectangle      = sel;
+
+    slotUpdateActionsEnabled();
     emit(signalRegionSelectionChanged());
 }
 
@@ -1879,6 +1884,7 @@ void KMapWidget::slotRemoveCurrentRegionSelection()
     clearRegionSelection();
     d->currentBackend->regionSelectionChanged();
 
+    slotUpdateActionsEnabled();
     emit(signalRegionSelectionChanged());
 }
 

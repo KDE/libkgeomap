@@ -1,16 +1,13 @@
 /** ===========================================================
- * @file
  *
  * This file is a part of digiKam project
  * <a href="http://www.digikam.org">http://www.digikam.org</a>
  *
- * @date   2010-02-13
- * @brief  Base class for altitude lookup backends
+ * @date   2010-05-07
+ * @brief  Test for the geonames based altitude lookup class
  *
- * @author Copyright (C) 2010 by Michael G. Hansen
+ * @author Copyright (C) 2011 by Michael G. Hansen
  *         <a href="mailto:mike at mghansen dot de">mike at mghansen dot de</a>
- * @author Copyright (C) 2010 by Gilles Caulier
- *         <a href="mailto:caulier dot gilles at gmail dot com">caulier dot gilles at gmail dot com</a>
  *
  * This program is free software; you can redistribute it
  * and/or modify it under the terms of the GNU General
@@ -24,18 +21,22 @@
  *
  * ============================================================ */
 
-#include "backend_altitude.moc"
+#ifndef TEST_LOOKUP_ALTITUDE_GEONAMES_H
+#define TEST_LOOKUP_ALTITUDE_GEONAMES_H
 
-namespace KMap
+// Qt includes
+
+#include <QtTest/QtTest>
+
+class TestLookupAltitudeGeonames : public QObject
 {
+    Q_OBJECT
 
-AltitudeBackend::AltitudeBackend(const QExplicitlySharedDataPointer<KMapSharedData>& sharedData, QObject* const parent)
-               : QObject(parent), s(sharedData)
-{
-}
+private Q_SLOTS:
 
-AltitudeBackend::~AltitudeBackend()
-{
-}
+    void testNoOp();
+    void testSimpleLookup();
+    
+};
 
-} /* namespace KMap */
+#endif /* TEST_LOOKUP_ALTITUDE_GEONAMES_H */

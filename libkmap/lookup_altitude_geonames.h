@@ -4,10 +4,10 @@
  * This file is a part of digiKam project
  * <a href="http://www.digikam.org">http://www.digikam.org</a>
  *
- * @date   2010-02-13
- * @brief  geonames.org based altitude lookup backend
+ * @date   2011-04-30
+ * @brief  Class for geonames.org based altitude lookup
  *
- * @author Copyright (C) 2010 by Michael G. Hansen
+ * @author Copyright (C) 2010, 2011 by Michael G. Hansen
  *         <a href="mailto:mike at mghansen dot de">mike at mghansen dot de</a>
  * @author Copyright (C) 2010 by Gilles Caulier
  *         <a href="mailto:caulier dot gilles at gmail dot com">caulier dot gilles at gmail dot com</a>
@@ -24,38 +24,44 @@
  *
  * ============================================================ */
 
-#ifndef BACKEND_ALTITUDE_GEONAMES_H
-#define BACKEND_ALTITUDE_GEONAMES_H
+#ifndef LOOKUP_ALTITUDE_GEONAMES_H
+#define LOOKUP_ALTITUDE_GEONAMES_H
 
-// Local includes
+// local includes
 
-#include "backend_altitude.h"
+#include "lookup_altitude.h"
 
 /// @cond false
 namespace KIO
 {
     class Job;
 }
-/// @endcond
-
 class KJob;
+/// @endcond
 
 namespace KMap
 {
 
-class BackendAltitudeGeonames : public AltitudeBackend
+class KMAP_EXPORT LookupAltitudeGeonames : public LookupAltitude
 {
     Q_OBJECT
 
 public:
 
-    BackendAltitudeGeonames(const QExplicitlySharedDataPointer<KMapSharedData>& sharedData, QObject* const parent);
-    virtual ~BackendAltitudeGeonames();
+    LookupAltitudeGeonames(QObject* const parent);
+    virtual ~LookupAltitudeGeonames();
 
     virtual QString backendName() const;
     virtual QString backendHumanName() const;
 
-    virtual bool queryAltitudes(const KMapAltitudeLookup::List& queryItems);
+    virtual void addRequests(const Request::List& requests);
+    virtual Request::List getRequests() const;
+    virtual Request getRequest(const int index) const;
+
+    virtual void startLookup();
+    virtual Status getStatus() const;
+    virtual QString errorMessage() const;
+    virtual void cancel();
 
 private Q_SLOTS:
 
@@ -64,10 +70,12 @@ private Q_SLOTS:
 
 private:
 
-    class BackendAltitudeGeonamesPrivate;
-    BackendAltitudeGeonamesPrivate* const d;
+    void startNextRequest();
+
+    class LookupAltitudeGeonamesPrivate;
+    LookupAltitudeGeonamesPrivate* const d;
 };
 
 } /* namespace KMap */
 
-#endif /* BACKEND_ALTITUDE_GEONAMES_H */
+#endif /* LOOKUP_ALTITUDE_GEONAMES_H */

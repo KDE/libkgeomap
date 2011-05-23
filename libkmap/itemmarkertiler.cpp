@@ -611,22 +611,21 @@ bool ItemMarkerTiler::indicesEqual(const QVariant& a, const QVariant& b) const
     return a.value<QPersistentModelIndex>()==b.value<QPersistentModelIndex>();
 }
 
-void ItemMarkerTiler::onIndicesClicked(const TileIndex::List& tileIndicesList, const QVariant& representativeIndex,
-                                       const KMapGroupState& groupSelectionState, const MouseModes currentMouseMode)
+void ItemMarkerTiler::onIndicesClicked(const ClickInfo& clickInfo)
 {
     QList<QPersistentModelIndex> clickedMarkers;
-    for (int i=0; i<tileIndicesList.count(); ++i)
+    for (int i=0; i<clickInfo.tileIndicesList.count(); ++i)
     {
-        const TileIndex tileIndex = tileIndicesList.at(i);
+        const TileIndex tileIndex = clickInfo.tileIndicesList.at(i);
 
         clickedMarkers << getTileMarkerIndices(tileIndex);
     }
 
-    const QPersistentModelIndex representativeModelIndex = representativeIndex.value<QPersistentModelIndex>();
+    const QPersistentModelIndex representativeModelIndex = clickInfo.representativeIndex.value<QPersistentModelIndex>();
 
-    if (currentMouseMode == MouseModeSelectThumbnail && d->selectionModel)
+    if (clickInfo.currentMouseMode == MouseModeSelectThumbnail && d->selectionModel)
     {
-        const bool doSelect = (groupSelectionState & KMapSelectedMask) != KMapSelectedAll;
+        const bool doSelect = (clickInfo.groupSelectionState & KMapSelectedMask) != KMapSelectedAll;
 
         const QItemSelectionModel::SelectionFlags selectionFlags =
                   (doSelect ? QItemSelectionModel::Select : QItemSelectionModel::Deselect)
@@ -651,9 +650,9 @@ void ItemMarkerTiler::onIndicesClicked(const TileIndex::List& tileIndicesList, c
          */
         //d->modelHelper->onIndicesClicked(clickedMarkers);
     }
-    else if (currentMouseMode == MouseModeFilter)
+    else if (clickInfo.currentMouseMode == MouseModeFilter)
     {
-        /// @todo Also forward the representative index in this call
+        /// @todo Also forward the representative index and the mouse mode in this call
         d->modelHelper->onIndicesClicked(clickedMarkers);
     }
 }

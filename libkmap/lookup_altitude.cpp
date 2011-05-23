@@ -4,10 +4,10 @@
  * This file is a part of digiKam project
  * <a href="http://www.digikam.org">http://www.digikam.org</a>
  *
- * @date   2010-02-13
- * @brief  Base class for altitude lookup backends
+ * @date   2011-04-30
+ * @brief  Base class for altitude lookup jobs
  *
- * @author Copyright (C) 2010 by Michael G. Hansen
+ * @author Copyright (C) 2010, 2011 by Michael G. Hansen
  *         <a href="mailto:mike at mghansen dot de">mike at mghansen dot de</a>
  * @author Copyright (C) 2010 by Gilles Caulier
  *         <a href="mailto:caulier dot gilles at gmail dot com">caulier dot gilles at gmail dot com</a>
@@ -24,39 +24,18 @@
  *
  * ============================================================ */
 
-#ifndef BACKEND_ALTITUDE_H
-#define BACKEND_ALTITUDE_H
-
-// Local includes
-
-#include "kmap_common.h"
+#include "lookup_altitude.moc"
 
 namespace KMap
 {
 
-class KMAP_EXPORT AltitudeBackend : public QObject
+LookupAltitude::LookupAltitude(QObject* const parent)
+ : QObject(parent)
 {
-    Q_OBJECT
+}
 
-public:
-
-    AltitudeBackend(const QExplicitlySharedDataPointer<KMapSharedData>& sharedData, QObject* const parent);
-    virtual ~AltitudeBackend();
-
-    virtual QString backendName() const = 0;
-    virtual QString backendHumanName() const = 0;
-
-    virtual bool queryAltitudes(const KMapAltitudeLookup::List& queryItems) = 0;
-
-Q_SIGNALS:
-
-    void signalAltitudes(const KMap::KMapAltitudeLookup::List results);
-
-public:
-
-    const QExplicitlySharedDataPointer<KMapSharedData> s;
-};
+LookupAltitude::~LookupAltitude()
+{
+}
 
 } /* namespace KMap */
-
-#endif /* BACKEND_ALTITUDE_H */
