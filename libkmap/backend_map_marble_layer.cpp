@@ -46,8 +46,8 @@ BMLayer::~BMLayer()
 {
 }
 
-bool BMLayer::render(Marble::GeoPainter* painter, Marble::ViewportParams* viewport,
-                     const QString& renderPos, Marble::GeoSceneLayer* layer)
+bool BMLayer::render(Marble::GeoPainter* painter, Marble::ViewportParams* /*viewport*/,
+                     const QString& renderPos, Marble::GeoSceneLayer* /*layer*/)
 {
     if (marbleBackend && (renderPos == QLatin1String("HOVERS_ABOVE_SURFACE")))
     {
