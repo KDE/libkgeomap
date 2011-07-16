@@ -104,7 +104,7 @@ AbstractMarkerTiler::NonEmptyIterator::NonEmptyIterator(AbstractMarkerTiler* con
                    : d(new AbstractMarkerTilerNonEmptyIteratorPrivate())
 {
     d->model = model;
-    KMAP_ASSERT(level <= TileIndex::MaxLevel);
+    KGEOMAP_ASSERT(level <= TileIndex::MaxLevel);
     d->level = level;
 
     TileIndex startIndex;
@@ -126,11 +126,11 @@ AbstractMarkerTiler::NonEmptyIterator::NonEmptyIterator(AbstractMarkerTiler* con
                                      : d(new AbstractMarkerTilerNonEmptyIteratorPrivate())
 {
     d->model = model;
-    KMAP_ASSERT(level <= TileIndex::MaxLevel);
+    KGEOMAP_ASSERT(level <= TileIndex::MaxLevel);
     d->level = level;
 
-    KMAP_ASSERT(startIndex.level() == level);
-    KMAP_ASSERT(endIndex.level() == level);
+    KGEOMAP_ASSERT(startIndex.level() == level);
+    KGEOMAP_ASSERT(endIndex.level() == level);
     d->boundsList << QPair<TileIndex, TileIndex>(startIndex, endIndex);
 
     initializeNextBounds();
@@ -141,15 +141,15 @@ AbstractMarkerTiler::NonEmptyIterator::NonEmptyIterator(AbstractMarkerTiler* con
                                      : d(new AbstractMarkerTilerNonEmptyIteratorPrivate())
 {
     d->model = model;
-    KMAP_ASSERT(level <= TileIndex::MaxLevel);
+    KGEOMAP_ASSERT(level <= TileIndex::MaxLevel);
     d->level = level;
 
     // store the coordinates of the bounds as indices:
     for (int i=0; i < normalizedMapBounds.count(); ++i)
     {
         GeoCoordinates::Pair currentBounds = normalizedMapBounds.at(i);
-        KMAP_ASSERT(currentBounds.first.lat() < currentBounds.second.lat());
-        KMAP_ASSERT(currentBounds.first.lon() < currentBounds.second.lon());
+        KGEOMAP_ASSERT(currentBounds.first.lat() < currentBounds.second.lat());
+        KGEOMAP_ASSERT(currentBounds.first.lon() < currentBounds.second.lon());
 
         const TileIndex startIndex = TileIndex::fromCoordinates(currentBounds.first, d->level);
         const TileIndex endIndex   = TileIndex::fromCoordinates(currentBounds.second, d->level);
@@ -173,8 +173,8 @@ bool AbstractMarkerTiler::NonEmptyIterator::initializeNextBounds()
     d->startIndex = nextBounds.first;
     d->endIndex   = nextBounds.second;
 
-    KMAP_ASSERT(d->startIndex.level() == d->level);
-    KMAP_ASSERT(d->endIndex.level() == d->level);
+    KGEOMAP_ASSERT(d->startIndex.level() == d->level);
+    KGEOMAP_ASSERT(d->endIndex.level() == d->level);
 
     d->currentIndex = d->startIndex.mid(0, 1);
     d->atStartOfLevel = true;
@@ -255,8 +255,8 @@ TileIndex AbstractMarkerTiler::NonEmptyIterator::nextIndex()
                 limitLonTR = d->endIndex.indexLon(currentLevel);
             }
 
-            KMAP_ASSERT(limitLatBL <= limitLatTR);
-            KMAP_ASSERT(limitLonBL <= limitLonTR);
+            KGEOMAP_ASSERT(limitLatBL <= limitLatTR);
+            KGEOMAP_ASSERT(limitLonBL <= limitLonTR);
 //             kDebug() << limitLatBL << limitLonBL << limitLatTR << limitLonTR << compareLevel << currentLevel;
 
             int currentLat = d->currentIndex.indexLat(d->currentIndex.level());
@@ -357,8 +357,8 @@ TileIndex AbstractMarkerTiler::NonEmptyIterator::nextIndex()
             limitLonTR = d->endIndex.indexLon(currentLevel+1);
         }
 
-        KMAP_ASSERT(limitLatBL <= limitLatTR);
-        KMAP_ASSERT(limitLonBL <= limitLonTR);
+        KGEOMAP_ASSERT(limitLatBL <= limitLatTR);
+        KGEOMAP_ASSERT(limitLonBL <= limitLonTR);
 
         // go one level down:
         d->currentIndex.appendLatLonIndex(limitLatBL, limitLonBL);

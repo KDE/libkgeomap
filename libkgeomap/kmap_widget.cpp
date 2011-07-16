@@ -24,7 +24,7 @@
  *
  * ============================================================ */
 
-#include "kmap_widget.moc"
+#include "kgeomap_widget.moc"
 
 // C++ includes
 
@@ -62,7 +62,7 @@
 #include "backend_map_googlemaps.h"
 #include "backend_map_marble.h"
 // #include "backend_map_osm.h"
-#include "kmap_common.h"
+#include "kgeomap_common.h"
 #include "dragdrophandler.h"
 #include "modelhelper.h"
 #include "placeholderwidget.h"
@@ -74,18 +74,18 @@ namespace KMap
 
 /**
  * @class KMapWidget
- * @brief The central map view class of libkmap
+ * @brief The central map view class of libkgeomap
  *
- * The KMapWidget class is the central widget of libkmap. It provides a widget which can display maps using
+ * The KMapWidget class is the central widget of libkgeomap. It provides a widget which can display maps using
  * either the Marble or Google Maps backend. Using a model, items can be displayed on the map. For
  * models containing only a small number of items, the items can be shown directly, but for models with
  * a larger number of items, the items can also be grouped. Currently, any number of ungrouped models
  * can be shown, but only one grouped model. Item selection models can also be used along with the models,
- * to interact with the selection states of the items on the map. In order to use a model with libkmap, however,
+ * to interact with the selection states of the items on the map. In order to use a model with libkgeomap, however,
  * a model helper has to be implemented, which extracts data from the model that is not provided by the Qt part
  * of a model's API.
  *
- * Now, a brief introduction on how to get libkmap working is provided:
+ * Now, a brief introduction on how to get libkgeomap working is provided:
  * @li First, an instance of @c KMapWidget has to be created.
  * @li Next, @c ModelHelper has to be subclassed and at least the pure virtual functions have to be implemented.
  * @li To show the model's data ungrouped, the model helper has to be added to @c KMapWidget instance using addUngroupedModel.
@@ -592,7 +592,7 @@ void KMapWidget::stopThumbnailTimer()
 
 void KMapWidget::saveSettingsToGroup(KConfigGroup* const group)
 {
-    KMAP_ASSERT(group != 0);
+    KGEOMAP_ASSERT(group != 0);
     if (!group)
         return;
 
@@ -624,7 +624,7 @@ void KMapWidget::saveSettingsToGroup(KConfigGroup* const group)
 
 void KMapWidget::readSettingsFromGroup(const KConfigGroup* const group)
 {
-    KMAP_ASSERT(group != 0);
+    KGEOMAP_ASSERT(group != 0);
     if (!group)
     {
         return;
@@ -887,7 +887,7 @@ void KMapWidget::slotUpdateActionsEnabled()
 
 void KMapWidget::slotChangeBackend(QAction* action)
 {
-    KMAP_ASSERT(action!=0);
+    KGEOMAP_ASSERT(action!=0);
 
     if (!action)
         return;
@@ -1000,7 +1000,7 @@ void KMapWidget::getColorInfos(const KMapGroupState groupState,
             break;
     }
 
-    /// @todo These are the fill colors for the circles, for cases in which only some or all of the images are positively filtered. Filtering is implemented in libkmap, but the code here has not been adapted yet.
+    /// @todo These are the fill colors for the circles, for cases in which only some or all of the images are positively filtered. Filtering is implemented in libkgeomap, but the code here has not been adapted yet.
     QColor fillAll, fillSome, fillNone;
     if (nMarkers>=100)
     {
@@ -1059,7 +1059,7 @@ void KMapWidget::getColorInfos(const KMapGroupState groupState,
 QString KMapWidget::convertZoomToBackendZoom(const QString& someZoom, const QString& targetBackend) const
 {
     const QStringList zoomParts = someZoom.split(QLatin1Char( ':' ));
-    KMAP_ASSERT(zoomParts.count()==2);
+    KGEOMAP_ASSERT(zoomParts.count()==2);
     const QString sourceBackend = zoomParts.first();
 
     if (sourceBackend==targetBackend)
@@ -1122,7 +1122,7 @@ QString KMapWidget::convertZoomToBackendZoom(const QString& someZoom, const QStr
         else { targetZoom = 20; } /// @todo Find values for level 20 and up
     }
 
-    KMAP_ASSERT(targetZoom>=0);
+    KGEOMAP_ASSERT(targetZoom>=0);
 
     return QString::fromLatin1("%1:%2").arg(targetBackend).arg(targetZoom);
 }
@@ -1960,7 +1960,7 @@ QString KMapWidget::MarbleWidgetVersion()
 
 QString KMapWidget::version()
 {
-    return QString::fromLatin1(kmap_version);
+    return QString::fromLatin1(kgeomap_version);
 }
 
 void KMapWidget::setActive(const bool state)

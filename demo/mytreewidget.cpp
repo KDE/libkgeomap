@@ -28,9 +28,9 @@
 #include <QApplication>
 #include <QMouseEvent>
 
-// libkmap includes
+// libkgeomap includes
 
-#include "libkmap/kmap_primitives.h"
+#include "libkgeomap/kgeomap_primitives.h"
 
 // local includes
 

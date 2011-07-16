@@ -24,8 +24,8 @@
  *
  * ============================================================ */
 
-#ifndef KMAP_PRIMITIVES_H
-#define KMAP_PRIMITIVES_H
+#ifndef KGEOMAP_PRIMITIVES_H
+#define KGEOMAP_PRIMITIVES_H
 
 // Qt includes
 
@@ -40,16 +40,16 @@
 
 // local includes
 
-#include "libkmap_export.h"
+#include "libkgeomap_export.h"
 #include "geocoordinates.h"
 
 Q_DECLARE_METATYPE(QPersistentModelIndex)
 
-#ifdef KMAP_HAVE_VALGRIND
+#ifdef KGEOMAP_HAVE_VALGRIND
 #include <valgrind/valgrind.h>
-#endif /* KMAP_HAVE_VALGRIND */
+#endif /* KGEOMAP_HAVE_VALGRIND */
 
-#define KMAP_ASSERT(cond) ((!(cond)) ? KMap::KMap_assert(#cond,__FILE__,__LINE__) : qt_noop())
+#define KGEOMAP_ASSERT(cond) ((!(cond)) ? KMap::KMap_assert(#cond,__FILE__,__LINE__) : qt_noop())
 
 namespace KMap
 {
@@ -57,7 +57,7 @@ namespace KMap
 inline void KMap_assert(const char* const condition, const char* const filename, const int lineNumber)
 {
     const QString debugString = QString::fromLatin1( "ASSERT: %1 - %2:%3").arg(QLatin1String( condition )).arg(QLatin1String( filename )).arg(lineNumber);
-#ifdef KMAP_HAVE_VALGRIND
+#ifdef KGEOMAP_HAVE_VALGRIND
     if (RUNNING_ON_VALGRIND>0)
     {
         // TODO: which encoding?
@@ -70,7 +70,7 @@ inline void KMap_assert(const char* const condition, const char* const filename,
     }
 #else
     kDebug(51006)<<debugString;
-#endif /* KMAP_HAVE_VALGRIND */
+#endif /* KGEOMAP_HAVE_VALGRIND */
 }
 
 enum MouseMode
@@ -249,4 +249,4 @@ public:
 
 Q_DECLARE_METATYPE(KMap::MouseModes)
 
-#endif /* KMAP_PRIMITIVES_H */
+#endif /* KGEOMAP_PRIMITIVES_H */

@@ -33,15 +33,15 @@
 
 // local includes
 
-#include "kmap_primitives.h"
-#include "libkmap_export.h"
+#include "kgeomap_primitives.h"
+#include "libkgeomap_export.h"
 
 namespace KMap
 {
 
 class KMapSharedData;
 
-class KMAP_EXPORT HTMLWidget : public KHTMLPart
+class KGEOMAP_EXPORT HTMLWidget : public KHTMLPart
 {
     Q_OBJECT
 

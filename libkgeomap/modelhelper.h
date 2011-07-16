@@ -24,8 +24,8 @@
  *
  * ============================================================ */
 
-#ifndef KMAP_MODELHELPER
-#define KMAP_MODELHELPER
+#ifndef KGEOMAP_MODELHELPER
+#define KGEOMAP_MODELHELPER
 
 // Qt includes
 
@@ -43,14 +43,14 @@
 
 // local includes
 
-#include "libkmap_export.h"
-#include "kmap_primitives.h"
+#include "libkgeomap_export.h"
+#include "kgeomap_primitives.h"
 
 namespace KMap
 {
 
 
-class KMAP_EXPORT ModelHelper : public QObject
+class KGEOMAP_EXPORT ModelHelper : public QObject
 {
     Q_OBJECT
 
@@ -100,4 +100,4 @@ Q_SIGNALS:
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(KMap::ModelHelper::Flags)
 
-#endif /* KMAP_MODELHELPER */
+#endif /* KGEOMAP_MODELHELPER */

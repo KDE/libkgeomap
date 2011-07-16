@@ -40,7 +40,7 @@
 // local includes
 
 #include "html_widget.h"
-#include "kmap.h"
+#include "kgeomap.h"
 #include "markermodel.h"
 
 namespace KMap
@@ -128,7 +128,7 @@ void BackendOSM::setCenter(const GeoCoordinates& coordinate)
 
     if (isReady())
     {
-        d->htmlWidget->runScript(QString::fromLatin1("kmapSetCenter(%1, %2);").arg(d->cacheCenter.latString())
+        d->htmlWidget->runScript(QString::fromLatin1("kgeomapSetCenter(%1, %2);").arg(d->cacheCenter.latString())
                                                                  .arg(d->cacheCenter.lonString()));
     }
 }
@@ -147,7 +147,7 @@ void BackendOSM::slotHTMLInitialized()
 
     // TODO: call javascript directly here and update action availability in one shot
     setCenter(d->cacheCenter);
-    d->htmlWidget->runScript(QString::fromLatin1("kmapSetZoom(%1);").arg(d->cacheZoom));
+    d->htmlWidget->runScript(QString::fromLatin1("kgeomapSetZoom(%1);").arg(d->cacheZoom));
     emit(signalBackendReady(backendName()));
 }
 
@@ -156,7 +156,7 @@ void BackendOSM::zoomIn()
     if (!d->isReady)
         return;
 
-    d->htmlWidget->runScript(QLatin1String("kmapZoomIn();"));
+    d->htmlWidget->runScript(QLatin1String("kgeomapZoomIn();"));
 }
 
 void BackendOSM::zoomOut()
@@ -164,7 +164,7 @@ void BackendOSM::zoomOut()
     if (!d->isReady)
         return;
 
-    d->htmlWidget->runScript(QLatin1String("kmapZoomOut();"));
+    d->htmlWidget->runScript(QLatin1String("kgeomapZoomOut();"));
 }
 
 void BackendOSM::updateActionsEnabled()
@@ -174,7 +174,7 @@ void BackendOSM::updateActionsEnabled()
 
 void BackendOSM::addActionsToConfigurationMenu(QMenu* const configurationMenu)
 {
-    KMAP_ASSERT(configurationMenu!=0);
+    KGEOMAP_ASSERT(configurationMenu!=0);
 
     if (!d->isReady)
         return;
@@ -182,33 +182,33 @@ void BackendOSM::addActionsToConfigurationMenu(QMenu* const configurationMenu)
 
 void BackendOSM::saveSettingsToGroup(KConfigGroup* const group)
 {
-    KMAP_ASSERT(group != 0);
+    KGEOMAP_ASSERT(group != 0);
     if (!group)
         return;
 }
 
 void BackendOSM::readSettingsFromGroup(const KConfigGroup* const group)
 {
-    KMAP_ASSERT(group != 0);
+    KGEOMAP_ASSERT(group != 0);
     if (!group)
         return;
 }
 
 void BackendOSM::updateMarkers()
 {
-    KMAP_ASSERT(isReady());
+    KGEOMAP_ASSERT(isReady());
     if (!isReady())
         return;
 
     // re-transfer all markers to the javascript-part:
-    d->htmlWidget->runScript(QLatin1String("kmapClearMarkers();"));
+    d->htmlWidget->runScript(QLatin1String("kgeomapClearMarkers();"));
     for (int row = 0; row<s->specialMarkersModel->rowCount(); ++row)
     {
         const QModelIndex currentIndex = s->specialMarkersModel->index(row, 0);
 
         const GeoCoordinates currentCoordinates = s->specialMarkersModel->data(currentIndex, s->specialMarkersCoordinatesRole).value<GeoCoordinates>();
 
-        d->htmlWidget->runScript(QLatin1String("kmapAddMarker(%1, %2, %3, %4);")
+        d->htmlWidget->runScript(QLatin1String("kgeomapAddMarker(%1, %2, %3, %4);")
                 .arg(row)
                 .arg(currentCoordinates.latString())
                 .arg(currentCoordinates.lonString())
@@ -267,7 +267,7 @@ void BackendOSM::slotHTMLEvents(const QStringList& events)
             // re-read the marker position:
             GeoCoordinates clusterCoordinates;
             const bool isValid = d->htmlWidget->runScript2Coordinates(
-                    QString::fromLatin1("kmapGetClusterPosition(%1);").arg(clusterIndex),
+                    QString::fromLatin1("kgeomapGetClusterPosition(%1);").arg(clusterIndex),
                     &clusterCoordinates);
 
             if (!isValid)
@@ -293,7 +293,7 @@ void BackendOSM::slotHTMLEvents(const QStringList& events)
             // re-read the marker position:
             GeoCoordinates markerCoordinates;
             const bool isValid = d->htmlWidget->runScript2Coordinates(
-                    QString::fromLatin1("kmapGetMarkerPosition(%1);").arg(markerRow),
+                    QString::fromLatin1("kgeomapGetMarkerPosition(%1);").arg(markerRow),
                     &markerCoordinates
                 );
 
@@ -328,13 +328,13 @@ void BackendOSM::slotHTMLEvents(const QStringList& events)
     // now process the buffered events:
     if (zoomProbablyChanged)
     {
-        d->cacheZoom = d->htmlWidget->runScript(QLatin1String("kmapGetZoom();")).toInt();
+        d->cacheZoom = d->htmlWidget->runScript(QLatin1String("kgeomapGetZoom();")).toInt();
         emit(signalZoomChanged(QString::fromLatin1("googlemaps:%1").arg(d->cacheZoom)));
     }
     if (centerProbablyChanged)
     {
         // there is nothing we can do if the coordinates are invalid
-        /*const bool isValid = */d->htmlWidget->runScript2Coordinates("kmapGetCenter();", &(d->cacheCenter));
+        /*const bool isValid = */d->htmlWidget->runScript2Coordinates("kgeomapGetCenter();", &(d->cacheCenter));
     }
 
     // update the actions if necessary:
@@ -345,7 +345,7 @@ void BackendOSM::slotHTMLEvents(const QStringList& events)
 
     if (mapBoundsProbablyChanged)
     {
-        const QString mapBoundsString = d->htmlWidget->runScript("kmapGetBounds();").toString();
+        const QString mapBoundsString = d->htmlWidget->runScript("kgeomapGetBounds();").toString();
         KMapHelperParseBoundsString(mapBoundsString, &d->cacheBounds);
     }
 
@@ -359,14 +359,14 @@ void BackendOSM::updateClusters()
 {
     kDebug()<<"start updateclusters";
     // re-transfer the clusters to the map:
-    KMAP_ASSERT(isReady());
+    KGEOMAP_ASSERT(isReady());
     if (!isReady())
         return;
 
     // TODO: only update clusters that have actually changed!
 
     // re-transfer all markers to the javascript-part:
-    d->htmlWidget->runScript(QLatin1String("kmapClearClusters();"));
+    d->htmlWidget->runScript(QLatin1String("kgeomapClearClusters();"));
     for (int currentIndex = 0; currentIndex<s->clusterList.size(); ++currentIndex)
     {
         const KMapCluster& currentCluster = s->clusterList.at(currentIndex);
@@ -382,7 +382,7 @@ void BackendOSM::updateClusters()
 
         const QString fillColorName = fillColor.name();
 
-        d->htmlWidget->runScript(QLatin1String("kmapAddCluster(%1, %2, %3, %4, '%5', '%6');")
+        d->htmlWidget->runScript(QLatin1String("kgeomapAddCluster(%1, %2, %3, %4, '%5', '%6');")
                 .arg(currentIndex)
                 .arg(currentCluster.coordinates.latString())
                 .arg(currentCluster.coordinates.lonString())
@@ -401,7 +401,7 @@ bool BackendOSM::screenCoordinates(const GeoCoordinates& coordinates, QPoint* co
 
     const bool isValid = KMapHelperParseXYStringToPoint(
             d->htmlWidget->runScript(
-                QLatin1String("kmapLatLngToPixel(%1, %2);")
+                QLatin1String("kgeomapLatLngToPixel(%1, %2);")
                     .arg(coordinates.latString())
                     .arg(coordinates.lonString())
                     ).toString(),
@@ -418,7 +418,7 @@ bool BackendOSM::GeoCoordinates(const QPoint& point, GeoCoordinates* const coord
         return false;
 
     const bool isValid = d->htmlWidget->runScript2Coordinates(
-            QLatin1String("kmapPixelToLatLng(%1, %2);")
+            QLatin1String("kgeomapPixelToLatLng(%1, %2);")
                 .arg(point.x())
                 .arg(point.y()),
             coordinates);
@@ -428,7 +428,7 @@ bool BackendOSM::GeoCoordinates(const QPoint& point, GeoCoordinates* const coord
 
 QSize BackendOSM::mapSize() const
 {
-    KMAP_ASSERT(d->htmlWidgetWrapper!=0);
+    KGEOMAP_ASSERT(d->htmlWidgetWrapper!=0);
 
     return d->htmlWidgetWrapper->size();
 }
@@ -442,7 +442,7 @@ void BackendOSM::setZoom(const QString& newZoom)
 {
     // zoom settings for OSM are basically the same as for Google Maps, so just re-use the prefix
     const QString myZoomString = s->worldMapWidget->convertZoomToBackendZoom(newZoom, "googlemaps");
-    KMAP_ASSERT(myZoomString.startsWith(QLatin1String("googlemaps:")));
+    KGEOMAP_ASSERT(myZoomString.startsWith(QLatin1String("googlemaps:")));
 
     const int myZoom = myZoomString.mid(QLatin1String("googlemaps:").length()).toInt();
     kDebug()<<myZoom;
@@ -451,7 +451,7 @@ void BackendOSM::setZoom(const QString& newZoom)
 
     if (isReady())
     {
-        d->htmlWidget->runScript(QString::fromLatin1("kmapSetZoom(%1);").arg(d->cacheZoom));
+        d->htmlWidget->runScript(QString::fromLatin1("kgeomapSetZoom(%1);").arg(d->cacheZoom));
     }
 }
 
@@ -463,7 +463,7 @@ QString BackendOSM::getZoom() const
 
 int BackendOSM::getMarkerModelLevel()
 {
-    KMAP_ASSERT(isReady());
+    KGEOMAP_ASSERT(isReady());
     if (!isReady())
     {
         return 0;
@@ -498,7 +498,7 @@ int BackendOSM::getMarkerModelLevel()
     else if (currentZoom==22) { tileLevel = 7; }
     else { tileLevel = s->markerModel->maxLevel()-1; }
 
-    KMAP_ASSERT(tileLevel<=s->markerModel->maxLevel()-1);
+    KGEOMAP_ASSERT(tileLevel<=s->markerModel->maxLevel()-1);
 
     return tileLevel;
 }

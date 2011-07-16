@@ -60,12 +60,12 @@
 #include <libkexiv2/version.h>
 #include <libkexiv2/kexiv2.h>
 
-// libkmap includes
+// libkgeomap includes
 
-#include "libkmap/lookup_altitude.h"
-#include "libkmap/lookup_factory.h"
-#include "libkmap/kmap_widget.h"
-#include "libkmap/itemmarkertiler.h"
+#include "libkgeomap/lookup_altitude.h"
+#include "libkgeomap/lookup_factory.h"
+#include "libkgeomap/kgeomap_widget.h"
+#include "libkgeomap/itemmarkertiler.h"
 
 // local includes
 
@@ -346,7 +346,7 @@ void MainWindow::slotFutureResultsReadyAt(int startIndex, int endIndex)
 
     // determine the sender:
     QFutureWatcher<MyImageData>* const futureSender = reinterpret_cast<QFutureWatcher<MyImageData>*>(sender());
-    KMAP_ASSERT(futureSender!=0);
+    KGEOMAP_ASSERT(futureSender!=0);
     if (futureSender==0)
         return;
 
@@ -359,7 +359,7 @@ void MainWindow::slotFutureResultsReadyAt(int startIndex, int endIndex)
             break;
         }
     }
-    KMAP_ASSERT(futureIndex>=0);
+    KGEOMAP_ASSERT(futureIndex>=0);
     if (futureIndex<0)
     {
         // TODO: error!

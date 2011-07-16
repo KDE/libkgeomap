@@ -5,7 +5,7 @@
  * <a href="http://www.digikam.org">http://www.digikam.org</a>
  *
  * @date   2010-09-18
- * @brief  A tool to calibrate the tiling levels used in libkmap
+ * @brief  A tool to calibrate the tiling levels used in libkgeomap
  *
  * @author Copyright (C) 2009-2010 by Michael G. Hansen
  *         <a href="mailto:mike at mghansen dot de">mike at mghansen dot de</a>
@@ -47,10 +47,10 @@
 
 // local includes
 
-#include "libkmap/abstractmarkertiler.h"
-#include "libkmap/itemmarkertiler.h"
-#include "libkmap/kmap_widget.h"
-#include "libkmap/version.h"
+#include "libkgeomap/abstractmarkertiler.h"
+#include "libkgeomap/itemmarkertiler.h"
+#include "libkgeomap/kgeomap_widget.h"
+#include "libkgeomap/version.h"
 
 const int CoordinatesRole = Qt::UserRole + 1;
 
@@ -390,10 +390,10 @@ void Calibrator::slotActivateMapActionTriggered(bool state)
 int main(int argc, char* argv[])
 {
     KAboutData aboutData(
-        "calibrator-kmap",
+        "calibrator-kgeomap",
         0,
         ki18n("KMap calibration tool"),
-        kmap_version,                                      // version
+        kgeomap_version,                                      // version
         ki18n("Used to calibrate the KMap library tiling level"),
         KAboutData::License_GPL,
         ki18n("(c) 2010 Michael G. Hansen"),

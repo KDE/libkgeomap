@@ -24,8 +24,8 @@
  *
  * ============================================================ */
 
-#ifndef KMAP_WIDGET_H
-#define KMAP_WIDGET_H
+#ifndef KGEOMAP_WIDGET_H
+#define KGEOMAP_WIDGET_H
 
 // Qt includes
 
@@ -34,8 +34,8 @@
 
 // local includes
 
-#include "kmap_primitives.h"
-#include "libkmap_export.h"
+#include "kgeomap_primitives.h"
+#include "libkgeomap_export.h"
 
 class KAction;
 class KConfigGroup;
@@ -51,7 +51,7 @@ class DragDropHandler;
 class KMapSharedData;
 class ModelHelper;
 
-class KMAP_EXPORT KMapWidget : public QWidget
+class KGEOMAP_EXPORT KMapWidget : public QWidget
 {
   Q_OBJECT
 
@@ -178,7 +178,7 @@ public:
      */
     static QString MarbleWidgetVersion();
 
-    /** Return a string version of libkmap release
+    /** Return a string version of libkgeomap release
      */
     static QString version();
 
@@ -230,4 +230,4 @@ private:
 
 } /* namespace KMap */
 
-#endif /* KMAP_WIDGET_H */
+#endif /* KGEOMAP_WIDGET_H */

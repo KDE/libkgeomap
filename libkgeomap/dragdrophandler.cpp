@@ -31,8 +31,8 @@
 
 // local includes
 
-#include "kmap_primitives.h"
-#include "libkmap_export.h"
+#include "kgeomap_primitives.h"
+#include "libkgeomap_export.h"
 
 namespace KMap
 {

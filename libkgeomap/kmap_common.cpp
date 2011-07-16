@@ -5,7 +5,7 @@
  * <a href="http://www.digikam.org">http://www.digikam.org</a>
  *
  * @date   2010-07-14
- * @brief  Common internal data structures for libkmap
+ * @brief  Common internal data structures for libkgeomap
  *
  * @author Copyright (C) 2010 by Michael G. Hansen
  *         <a href="mailto:mike at mghansen dot de">mike at mghansen dot de</a>
@@ -25,7 +25,7 @@
  *
  * ============================================================ */
 
-#include "kmap_common.moc"
+#include "kgeomap_common.moc"
 
 // local includes
 
@@ -42,7 +42,7 @@ public:
     KMapGlobalObject object;
 };
 
-K_GLOBAL_STATIC(KMapGlobalObjectCreator, kmapGlobalObjectCreator)
+K_GLOBAL_STATIC(KMapGlobalObjectCreator, kgeomapGlobalObjectCreator)
 
 class KMapGlobalObject::Private
 {
@@ -102,7 +102,7 @@ KMapGlobalObject::~KMapGlobalObject()
 
 KMapGlobalObject* KMapGlobalObject::instance()
 {
-    return &(kmapGlobalObjectCreator->object);
+    return &(kgeomapGlobalObjectCreator->object);
 }
 
 QPixmap KMapGlobalObject::getMarkerPixmap(const QString pixmapId)
@@ -124,7 +124,7 @@ KUrl KMapGlobalObject::locateDataFile(const QString filename)
 {
     return KStandardDirs::locate(
                 "data",
-                QLatin1String("libkmap/")+filename
+                QLatin1String("libkgeomap/")+filename
                           );
 }
 

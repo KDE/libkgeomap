@@ -24,24 +24,24 @@
  *
  * ============================================================ */
 
-#ifndef LIBKMAP_EXPORT_H
-#define LIBKMAP_EXPORT_H
+#ifndef LIBKGEOMAP_EXPORT_H
+#define LIBKGEOMAP_EXPORT_H
 
 // needed for KDE_EXPORT and KDE_IMPORT macros
 #include <kdemacros.h>
 
-#ifndef KMAP_EXPORT
-# if defined(MAKE_KMAP_LIB)
+#ifndef KGEOMAP_EXPORT
+# if defined(MAKE_KGEOMAP_LIB)
    // We are building this library
-#  define KMAP_EXPORT KDE_EXPORT
+#  define KGEOMAP_EXPORT KDE_EXPORT
 # else
    // We are using this library
-#  define KMAP_EXPORT KDE_IMPORT
+#  define KGEOMAP_EXPORT KDE_IMPORT
 # endif
 #endif
 
-# ifndef KMAP_EXPORT_DEPRECATED
-#  define KMAP_EXPORT_DEPRECATED KDE_DEPRECATED KMAP_EXPORT
+# ifndef KGEOMAP_EXPORT_DEPRECATED
+#  define KGEOMAP_EXPORT_DEPRECATED KDE_DEPRECATED KGEOMAP_EXPORT
 # endif
 
 #endif

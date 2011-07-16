@@ -37,8 +37,8 @@
 
 // local includes
 
-#include "kmap_common.h"
-#include "kmap_primitives.h"
+#include "kgeomap_common.h"
+#include "kgeomap_primitives.h"
 
 namespace KMap
 {
@@ -129,7 +129,7 @@ void HTMLWidget::khtmlMouseReleaseEvent(khtml::MouseReleaseEvent* e)
     {
         if (!d->firstSelectionPoint.hasCoordinates())
         {
-            runScript2Coordinates( QString::fromLatin1("kmapPixelToLatLng(%1, %2);")
+            runScript2Coordinates( QString::fromLatin1("kgeomapPixelToLatLng(%1, %2);")
                                     .arg(e->x())
                                     .arg(e->y()),
                                    &d->firstSelectionPoint);
@@ -138,7 +138,7 @@ void HTMLWidget::khtmlMouseReleaseEvent(khtml::MouseReleaseEvent* e)
         }
         else
         {
-            runScript2Coordinates( QString::fromLatin1("kmapPixelToLatLng(%1, %2);")
+            runScript2Coordinates( QString::fromLatin1("kgeomapPixelToLatLng(%1, %2);")
                                     .arg(e->x())
                                     .arg(e->y()),
                                     &d->intermediateSelectionPoint);
@@ -168,9 +168,9 @@ void HTMLWidget::khtmlMouseReleaseEvent(khtml::MouseReleaseEvent* e)
                 latSouth = d->firstSelectionPoint.lat();
             }
 
-            runScript(QLatin1String("kmapRemoveTemporarySelectionRectangle();"));
+            runScript(QLatin1String("kgeomapRemoveTemporarySelectionRectangle();"));
             runScript(
-                QString::fromLatin1("kmapSetSelectionRectangle(%1, %2, %3, %4);")
+                QString::fromLatin1("kgeomapSetSelectionRectangle(%1, %2, %3, %4);")
                     .arg(lonWest)
                     .arg(latNorth)
                     .arg(lonEast)
@@ -198,7 +198,7 @@ void HTMLWidget::khtmlMouseMoveEvent(khtml::MouseMoveEvent *e)
     if (   s->currentMouseMode == MouseModeRegionSelection
         && d->firstSelectionPoint.hasCoordinates() )
     {
-        runScript2Coordinates( QString::fromLatin1("kmapPixelToLatLng(%1, %2);")
+        runScript2Coordinates( QString::fromLatin1("kgeomapPixelToLatLng(%1, %2);")
                                     .arg(e->x())
                                     .arg(e->y()),
                                    &d->intermediateSelectionPoint);
@@ -231,7 +231,7 @@ void HTMLWidget::khtmlMouseMoveEvent(khtml::MouseMoveEvent *e)
         }
 
         runScript(
-                QString::fromLatin1("kmapSetTemporarySelectionRectangle(%1, %2, %3, %4);")
+                QString::fromLatin1("kgeomapSetTemporarySelectionRectangle(%1, %2, %3, %4);")
                     .arg(lonWest)
                     .arg(latNorth)
                     .arg(lonEast)
@@ -251,7 +251,7 @@ void HTMLWidget::slotScanForJSMessages()
         return;
 
     kDebug()<<status;
-    const QString eventBufferString = runScript(QLatin1String("kmapReadEventStrings();")).toString();
+    const QString eventBufferString = runScript(QLatin1String("kgeomapReadEventStrings();")).toString();
     if (eventBufferString.isEmpty())
         return;
 
@@ -265,7 +265,7 @@ void HTMLWidget::slotScanForJSMessages()
  */
 QVariant HTMLWidget::runScript(const QString& scriptCode)
 {
-    KMAP_ASSERT(d->isReady);
+    KGEOMAP_ASSERT(d->isReady);
 
     if (!d->isReady)
         return QVariant();
@@ -306,7 +306,7 @@ void HTMLWidget::setSelectionRectangle(const GeoCoordinates::Pair& searchCoordin
 {
     if (!searchCoordinates.first.hasCoordinates())
     {
-        runScript(QString::fromLatin1("kmapRemoveSelectionRectangle();"));
+        runScript(QString::fromLatin1("kgeomapRemoveSelectionRectangle();"));
         return;
     }
 
@@ -315,12 +315,12 @@ void HTMLWidget::setSelectionRectangle(const GeoCoordinates::Pair& searchCoordin
     qreal East  = searchCoordinates.second.lon();
     qreal South = searchCoordinates.second.lat();
 
-    runScript(QString::fromLatin1("kmapSetSelectionRectangle(%1, %2, %3, %4);").arg(West).arg(North).arg(East).arg(South));
+    runScript(QString::fromLatin1("kgeomapSetSelectionRectangle(%1, %2, %3, %4);").arg(West).arg(North).arg(East).arg(South));
 }
 
 void HTMLWidget::removeSelectionRectangle()
 {
-    runScript(QLatin1String("kmapRemoveSelectionRectangle();"));
+    runScript(QLatin1String("kgeomapRemoveSelectionRectangle();"));
 }
 
 void HTMLWidget::mouseModeChanged(const MouseModes mouseMode)
@@ -331,11 +331,11 @@ void HTMLWidget::mouseModeChanged(const MouseModes mouseMode)
     {
         d->firstSelectionPoint.clear();
         d->intermediateSelectionPoint.clear();
-        runScript(QString::fromLatin1("kmapSelectionModeStatus(%1);").arg(inSelectionMode));
+        runScript(QString::fromLatin1("kgeomapSelectionModeStatus(%1);").arg(inSelectionMode));
     }
     else
     {
-        runScript(QString::fromLatin1("kmapSelectionModeStatus(%1);").arg(inSelectionMode));
+        runScript(QString::fromLatin1("kgeomapSelectionModeStatus(%1);").arg(inSelectionMode));
     }
 }
 
@@ -343,7 +343,7 @@ void HTMLWidget::centerOn(const qreal west, const qreal north, const qreal east,
 {
 //    kDebug()<<"West:"<<west<<" North:"<<north<<" East:"<<east<<" South:"<<south;
     runScript(
-            QString::fromLatin1("kmapSetMapBoundaries(%1, %2, %3, %4, %5);")
+            QString::fromLatin1("kgeomapSetMapBoundaries(%1, %2, %3, %4, %5);")
                 .arg(west)
                 .arg(north)
                 .arg(east)

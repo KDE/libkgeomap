@@ -30,9 +30,9 @@
 #include <QMimeData>
 #include <QTreeWidgetItem>
 
-// libkmap includes
+// libkgeomap includes
 
-#include "libkmap/dragdrophandler.h"
+#include "libkgeomap/dragdrophandler.h"
 
 class MyDragData : public QMimeData
 {

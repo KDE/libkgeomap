@@ -36,7 +36,7 @@ namespace KMap
 BMWidget::BMWidget(BackendMarble* const pMarbleBackend, QWidget* const parent)
         : Marble::MarbleWidget(parent), marbleBackend(pMarbleBackend)
 {
-    KMAP_ASSERT(marbleBackend!=0);
+    KGEOMAP_ASSERT(marbleBackend!=0);
 }
 
 BMWidget::~BMWidget()

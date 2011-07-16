@@ -31,7 +31,7 @@ namespace KMap
 
 TileIndex TileIndex::fromCoordinates(const KMap::GeoCoordinates& coordinate, const int getLevel)
 {
-    KMAP_ASSERT(getLevel<=MaxLevel);
+    KGEOMAP_ASSERT(getLevel<=MaxLevel);
 
     if (!coordinate.hasCoordinates())
         return TileIndex();

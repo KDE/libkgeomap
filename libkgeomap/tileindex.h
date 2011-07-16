@@ -24,8 +24,8 @@
  *
  * ============================================================ */
 
-#ifndef KMAP_TILEINDEX_H
-#define KMAP_TILEINDEX_H
+#ifndef KGEOMAP_TILEINDEX_H
+#define KGEOMAP_TILEINDEX_H
 
 // Qt includes
 
@@ -35,13 +35,13 @@
 
 // local includes
 
-#include "kmap_primitives.h"
-#include "libkmap_export.h"
+#include "kgeomap_primitives.h"
+#include "libkgeomap_export.h"
 
 namespace KMap
 {
 
-class KMAP_EXPORT TileIndex
+class KGEOMAP_EXPORT TileIndex
 {
 public:
 
@@ -87,26 +87,26 @@ public:
 
     inline void appendLinearIndex(const int newIndex)
     {
-        KMAP_ASSERT(m_indicesCount+1<=MaxIndexCount);
+        KGEOMAP_ASSERT(m_indicesCount+1<=MaxIndexCount);
         m_indices[m_indicesCount] = newIndex;
         m_indicesCount++;
     }
 
     inline int linearIndex(const int getLevel) const
     {
-        KMAP_ASSERT(getLevel<=level());
+        KGEOMAP_ASSERT(getLevel<=level());
         return m_indices[getLevel];
     }
 
     inline int at(const int getLevel) const
     {
-        KMAP_ASSERT(getLevel<=level());
+        KGEOMAP_ASSERT(getLevel<=level());
         return m_indices[getLevel];
     }
 
     inline int lastIndex() const
     {
-        KMAP_ASSERT(m_indicesCount>0);
+        KGEOMAP_ASSERT(m_indicesCount>0);
         return m_indices[m_indicesCount-1];
     }
 
@@ -127,11 +127,11 @@ public:
 
     inline void latLonIndex(const int getLevel, int* const latIndex, int* const lonIndex) const
     {
-        KMAP_ASSERT(getLevel <= level());
+        KGEOMAP_ASSERT(getLevel <= level());
         *latIndex = indexLat(getLevel);
         *lonIndex = indexLon(getLevel);
-        KMAP_ASSERT(*latIndex < Tiling);
-        KMAP_ASSERT(*lonIndex < Tiling);
+        KGEOMAP_ASSERT(*latIndex < Tiling);
+        KGEOMAP_ASSERT(*lonIndex < Tiling);
     }
 
     inline void appendLatLonIndex(const int latIndex, const int lonIndex)
@@ -168,8 +168,8 @@ public:
 
     inline static bool indicesEqual(const TileIndex& a, const TileIndex& b, const int upToLevel)
     {
-        KMAP_ASSERT(a.level() >= upToLevel);
-        KMAP_ASSERT(b.level() >= upToLevel);
+        KGEOMAP_ASSERT(a.level() >= upToLevel);
+        KGEOMAP_ASSERT(b.level() >= upToLevel);
 
         for (int i=0; i <= upToLevel; ++i)
         {
@@ -184,7 +184,7 @@ public:
 
     inline TileIndex mid(const int first, const int len) const
     {
-        KMAP_ASSERT(first+(len-1) <= m_indicesCount);
+        KGEOMAP_ASSERT(first+(len-1) <= m_indicesCount);
         TileIndex result;
         for (int i = first; i < first+len; ++i)
         {
@@ -196,7 +196,7 @@ public:
 
     inline void oneUp()
     {
-        KMAP_ASSERT(m_indicesCount>0);
+        KGEOMAP_ASSERT(m_indicesCount>0);
         m_indicesCount--;
     }
 
@@ -228,4 +228,4 @@ inline QDebug operator<<(QDebug debugOut, const KMap::TileIndex& tileIndex)
 
 Q_DECLARE_TYPEINFO(KMap::TileIndex, Q_MOVABLE_TYPE);
 
-#endif /* KMAP_TILEINDEX_H */
+#endif /* KGEOMAP_TILEINDEX_H */

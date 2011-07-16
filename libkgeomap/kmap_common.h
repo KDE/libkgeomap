@@ -5,7 +5,7 @@
  * <a href="http://www.digikam.org">http://www.digikam.org</a>
  *
  * @date   2010-07-14
- * @brief  Common internal data structures for libkmap
+ * @brief  Common internal data structures for libkgeomap
  *
  * @author Copyright (C) 2010, 2011 by Michael G. Hansen
  *         <a href="mailto:mike at mghansen dot de">mike at mghansen dot de</a>
@@ -24,8 +24,8 @@
  *
  * ============================================================ */
 
-#ifndef KMAP_COMMON_H
-#define KMAP_COMMON_H
+#ifndef KGEOMAP_COMMON_H
+#define KGEOMAP_COMMON_H
 
 // Qt includes
 
@@ -39,9 +39,9 @@
 
 #include <kstandarddirs.h>
 
-// libkmap includes
+// libkgeomap includes
 
-#include "kmap_primitives.h"
+#include "kgeomap_primitives.h"
 #include "tileindex.h"
 
 namespace KMap
@@ -94,7 +94,7 @@ public:
 Q_DECLARE_OPERATORS_FOR_FLAGS(KMapInternalWidgetInfo::InternalWidgetStates)
 
 /**
- * @brief Global object for libkmap to hold items common to all KMapWidget instances
+ * @brief Global object for libkgeomap to hold items common to all KMapWidget instances
  */
 class KMapGlobalObject : public QObject
 {
@@ -254,11 +254,11 @@ public:
 
 // helper functions:
 
-KMAP_EXPORT bool KMapHelperParseLatLonString(const QString& latLonString, GeoCoordinates* const coordinates);
-KMAP_EXPORT bool KMapHelperParseXYStringToPoint(const QString& xyString, QPoint* const point);
-KMAP_EXPORT bool KMapHelperParseBoundsString(const QString& boundsString, QPair<GeoCoordinates, GeoCoordinates>* const boundsCoordinates);
-KMAP_EXPORT GeoCoordinates::PairList KMapHelperNormalizeBounds(const GeoCoordinates::Pair& boundsPair);
+KGEOMAP_EXPORT bool KMapHelperParseLatLonString(const QString& latLonString, GeoCoordinates* const coordinates);
+KGEOMAP_EXPORT bool KMapHelperParseXYStringToPoint(const QString& xyString, QPoint* const point);
+KGEOMAP_EXPORT bool KMapHelperParseBoundsString(const QString& boundsString, QPair<GeoCoordinates, GeoCoordinates>* const boundsCoordinates);
+KGEOMAP_EXPORT GeoCoordinates::PairList KMapHelperNormalizeBounds(const GeoCoordinates::Pair& boundsPair);
 
 } /* namespace KMap */
 
-#endif /* KMAP_COMMON_H */
+#endif /* KGEOMAP_COMMON_H */

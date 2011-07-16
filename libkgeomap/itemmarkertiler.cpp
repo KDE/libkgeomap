@@ -209,7 +209,7 @@ void ItemMarkerTiler::slotSelectionChanged(const QItemSelection& selected, const
 
                 myTile->selectedCount++;
 //                 kDebug()<<l<<tileIndex<<myTile->selectedCount;
-                KMAP_ASSERT(myTile->selectedCount <= myTile->markerIndices.count());
+                KGEOMAP_ASSERT(myTile->selectedCount <= myTile->markerIndices.count());
 
                 if (myTile->childrenEmpty())
                     break;
@@ -235,7 +235,7 @@ void ItemMarkerTiler::slotSelectionChanged(const QItemSelection& selected, const
                     break;
 
                 myTile->selectedCount--;
-                KMAP_ASSERT(myTile->selectedCount >= 0);
+                KGEOMAP_ASSERT(myTile->selectedCount >= 0);
 
                 if (myTile->childrenEmpty())
                     break;
@@ -325,7 +325,7 @@ void ItemMarkerTiler::removeMarkerIndexFromGrid(const QModelIndex& markerIndex, 
         return;
     }
 
-    KMAP_ASSERT(markerIndex.isValid());
+    KGEOMAP_ASSERT(markerIndex.isValid());
 
     bool markerIsSelected = false;
     if (d->selectionModel)
@@ -354,7 +354,7 @@ void ItemMarkerTiler::removeMarkerIndexFromGrid(const QModelIndex& markerIndex, 
         if (markerIsSelected&&!ignoreSelection)
         {
             currentTile->selectedCount--;
-            KMAP_ASSERT(currentTile->selectedCount>=0);
+            KGEOMAP_ASSERT(currentTile->selectedCount>=0);
         }
     }
 
@@ -378,7 +378,7 @@ int ItemMarkerTiler::getTileMarkerCount(const TileIndex& tileIndex)
         regenerateTiles();
     }
 
-    KMAP_ASSERT(tileIndex.level()<=TileIndex::MaxLevel);
+    KGEOMAP_ASSERT(tileIndex.level()<=TileIndex::MaxLevel);
 
     MyTile* const myTile = static_cast<MyTile*>(getTile(tileIndex, true));
 
@@ -397,7 +397,7 @@ int ItemMarkerTiler::getTileSelectedCount(const TileIndex& tileIndex)
         regenerateTiles();
     }
 
-    KMAP_ASSERT(tileIndex.level()<=TileIndex::MaxLevel);
+    KGEOMAP_ASSERT(tileIndex.level()<=TileIndex::MaxLevel);
 
     MyTile* const myTile = static_cast<MyTile*>(getTile(tileIndex, true));
 
@@ -416,7 +416,7 @@ KMapGroupState ItemMarkerTiler::getTileGroupState(const TileIndex& tileIndex)
         regenerateTiles();
     }
 
-    KMAP_ASSERT(tileIndex.level()<=TileIndex::MaxLevel);
+    KGEOMAP_ASSERT(tileIndex.level()<=TileIndex::MaxLevel);
 
     MyTile* const myTile = static_cast<MyTile*>(getTile(tileIndex, true));
 
@@ -445,7 +445,7 @@ AbstractMarkerTiler::Tile* ItemMarkerTiler::getTile(const TileIndex& tileIndex, 
         regenerateTiles();
     }
 
-    KMAP_ASSERT(tileIndex.level()<=TileIndex::MaxLevel);
+    KGEOMAP_ASSERT(tileIndex.level()<=TileIndex::MaxLevel);
 
     MyTile* tile = static_cast<MyTile*>(rootTile());
     for (int level = 0; level < tileIndex.indexCount(); ++level)
@@ -462,7 +462,7 @@ AbstractMarkerTiler::Tile* ItemMarkerTiler::getTile(const TileIndex& tileIndex, 
                 for (int i=0; i<tile->markerIndices.count(); ++i)
                 {
                     const QPersistentModelIndex currentMarkerIndex = tile->markerIndices.at(i);
-                    KMAP_ASSERT(currentMarkerIndex.isValid());
+                    KGEOMAP_ASSERT(currentMarkerIndex.isValid());
 
                     // get the tile index for this marker:
                     GeoCoordinates currentMarkerCoordinates;
@@ -515,7 +515,7 @@ QList<QPersistentModelIndex> ItemMarkerTiler::getTileMarkerIndices(const TileInd
         regenerateTiles();
     }
 
-    KMAP_ASSERT(tileIndex.level()<=TileIndex::MaxLevel);
+    KGEOMAP_ASSERT(tileIndex.level()<=TileIndex::MaxLevel);
 
     MyTile* const myTile = static_cast<MyTile*>(getTile(tileIndex, true));
 
@@ -540,7 +540,7 @@ void ItemMarkerTiler::addMarkerIndexToGrid(const QPersistentModelIndex& markerIn
         return;
 
     TileIndex tileIndex = TileIndex::fromCoordinates(markerCoordinates, TileIndex::MaxLevel);
-    KMAP_ASSERT(tileIndex.level()==TileIndex::MaxLevel);
+    KGEOMAP_ASSERT(tileIndex.level()==TileIndex::MaxLevel);
 
     bool markerIsSelected = false;
     if (d->selectionModel)

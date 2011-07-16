@@ -42,7 +42,7 @@ namespace KMap
 
 class ModelHelper;
 
-class KMAP_EXPORT ItemMarkerTiler : public AbstractMarkerTiler
+class KGEOMAP_EXPORT ItemMarkerTiler : public AbstractMarkerTiler
 {
     Q_OBJECT
 

@@ -27,14 +27,14 @@
 
 // local includes
 
-#include "kmap_primitives.h"
+#include "kgeomap_primitives.h"
 
 namespace KMap
 {
 
 class LookupAltitude;
 
-class KMAP_EXPORT LookupFactory
+class KGEOMAP_EXPORT LookupFactory
 {
 public:
 

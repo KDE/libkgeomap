@@ -195,7 +195,7 @@ void TestItemMarkerTiler::testMoveMarkers1()
     itemModel->appendRow(item1);
     const QModelIndex markerIndex1 = itemModel->indexFromItem(item1);
 
-    KMAP_ASSERT(markerIndex1.isValid());
+    KGEOMAP_ASSERT(markerIndex1.isValid());
     for (int l = 1; l<=fillLevel; ++l)
     {
         const TileIndex tileIndex = TileIndex::fromCoordinates(coord_1_2, l);

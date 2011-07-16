@@ -30,9 +30,9 @@
 #include <kdebug.h>
 #include <kicon.h>
 
-// libkmap includes
+// libkgeomap includes
 
-#include "libkmap/version.h"
+#include "libkgeomap/version.h"
 
 // local includes
 
@@ -41,10 +41,10 @@
 int main(int argc, char* argv[])
 {
     KAboutData aboutData(
-        "demo-kmap",
+        "demo-kgeomap",
         0,
         ki18n("KMap demo application"),
-        kmap_version,                                      // version
+        kgeomap_version,                                      // version
         ki18n("Presents the World Map Widget Interface"),
         KAboutData::License_GPL,
         ki18n("(c) 2009-2010 Michael G. Hansen"),

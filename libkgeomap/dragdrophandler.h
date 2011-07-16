@@ -24,20 +24,20 @@
  *
  * ============================================================ */
 
-#ifndef KMAP_DRAGDROPHANDLER_H
-#define KMAP_DRAGDROPHANDLER_H
+#ifndef KGEOMAP_DRAGDROPHANDLER_H
+#define KGEOMAP_DRAGDROPHANDLER_H
 
 // local includes
 
-#include "kmap_primitives.h"
-#include "libkmap_export.h"
+#include "kgeomap_primitives.h"
+#include "libkgeomap_export.h"
 
 class QDropEvent;
 
 namespace KMap
 {
 
-class KMAP_EXPORT DragDropHandler : public QObject
+class KGEOMAP_EXPORT DragDropHandler : public QObject
 {
     Q_OBJECT
 
@@ -53,4 +53,4 @@ public:
 
 } /* namespace KMap */
 
-#endif /* KMAP_DRAGDROPHANDLER_H */
+#endif /* KGEOMAP_DRAGDROPHANDLER_H */

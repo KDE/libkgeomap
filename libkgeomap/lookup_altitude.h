@@ -29,18 +29,18 @@
 
 // local includes
 
-#include "kmap_primitives.h"
+#include "kgeomap_primitives.h"
 
 namespace KMap
 {
 
-class KMAP_EXPORT LookupAltitude : public QObject
+class KGEOMAP_EXPORT LookupAltitude : public QObject
 {
     Q_OBJECT
 
 public:
 
-    class KMAP_EXPORT Request
+    class KGEOMAP_EXPORT Request
     {
     public:
         Request()

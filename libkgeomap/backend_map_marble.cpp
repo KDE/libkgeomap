@@ -50,14 +50,14 @@
 
 // local includes
 
-#ifdef KMAP_MARBLE_ADD_LAYER
+#ifdef KGEOMAP_MARBLE_ADD_LAYER
 #include "backend_map_marble_layer.h"
 #else
 #include "backend_map_marble_subwidget.h"
-#endif // KMAP_MARBLE_ADD_LAYER
+#endif // KGEOMAP_MARBLE_ADD_LAYER
 
 #include "abstractmarkertiler.h"
-#include "kmap_widget.h"
+#include "kgeomap_widget.h"
 #include "modelhelper.h"
 
 namespace KMap
@@ -67,7 +67,7 @@ class BMInternalWidgetInfo
 {
 public:
 
-#ifdef KMAP_MARBLE_ADD_LAYER
+#ifdef KGEOMAP_MARBLE_ADD_LAYER
     BMLayer*               bmLayer;
 #endif    
 };
@@ -152,7 +152,7 @@ public:
     bool                   widgetIsDocked;
     bool                   blockingZoomWhileChangingTheme;
 
-#ifdef KMAP_MARBLE_ADD_LAYER
+#ifdef KGEOMAP_MARBLE_ADD_LAYER
     BMLayer*               bmLayer;
 #endif
 };
@@ -171,7 +171,7 @@ BackendMarble::~BackendMarble()
 
     if (d->marbleWidget)
     {
-#ifdef KMAP_MARBLE_ADD_LAYER
+#ifdef KGEOMAP_MARBLE_ADD_LAYER
 
 #if MARBLE_VERSION>=0x000c00
         d->marbleWidget->removeLayer(d->bmLayer);
@@ -210,14 +210,14 @@ QWidget* BackendMarble::mapWidget()
         {
             d->marbleWidget = qobject_cast<Marble::MarbleWidget*>(info.widget);
             const BMInternalWidgetInfo intInfo = info.backendData.value<BMInternalWidgetInfo>();
-#ifdef KMAP_MARBLE_ADD_LAYER
+#ifdef KGEOMAP_MARBLE_ADD_LAYER
             d->bmLayer = intInfo.bmLayer;
             d->bmLayer->setBackend(this);
 #endif
         }
         else
         {
-#ifdef KMAP_MARBLE_ADD_LAYER
+#ifdef KGEOMAP_MARBLE_ADD_LAYER
             d->marbleWidget = new Marble::MarbleWidget();
             d->bmLayer = new BMLayer(this);
 
@@ -254,7 +254,7 @@ void BackendMarble::releaseWidget(KMapInternalWidgetInfo* const info)
     info->widget->removeEventFilter(this);
 
     BMInternalWidgetInfo intInfo = info->backendData.value<BMInternalWidgetInfo>();
-#ifdef KMAP_MARBLE_ADD_LAYER
+#ifdef KGEOMAP_MARBLE_ADD_LAYER
     if (intInfo.bmLayer)
     {
         intInfo.bmLayer->setBackend(0);
@@ -268,9 +268,9 @@ void BackendMarble::releaseWidget(KMapInternalWidgetInfo* const info)
     info->state = KMapInternalWidgetInfo::InternalWidgetReleased;
 
     d->marbleWidget = 0;
-#ifdef KMAP_MARBLE_ADD_LAYER
+#ifdef KGEOMAP_MARBLE_ADD_LAYER
     d->bmLayer = 0;
-#endif /* KMAP_MARBLE_ADD_LAYER */
+#endif /* KGEOMAP_MARBLE_ADD_LAYER */
 
     emit(signalBackendReadyChanged(backendName()));
 }
@@ -389,7 +389,7 @@ void BackendMarble::createActions()
 
 void BackendMarble::addActionsToConfigurationMenu(QMenu* const configurationMenu)
 {
-    KMAP_ASSERT(configurationMenu!=0);
+    KGEOMAP_ASSERT(configurationMenu!=0);
 
     configurationMenu->addSeparator();
 
@@ -484,7 +484,7 @@ void BackendMarble::setMapTheme(const QString& newMapTheme)
 
 void BackendMarble::saveSettingsToGroup(KConfigGroup* const group)
 {
-    KMAP_ASSERT(group!=0);
+    KGEOMAP_ASSERT(group!=0);
     if (!group)
     {
         return;
@@ -499,7 +499,7 @@ void BackendMarble::saveSettingsToGroup(KConfigGroup* const group)
 
 void BackendMarble::readSettingsFromGroup(const KConfigGroup* const group)
 {
-    KMAP_ASSERT(group!=0);
+    KGEOMAP_ASSERT(group!=0);
     if (!group)
     {
         return;
@@ -950,7 +950,7 @@ void BackendMarble::slotMarbleZoomChanged()
 void BackendMarble::setZoom(const QString& newZoom)
 {
     const QString myZoomString = s->worldMapWidget->convertZoomToBackendZoom(newZoom, QLatin1String("marble"));
-    KMAP_ASSERT(myZoomString.startsWith(QLatin1String("marble:")));
+    KGEOMAP_ASSERT(myZoomString.startsWith(QLatin1String("marble:")));
 
     const int myZoom = myZoomString.mid(QString::fromLatin1("marble:").length()).toInt();
  
@@ -971,7 +971,7 @@ QString BackendMarble::getZoom() const
 int BackendMarble::getMarkerModelLevel()
 {
 //    return AbstractMarkerTiler::TileIndex::MaxLevel-1;
-    KMAP_ASSERT(isReady());
+    KGEOMAP_ASSERT(isReady());
     if (!isReady())
     {
         return 0;
@@ -1017,7 +1017,7 @@ int BackendMarble::getMarkerModelLevel()
     }
 
     // TODO: verify that this assertion was too strict
-//     KMAP_ASSERT(tileLevel <= AbstractMarkerTiler::TileIndex::MaxLevel-1);
+//     KGEOMAP_ASSERT(tileLevel <= AbstractMarkerTiler::TileIndex::MaxLevel-1);
 
     return tileLevel;
 }
@@ -1617,7 +1617,7 @@ void BackendMarble::setActive(const bool state)
             info.state = d->widgetIsDocked ? KMapInternalWidgetInfo::InternalWidgetStillDocked : KMapInternalWidgetInfo::InternalWidgetUndocked;
 
             BMInternalWidgetInfo intInfo;
-#ifdef KMAP_MARBLE_ADD_LAYER
+#ifdef KGEOMAP_MARBLE_ADD_LAYER
             intInfo.bmLayer = d->bmLayer;
 #endif
             info.backendData.setValue(intInfo);
@@ -1696,7 +1696,7 @@ void BackendMarble::deleteInfoFunction(KMapInternalWidgetInfo* const info)
     }
 
     BMInternalWidgetInfo intInfo = info->backendData.value<BMInternalWidgetInfo>();
-#ifdef KMAP_MARBLE_ADD_LAYER
+#ifdef KGEOMAP_MARBLE_ADD_LAYER
     if (intInfo.bmLayer)
     {
         delete intInfo.bmLayer;

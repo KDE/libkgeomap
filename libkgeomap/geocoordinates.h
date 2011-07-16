@@ -24,8 +24,8 @@
  *
  * ============================================================ */
 
-#ifndef KMAP_GEOCOORDINATES_H
-#define KMAP_GEOCOORDINATES_H
+#ifndef KGEOMAP_GEOCOORDINATES_H
+#define KGEOMAP_GEOCOORDINATES_H
 
 // Qt includes
 
@@ -39,12 +39,12 @@
 
 // local includes
 
-#include "libkmap_export.h"
+#include "libkgeomap_export.h"
 
 namespace KMap
 {
 
-class KMAP_EXPORT GeoCoordinates
+class KGEOMAP_EXPORT GeoCoordinates
 {
 public:
 
@@ -247,4 +247,4 @@ Q_DECLARE_METATYPE(KMap::GeoCoordinates::Pair)
 Q_DECLARE_METATYPE(KMap::GeoCoordinates::PairList)
 
 
-#endif /* KMAP_GEOCOORDINATES_H */
+#endif /* KGEOMAP_GEOCOORDINATES_H */

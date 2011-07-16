@@ -27,7 +27,7 @@
 
 #include "lookup_altitude_geonames.h"
 #include "lookup_factory.h"
-#include "kmap_common.h"
+#include "kgeomap_common.h"
 
 using namespace KMap;
 

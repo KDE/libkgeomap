@@ -36,13 +36,13 @@
 // local includes
 
 #include "tileindex.h"
-#include "kmap_primitives.h"
-#include "libkmap_export.h"
+#include "kgeomap_primitives.h"
+#include "libkgeomap_export.h"
 
 namespace KMap
 {
 
-class KMAP_EXPORT AbstractMarkerTiler : public QObject
+class KGEOMAP_EXPORT AbstractMarkerTiler : public QObject
 {
     Q_OBJECT
 
@@ -215,7 +215,7 @@ public:
     virtual KMapGroupState getTileGroupState(const TileIndex& tileIndex) = 0;
     virtual KMapGroupState getGlobalGroupState() = 0;
 
-    // these can be implemented if you want to react to actions in kmap
+    // these can be implemented if you want to react to actions in kgeomap
     virtual void onIndicesClicked(const ClickInfo& clickInfo);
     virtual void onIndicesMoved(const TileIndex::List& tileIndicesList, const GeoCoordinates& targetCoordinates,
                                 const QPersistentModelIndex& targetSnapIndex);
