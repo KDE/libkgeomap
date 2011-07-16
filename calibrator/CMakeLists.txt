@@ -29,9 +29,9 @@ SET(calibrator_sources
         calibrator.cpp
     )
 
-KDE4_ADD_EXECUTABLE(libkmap_calibrator ${calibrator_sources})
-TARGET_LINK_LIBRARIES(libkmap_calibrator
-                        kmap
+KDE4_ADD_EXECUTABLE(libkgeomap_calibrator ${calibrator_sources})
+TARGET_LINK_LIBRARIES(libkgeomap_calibrator
+                        kgeomap
                         ${QT_QTGUI_LIBRARY}
                         ${KDE4_KDECORE_LIBS}
                         ${KDE4_UI_LIBS}

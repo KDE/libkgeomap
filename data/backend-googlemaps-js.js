@@ -42,13 +42,13 @@ ProjectionHelper.prototype = new google.maps.OverlayView();
 ProjectionHelper.prototype.draw = function() { }
 var projectionHelper = null;
 
-function kmapPostEventString(eventString)
+function kgeomapPostEventString(eventString)
 {
     eventBuffer.push(eventString);
     window.status = '(event)';
 }
 
-function kmapReadEventStrings()
+function kgeomapReadEventStrings()
 {
     var eventBufferString = eventBuffer.join('|');
     eventBuffer = new Array();
@@ -57,27 +57,27 @@ function kmapReadEventStrings()
     return eventBufferString;
 }
 
-function kmapDebugOut(someString)
+function kgeomapDebugOut(someString)
 {
-    kmapPostEventString('do'+someString);
+    kgeomapPostEventString('do'+someString);
 }
 
-function kmapSetZoom(zoomvalue)
+function kgeomapSetZoom(zoomvalue)
 {
     map.setZoom(zoomvalue);
 }
 
-function kmapGetZoom()
+function kgeomapGetZoom()
 {
     return map.getZoom();
 }
 
-function kmapGetMaxZoom()
+function kgeomapGetMaxZoom()
 {
     return map.mapTypes[map.getMapTypeId()].maxZoom;
 }
 
-function kmapGetMinZoom()
+function kgeomapGetMinZoom()
 {
     var minZoom = map.mapTypes[map.getMapTypeId()].minZoom;
     if (minZoom==null)
@@ -87,39 +87,39 @@ function kmapGetMinZoom()
     return minZoom;
 }
 
-function kmapZoomIn()
+function kgeomapZoomIn()
 {
     map.setZoom(map.getZoom()+1);
 }
 
-function kmapZoomOut()
+function kgeomapZoomOut()
 {
     map.setZoom(map.getZoom()-1);
 }
 
-function kmapSetCenter(lat, lon)
+function kgeomapSetCenter(lat, lon)
 {
     var latlng = new google.maps.LatLng(lat, lon);
     map.setCenter(latlng);
 }
 
-function kmapGetCenter()
+function kgeomapGetCenter()
 {
     var latlngString = map.getCenter().toUrlValue(12);
     return latlngString;
 }
 
-function kmapGetBounds()
+function kgeomapGetBounds()
 {
     return map.getBounds().toString();
 }
 
-function kmapSetIsInEditMode(state)
+function kgeomapSetIsInEditMode(state)
 {
     isInEditMode = state;
 }
 
-function kmapLatLngToPoint(latLng)
+function kgeomapLatLngToPoint(latLng)
 {
     //      There is an offset in fromLatLngToDivPixel once the map has been panned
     var myPoint = projectionHelper.getProjection().fromLatLngToDivPixel(latLng);
@@ -131,7 +131,7 @@ function kmapLatLngToPoint(latLng)
     return new google.maps.Point(pointX, pointY);
 }
 
-function kmapLatLngToPixel(lat, lon)
+function kgeomapLatLngToPixel(lat, lon)
 {
     //      There is an offset in fromLatLngToDivPixel once the map has been panned
     var latlng = new google.maps.LatLng(lat, lon);
@@ -145,7 +145,7 @@ function kmapLatLngToPixel(lat, lon)
 //         return projectionHelper.getProjection().fromLatLngToDivPixel(latlng).toString();
 }
 
-function kmapPixelToLatLngObject(x, y)
+function kgeomapPixelToLatLngObject(x, y)
 {
     //      There is an offset in fromDivPixelToLatLng once the map has been panned
     var centerPoint = projectionHelper.getProjection().fromLatLngToDivPixel(map.getCenter());
@@ -157,13 +157,13 @@ function kmapPixelToLatLngObject(x, y)
     return projectionHelper.getProjection().fromDivPixelToLatLng(point);
 }
 
-function kmapPixelToLatLng(x, y)
+function kgeomapPixelToLatLng(x, y)
 {
-    return kmapPixelToLatLngObject(x, y).toUrlValue(12);
+    return kgeomapPixelToLatLngObject(x, y).toUrlValue(12);
 }
 
 // parameter: "SATELLITE"/"ROADMAP"/"HYBRID"/"TERRAIN"
-function kmapSetMapType(newMapType)
+function kgeomapSetMapType(newMapType)
 {
     if (newMapType == "SATELLITE") { map.setMapTypeId(google.maps.MapTypeId.SATELLITE); }
     if (newMapType == "ROADMAP")   { map.setMapTypeId(google.maps.MapTypeId.ROADMAP); }
@@ -171,7 +171,7 @@ function kmapSetMapType(newMapType)
     if (newMapType == "TERRAIN")   { map.setMapTypeId(google.maps.MapTypeId.TERRAIN); }
 }
 
-function kmapGetMapType()
+function kgeomapGetMapType()
 {
     var myMapType = map.getMapTypeId();
     if (myMapType == google.maps.MapTypeId.SATELLITE) { return "SATELLITE"; }
@@ -181,7 +181,7 @@ function kmapGetMapType()
     return "";
 }
 
-function kmapSetShowMapTypeControl(state)
+function kgeomapSetShowMapTypeControl(state)
 {
     var myOptions = {
             mapTypeControl: state
@@ -189,7 +189,7 @@ function kmapSetShowMapTypeControl(state)
     map.setOptions(myOptions);
 }
 
-function kmapSetShowNavigationControl(state)
+function kgeomapSetShowNavigationControl(state)
 {
     var myOptions = {
             navigationControl: state
@@ -197,7 +197,7 @@ function kmapSetShowNavigationControl(state)
     map.setOptions(myOptions);
 }
 
-function kmapSetShowScaleControl(state)
+function kgeomapSetShowScaleControl(state)
 {
     var myOptions = {
             scaleControl: state
@@ -205,7 +205,7 @@ function kmapSetShowScaleControl(state)
     map.setOptions(myOptions);
 }
 
-function kmapClearMarkers(mid)
+function kgeomapClearMarkers(mid)
 {
     for (var i in markerList[mid])
     {
@@ -214,7 +214,7 @@ function kmapClearMarkers(mid)
     markerList[mid] = new Object();
 }
 
-function kmapSetMarkerPixmap(mid, id, pixmapWidth, pixmapHeight, xOffset, yOffset, pixmapurl)
+function kgeomapSetMarkerPixmap(mid, id, pixmapWidth, pixmapHeight, xOffset, yOffset, pixmapurl)
 {
     var pixmapSize = new google.maps.Size(pixmapWidth, pixmapHeight);
     var pixmapOrigin = new google.maps.Point(0, 0);
@@ -223,7 +223,7 @@ function kmapSetMarkerPixmap(mid, id, pixmapWidth, pixmapHeight, xOffset, yOffse
     markerList[mid][id].marker.setIcon(markerImage);
 }
 
-function kmapAddMarker(mid, id, lat, lon, setDraggable, setSnaps)
+function kgeomapAddMarker(mid, id, lat, lon, setDraggable, setSnaps)
 {
     var latlng = new google.maps.LatLng(lat, lon);
     var marker = new google.maps.Marker({
@@ -236,7 +236,7 @@ function kmapAddMarker(mid, id, lat, lon, setDraggable, setSnaps)
 
     google.maps.event.addListener(marker, 'dragend', function()
         {
-            kmapPostEventString('mm'+id.toString());
+            kgeomapPostEventString('mm'+id.toString());
         });
     if (!markerList[mid])
     {
@@ -248,7 +248,7 @@ function kmapAddMarker(mid, id, lat, lon, setDraggable, setSnaps)
         };
 }
 
-function kmapGetMarkerPosition(mid,id)
+function kgeomapGetMarkerPosition(mid,id)
 {
     var latlngString;
     if (markerList[mid.toString()][id.toString()])
@@ -258,7 +258,7 @@ function kmapGetMarkerPosition(mid,id)
     return latlngString;
 }
 
-function kmapClearClusters()
+function kgeomapClearClusters()
 {
     for (var i in clusterList)
     {
@@ -268,7 +268,7 @@ function kmapClearClusters()
     clusterDataList = new Object();
 }
 
-function kmapGetPixmapName(markerCount, markerSelectedCount)
+function kgeomapGetPixmapName(markerCount, markerSelectedCount)
 {
     var colorCode;
     if (markerCount>=100)
@@ -302,7 +302,7 @@ function kmapGetPixmapName(markerCount, markerSelectedCount)
     return colorCode;
 }
 
-function kmapSetClusterPixmap(id, pixmapWidth, pixmapHeight, xOffset, yOffset, pixmapurl)
+function kgeomapSetClusterPixmap(id, pixmapWidth, pixmapHeight, xOffset, yOffset, pixmapurl)
 {
     var pixmapSize = new google.maps.Size(pixmapWidth, pixmapHeight);
     var pixmapOrigin = new google.maps.Point(0, 0);
@@ -311,11 +311,11 @@ function kmapSetClusterPixmap(id, pixmapWidth, pixmapHeight, xOffset, yOffset, p
     clusterList[id].setIcon(markerImage);
 }
 
-function kmapAddCluster(id, lat, lon, setDraggable, markerCount, markerSelectedCount)
+function kgeomapAddCluster(id, lat, lon, setDraggable, markerCount, markerSelectedCount)
 {
     var latlng = new google.maps.LatLng(lat, lon);
     var clusterIcon;
-    var colorCode = kmapGetPixmapName(markerCount, markerSelectedCount);
+    var colorCode = kgeomapGetPixmapName(markerCount, markerSelectedCount);
     if (isInEditMode)
     {
         clusterIcon = new google.maps.MarkerImage('marker-'+colorCode+'.png', new google.maps.Size(20, 32));
@@ -359,14 +359,14 @@ function kmapAddCluster(id, lat, lon, setDraggable, markerCount, markerSelectedC
 
                     if (i!=id)
                     {
-                        var colorCode = kmapGetPixmapName(newMarkerCount, 0);
+                        var colorCode = kgeomapGetPixmapName(newMarkerCount, 0);
                         var clusterIcon = new google.maps.MarkerImage('marker-'+colorCode+'.png', new google.maps.Size(20, 32));
                         clusterList[i].setOptions({ icon: clusterIcon, title: newMarkerCount.toString() });
                     }
                 }
             }
             // adjust the moving marker
-            var colorCode = kmapGetPixmapName(newSelectedCount, newSelectedCount);
+            var colorCode = kgeomapGetPixmapName(newSelectedCount, newSelectedCount);
             var clusterIcon = new google.maps.MarkerImage('marker-'+colorCode+'.png', new google.maps.Size(20, 32));
             clusterList[id].setOptions({ icon: clusterIcon, title: newSelectedCount.toString()});
 
@@ -374,7 +374,7 @@ function kmapAddCluster(id, lat, lon, setDraggable, markerCount, markerSelectedC
             var leftOverMarkerCount=movingClusterData.MarkerCount-movingClusterData.MarkerSelectedCount;
             if (leftOverMarkerCount>0)
             {
-                var colorCode = kmapGetPixmapName(leftOverMarkerCount, 0);
+                var colorCode = kgeomapGetPixmapName(leftOverMarkerCount, 0);
                 var clusterIcon = new google.maps.MarkerImage('marker-'+colorCode+'.png', new google.maps.Size(20, 32));
                 var leftOverMarker = new google.maps.Marker({
                         position: latlng,
@@ -389,12 +389,12 @@ function kmapAddCluster(id, lat, lon, setDraggable, markerCount, markerSelectedC
     google.maps.event.addListener(marker, 'drag', function(e)
         {
             // get the pixel position:
-            var clusterPoint = kmapLatLngToPoint(e.latLng);
+            var clusterPoint = kgeomapLatLngToPoint(e.latLng);
             // now iterate through all markers to which we can snap
             var minDistSquared=-1;
             var minMid;
             var minId;
-            kmapDebugOut('drag');
+            kgeomapDebugOut('drag');
             for (var mid in markerList)
             {
                 for (var id in markerList[mid])
@@ -404,7 +404,7 @@ function kmapAddCluster(id, lat, lon, setDraggable, markerCount, markerSelectedC
                         continue;
                     }
 
-                    var markerPoint = kmapLatLngToPoint(markerList[mid][id].marker.getPosition());
+                    var markerPoint = kgeomapLatLngToPoint(markerList[mid][id].marker.getPosition());
                     var distanceSquared = (clusterPoint.x-markerPoint.x)*(clusterPoint.x-markerPoint.x) + (clusterPoint.y-markerPoint.y)*(clusterPoint.y-markerPoint.y);
                     if ((distanceSquared<=100)&&((minDistSquared<0)||(distanceSquared<minDistSquared)))
                     {
@@ -431,16 +431,16 @@ function kmapAddCluster(id, lat, lon, setDraggable, markerCount, markerSelectedC
         {
             if (dragSnappingToMid>=0)
             {
-                kmapPostEventString('cs'+id.toString()+'/'+dragSnappingToMid.toString()+'/'+dragSnappingToId.toString());
+                kgeomapPostEventString('cs'+id.toString()+'/'+dragSnappingToMid.toString()+'/'+dragSnappingToId.toString());
             }
             else
             {
-                kmapPostEventString('cm'+id.toString());
+                kgeomapPostEventString('cm'+id.toString());
             }
         });
     google.maps.event.addListener(marker, 'click', function()
         {
-            kmapPostEventString('cc'+id.toString());
+            kgeomapPostEventString('cc'+id.toString());
         });
     
     clusterList[id] = marker;
@@ -450,7 +450,7 @@ function kmapAddCluster(id, lat, lon, setDraggable, markerCount, markerSelectedC
     clusterDataList[id]=clusterData;
 }
 
-function kmapGetClusterPosition(id)
+function kgeomapGetClusterPosition(id)
 {
     var latlngString;
     if (clusterList[id.toString()])
@@ -460,12 +460,12 @@ function kmapGetClusterPosition(id)
     return latlngString;
 }
 
-function kmapWidgetResized(newWidth, newHeight)
+function kgeomapWidgetResized(newWidth, newHeight)
 {
     document.getElementById('map_canvas').style.height=newHeight.toString()+'px';
 }
 
-function kmapRemoveDragMarker()
+function kgeomapRemoveDragMarker()
 {
     if (dragMarker)
     {
@@ -474,19 +474,19 @@ function kmapRemoveDragMarker()
     }
 }
 
-function kmapMoveDragMarker(x, y)
+function kgeomapMoveDragMarker(x, y)
 {
     if (dragMarker)
     {
-        dragMarker.setPosition(kmapPixelToLatLngObject(x ,y));
+        dragMarker.setPosition(kgeomapPixelToLatLngObject(x ,y));
     }
 }
 
-function kmapSetDragMarker(x, y, markerCount, markerSelectedCount)
+function kgeomapSetDragMarker(x, y, markerCount, markerSelectedCount)
 {
-    kmapRemoveDragMarker();
-    var latlng = kmapPixelToLatLngObject(x, y);
-    var colorCode = kmapGetPixmapName(markerCount, markerSelectedCount);
+    kgeomapRemoveDragMarker();
+    var latlng = kgeomapPixelToLatLngObject(x, y);
+    var colorCode = kgeomapGetPixmapName(markerCount, markerSelectedCount);
     var clusterIcon = new google.maps.MarkerImage('marker-'+colorCode+'.png', new google.maps.Size(20, 32));
     dragMarker = new google.maps.Marker({
             position: latlng,
@@ -495,7 +495,7 @@ function kmapSetDragMarker(x, y, markerCount, markerSelectedCount)
         });
 }
 
-function kmapUpdateSelectionRectangleColor()
+function kgeomapUpdateSelectionRectangleColor()
 {
     if (selectionRectangle == null)
     {
@@ -520,7 +520,7 @@ function kmapUpdateSelectionRectangleColor()
     }
 }
 
-function kmapSetSelectionRectangle(west, north, east, south)
+function kgeomapSetSelectionRectangle(west, north, east, south)
 {
     var firstSelectionPoint = new google.maps.LatLng(south,west,true);
     var secondSelectionPoint = new google.maps.LatLng(north,east,true);
@@ -552,11 +552,11 @@ function kmapSetSelectionRectangle(west, north, east, south)
                 });
     }
 
-    kmapUpdateSelectionRectangleColor();
+    kgeomapUpdateSelectionRectangleColor();
 }
 
 
-function kmapSetTemporarySelectionRectangle(west, north, east, south)
+function kgeomapSetTemporarySelectionRectangle(west, north, east, south)
 {
     var firstPoint = new google.maps.LatLng(south,west,true);
     var secondPoint = new google.maps.LatLng(north,east,true);
@@ -588,10 +588,10 @@ function kmapSetTemporarySelectionRectangle(west, north, east, south)
                 });
     }
 
-    kmapUpdateSelectionRectangleColor();
+    kgeomapUpdateSelectionRectangleColor();
 }
 
-function kmapRemoveSelectionRectangle()
+function kgeomapRemoveSelectionRectangle()
 {
     if (!selectionRectangle)
     {
@@ -602,7 +602,7 @@ function kmapRemoveSelectionRectangle()
     selectionRectangle = null;
 }
 
-function kmapRemoveTemporarySelectionRectangle()
+function kgeomapRemoveTemporarySelectionRectangle()
 {
     if (!temporarySelectionRectangle)
     {
@@ -612,20 +612,20 @@ function kmapRemoveTemporarySelectionRectangle()
     temporarySelectionRectangle.setMap(null);
     temporarySelectionRectangle = null;
 
-    kmapUpdateSelectionRectangleColor();
+    kgeomapUpdateSelectionRectangleColor();
 }
 
-function kmapSelectionModeStatus(state)
+function kgeomapSelectionModeStatus(state)
 {
     map.draggable = !state;
 
     if (!state)
     {
-        kmapRemoveTemporarySelectionRectangle();
+        kgeomapRemoveTemporarySelectionRectangle();
     }
 }
 
-function kmapSetMapBoundaries(west, north, east, south, useSaneZoomLevel)
+function kgeomapSetMapBoundaries(west, north, east, south, useSaneZoomLevel)
 {
     firstPoint = new google.maps.LatLng(south, west, true);
     secondPoint = new google.maps.LatLng(north, east, true);
@@ -640,7 +640,7 @@ function kmapSetMapBoundaries(west, north, east, south, useSaneZoomLevel)
 }
 
 
-function kmapInitialize()
+function kgeomapInitialize()
 {
     var latlng = new google.maps.LatLng(52.0, 6.0);
     var myOptions = {
@@ -653,7 +653,7 @@ function kmapInitialize()
     map = new google.maps.Map(mapDiv, myOptions);
     google.maps.event.addListener(map, 'maptypeid_changed', function()
         {
-            kmapPostEventString('MT'+kmapGetMapType());
+            kgeomapPostEventString('MT'+kgeomapGetMapType());
         });
 
     //google.maps.event.clearListeners(map, 'dragstart');
@@ -663,14 +663,14 @@ function kmapInitialize()
 
     //  these are too heavy on the performance. monitor 'idle' event only for now:
     //       google.maps.event.addListener(map, 'bounds_changed', function() {
-    //           kmapPostEventString('MB');
+    //           kgeomapPostEventString('MB');
     //       });
     //       google.maps.event.addListener(map, 'zoom_changed', function() {
-    //           kmapPostEventString('ZC');
+    //           kgeomapPostEventString('ZC');
     //       });
     google.maps.event.addListener(map, 'idle', function()
         {
-            kmapPostEventString('id');
+            kgeomapPostEventString('id');
         });
     // source: http://taapps-javalibs.blogspot.com/2009/10/google-map-v3how-to-use-overlayviews.html
     projectionHelper = new ProjectionHelper(map);

@@ -111,5 +111,5 @@ ENDIF(NOT WIN32)
 
 # Install find cmake script to the system for client applications.
 
-INSTALL(FILES ${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules/FindKmap.cmake
+INSTALL(FILES ${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules/FindKGeoMap.cmake
         DESTINATION ${DATA_INSTALL_DIR}/cmake/modules)

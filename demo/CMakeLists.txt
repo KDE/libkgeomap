@@ -35,9 +35,9 @@ SET(demo_sources
     dragdrophandler.cpp
    )
 
-KDE4_ADD_EXECUTABLE( libkmap_demo ${demo_sources} )
-target_link_libraries( libkmap_demo
-                        kmap
+KDE4_ADD_EXECUTABLE( libkgeomap_demo ${demo_sources} )
+target_link_libraries( libkgeomap_demo
+                        kgeomap
                         ${KEXIV2_LIBRARIES}
                         ${QT_QTGUI_LIBRARY} 
                         ${KDE4_KDECORE_LIBS}
@@ -45,4 +45,4 @@ target_link_libraries( libkmap_demo
                         ${KDE4_KPARTS_LIBS}
                         ${KDE4_KHTML_LIBS})
 
-INSTALL(TARGETS libkmap_demo ${INSTALL_TARGETS_DEFAULT_ARGS})
+INSTALL(TARGETS libkgeomap_demo ${INSTALL_TARGETS_DEFAULT_ARGS})

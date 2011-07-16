@@ -29,84 +29,84 @@ for (var layerColorIndex in layerColors) {
     eval('var vectorLayersClusters'+layerColors[layerColorIndex]+';');
 }
 
-function kmapLonLat2Projection(lonLat) {
+function kgeomapLonLat2Projection(lonLat) {
     return lonLat.transform(new OpenLayers.Projection('EPSG:4326'), map.getProjectionObject());
 }
-function kmapLonLatFromProjection(lonLat) {
+function kgeomapLonLatFromProjection(lonLat) {
     return lonLat.clone().transform(map.getProjectionObject(), new OpenLayers.Projection('EPSG:4326'));
 }
-function kmapLonLat2String(lonLat) {
+function kgeomapLonLat2String(lonLat) {
     return lonLat.lat.toString()+','+lonLat.lon.toString();
 }
-function kmapProjectedLonLat2String(lonLat) {
-    var myLonLat = kmapLonLatFromProjection(lonLat);
-    return kmapLonLat2String(myLonLat);
+function kgeomapProjectedLonLat2String(lonLat) {
+    var myLonLat = kgeomapLonLatFromProjection(lonLat);
+    return kgeomapLonLat2String(myLonLat);
 }
-function kmapPostEventString(eventString) {
+function kgeomapPostEventString(eventString) {
     eventBuffer.push(eventString);
     window.status = '(event)';
 }
-function kmapReadEventStrings() {
+function kgeomapReadEventStrings() {
     var eventBufferString = eventBuffer.join('|');
     eventBuffer = new Array();
     // let the application know that there are no more events waiting:
     window.status = '()';
     return eventBufferString;
 }
-function kmapDebugOut(someString) {
-    if (typeof kmapDebugHook == 'function') {
-        kmapDebugHook(someString);
+function kgeomapDebugOut(someString) {
+    if (typeof kgeomapDebugHook == 'function') {
+        kgeomapDebugHook(someString);
     } else {
-        kmapPostEventString('do'+someString);
+        kgeomapPostEventString('do'+someString);
     }
 }
-function kmapSetZoom(zoomvalue) {
+function kgeomapSetZoom(zoomvalue) {
     map.zoomTo(zoomvalue);
 }
-function kmapGetZoom() {
+function kgeomapGetZoom() {
     return map.getZoom();
 }
-function kmapZoomIn() {
+function kgeomapZoomIn() {
     map.zoomIn();
 }
-function kmapZoomOut() {
+function kgeomapZoomOut() {
     map.zoomOut();
 }
-function kmapSetCenter(lat, lon) {
+function kgeomapSetCenter(lat, lon) {
     var lonLat = new OpenLayers.LonLat(lon, lat);
-    map.setCenter(kmapLonLat2Projection(lonLat), 2);
+    map.setCenter(kgeomapLonLat2Projection(lonLat), 2);
 }
-function kmapGetCenter() {
-    var lonLat = kmapLonLatFromProjection(map.getCenter());
-    return kmapLonLat2String(lonLat);
+function kgeomapGetCenter() {
+    var lonLat = kgeomapLonLatFromProjection(map.getCenter());
+    return kgeomapLonLat2String(lonLat);
 }
-function kmapGetBounds() {
+function kgeomapGetBounds() {
     var mapBounds = mapLayer.getExtent();
     mapBounds.transform(map.getProjectionObject(),new OpenLayers.Projection('EPSG:4326'));
 
     return '(('+mapBounds.bottom+','+mapBounds.left+'),('+mapBounds.top+','+mapBounds.right+'))';
 }
-function kmapLatLngToPixel(lat, lon) {
+function kgeomapLatLngToPixel(lat, lon) {
     // TODO: do we need to transform the lonlat???
-    var myPixel = map.getPixelFromLonLat(kmapLonLat2Projection(new OpenLayers.LonLat(lon, lat)));
+    var myPixel = map.getPixelFromLonLat(kgeomapLonLat2Projection(new OpenLayers.LonLat(lon, lat)));
     return '('+myPixel.x.toString()+','+myPixel.y.toString()+')';
 }
-function kmapPixelToLatLng(x, y) {
+function kgeomapPixelToLatLng(x, y) {
     // TODO: do we need to transform the lonlat???
-    var myLonLat = kmapLonLatFromProjection(map.getLonLatFromPixel(new OpenLayers.Pixel(x, y)));
-    return kmapLonLat2String(myLonLat);
+    var myLonLat = kgeomapLonLatFromProjection(map.getLonLatFromPixel(new OpenLayers.Pixel(x, y)));
+    return kgeomapLonLat2String(myLonLat);
 }
-function kmapClearMarkers() {
+function kgeomapClearMarkers() {
     for (var i in markerList) {
         vectorLayerMarkers.removeFeatures(markerList[i]);
         markerList[i].destroy();
     }
     markerList = new Object();
 }
-function kmapGetMapBounds() {
+function kgeomapGetMapBounds() {
 }
-function kmapAddMarker(id, lat, lon, setDraggable) {
-    var projectedLonLat = kmapLonLat2Projection(new OpenLayers.LonLat(lon, lat));
+function kgeomapAddMarker(id, lat, lon, setDraggable) {
+    var projectedLonLat = kgeomapLonLat2Projection(new OpenLayers.LonLat(lon, lat));
 
     var myVectorMarker = new OpenLayers.Feature.Vector(
             new OpenLayers.Geometry.Point(projectedLonLat.lon, projectedLonLat.lat)
@@ -114,7 +114,7 @@ function kmapAddMarker(id, lat, lon, setDraggable) {
     vectorLayerMarkers.addFeatures(myVectorMarker);
     markerList[id.toString()] = myVectorMarker;
 }
-function kmapGetMarkerPosition(id) {
+function kgeomapGetMarkerPosition(id) {
     var latlngString;
     if (markerList[id.toString()]) {
         var markerClone = markerList[id.toString()].clone();
@@ -125,7 +125,7 @@ function kmapGetMarkerPosition(id) {
     }
     return latlngString;
 }
-function kmapClearClusters() {
+function kgeomapClearClusters() {
     for (var layerColorIndex in layerColors) {
         eval('vectorLayersClusters'+layerColors[layerColorIndex]+'.removeFeatures(vectorLayersClusters'+layerColors[layerColorIndex]+'.features);');
     }
@@ -134,8 +134,8 @@ function kmapClearClusters() {
     }
     clusterList = new Object();
 }
-function kmapAddCluster(id, lat, lon, setDraggable, clusterColor, labelText) {
-    var projectedLonLat = kmapLonLat2Projection(new OpenLayers.LonLat(lon, lat));
+function kgeomapAddCluster(id, lat, lon, setDraggable, clusterColor, labelText) {
+    var projectedLonLat = kgeomapLonLat2Projection(new OpenLayers.LonLat(lon, lat));
 
     var myVectorMarker = new OpenLayers.Feature.Vector(
             new OpenLayers.Geometry.Point(projectedLonLat.lon, projectedLonLat.lat)
@@ -149,7 +149,7 @@ function kmapAddCluster(id, lat, lon, setDraggable, clusterColor, labelText) {
     eval('vectorLayersClusters'+clusterColor+'.addFeatures(myVectorMarker);');
     clusterList[id.toString()] = myVectorMarker;
 }
-function kmapGetClusterPosition(id) {
+function kgeomapGetClusterPosition(id) {
     var latlngString;
     if (clusterList[id.toString()]) {
         var clusterClone = clusterList[id.toString()].clone();
@@ -160,10 +160,10 @@ function kmapGetClusterPosition(id) {
     }
     return latlngString;
 }
-function kmapWidgetResized(newWidth, newHeight) {
+function kgeomapWidgetResized(newWidth, newHeight) {
     document.getElementById('map_canvas').style.height=newHeight.toString()+'px';
 }
-function kmapInitialize() {
+function kgeomapInitialize() {
     map = new OpenLayers.Map("map_canvas", {
         controls:[
             new OpenLayers.Control.Navigation(),
@@ -202,14 +202,14 @@ function kmapInitialize() {
             for (id in markerList) {
                 if (markerList[id] == feature) {
                     // marker moved
-                    kmapPostEventString('mm'+id);
+                    kgeomapPostEventString('mm'+id);
                     return;
                 }
             }
             for (id in clusterList) {
                 if (clusterList[id] == feature) {
                     // marker moved
-                    kmapPostEventString('cm'+id);
+                    kgeomapPostEventString('cm'+id);
                     return;
                 }
             }
@@ -217,11 +217,11 @@ function kmapInitialize() {
     map.addControl(dragFeature);
     dragFeature.activate();
 
-    kmapSetCenter(52.0, 6.0);
+    kgeomapSetCenter(52.0, 6.0);
 
     map.events.register('moveend', map, function() {
-        kmapPostEventString('id');
+        kgeomapPostEventString('id');
     } );
 
-    kmapDebugOut('OSM initialize done');
+    kgeomapDebugOut('OSM initialize done');
 }
