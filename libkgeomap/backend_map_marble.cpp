@@ -5,7 +5,7 @@
  * <a href="http://www.digikam.org">http://www.digikam.org</a>
  *
  * @date   2009-12-08
- * @brief  Marble-backend for KMap
+ * @brief  Marble-backend for KGeoMap
  *
  * @author Copyright (C) 2009-2011 by Michael G. Hansen
  *         <a href="mailto:mike at mghansen dot de">mike at mghansen dot de</a>
@@ -60,7 +60,7 @@
 #include "kgeomap_widget.h"
 #include "modelhelper.h"
 
-namespace KMap
+namespace KGeoMap
 {
 
 class BMInternalWidgetInfo
@@ -72,11 +72,11 @@ public:
 #endif    
 };
 
-} /* KMap */
+} /* KGeoMap */
 
-Q_DECLARE_METATYPE(KMap::BMInternalWidgetInfo)
+Q_DECLARE_METATYPE(KGeoMap::BMInternalWidgetInfo)
 
-namespace KMap
+namespace KGeoMap
 {
     
 class BackendMarble::BackendMarblePrivate
@@ -157,7 +157,7 @@ public:
 #endif
 };
 
-BackendMarble::BackendMarble(const QExplicitlySharedDataPointer<KMapSharedData>& sharedData, QObject* const parent)
+BackendMarble::BackendMarble(const QExplicitlySharedDataPointer<KGeoMapSharedData>& sharedData, QObject* const parent)
              : MapBackend(sharedData, parent), d(new BackendMarblePrivate())
 {
     createActions();
@@ -166,7 +166,7 @@ BackendMarble::BackendMarble(const QExplicitlySharedDataPointer<KMapSharedData>&
 BackendMarble::~BackendMarble()
 {
     /// @todo Should we leave our widget in this list and not destroy it?
-    KMapGlobalObject* const go = KMapGlobalObject::instance();
+    KGeoMapGlobalObject* const go = KGeoMapGlobalObject::instance();
     go->removeMyInternalWidgetFromPool(this);
 
     if (d->marbleWidget)
@@ -203,9 +203,9 @@ QWidget* BackendMarble::mapWidget()
 {
     if (!d->marbleWidget)
     {
-        KMapGlobalObject* const go = KMapGlobalObject::instance();
+        KGeoMapGlobalObject* const go = KGeoMapGlobalObject::instance();
 
-        KMapInternalWidgetInfo info;
+        KGeoMapInternalWidgetInfo info;
         if (go->getInternalWidgetFromPool(this, &info))
         {
             d->marbleWidget = qobject_cast<Marble::MarbleWidget*>(info.widget);
@@ -249,7 +249,7 @@ QWidget* BackendMarble::mapWidget()
     return d->marbleWidget;
 }
 
-void BackendMarble::releaseWidget(KMapInternalWidgetInfo* const info)
+void BackendMarble::releaseWidget(KGeoMapInternalWidgetInfo* const info)
 {
     info->widget->removeEventFilter(this);
 
@@ -265,7 +265,7 @@ void BackendMarble::releaseWidget(KMapInternalWidgetInfo* const info)
                this, SLOT(slotMarbleZoomChanged(int)));
 
     info->currentOwner = 0;
-    info->state = KMapInternalWidgetInfo::InternalWidgetReleased;
+    info->state = KGeoMapInternalWidgetInfo::InternalWidgetReleased;
 
     d->marbleWidget = 0;
 #ifdef KGEOMAP_MARBLE_ADD_LAYER
@@ -680,7 +680,7 @@ void BackendMarble::marbleCustomPaint(Marble::GeoPainter* painter)
             const bool haveMarkerPixmap = modelHelper->itemIcon(currentIndex, &markerOffsetPoint, 0, &markerPixmap, 0);
             if (!haveMarkerPixmap || markerPixmap.isNull())
             {
-                markerPixmap = KMapGlobalObject::instance()->getStandardMarkerPixmap();
+                markerPixmap = KGeoMapGlobalObject::instance()->getStandardMarkerPixmap();
                 markerOffsetPoint = QPoint(markerPixmap.width()/2, markerPixmap.height()-1);
             }
 
@@ -696,18 +696,18 @@ void BackendMarble::marbleCustomPaint(Marble::GeoPainter* painter)
 
         for (int i = 0; i<s->clusterList.size(); ++i)
         {
-            const KMapCluster& cluster = s->clusterList.at(i);
+            const KGeoMapCluster& cluster = s->clusterList.at(i);
             GeoCoordinates clusterCoordinates = cluster.coordinates;
             int markerCountOverride = cluster.markerCount;
-            KMapGroupState selectionStateOverride = cluster.groupState;
+            KGeoMapGroupState selectionStateOverride = cluster.groupState;
             if (d->haveMouseMovingObject&&(d->mouseMoveClusterIndex>=0))
             {
-                bool movingSelectedMarkers = s->clusterList.at(d->mouseMoveClusterIndex).groupState!=KMapSelectedNone;
+                bool movingSelectedMarkers = s->clusterList.at(d->mouseMoveClusterIndex).groupState!=KGeoMapSelectedNone;
                 if (movingSelectedMarkers)
                 {
                     markersInMovingCluster+=cluster.markerSelectedCount;
                     markerCountOverride-=cluster.markerSelectedCount;
-                    selectionStateOverride = KMapSelectedNone;
+                    selectionStateOverride = KGeoMapSelectedNone;
                 }
                 else if (d->mouseMoveClusterIndex == i)
                 {
@@ -735,10 +735,10 @@ void BackendMarble::marbleCustomPaint(Marble::GeoPainter* painter)
     // now render the mouse-moving cluster, if there is one:
     if (d->haveMouseMovingObject&&(d->mouseMoveClusterIndex>=0))
     {
-        const KMapCluster& cluster = s->clusterList.at(d->mouseMoveClusterIndex);
+        const KGeoMapCluster& cluster = s->clusterList.at(d->mouseMoveClusterIndex);
         GeoCoordinates clusterCoordinates = d->mouseMoveObjectCoordinates;
         int markerCountOverride = (markersInMovingCluster>0)?markersInMovingCluster:cluster.markerCount;
-        KMapGroupState selectionStateOverride = cluster.groupState;
+        KGeoMapGroupState selectionStateOverride = cluster.groupState;
 
         QPoint clusterPoint;
         if (screenCoordinates(clusterCoordinates, &clusterPoint))
@@ -755,15 +755,15 @@ void BackendMarble::marbleCustomPaint(Marble::GeoPainter* painter)
                                 &markerCountOverride);
 
             QString pixmapName = fillColor.name().mid(1);
-            if (cluster.groupState==KMapSelectedAll)
+            if (cluster.groupState==KGeoMapSelectedAll)
             {
                 pixmapName+=QLatin1String("-selected");
             }
-            if (cluster.groupState==KMapSelectedSome)
+            if (cluster.groupState==KGeoMapSelectedSome)
             {
                 pixmapName+=QLatin1String("-someselected");
             }
-            const QPixmap& markerPixmap = KMapGlobalObject::instance()->getMarkerPixmap(pixmapName);
+            const QPixmap& markerPixmap = KGeoMapGlobalObject::instance()->getMarkerPixmap(pixmapName);
             painter->drawPixmap(clusterPoint.x()-markerPixmap.width()/2, clusterPoint.y()-markerPixmap.height()-1, markerPixmap);
         }
     }
@@ -777,14 +777,14 @@ void BackendMarble::marbleCustomPaint(Marble::GeoPainter* painter)
         Qt::PenStyle strokeStyle;
         QColor       labelColor;
         QString      labelText;
-        s->worldMapWidget->getColorInfos(KMapSelectedAll, d->dragDropMarkerCount,
+        s->worldMapWidget->getColorInfos(KGeoMapSelectedAll, d->dragDropMarkerCount,
                             &fillColor, &strokeColor,
                             &strokeStyle, &labelText, &labelColor);
 
         QString pixmapName = fillColor.name().mid(1);
         pixmapName+=QLatin1String("-selected");
 
-        const QPixmap& markerPixmap = KMapGlobalObject::instance()->getMarkerPixmap(pixmapName);
+        const QPixmap& markerPixmap = KGeoMapGlobalObject::instance()->getMarkerPixmap(pixmapName);
         painter->drawPixmap(d->dragDropMarkerPos.x()-markerPixmap.width()/2, d->dragDropMarkerPos.y()-markerPixmap.height()-1, markerPixmap);
     }
 
@@ -1044,9 +1044,9 @@ GeoCoordinates::PairList BackendMarble::getNormalizedBounds()
         );
 
 //     kDebug()<<boundsPair.first<<boundsPair.second;
-//     kDebug()<<KMapHelperNormalizeBounds(boundsPair);
+//     kDebug()<<KGeoMapHelperNormalizeBounds(boundsPair);
 
-    return KMapHelperNormalizeBounds(boundsPair);
+    return KGeoMapHelperNormalizeBounds(boundsPair);
 }
 
 bool BackendMarble::eventFilter(QObject *object, QEvent *event)
@@ -1228,7 +1228,7 @@ bool BackendMarble::eventFilter(QObject *object, QEvent *event)
                 // scan in reverse order of painting!
                 for (int clusterIndex = s->clusterList.count()-1; clusterIndex>=0; --clusterIndex)
                 {
-                    const KMapCluster& cluster = s->clusterList.at(clusterIndex);
+                    const KGeoMapCluster& cluster = s->clusterList.at(clusterIndex);
                     const GeoCoordinates currentCoordinates = cluster.coordinates;
 
                     QPoint clusterPoint;
@@ -1373,7 +1373,7 @@ bool BackendMarble::eventFilter(QObject *object, QEvent *event)
     return QObject::eventFilter(object, event);
 }
 
-// void BackendMarble::updateDragDropMarker(const QPoint& pos, const KMapDragData* const dragData)
+// void BackendMarble::updateDragDropMarker(const QPoint& pos, const KGeoMapDragData* const dragData)
 // {
 //     if (!dragData)
 //     {
@@ -1609,12 +1609,12 @@ void BackendMarble::setActive(const bool state)
         if ((!state)&&d->marbleWidget)
         {
             // we should share our widget in the list of widgets in the global object
-            KMapInternalWidgetInfo info;
+            KGeoMapInternalWidgetInfo info;
             info.deleteFunction = deleteInfoFunction;
             info.widget = d->marbleWidget;
             info.currentOwner = this;
             info.backendName = backendName();
-            info.state = d->widgetIsDocked ? KMapInternalWidgetInfo::InternalWidgetStillDocked : KMapInternalWidgetInfo::InternalWidgetUndocked;
+            info.state = d->widgetIsDocked ? KGeoMapInternalWidgetInfo::InternalWidgetStillDocked : KGeoMapInternalWidgetInfo::InternalWidgetUndocked;
 
             BMInternalWidgetInfo intInfo;
 #ifdef KGEOMAP_MARBLE_ADD_LAYER
@@ -1622,14 +1622,14 @@ void BackendMarble::setActive(const bool state)
 #endif
             info.backendData.setValue(intInfo);
 
-            KMapGlobalObject* const go = KMapGlobalObject::instance();
+            KGeoMapGlobalObject* const go = KGeoMapGlobalObject::instance();
             go->addMyInternalWidgetToPool(info);
         }
 
         if (state&&d->marbleWidget)
         {
             // we should remove our widget from the list of widgets in the global object
-            KMapGlobalObject* const go = KMapGlobalObject::instance();
+            KGeoMapGlobalObject* const go = KGeoMapGlobalObject::instance();
             go->removeMyInternalWidgetFromPool(this);
         }
     }
@@ -1639,8 +1639,8 @@ void BackendMarble::mapWidgetDocked(const bool state)
 {
     if (d->widgetIsDocked!=state)
     {
-        KMapGlobalObject* const go = KMapGlobalObject::instance();
-        go->updatePooledWidgetState(d->marbleWidget, state ? KMapInternalWidgetInfo::InternalWidgetStillDocked : KMapInternalWidgetInfo::InternalWidgetUndocked);
+        KGeoMapGlobalObject* const go = KGeoMapGlobalObject::instance();
+        go->updatePooledWidgetState(d->marbleWidget, state ? KGeoMapInternalWidgetInfo::InternalWidgetStillDocked : KGeoMapInternalWidgetInfo::InternalWidgetUndocked);
     }
     d->widgetIsDocked = state;
 }
@@ -1688,7 +1688,7 @@ void BackendMarble::drawSearchRectangle(Marble::GeoPainter* const painter, const
     painter->drawPolygon(polyRing);
 }
 
-void BackendMarble::deleteInfoFunction(KMapInternalWidgetInfo* const info)
+void BackendMarble::deleteInfoFunction(KGeoMapInternalWidgetInfo* const info)
 {
     if (info->currentOwner)
     {
@@ -1721,4 +1721,4 @@ void BackendMarble::applyCacheToWidget()
     setShowScaleBar(d->cacheShowScaleBar);
 }
 
-} /* namespace KMap */
+} /* namespace KGeoMap */

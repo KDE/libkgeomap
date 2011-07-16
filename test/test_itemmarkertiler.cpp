@@ -27,7 +27,7 @@
 
 #include <QStandardItemModel>
 
-using namespace KMap;
+using namespace KGeoMap;
 
 const int CoordinatesRole = Qt::UserRole + 0;
 
@@ -497,7 +497,7 @@ void TestItemMarkerTiler::testSelectionState1()
         ItemMarkerTiler::Tile* const myTile = mm.getTile(tileIndex, true);
         QVERIFY(myTile != 0);
         QVERIFY(mm.getTileMarkerCount(tileIndex) == 1);
-        QVERIFY(mm.getTileGroupState(tileIndex)==KMapSelectedNone);
+        QVERIFY(mm.getTileGroupState(tileIndex)==KGeoMapSelectedNone);
     }
 
     selectionModel->select(item1Index, QItemSelectionModel::Select);
@@ -509,7 +509,7 @@ void TestItemMarkerTiler::testSelectionState1()
         ItemMarkerTiler::Tile* const myTile = mm.getTile(tileIndex, true);
         QVERIFY(myTile != 0);
         QCOMPARE(mm.getTileMarkerCount(tileIndex), 1);
-        QVERIFY(mm.getTileGroupState(tileIndex)==KMapSelectedAll);
+        QVERIFY(mm.getTileGroupState(tileIndex)==KGeoMapSelectedAll);
         QVERIFY(mm.getTileSelectedCount(tileIndex)==1);
     }
 
@@ -524,7 +524,7 @@ void TestItemMarkerTiler::testSelectionState1()
         ItemMarkerTiler::Tile* const myTile = mm.getTile(tileIndex, true);
         QVERIFY(myTile != 0);
         QCOMPARE(mm.getTileMarkerCount(tileIndex), 2);
-        QVERIFY(mm.getTileGroupState(tileIndex)==KMapSelectedSome);
+        QVERIFY(mm.getTileGroupState(tileIndex)==KGeoMapSelectedSome);
         QCOMPARE(mm.getTileSelectedCount(tileIndex), 1);
     }
 
@@ -536,7 +536,7 @@ void TestItemMarkerTiler::testSelectionState1()
         QVERIFY(myTile != 0);
         QCOMPARE(mm.getTileMarkerCount(tileIndex), 2);
         QCOMPARE(mm.getTileSelectedCount(tileIndex), 2);
-        QVERIFY(mm.getTileGroupState(tileIndex)==KMapSelectedAll);
+        QVERIFY(mm.getTileGroupState(tileIndex)==KGeoMapSelectedAll);
     }
 
     // now remove the selected item:
@@ -550,7 +550,7 @@ void TestItemMarkerTiler::testSelectionState1()
         QVERIFY(myTile != 0);
         QCOMPARE(mm.getTileMarkerCount(tileIndex), 1);
         QCOMPARE(mm.getTileSelectedCount(tileIndex), 1);
-        QVERIFY(mm.getTileGroupState(tileIndex)==KMapSelectedAll);
+        QVERIFY(mm.getTileGroupState(tileIndex)==KGeoMapSelectedAll);
     }
 
     // add a selected item and then move it:
@@ -566,7 +566,7 @@ void TestItemMarkerTiler::testSelectionState1()
         QVERIFY(myTile != 0);
         QCOMPARE(mm.getTileMarkerCount(tileIndex), 1);
         QCOMPARE(mm.getTileSelectedCount(tileIndex), 1);
-        QVERIFY(mm.getTileGroupState(tileIndex)==KMapSelectedAll);
+        QVERIFY(mm.getTileGroupState(tileIndex)==KGeoMapSelectedAll);
     }
     for (int l = 0; l<=maxLevel; ++l)
     {
@@ -575,7 +575,7 @@ void TestItemMarkerTiler::testSelectionState1()
         QVERIFY(myTile != 0);
         QCOMPARE(mm.getTileMarkerCount(tileIndex), 1);
         QCOMPARE(mm.getTileSelectedCount(tileIndex), 1);
-        QVERIFY(mm.getTileGroupState(tileIndex)==KMapSelectedAll);
+        QVERIFY(mm.getTileGroupState(tileIndex)==KGeoMapSelectedAll);
     }
     itemModel->setData(item3Index, QVariant::fromValue(coord_50_60), CoordinatesRole);
     for (int l = 0; l<=maxLevel; ++l)
@@ -585,7 +585,7 @@ void TestItemMarkerTiler::testSelectionState1()
         QVERIFY(myTile != 0);
         QCOMPARE(mm.getTileMarkerCount(tileIndex), 2);
         QCOMPARE(mm.getTileSelectedCount(tileIndex), 2);
-        QVERIFY(mm.getTileGroupState(tileIndex)==KMapSelectedAll);
+        QVERIFY(mm.getTileGroupState(tileIndex)==KGeoMapSelectedAll);
     }
     itemModel->setData(item3Index, QVariant::fromValue(coord_m50_m60), CoordinatesRole);
     for (int l = 0; l<=maxLevel; ++l)
@@ -595,7 +595,7 @@ void TestItemMarkerTiler::testSelectionState1()
         QVERIFY(myTile != 0);
         QCOMPARE(mm.getTileMarkerCount(tileIndex), 1);
         QCOMPARE(mm.getTileSelectedCount(tileIndex), 1);
-        QVERIFY(mm.getTileGroupState(tileIndex)==KMapSelectedAll);
+        QVERIFY(mm.getTileGroupState(tileIndex)==KGeoMapSelectedAll);
     }
     for (int l = 0; l<=maxLevel; ++l)
     {
@@ -604,7 +604,7 @@ void TestItemMarkerTiler::testSelectionState1()
         QVERIFY(myTile != 0);
         QCOMPARE(mm.getTileMarkerCount(tileIndex), 1);
         QCOMPARE(mm.getTileSelectedCount(tileIndex), 1);
-        QVERIFY(mm.getTileGroupState(tileIndex)==KMapSelectedAll);
+        QVERIFY(mm.getTileGroupState(tileIndex)==KGeoMapSelectedAll);
     }
 
     // TODO: set a model with selected items, make sure the selections are read out
@@ -632,7 +632,7 @@ void TestItemMarkerTiler::benchmarkIteratorWholeWorld()
         {
             for (qreal y=-50; y<50; y+=1.0)
             {
-                itemModel->appendRow(MakeItemAt(KMap::GeoCoordinates(x,y)));
+                itemModel->appendRow(MakeItemAt(KGeoMap::GeoCoordinates(x,y)));
             }
         }
 

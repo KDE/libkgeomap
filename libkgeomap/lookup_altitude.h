@@ -31,7 +31,7 @@
 
 #include "kgeomap_primitives.h"
 
-namespace KMap
+namespace KGeoMap
 {
 
 class KGEOMAP_EXPORT LookupAltitude : public QObject
@@ -87,8 +87,8 @@ Q_SIGNALS:
     void signalDone();
 };
 
-} /* namespace KMap */
+} /* namespace KGeoMap */
 
-Q_DECLARE_OPERATORS_FOR_FLAGS(KMap::LookupAltitude::Status)
+Q_DECLARE_OPERATORS_FOR_FLAGS(KGeoMap::LookupAltitude::Status)
 
 #endif /* LOOKUP_ALTITUDE_H */

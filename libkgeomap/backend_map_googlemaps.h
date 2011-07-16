@@ -5,7 +5,7 @@
  * <a href="http://www.digikam.org">http://www.digikam.org</a>
  *
  * @date   2009-12-01
- * @brief  Google-Maps-backend for KMap
+ * @brief  Google-Maps-backend for KGeoMap
  *
  * @author Copyright (C) 2009-2010 by Michael G. Hansen
  *         <a href="mailto:mike at mghansen dot de">mike at mghansen dot de</a>
@@ -31,7 +31,7 @@
 
 #include "backend_map.h"
 
-namespace KMap
+namespace KGeoMap
 {
 
 class BackendGoogleMaps : public MapBackend
@@ -40,13 +40,13 @@ class BackendGoogleMaps : public MapBackend
 
 public:
 
-    explicit BackendGoogleMaps(const QExplicitlySharedDataPointer<KMapSharedData>& sharedData, QObject* const parent = 0);
+    explicit BackendGoogleMaps(const QExplicitlySharedDataPointer<KGeoMapSharedData>& sharedData, QObject* const parent = 0);
     virtual ~BackendGoogleMaps();
 
     virtual QString backendName() const;
     virtual QString backendHumanName() const;
     virtual QWidget* mapWidget();
-    virtual void releaseWidget(KMapInternalWidgetInfo* const info);
+    virtual void releaseWidget(KGeoMapInternalWidgetInfo* const info);
     virtual void mapWidgetDocked(const bool state);
 
     virtual GeoCoordinates getCenter() const;
@@ -75,7 +75,7 @@ public:
     virtual int getMarkerModelLevel();
     virtual GeoCoordinates::PairList getNormalizedBounds();
 
-//     virtual void updateDragDropMarker(const QPoint& pos, const KMapDragData* const dragData);
+//     virtual void updateDragDropMarker(const QPoint& pos, const KGeoMapDragData* const dragData);
 //     virtual void updateDragDropMarkerPosition(const QPoint& pos);
 
     virtual void updateActionAvailability();
@@ -112,12 +112,12 @@ private Q_SLOTS:
     void slotMapTypeActionTriggered(QAction* action);
     void slotHTMLEvents(const QStringList& eventStrings);
     void slotFloatSettingsTriggered(QAction* action);
-    void slotSelectionHasBeenMade(const KMap::GeoCoordinates::Pair& searchCoordinates);
+    void slotSelectionHasBeenMade(const KGeoMap::GeoCoordinates::Pair& searchCoordinates);
 
 private:
 
     void updateZoomMinMaxCache();
-    static void deleteInfoFunction(KMapInternalWidgetInfo* const info);
+    static void deleteInfoFunction(KGeoMapInternalWidgetInfo* const info);
 
 private:
 
@@ -125,6 +125,6 @@ private:
     BackendGoogleMapsPrivate* const d;
 };
 
-} /* namespace KMap */
+} /* namespace KGeoMap */
 
 #endif /* BACKEND_MAP_GOOGLEMAPS_H */

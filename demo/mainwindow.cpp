@@ -73,7 +73,7 @@
 #include "mytreewidget.h"
 #include "myimageitem.h"
 
-using namespace KMap;
+using namespace KGeoMap;
 
 MarkerModelHelper::MarkerModelHelper(QAbstractItemModel* const itemModel, QItemSelectionModel* const itemSelectionModel)
  : ModelHelper(itemModel),
@@ -152,7 +152,7 @@ public:
     }
 
     QSplitter*                          splitter;
-    KMapWidget*                         mapWidget;
+    KGeoMapWidget*                         mapWidget;
     QList<LookupAltitude*>              lookupAltitudeList;
     MyTreeWidget*                       treeWidget;
     QPointer<QProgressBar>              progressBar;
@@ -188,9 +188,9 @@ MainWindow::MainWindow(KCmdLineArgs* const cmdLineArgs, QWidget* const parent)
     ItemMarkerTiler* const mm = new ItemMarkerTiler(d->markerModelHelper, this);
 
     resize(512, 512);
-    setWindowTitle(i18n("LibKMap demo"));
+    setWindowTitle(i18n("LibKGeoMap demo"));
     setWindowIcon(SmallIcon( QLatin1String("applications-internet" )));
-    setObjectName(QLatin1String("Demo-KMap" ));
+    setObjectName(QLatin1String("Demo-KGeoMap" ));
 
     d->cmdLineArgs = cmdLineArgs;
 
@@ -206,12 +206,12 @@ MainWindow::MainWindow(KCmdLineArgs* const cmdLineArgs, QWidget* const parent)
     d->splitter = new QSplitter(Qt::Vertical, this);
     setCentralWidget(d->splitter);
 
-    d->mapWidget = new KMapWidget(d->splitter);
+    d->mapWidget = new KGeoMapWidget(d->splitter);
     d->mapWidget->setGroupedModel(mm);
     d->mapWidget->setActive(true);
     d->mapWidget->setDragDropHandler(new DemoDragDropHandler(d->displayMarkersModel, d->mapWidget));
-    d->mapWidget->setVisibleMouseModes(KMap::MouseModePan|KMap::MouseModeZoomIntoGroup|KMap::MouseModeSelectThumbnail);
-    d->mapWidget->setAvailableMouseModes(KMap::MouseModePan|KMap::MouseModeZoomIntoGroup|KMap::MouseModeSelectThumbnail);
+    d->mapWidget->setVisibleMouseModes(KGeoMap::MouseModePan|KGeoMap::MouseModeZoomIntoGroup|KGeoMap::MouseModeSelectThumbnail);
+    d->mapWidget->setAvailableMouseModes(KGeoMap::MouseModePan|KGeoMap::MouseModeZoomIntoGroup|KGeoMap::MouseModeSelectThumbnail);
 
     connect(d->markerModelHelper, SIGNAL(signalMarkersMoved(const QList<QPersistentModelIndex>&)),
             this, SLOT(slotMarkersMoved(const QList<QPersistentModelIndex>&)));
@@ -485,7 +485,7 @@ void MainWindow::slotAltitudeRequestsReady(const QList<int>& readyRequests)
 
     for (int i=0; i<readyRequests.count(); ++i)
     {
-        const KMap::LookupAltitude::Request& myLookup = myAltitudeLookup->getRequest(readyRequests.at(i));
+        const KGeoMap::LookupAltitude::Request& myLookup = myAltitudeLookup->getRequest(readyRequests.at(i));
 
         const QPersistentModelIndex markerIndex = myLookup.data.value<QPersistentModelIndex>();
 
@@ -536,7 +536,7 @@ void MainWindow::createMenus()
     menuBar()->addMenu(helpMenu());
 }
 
-KMap::ModelHelper::Flags MarkerModelHelper::modelFlags() const
+KGeoMap::ModelHelper::Flags MarkerModelHelper::modelFlags() const
 {
     return FlagMovable;
 }

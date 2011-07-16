@@ -85,13 +85,13 @@ QItemSelectionModel* CalibratorModelHelper::selectionModel() const
     return 0;
 }
 
-bool CalibratorModelHelper::itemCoordinates(const QModelIndex& index, KMap::GeoCoordinates* const coordinates) const
+bool CalibratorModelHelper::itemCoordinates(const QModelIndex& index, KGeoMap::GeoCoordinates* const coordinates) const
 {
     if (!index.isValid())
         return false;
 
     const QVariant coordinatesVariant = index.data(CoordinatesRole);
-    KMap::GeoCoordinates itemCoordinates = coordinatesVariant.value<KMap::GeoCoordinates>();
+    KGeoMap::GeoCoordinates itemCoordinates = coordinatesVariant.value<KGeoMap::GeoCoordinates>();
 
     if (coordinates)
         *coordinates = itemCoordinates;
@@ -99,7 +99,7 @@ bool CalibratorModelHelper::itemCoordinates(const QModelIndex& index, KMap::GeoC
     return itemCoordinates.hasCoordinates();
 }
 
-void CalibratorModelHelper::setItemCoordinates(const QModelIndex& index, const KMap::GeoCoordinates& coordinates)
+void CalibratorModelHelper::setItemCoordinates(const QModelIndex& index, const KGeoMap::GeoCoordinates& coordinates)
 {
     if (!index.isValid())
         return;
@@ -107,7 +107,7 @@ void CalibratorModelHelper::setItemCoordinates(const QModelIndex& index, const K
     d->model->setData(index, QVariant::fromValue(coordinates), CoordinatesRole);
 }
 
-KMap::ModelHelper::Flags CalibratorModelHelper::modelFlags() const
+KGeoMap::ModelHelper::Flags CalibratorModelHelper::modelFlags() const
 {
     return FlagVisible;
 }
@@ -120,10 +120,10 @@ public:
     }
 
     QHBoxLayout                *hBoxLayout;
-    QList<QPair<QWidget*, KMap::KMapWidget*> >        extraWidgetHolders;
+    QList<QPair<QWidget*, KGeoMap::KGeoMapWidget*> >        extraWidgetHolders;
     QStandardItemModel         *model;
     CalibratorModelHelper      *modelHelper;
-    KMap::ItemMarkerTiler      *markerTiler;
+    KGeoMap::ItemMarkerTiler      *markerTiler;
 
     QButtonGroup               *groupingMode;
     QSpinBox                   *sbLevel;
@@ -137,7 +137,7 @@ Calibrator::Calibrator()
 {
     d->model = new QStandardItemModel(this);
     d->modelHelper = new CalibratorModelHelper(d->model, this);
-    d->markerTiler = new KMap::ItemMarkerTiler(d->modelHelper, this);
+    d->markerTiler = new KGeoMap::ItemMarkerTiler(d->modelHelper, this);
 
     QVBoxLayout* const vboxLayout1 = new QVBoxLayout();
     QWidget* const dummy1 = new QWidget(this);
@@ -157,7 +157,7 @@ Calibrator::Calibrator()
 
     d->sbLevel = new QSpinBox(this);
     d->sbLevel->setMinimum(1);
-    d->sbLevel->setMaximum(KMap::TileIndex::MaxLevel);
+    d->sbLevel->setMaximum(KGeoMap::TileIndex::MaxLevel);
     QLabel* const labelsbLevel = new QLabel(i18nc("Tile level", "Level:"), this);
     labelsbLevel->setBuddy(d->sbLevel);
 
@@ -219,7 +219,7 @@ void Calibrator::updateGroupingMode()
 
     for (int i = 0; i<d->extraWidgetHolders.count(); ++i)
     {
-        KMap::KMapWidget* const mapWidget = d->extraWidgetHolders.at(i).second;
+        KGeoMap::KGeoMapWidget* const mapWidget = d->extraWidgetHolders.at(i).second;
 
         if (shouldBeGrouped)
         {
@@ -234,7 +234,7 @@ void Calibrator::updateGroupingMode()
     }
 }
 
-void Calibrator::addMarkerAt(const KMap::GeoCoordinates& coordinates)
+void Calibrator::addMarkerAt(const KGeoMap::GeoCoordinates& coordinates)
 {
     kDebug()<<coordinates;
     QStandardItem* const item = new QStandardItem(coordinates.geoUrl());
@@ -248,7 +248,7 @@ void Calibrator::updateMarkers()
     d->model->clear();
 
     const int newLevel = d->sbLevel->value();
-    const int Tiling = KMap::TileIndex::Tiling;
+    const int Tiling = KGeoMap::TileIndex::Tiling;
 
     // add markers in all four corners and in the middle of the edges:
     typedef QPair<int, int> QIntPair;
@@ -288,7 +288,7 @@ void Calibrator::updateMarkers()
         const int level0Index = currentPair.first;
         const int followingIndex = currentPair.second;
 
-        KMap::TileIndex markerIndex;
+        KGeoMap::TileIndex markerIndex;
         markerIndex.appendLinearIndex(level0Index);
 
         for (int level = 1; level < newLevel-2; level++)
@@ -306,12 +306,12 @@ void Calibrator::updateMarkers()
                     const int newLinIndex = followingIndex + i + j*Tiling;
                     if ((newLinIndex>=0)&&(newLinIndex<Tiling*Tiling))
                     {
-                        KMap::TileIndex newIndex = markerIndex;
+                        KGeoMap::TileIndex newIndex = markerIndex;
                         newIndex.appendLinearIndex(newLinIndex);
                         addMarkerAt(newIndex.toCoordinates());
 //                         for (int corner = 1; corner<=4; ++corner)
 //                         {
-//                             addMarkerAt(newIndex.toCoordinates(KMap::TileIndex::CornerPosition(corner)));
+//                             addMarkerAt(newIndex.toCoordinates(KGeoMap::TileIndex::CornerPosition(corner)));
 //                         }
                     }
                 }
@@ -329,7 +329,7 @@ void Calibrator::updateZoomView()
         return;
     }
 
-    KMap::KMapWidget* const firstMapWidget = d->extraWidgetHolders.first().second;
+    KGeoMap::KGeoMapWidget* const firstMapWidget = d->extraWidgetHolders.first().second;
     const QString newZoom = firstMapWidget->getZoom();
     if (newZoom!=d->zoomDisplay->text())
     {
@@ -340,7 +340,7 @@ void Calibrator::updateZoomView()
 void Calibrator::slotAddMapWidget()
 {
     QVBoxLayout* boxLayout = new QVBoxLayout();
-    KMap::KMapWidget* mapWidget = new KMap::KMapWidget();
+    KGeoMap::KGeoMapWidget* mapWidget = new KGeoMap::KGeoMapWidget();
     boxLayout->addWidget(mapWidget);
     boxLayout->addWidget(mapWidget->getControlWidget());
 
@@ -356,7 +356,7 @@ void Calibrator::slotAddMapWidget()
 
     QWidget* const dummyWidget = new QWidget();
     dummyWidget->setLayout(boxLayout);
-    d->extraWidgetHolders.append(QPair<QWidget*, KMap::KMapWidget*>(dummyWidget, mapWidget));
+    d->extraWidgetHolders.append(QPair<QWidget*, KGeoMap::KGeoMapWidget*>(dummyWidget, mapWidget));
 
     d->hBoxLayout->addWidget(dummyWidget);
 
@@ -370,7 +370,7 @@ void Calibrator::slotRemoveMapWidget()
         return;
     }
 
-    QPair<QWidget*, KMap::KMapWidget*> info =  d->extraWidgetHolders.takeLast();
+    QPair<QWidget*, KGeoMap::KGeoMapWidget*> info =  d->extraWidgetHolders.takeLast();
     d->hBoxLayout->removeWidget(info.first);
     delete info.first;
 }
@@ -383,7 +383,7 @@ void Calibrator::slotActivateMapActionTriggered(bool state)
         return;
     }
 
-    KMap::KMapWidget* const mapWidget = static_cast<KMap::KMapWidget*>(senderAction->data().value<void*>());
+    KGeoMap::KGeoMapWidget* const mapWidget = static_cast<KGeoMap::KGeoMapWidget*>(senderAction->data().value<void*>());
     mapWidget->setActive(state);
 }
 
@@ -392,9 +392,9 @@ int main(int argc, char* argv[])
     KAboutData aboutData(
         "calibrator-kgeomap",
         0,
-        ki18n("KMap calibration tool"),
+        ki18n("KGeoMap calibration tool"),
         kgeomap_version,                                      // version
-        ki18n("Used to calibrate the KMap library tiling level"),
+        ki18n("Used to calibrate the KGeoMap library tiling level"),
         KAboutData::License_GPL,
         ki18n("(c) 2010 Michael G. Hansen"),
         ki18n(""),                                         // optional text
@@ -403,7 +403,7 @@ int main(int argc, char* argv[])
     );
 
     aboutData.addAuthor(ki18n("Michael G. Hansen"),
-                        ki18n("KMap library"),
+                        ki18n("KGeoMap library"),
                         "mike@mghansen.de",
                         "http://www.mghansen.de");
 

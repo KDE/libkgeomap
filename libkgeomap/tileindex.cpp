@@ -26,10 +26,10 @@
 
 #include "tileindex.h"
 
-namespace KMap
+namespace KGeoMap
 {
 
-TileIndex TileIndex::fromCoordinates(const KMap::GeoCoordinates& coordinate, const int getLevel)
+TileIndex TileIndex::fromCoordinates(const KGeoMap::GeoCoordinates& coordinate, const int getLevel)
 {
     KGEOMAP_ASSERT(getLevel<=MaxLevel);
 
@@ -183,4 +183,4 @@ GeoCoordinates TileIndex::toCoordinates(const CornerPosition ofCorner) const
     return GeoCoordinates(tileLatBL, tileLonBL);
 }
 
-} /* KMap */
+} /* KGeoMap */

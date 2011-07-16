@@ -5,7 +5,7 @@
  * <a href="http://www.digikam.org">http://www.digikam.org</a>
  *
  * @date   2009-12-01
- * @brief  OpenStreetMap-backend for KMap
+ * @brief  OpenStreetMap-backend for KGeoMap
  *
  * @author Copyright (C) 2009-2010 by Michael G. Hansen
  *         <a href="mailto:mike at mghansen dot de">mike at mghansen dot de</a>
@@ -31,7 +31,7 @@
 
 #include "backend_map.h"
 
-namespace KMap
+namespace KGeoMap
 {
 
 class BackendOSM : public MapBackend
@@ -40,7 +40,7 @@ class BackendOSM : public MapBackend
 
 public:
 
-    explicit BackendOSM(const QExplicitlySharedDataPointer<KMapSharedData>& sharedData, QObject* const parent = 0);
+    explicit BackendOSM(const QExplicitlySharedDataPointer<KGeoMapSharedData>& sharedData, QObject* const parent = 0);
     virtual ~BackendOSM();
 
     virtual QString backendName() const;
@@ -93,6 +93,6 @@ private:
     BackendOSMPrivate* const d;
 };
 
-} /* KMap */
+} /* KGeoMap */
 
 #endif /* BACKEND_MAP_OSM_H */

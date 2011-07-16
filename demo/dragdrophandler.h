@@ -4,7 +4,7 @@
  * <a href="http://www.digikam.org">http://www.digikam.org</a>
  *
  * @date   2010-03-18
- * @brief  Drag-and-drop handler for KMap used in the demo
+ * @brief  Drag-and-drop handler for KGeoMap used in the demo
  *
  * @author Copyright (C) 2010 by Michael G. Hansen
  *         <a href="mailto:mike at mghansen dot de">mike at mghansen dot de</a>
@@ -48,7 +48,7 @@ public:
     QList<QPersistentModelIndex> draggedIndices;
 };
 
-class DemoDragDropHandler : public KMap::DragDropHandler
+class DemoDragDropHandler : public KGeoMap::DragDropHandler
 {
     Q_OBJECT
 
@@ -58,7 +58,7 @@ public:
     virtual ~DemoDragDropHandler();
 
     virtual Qt::DropAction accepts(const QDropEvent* e);
-    virtual bool dropEvent(const QDropEvent* e, const KMap::GeoCoordinates& dropCoordinates);
+    virtual bool dropEvent(const QDropEvent* e, const KGeoMap::GeoCoordinates& dropCoordinates);
     virtual QMimeData* createMimeData(const QList<QPersistentModelIndex>& modelIndices);
 
 private:

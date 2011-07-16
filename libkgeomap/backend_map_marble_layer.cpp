@@ -5,7 +5,7 @@
  * <a href="http://www.digikam.org">http://www.digikam.org</a>
  *
  * @date   2009-12-08
- * @brief  Internal part of the Marble-backend for KMap
+ * @brief  Internal part of the Marble-backend for KGeoMap
  *
  * @author Copyright (C) 2009-2010 by Michael G. Hansen
  *         <a href="mailto:mike at mghansen dot de">mike at mghansen dot de</a>
@@ -34,7 +34,7 @@
 
 #include "backend_map_marble.h"
 
-namespace KMap
+namespace KGeoMap
 {
 
 BMLayer::BMLayer(BackendMarble* const pMarbleBackend)
@@ -70,4 +70,4 @@ void BMLayer::setBackend(BackendMarble* const pMarbleBackend)
     marbleBackend = pMarbleBackend;
 }
 
-} /* namespace KMap */
+} /* namespace KGeoMap */

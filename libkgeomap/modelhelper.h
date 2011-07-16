@@ -46,7 +46,7 @@
 #include "libkgeomap_export.h"
 #include "kgeomap_primitives.h"
 
-namespace KMap
+namespace KGeoMap
 {
 
 
@@ -96,8 +96,8 @@ Q_SIGNALS:
     void signalModelChangedDrastically();
 };
 
-} /* namespace KMap */
+} /* namespace KGeoMap */
 
-Q_DECLARE_OPERATORS_FOR_FLAGS(KMap::ModelHelper::Flags)
+Q_DECLARE_OPERATORS_FOR_FLAGS(KGeoMap::ModelHelper::Flags)
 
 #endif /* KGEOMAP_MODELHELPER */

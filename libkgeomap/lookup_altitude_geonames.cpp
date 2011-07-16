@@ -35,7 +35,7 @@
 #include <kio/job.h>
 #include <klocale.h>
 
-namespace KMap
+namespace KGeoMap
 {
 
 class MergedRequests
@@ -271,5 +271,5 @@ void LookupAltitudeGeonames::cancel()
     emit(signalDone());
 }
 
-} /* namespace KMap */
+} /* namespace KGeoMap */
 

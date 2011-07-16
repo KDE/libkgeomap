@@ -41,7 +41,7 @@
 
 #include "libkgeomap_export.h"
 
-namespace KMap
+namespace KGeoMap
 {
 
 class KGEOMAP_EXPORT GeoCoordinates
@@ -218,17 +218,17 @@ private:
     HasFlags m_hasFlags;
 };
 
-} /* namespace KMap */
+} /* namespace KGeoMap */
 
-Q_DECLARE_OPERATORS_FOR_FLAGS(KMap::GeoCoordinates::HasFlags)
+Q_DECLARE_OPERATORS_FOR_FLAGS(KGeoMap::GeoCoordinates::HasFlags)
 
-inline QDebug operator<<(QDebug debugOut, const KMap::GeoCoordinates& coordinate)
+inline QDebug operator<<(QDebug debugOut, const KGeoMap::GeoCoordinates& coordinate)
 {
     debugOut << coordinate.geoUrl();
     return debugOut;
 }
 
-inline bool operator==(const KMap::GeoCoordinates& a, const KMap::GeoCoordinates& b)
+inline bool operator==(const KGeoMap::GeoCoordinates& a, const KGeoMap::GeoCoordinates& b)
 {
     return
         ( a.hasCoordinates() == b.hasCoordinates() ) &&
@@ -241,10 +241,10 @@ inline bool operator==(const KMap::GeoCoordinates& a, const KMap::GeoCoordinates
         ( a.hasAltitude() ? ( a.alt() == b.alt() ) : true );
 }
 
-Q_DECLARE_TYPEINFO(KMap::GeoCoordinates, Q_MOVABLE_TYPE);
-Q_DECLARE_METATYPE(KMap::GeoCoordinates)
-Q_DECLARE_METATYPE(KMap::GeoCoordinates::Pair)
-Q_DECLARE_METATYPE(KMap::GeoCoordinates::PairList)
+Q_DECLARE_TYPEINFO(KGeoMap::GeoCoordinates, Q_MOVABLE_TYPE);
+Q_DECLARE_METATYPE(KGeoMap::GeoCoordinates)
+Q_DECLARE_METATYPE(KGeoMap::GeoCoordinates::Pair)
+Q_DECLARE_METATYPE(KGeoMap::GeoCoordinates::PairList)
 
 
 #endif /* KGEOMAP_GEOCOORDINATES_H */

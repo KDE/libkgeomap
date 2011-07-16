@@ -4,7 +4,7 @@
  * <a href="http://www.digikam.org">http://www.digikam.org</a>
  *
  * @date   2011-01-12
- * @brief  Test the KMap::TileIndex class
+ * @brief  Test the KGeoMap::TileIndex class
  *
  * @author Copyright (C) 2011 by Michael G. Hansen
  *         <a href="mailto:mike at mghansen dot de">mike at mghansen dot de</a>
@@ -27,7 +27,7 @@
 
 #include "tileindex.h"
 
-using namespace KMap;
+using namespace KGeoMap;
 
 void TestTileIndex::testNoOp()
 {
@@ -100,7 +100,7 @@ void TestTileIndex::testIntListInteraction()
 }
 
 /**
- * KMap::TileIndex is declared as Q_MOVABLE_TYPE, and here we verify that it still works with QList.
+ * KGeoMap::TileIndex is declared as Q_MOVABLE_TYPE, and here we verify that it still works with QList.
  */
 void TestTileIndex::testMovable()
 {

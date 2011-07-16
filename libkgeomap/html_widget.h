@@ -36,10 +36,10 @@
 #include "kgeomap_primitives.h"
 #include "libkgeomap_export.h"
 
-namespace KMap
+namespace KGeoMap
 {
 
-class KMapSharedData;
+class KGeoMapSharedData;
 
 class KGEOMAP_EXPORT HTMLWidget : public KHTMLPart
 {
@@ -57,7 +57,7 @@ public:
     void setSelectionRectangle(const GeoCoordinates::Pair& searchCoordinates);
     void removeSelectionRectangle();
     void centerOn(const qreal west, const qreal north, const qreal east, const qreal south, const bool useSaneZoomLevel = true);
-    void setSharedKMapObject(KMapSharedData* const sharedData);
+    void setSharedKGeoMapObject(KGeoMapSharedData* const sharedData);
 
 protected:
 
@@ -75,15 +75,15 @@ Q_SIGNALS:
 
     void signalHTMLEvents(const QStringList& events);
     void signalJavaScriptReady();
-    void selectionHasBeenMade(const KMap::GeoCoordinates::Pair& coordinatesRect);
+    void selectionHasBeenMade(const KGeoMap::GeoCoordinates::Pair& coordinatesRect);
 
 private:
 
     class HTMLWidgetPrivate;
     HTMLWidgetPrivate* const d;
-    KMapSharedData* s;
+    KGeoMapSharedData* s;
 };
 
-} /* namespace KMap */
+} /* namespace KGeoMap */
 
 #endif /* HTML_WIDGET_H */

@@ -28,7 +28,7 @@
 
 #include "lookup_altitude_geonames.h"
 
-namespace KMap
+namespace KGeoMap
 {
 
 LookupAltitude* LookupFactory::getAltitudeLookup(const QString& backendName, QObject* const parent)
@@ -41,5 +41,5 @@ LookupAltitude* LookupFactory::getAltitudeLookup(const QString& backendName, QOb
     return 0;
 }
 
-} /* namespace KMap */
+} /* namespace KGeoMap */
 

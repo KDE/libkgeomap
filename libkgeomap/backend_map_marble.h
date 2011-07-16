@@ -5,7 +5,7 @@
  * <a href="http://www.digikam.org">http://www.digikam.org</a>
  *
  * @date   2009-12-08
- * @brief  Marble-backend for KMap
+ * @brief  Marble-backend for KGeoMap
  *
  * @author Copyright (C) 2009-2011 by Michael G. Hansen
  *         <a href="mailto:mike at mghansen dot de">mike at mghansen dot de</a>
@@ -38,7 +38,7 @@ namespace Marble
 }
 /// @endcond
 
-namespace KMap
+namespace KGeoMap
 {
 
 class BackendMarble : public MapBackend
@@ -47,13 +47,13 @@ class BackendMarble : public MapBackend
 
 public:
 
-    explicit BackendMarble(const QExplicitlySharedDataPointer<KMapSharedData>& sharedData, QObject* const parent = 0);
+    explicit BackendMarble(const QExplicitlySharedDataPointer<KGeoMapSharedData>& sharedData, QObject* const parent = 0);
     virtual ~BackendMarble();
 
     virtual QString backendName() const;
     virtual QString backendHumanName() const;
     virtual QWidget* mapWidget();
-    virtual void releaseWidget(KMapInternalWidgetInfo* const info);
+    virtual void releaseWidget(KGeoMapInternalWidgetInfo* const info);
     virtual void mapWidgetDocked(const bool state);
 
     virtual GeoCoordinates getCenter() const;
@@ -88,7 +88,7 @@ public:
     virtual int getMarkerModelLevel();
     virtual GeoCoordinates::PairList getNormalizedBounds();
 
-//     virtual void updateDragDropMarker(const QPoint& pos, const KMapDragData* const dragData);
+//     virtual void updateDragDropMarker(const QPoint& pos, const KGeoMapDragData* const dragData);
 //     virtual void updateDragDropMarkerPosition(const QPoint& pos);
 
     virtual void updateActionAvailability();
@@ -119,7 +119,7 @@ protected:
     void drawSearchRectangle(Marble::GeoPainter* const painter, const GeoCoordinates::Pair& searchRectangle, const bool isOldRectangle);
     void applyCacheToWidget();
 
-    static void deleteInfoFunction(KMapInternalWidgetInfo* const info);
+    static void deleteInfoFunction(KGeoMapInternalWidgetInfo* const info);
 
 protected Q_SLOTS:
 
@@ -134,6 +134,6 @@ private:
     BackendMarblePrivate* const d;
 };
 
-} /* namespace KMap */
+} /* namespace KGeoMap */
 
 #endif /* BACKEND_MAP_MARBLE_H */

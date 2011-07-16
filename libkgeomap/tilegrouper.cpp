@@ -29,7 +29,7 @@
 #include "abstractmarkertiler.h"
 #include "backend_map.h"
 
-namespace KMap
+namespace KGeoMap
 {
 
 class TileGrouper::TileGrouperPrivate
@@ -46,7 +46,7 @@ public:
     MapBackend* currentBackend;
 };
 
-TileGrouper::TileGrouper(const QExplicitlySharedDataPointer<KMapSharedData>& sharedData, QObject* const parent)
+TileGrouper::TileGrouper(const QExplicitlySharedDataPointer<KGeoMapSharedData>& sharedData, QObject* const parent)
     : QObject(parent), d(new TileGrouperPrivate()), s(sharedData)
 {
 }
@@ -259,7 +259,7 @@ void TileGrouper::updateClusters()
             break;
 
         GeoCoordinates clusterCoordinates = pixelNonEmptyTileIndexGrid.at(markerX+markerY*gridWidth).first().toCoordinates();
-        KMapCluster cluster;
+        KGeoMapCluster cluster;
         cluster.coordinates = clusterCoordinates;
         cluster.pixelPos = QPoint(markerX, markerY);
         cluster.tileIndicesList = pixelNonEmptyTileIndexGrid.at(markerX+markerY*gridWidth);
@@ -325,17 +325,17 @@ void TileGrouper::updateClusters()
     // determine the selected states of the clusters:
     for (int i=0; i<s->clusterList.count(); ++i)
     {
-        KMapCluster& cluster = s->clusterList[i];
+        KGeoMapCluster& cluster = s->clusterList[i];
 
         int clusterSelectedCount = 0;
-        KMapGroupStateComputer clusterStateComputer;
+        KGeoMapGroupStateComputer clusterStateComputer;
         for (int iTile=0;
                 (iTile<cluster.tileIndicesList.count());
                 ++iTile)
         {
             const TileIndex tileIndex = cluster.tileIndicesList.at(iTile);
 
-            const KMapGroupState tileGroupState = s->markerModel->getTileGroupState(tileIndex);
+            const KGeoMapGroupState tileGroupState = s->markerModel->getTileGroupState(tileIndex);
             clusterStateComputer.addState(tileGroupState);
             clusterSelectedCount+= s->markerModel->getTileSelectedCount(tileIndex);
         }
@@ -349,5 +349,5 @@ void TileGrouper::updateClusters()
     d->currentBackend->updateClusters();
 }
 
-} /* KMap */
+} /* KGeoMap */
 

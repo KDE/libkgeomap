@@ -40,7 +40,7 @@
 #include "kgeomap_common.h"
 #include "kgeomap_primitives.h"
 
-namespace KMap
+namespace KGeoMap
 {
 
 class HTMLWidget::HTMLWidgetPrivate
@@ -281,7 +281,7 @@ bool HTMLWidget::runScript2Coordinates(const QString& scriptCode, GeoCoordinates
 {
     const QVariant scriptResult = runScript(scriptCode);
 
-    return KMapHelperParseLatLonString(scriptResult.toString(), coordinates);
+    return KGeoMapHelperParseLatLonString(scriptResult.toString(), coordinates);
 }
 
 bool HTMLWidget::eventFilter(QObject* object, QEvent* event)
@@ -352,9 +352,9 @@ void HTMLWidget::centerOn(const qreal west, const qreal north, const qreal east,
         );
 }
 
-void HTMLWidget::setSharedKMapObject(KMapSharedData* const sharedData)
+void HTMLWidget::setSharedKGeoMapObject(KGeoMapSharedData* const sharedData)
 {
     s = sharedData;
 }
 
-} /* namespace KMap */
+} /* namespace KGeoMap */

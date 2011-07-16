@@ -32,19 +32,19 @@
 #include "backend_map.h"
 
 
-namespace KMap
+namespace KGeoMap
 {
 
-class KMapGlobalObjectCreator
+class KGeoMapGlobalObjectCreator
 {
 public:
 
-    KMapGlobalObject object;
+    KGeoMapGlobalObject object;
 };
 
-K_GLOBAL_STATIC(KMapGlobalObjectCreator, kgeomapGlobalObjectCreator)
+K_GLOBAL_STATIC(KGeoMapGlobalObjectCreator, kgeomapGlobalObjectCreator)
 
-class KMapGlobalObject::Private
+class KGeoMapGlobalObject::Private
 {
 public:
     Private()
@@ -53,7 +53,7 @@ public:
     {
     }
 
-    QList<KMapInternalWidgetInfo> internalMapWidgetsPool;
+    QList<KGeoMapInternalWidgetInfo> internalMapWidgetsPool;
 
     // marker pixmaps:
     QMap<QString, QPixmap>    markerPixmaps;
@@ -79,33 +79,33 @@ public:
             for (QStringList::const_iterator sit = stateNames.constBegin(); sit!=stateNames.constEnd(); ++sit)
             {
                 const QString pixmapName = *it + *sit;
-                const KUrl markerUrl = KMapGlobalObject::instance()->locateDataFile(
+                const KUrl markerUrl = KGeoMapGlobalObject::instance()->locateDataFile(
                         QString::fromLatin1( "marker-%1.png").arg(pixmapName));
                 markerPixmaps[pixmapName] = QPixmap(markerUrl.toLocalFile());
             }
         }
 
-        const KUrl markerIconUrl = KMapGlobalObject::instance()->locateDataFile(QLatin1String( "marker-icon-16x16.png" ));
+        const KUrl markerIconUrl = KGeoMapGlobalObject::instance()->locateDataFile(QLatin1String( "marker-icon-16x16.png" ));
         markerPixmaps[QLatin1String( "marker-icon-16x16" )] = QPixmap(markerIconUrl.toLocalFile());
     }
 };
 
-KMapGlobalObject::KMapGlobalObject()
+KGeoMapGlobalObject::KGeoMapGlobalObject()
     : QObject(), d(new Private())
 {
 }
 
-KMapGlobalObject::~KMapGlobalObject()
+KGeoMapGlobalObject::~KGeoMapGlobalObject()
 {
     delete d;
 }
 
-KMapGlobalObject* KMapGlobalObject::instance()
+KGeoMapGlobalObject* KGeoMapGlobalObject::instance()
 {
     return &(kgeomapGlobalObjectCreator->object);
 }
 
-QPixmap KMapGlobalObject::getMarkerPixmap(const QString pixmapId)
+QPixmap KGeoMapGlobalObject::getMarkerPixmap(const QString pixmapId)
 {
     if (d->markerPixmaps.isEmpty())
     {
@@ -115,12 +115,12 @@ QPixmap KMapGlobalObject::getMarkerPixmap(const QString pixmapId)
     return d->markerPixmaps.value(pixmapId);
 }
 
-QPixmap KMapGlobalObject::getStandardMarkerPixmap()
+QPixmap KGeoMapGlobalObject::getStandardMarkerPixmap()
 {
     return getMarkerPixmap(QLatin1String( "00ff00" ));
 }
 
-KUrl KMapGlobalObject::locateDataFile(const QString filename)
+KUrl KGeoMapGlobalObject::locateDataFile(const QString filename)
 {
     return KStandardDirs::locate(
                 "data",
@@ -132,7 +132,7 @@ KUrl KMapGlobalObject::locateDataFile(const QString filename)
  * @brief Parse a 'lat,lon' string a returned by the JavaScript parts
  * @return true if the string could be parsed successfully
  */
-bool KMapHelperParseLatLonString(const QString& latLonString, GeoCoordinates* const coordinates)
+bool KGeoMapHelperParseLatLonString(const QString& latLonString, GeoCoordinates* const coordinates)
 {
     // parse a 'lat,lon' string:
     const QStringList coordinateStrings = latLonString.trimmed().split(QLatin1Char( ',' ));
@@ -163,7 +163,7 @@ bool KMapHelperParseLatLonString(const QString& latLonString, GeoCoordinates* co
 /**
  * @brief Parse a '(X.xxx,Y.yyy)' string as returned by the JavaScript parts
  */
-bool KMapHelperParseXYStringToPoint(const QString& xyString, QPoint* const point)
+bool KGeoMapHelperParseXYStringToPoint(const QString& xyString, QPoint* const point)
 {
     // a point is returned as (X.xxx, Y.yyy)
 
@@ -203,7 +203,7 @@ bool KMapHelperParseXYStringToPoint(const QString& xyString, QPoint* const point
 /**
  * @brief Parses a '((lat1, lon1), (lat2, lon2))' bounds string as returned by the JavaScript parts
  */
-bool KMapHelperParseBoundsString(const QString& boundsString, QPair<GeoCoordinates, GeoCoordinates>* const boundsCoordinates)
+bool KGeoMapHelperParseBoundsString(const QString& boundsString, QPair<GeoCoordinates, GeoCoordinates>* const boundsCoordinates)
 {
     // bounds are returned as ((lat1, lon1), (lat2, lon2))
 
@@ -233,11 +233,11 @@ bool KMapHelperParseBoundsString(const QString& boundsString, QPair<GeoCoordinat
             GeoCoordinates coord1, coord2;
             if (valid)
             {
-                valid = KMapHelperParseLatLonString(coord1String.mid(1, coord1String.length()-2), &coord1);
+                valid = KGeoMapHelperParseLatLonString(coord1String.mid(1, coord1String.length()-2), &coord1);
             }
             if (valid)
             {
-                valid = KMapHelperParseLatLonString(coord2String.mid(1, coord2String.length()-2), &coord2);
+                valid = KGeoMapHelperParseLatLonString(coord2String.mid(1, coord2String.length()-2), &coord2);
             }
 
             if (valid && boundsCoordinates)
@@ -255,7 +255,7 @@ bool KMapHelperParseBoundsString(const QString& boundsString, QPair<GeoCoordinat
 /**
  * @brief Split bounds crossing the dateline into parts which do not cross the dateline
  */
-GeoCoordinates::PairList KMapHelperNormalizeBounds(const GeoCoordinates::Pair& boundsPair)
+GeoCoordinates::PairList KGeoMapHelperNormalizeBounds(const GeoCoordinates::Pair& boundsPair)
 {
     GeoCoordinates::PairList boundsList;
 
@@ -278,7 +278,7 @@ GeoCoordinates::PairList KMapHelperNormalizeBounds(const GeoCoordinates::Pair& b
     return boundsList;
 }
 
-void KMapGlobalObject::removeMyInternalWidgetFromPool(const MapBackend* const mapBackend)
+void KGeoMapGlobalObject::removeMyInternalWidgetFromPool(const MapBackend* const mapBackend)
 {
     for (int i=0; i<d->internalMapWidgetsPool.count(); ++i)
     {
@@ -290,7 +290,7 @@ void KMapGlobalObject::removeMyInternalWidgetFromPool(const MapBackend* const ma
     }
 }
 
-bool KMapGlobalObject::getInternalWidgetFromPool(const MapBackend* const mapBackend, KMapInternalWidgetInfo* const targetInfo)
+bool KGeoMapGlobalObject::getInternalWidgetFromPool(const MapBackend* const mapBackend, KGeoMapInternalWidgetInfo* const targetInfo)
 {
     const QString requestingBackendName = mapBackend->backendName();
 
@@ -300,25 +300,25 @@ bool KMapGlobalObject::getInternalWidgetFromPool(const MapBackend* const mapBack
     int bestReleasedWidget = -1;
     for (int i=0; i<d->internalMapWidgetsPool.count(); ++i)
     {
-        const KMapInternalWidgetInfo& info = d->internalMapWidgetsPool.at(i);
+        const KGeoMapInternalWidgetInfo& info = d->internalMapWidgetsPool.at(i);
 
         if (info.backendName!=requestingBackendName)
         {
             continue;
         }
 
-        if ((info.state.testFlag(KMapInternalWidgetInfo::InternalWidgetReleased)&&(bestReleasedWidget<0)))
+        if ((info.state.testFlag(KGeoMapInternalWidgetInfo::InternalWidgetReleased)&&(bestReleasedWidget<0)))
         {
             bestReleasedWidget = i;
             break;
         }
 
-        if ((info.state.testFlag(KMapInternalWidgetInfo::InternalWidgetUndocked)&&(bestUndockedWidget<0)))
+        if ((info.state.testFlag(KGeoMapInternalWidgetInfo::InternalWidgetUndocked)&&(bestUndockedWidget<0)))
         {
             bestUndockedWidget = i;
         }
 
-        if ((info.state.testFlag(KMapInternalWidgetInfo::InternalWidgetStillDocked)&&(bestDockedWidget<0)))
+        if ((info.state.testFlag(KGeoMapInternalWidgetInfo::InternalWidgetStillDocked)&&(bestDockedWidget<0)))
         {
             bestDockedWidget = i;
         }
@@ -349,21 +349,21 @@ bool KMapGlobalObject::getInternalWidgetFromPool(const MapBackend* const mapBack
     return true;
 }
 
-void KMapGlobalObject::addMyInternalWidgetToPool(const KMapInternalWidgetInfo& info)
+void KGeoMapGlobalObject::addMyInternalWidgetToPool(const KGeoMapInternalWidgetInfo& info)
 {
     d->internalMapWidgetsPool.append(info);
 }
 
-void KMapGlobalObject::updatePooledWidgetState(const QWidget* const widget, const KMapInternalWidgetInfo::InternalWidgetState newState)
+void KGeoMapGlobalObject::updatePooledWidgetState(const QWidget* const widget, const KGeoMapInternalWidgetInfo::InternalWidgetState newState)
 {
     for (int i=0; i<d->internalMapWidgetsPool.count(); ++i)
     {
         if (d->internalMapWidgetsPool.at(i).widget==widget)
         {
-            KMapInternalWidgetInfo& info = d->internalMapWidgetsPool[i];
+            KGeoMapInternalWidgetInfo& info = d->internalMapWidgetsPool[i];
             info.state = newState;
 
-            if (newState==KMapInternalWidgetInfo::InternalWidgetReleased)
+            if (newState==KGeoMapInternalWidgetInfo::InternalWidgetReleased)
             {
                 info.currentOwner = 0;
             }
@@ -373,11 +373,11 @@ void KMapGlobalObject::updatePooledWidgetState(const QWidget* const widget, cons
     }
 }
 
-void KMapGlobalObject::clearWidgetPool()
+void KGeoMapGlobalObject::clearWidgetPool()
 {
     while (!d->internalMapWidgetsPool.isEmpty())
     {
-        KMapInternalWidgetInfo info = d->internalMapWidgetsPool.takeLast();
+        KGeoMapInternalWidgetInfo info = d->internalMapWidgetsPool.takeLast();
         kDebug()<<info.backendName<<info.deleteFunction;
         if (info.deleteFunction)
         {
@@ -386,4 +386,4 @@ void KMapGlobalObject::clearWidgetPool()
     }
 }
 
-} /* namespace KMap */
+} /* namespace KGeoMap */

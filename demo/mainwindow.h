@@ -40,7 +40,7 @@
 
 class KCmdLineArgs;
 
-class MarkerModelHelper : public KMap::ModelHelper
+class MarkerModelHelper : public KGeoMap::ModelHelper
 {
 Q_OBJECT
 
@@ -50,8 +50,8 @@ public:
 
     virtual QAbstractItemModel* model() const;
     virtual QItemSelectionModel* selectionModel() const;
-    virtual bool itemCoordinates(const QModelIndex& index, KMap::GeoCoordinates* const coordinates) const;
-    virtual void onIndicesMoved(const QList<QPersistentModelIndex>& movedIndices, const KMap::GeoCoordinates& targetCoordinates, const QPersistentModelIndex& targetSnapIndex);
+    virtual bool itemCoordinates(const QModelIndex& index, KGeoMap::GeoCoordinates* const coordinates) const;
+    virtual void onIndicesMoved(const QList<QPersistentModelIndex>& movedIndices, const KGeoMap::GeoCoordinates& targetCoordinates, const QPersistentModelIndex& targetSnapIndex);
     virtual Flags modelFlags() const;
 
 private:

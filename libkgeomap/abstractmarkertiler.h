@@ -39,7 +39,7 @@
 #include "kgeomap_primitives.h"
 #include "libkgeomap_export.h"
 
-namespace KMap
+namespace KGeoMap
 {
 
 class KGEOMAP_EXPORT AbstractMarkerTiler : public QObject
@@ -62,7 +62,7 @@ public:
 
         TileIndex::List tileIndicesList;
         QVariant representativeIndex;
-        KMapGroupState groupSelectionState;
+        KGeoMapGroupState groupSelectionState;
         MouseModes currentMouseMode;
     };
 
@@ -212,8 +212,8 @@ public:
     virtual QVariant bestRepresentativeIndexFromList(const QList<QVariant>& indices, const int sortKey) = 0;
     virtual QPixmap pixmapFromRepresentativeIndex(const QVariant& index, const QSize& size) = 0;
     virtual bool indicesEqual(const QVariant& a, const QVariant& b) const = 0;
-    virtual KMapGroupState getTileGroupState(const TileIndex& tileIndex) = 0;
-    virtual KMapGroupState getGlobalGroupState() = 0;
+    virtual KGeoMapGroupState getTileGroupState(const TileIndex& tileIndex) = 0;
+    virtual KGeoMapGroupState getGlobalGroupState() = 0;
 
     // these can be implemented if you want to react to actions in kgeomap
     virtual void onIndicesClicked(const ClickInfo& clickInfo);
@@ -245,8 +245,8 @@ private:
     AbstractMarkerTilerPrivate* const d;
 };
 
-} /* namespace KMap */
+} /* namespace KGeoMap */
 
-Q_DECLARE_OPERATORS_FOR_FLAGS(KMap::AbstractMarkerTiler::Flags)
+Q_DECLARE_OPERATORS_FOR_FLAGS(KGeoMap::AbstractMarkerTiler::Flags)
 
 #endif /* ABSTRACTMARKERTILER_H */

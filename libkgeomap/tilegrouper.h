@@ -29,7 +29,7 @@
 
 #include "kgeomap_common.h"
 
-namespace KMap
+namespace KGeoMap
 {
 
 class MapBackend;
@@ -40,7 +40,7 @@ class TileGrouper : public QObject
 
 public:
 
-    TileGrouper(const QExplicitlySharedDataPointer<KMapSharedData>& sharedData, QObject* const parent);
+    TileGrouper(const QExplicitlySharedDataPointer<KGeoMapSharedData>& sharedData, QObject* const parent);
     ~TileGrouper();
 
     void setClustersDirty();
@@ -55,10 +55,10 @@ private:
     class TileGrouperPrivate;
     TileGrouperPrivate* const d;
 
-    const QExplicitlySharedDataPointer<KMapSharedData> s;
+    const QExplicitlySharedDataPointer<KGeoMapSharedData> s;
 
 };
 
-} /* KMap */
+} /* KGeoMap */
 
 #endif /* TILEGROUPER_H */

@@ -5,7 +5,7 @@
  * <a href="http://www.digikam.org">http://www.digikam.org</a>
  *
  * @date   2009-12-08
- * @brief  Internal part of the Marble-backend for KMap
+ * @brief  Internal part of the Marble-backend for KGeoMap
  *
  * @author Copyright (C) 2009-2010 by Michael G. Hansen
  *         <a href="mailto:mike at mghansen dot de">mike at mghansen dot de</a>
@@ -35,7 +35,7 @@
 
 #include <marble/MarbleWidget.h>
 
-namespace KMap
+namespace KGeoMap
 {
 
 class BackendMarble;
@@ -58,6 +58,6 @@ private:
     QPointer<BackendMarble> const marbleBackend;
 };
 
-} /* namespace KMap */
+} /* namespace KGeoMap */
 
 #endif /* BACKEND_MAP_MARBLE_SUBWIDGET_H */

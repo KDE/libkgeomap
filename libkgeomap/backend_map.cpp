@@ -5,7 +5,7 @@
  * <a href="http://www.digikam.org">http://www.digikam.org</a>
  *
  * @date   2009-12-01
- * @brief  Base-class for backends for KMap
+ * @brief  Base-class for backends for KGeoMap
  *
  * @author Copyright (C) 2009-2010 by Michael G. Hansen
  *         <a href="mailto:mike at mghansen dot de">mike at mghansen dot de</a>
@@ -26,10 +26,10 @@
 
 #include "backend_map.moc"
 
-namespace KMap
+namespace KGeoMap
 {
 
-MapBackend::MapBackend(const QExplicitlySharedDataPointer<KMapSharedData>& sharedData, QObject* const parent)
+MapBackend::MapBackend(const QExplicitlySharedDataPointer<KGeoMapSharedData>& sharedData, QObject* const parent)
           : QObject(parent), s(sharedData)
 {
 }
@@ -44,4 +44,4 @@ void MapBackend::slotThumbnailAvailableForIndex(const QVariant& index, const QPi
     Q_UNUSED(pixmap)
 }
 
-} /* namespace KMap */
+} /* namespace KGeoMap */

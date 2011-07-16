@@ -29,7 +29,7 @@
 
 #include <QFrame>
 
-namespace KMap
+namespace KGeoMap
 {
 
 class PlaceholderWidget : public QFrame
@@ -51,6 +51,6 @@ private:
 
 };
 
-} /* KMap */
+} /* KGeoMap */
 
 #endif /* PLACEHOLDERWIDGET_H */

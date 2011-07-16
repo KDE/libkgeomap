@@ -26,7 +26,7 @@
 
 #include "lookup_altitude.moc"
 
-namespace KMap
+namespace KGeoMap
 {
 
 LookupAltitude::LookupAltitude(QObject* const parent)
@@ -38,4 +38,4 @@ LookupAltitude::~LookupAltitude()
 {
 }
 
-} /* namespace KMap */
+} /* namespace KGeoMap */

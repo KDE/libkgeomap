@@ -28,7 +28,7 @@
 #include "kgeomap_primitives.h"
 #include "kgeomap_common.h"
 
-using namespace KMap;
+using namespace KGeoMap;
 
 void TestPrimitives::testNoOp()
 {
@@ -37,110 +37,110 @@ void TestPrimitives::testNoOp()
 void TestPrimitives::testParseLatLonString()
 {
     // make sure there is no crash on null-pointer
-    QVERIFY(KMapHelperParseLatLonString(QLatin1String("52,6"), 0));
+    QVERIFY(KGeoMapHelperParseLatLonString(QLatin1String("52,6"), 0));
 
     GeoCoordinates coordinate;
 
-    QVERIFY(KMapHelperParseLatLonString(QLatin1String("52,6"), &coordinate));
+    QVERIFY(KGeoMapHelperParseLatLonString(QLatin1String("52,6"), &coordinate));
     QCOMPARE(coordinate.geoUrl(), QLatin1String("geo:52,6"));
 
-    QVERIFY(KMapHelperParseLatLonString(QLatin1String("52.5,6.5"), &coordinate));
+    QVERIFY(KGeoMapHelperParseLatLonString(QLatin1String("52.5,6.5"), &coordinate));
     QCOMPARE(coordinate.geoUrl(), QLatin1String("geo:52.5,6.5"));
 
-    QVERIFY(KMapHelperParseLatLonString(QLatin1String(" 52.5, 6.5 "), &coordinate));
+    QVERIFY(KGeoMapHelperParseLatLonString(QLatin1String(" 52.5, 6.5 "), &coordinate));
     QCOMPARE(coordinate.geoUrl(), QLatin1String("geo:52.5,6.5"));
 
-    QVERIFY(KMapHelperParseLatLonString(QLatin1String("-52.5, 6.5 "), &coordinate));
+    QVERIFY(KGeoMapHelperParseLatLonString(QLatin1String("-52.5, 6.5 "), &coordinate));
     QCOMPARE(coordinate.geoUrl(), QLatin1String("geo:-52.5,6.5"));
 
-    QVERIFY(KMapHelperParseLatLonString(QLatin1String("    -52.5,  6.5   "), &coordinate));
+    QVERIFY(KGeoMapHelperParseLatLonString(QLatin1String("    -52.5,  6.5   "), &coordinate));
     QCOMPARE(coordinate.geoUrl(), QLatin1String("geo:-52.5,6.5"));
 
-    QVERIFY(KMapHelperParseLatLonString(QLatin1String("52.5,-6.5"), &coordinate));
+    QVERIFY(KGeoMapHelperParseLatLonString(QLatin1String("52.5,-6.5"), &coordinate));
     QCOMPARE(coordinate.geoUrl(), QLatin1String("geo:52.5,-6.5"));
 
-    QVERIFY(!KMapHelperParseLatLonString(QLatin1String(""), 0));
-    QVERIFY(!KMapHelperParseLatLonString(QLatin1String("52.6"), 0));
-    QVERIFY(!KMapHelperParseLatLonString(QLatin1String("52.6,"), 0));
-    QVERIFY(!KMapHelperParseLatLonString(QLatin1String(",6"), 0));
-    QVERIFY(!KMapHelperParseLatLonString(QLatin1String("a52,6"), 0));
-    QVERIFY(!KMapHelperParseLatLonString(QLatin1String("52,a"), 0));
-    QVERIFY(!KMapHelperParseLatLonString(QLatin1String("52,6a"), 0));
-    QVERIFY(!KMapHelperParseLatLonString(QLatin1String("(52,6)"), 0));
+    QVERIFY(!KGeoMapHelperParseLatLonString(QLatin1String(""), 0));
+    QVERIFY(!KGeoMapHelperParseLatLonString(QLatin1String("52.6"), 0));
+    QVERIFY(!KGeoMapHelperParseLatLonString(QLatin1String("52.6,"), 0));
+    QVERIFY(!KGeoMapHelperParseLatLonString(QLatin1String(",6"), 0));
+    QVERIFY(!KGeoMapHelperParseLatLonString(QLatin1String("a52,6"), 0));
+    QVERIFY(!KGeoMapHelperParseLatLonString(QLatin1String("52,a"), 0));
+    QVERIFY(!KGeoMapHelperParseLatLonString(QLatin1String("52,6a"), 0));
+    QVERIFY(!KGeoMapHelperParseLatLonString(QLatin1String("(52,6)"), 0));
 }
 
 void TestPrimitives::testParseXYStringToPoint()
 {
     // make sure there is no crash on null-pointer
-    QVERIFY(KMapHelperParseXYStringToPoint(QLatin1String("(52,6)"), 0));
+    QVERIFY(KGeoMapHelperParseXYStringToPoint(QLatin1String("(52,6)"), 0));
 
     QPoint point;
 
-    QVERIFY(KMapHelperParseXYStringToPoint(QLatin1String("(52,6)"), &point));
+    QVERIFY(KGeoMapHelperParseXYStringToPoint(QLatin1String("(52,6)"), &point));
     QCOMPARE(point, QPoint(52,6));
 
-    QVERIFY(KMapHelperParseXYStringToPoint(QLatin1String("(10,20)"), &point));
+    QVERIFY(KGeoMapHelperParseXYStringToPoint(QLatin1String("(10,20)"), &point));
     QCOMPARE(point, QPoint(10,20));
 
-    QVERIFY(KMapHelperParseXYStringToPoint(QLatin1String(" ( 52, 6 ) "), &point));
+    QVERIFY(KGeoMapHelperParseXYStringToPoint(QLatin1String(" ( 52, 6 ) "), &point));
     QCOMPARE(point, QPoint(52,6));
 
-    QVERIFY(KMapHelperParseXYStringToPoint(QLatin1String("  ( 52, 6 )  "), &point));
+    QVERIFY(KGeoMapHelperParseXYStringToPoint(QLatin1String("  ( 52, 6 )  "), &point));
     QCOMPARE(point, QPoint(52,6));
 
     // we used to expect integer results, but floats are also possible
     // BKO 270624
-    QVERIFY(KMapHelperParseXYStringToPoint(QLatin1String("  ( 52.5, 6.5 )  "), &point));
+    QVERIFY(KGeoMapHelperParseXYStringToPoint(QLatin1String("  ( 52.5, 6.5 )  "), &point));
     QCOMPARE(point, QPoint(52.5,6.5));
 
-    QVERIFY(KMapHelperParseXYStringToPoint("(204.94641003022224, 68.00444002512285)", &point));
+    QVERIFY(KGeoMapHelperParseXYStringToPoint("(204.94641003022224, 68.00444002512285)", &point));
 
-    QVERIFY(!KMapHelperParseXYStringToPoint(QLatin1String(""), 0));
-    QVERIFY(!KMapHelperParseXYStringToPoint(QLatin1String("()"), 0));
-    QVERIFY(!KMapHelperParseXYStringToPoint(QLatin1String("(52)"), 0));
-    QVERIFY(!KMapHelperParseXYStringToPoint(QLatin1String("(52,6a)"), 0));
-    QVERIFY(!KMapHelperParseXYStringToPoint(QLatin1String("(a52,6)"), 0));
-    QVERIFY(!KMapHelperParseXYStringToPoint(QLatin1String("52,6"), 0));
-    QVERIFY(!KMapHelperParseXYStringToPoint(QLatin1String("(,6)"), 0));
-    QVERIFY(!KMapHelperParseXYStringToPoint(QLatin1String("(6,)"), 0));
+    QVERIFY(!KGeoMapHelperParseXYStringToPoint(QLatin1String(""), 0));
+    QVERIFY(!KGeoMapHelperParseXYStringToPoint(QLatin1String("()"), 0));
+    QVERIFY(!KGeoMapHelperParseXYStringToPoint(QLatin1String("(52)"), 0));
+    QVERIFY(!KGeoMapHelperParseXYStringToPoint(QLatin1String("(52,6a)"), 0));
+    QVERIFY(!KGeoMapHelperParseXYStringToPoint(QLatin1String("(a52,6)"), 0));
+    QVERIFY(!KGeoMapHelperParseXYStringToPoint(QLatin1String("52,6"), 0));
+    QVERIFY(!KGeoMapHelperParseXYStringToPoint(QLatin1String("(,6)"), 0));
+    QVERIFY(!KGeoMapHelperParseXYStringToPoint(QLatin1String("(6,)"), 0));
 }
 
 void TestPrimitives::testParseBoundsString()
 {
     // make sure there is no crash on null-pointer
-    QVERIFY(KMapHelperParseBoundsString(QLatin1String("((-52,-6),(52,6))"), 0));
+    QVERIFY(KGeoMapHelperParseBoundsString(QLatin1String("((-52,-6),(52,6))"), 0));
 
     GeoCoordinates::Pair bounds;
 
-    QVERIFY(KMapHelperParseBoundsString(QLatin1String("((-52,-6),(52,6))"), &bounds));
+    QVERIFY(KGeoMapHelperParseBoundsString(QLatin1String("((-52,-6),(52,6))"), &bounds));
     QCOMPARE(bounds.first.geoUrl(), QLatin1String("geo:-52,-6"));
     QCOMPARE(bounds.second.geoUrl(), QLatin1String("geo:52,6"));
 
-    QVERIFY(KMapHelperParseBoundsString(QLatin1String("((-52,-6), (52,6))"), &bounds));
+    QVERIFY(KGeoMapHelperParseBoundsString(QLatin1String("((-52,-6), (52,6))"), &bounds));
     QCOMPARE(bounds.first.geoUrl(), QLatin1String("geo:-52,-6"));
     QCOMPARE(bounds.second.geoUrl(), QLatin1String("geo:52,6"));
 
-    QVERIFY(KMapHelperParseBoundsString(QLatin1String("((-52, -6), (52, 6))"), &bounds));
+    QVERIFY(KGeoMapHelperParseBoundsString(QLatin1String("((-52, -6), (52, 6))"), &bounds));
     QCOMPARE(bounds.first.geoUrl(), QLatin1String("geo:-52,-6"));
     QCOMPARE(bounds.second.geoUrl(), QLatin1String("geo:52,6"));
 
-    QVERIFY(KMapHelperParseBoundsString(QLatin1String("((10,20),(30,40))"), &bounds));
+    QVERIFY(KGeoMapHelperParseBoundsString(QLatin1String("((10,20),(30,40))"), &bounds));
     QCOMPARE(bounds.first.geoUrl(), QLatin1String("geo:10,20"));
     QCOMPARE(bounds.second.geoUrl(), QLatin1String("geo:30,40"));
 
-    QVERIFY(KMapHelperParseBoundsString(QLatin1String("((-52.5,-6.5),(52.5,6.5))"), &bounds));
+    QVERIFY(KGeoMapHelperParseBoundsString(QLatin1String("((-52.5,-6.5),(52.5,6.5))"), &bounds));
     QCOMPARE(bounds.first.geoUrl(), QLatin1String("geo:-52.5,-6.5"));
     QCOMPARE(bounds.second.geoUrl(), QLatin1String("geo:52.5,6.5"));
 
-    QVERIFY(!KMapHelperParseBoundsString(QLatin1String(" (-52.5,-6.5),(52.5,6.5))"), 0));
-    QVERIFY(!KMapHelperParseBoundsString(QLatin1String("((-52.5,-6.5),(52.5,6.5) "), 0));
-    QVERIFY(!KMapHelperParseBoundsString(QLatin1String("((-52.5,-6.5), 52.5,6.5))"), 0));
-    QVERIFY(!KMapHelperParseBoundsString(QLatin1String("((-52.5,-6.5  (52.5,6.5))"), 0));
-    QVERIFY(!KMapHelperParseBoundsString(QLatin1String("((-52.5 -6.5),(52.5,6.5))"), 0));
-    QVERIFY(!KMapHelperParseBoundsString(QLatin1String("((-52.5,-6.5),(52.5 6.5))"), 0));
-    QVERIFY(!KMapHelperParseBoundsString(QLatin1String("( -52.5,-6.5),(52.5,6.5))"), 0));
-    QVERIFY(!KMapHelperParseBoundsString(QLatin1String("((-52.5,-6.5),(52.5,6.5)a"), 0));
-    QVERIFY(!KMapHelperParseBoundsString(QLatin1String("((-52.5,),(52.5,6.5))"), 0));
+    QVERIFY(!KGeoMapHelperParseBoundsString(QLatin1String(" (-52.5,-6.5),(52.5,6.5))"), 0));
+    QVERIFY(!KGeoMapHelperParseBoundsString(QLatin1String("((-52.5,-6.5),(52.5,6.5) "), 0));
+    QVERIFY(!KGeoMapHelperParseBoundsString(QLatin1String("((-52.5,-6.5), 52.5,6.5))"), 0));
+    QVERIFY(!KGeoMapHelperParseBoundsString(QLatin1String("((-52.5,-6.5  (52.5,6.5))"), 0));
+    QVERIFY(!KGeoMapHelperParseBoundsString(QLatin1String("((-52.5 -6.5),(52.5,6.5))"), 0));
+    QVERIFY(!KGeoMapHelperParseBoundsString(QLatin1String("((-52.5,-6.5),(52.5 6.5))"), 0));
+    QVERIFY(!KGeoMapHelperParseBoundsString(QLatin1String("( -52.5,-6.5),(52.5,6.5))"), 0));
+    QVERIFY(!KGeoMapHelperParseBoundsString(QLatin1String("((-52.5,-6.5),(52.5,6.5)a"), 0));
+    QVERIFY(!KGeoMapHelperParseBoundsString(QLatin1String("((-52.5,),(52.5,6.5))"), 0));
 }
 
 void TestPrimitives::testNormalizeBounds_data()
@@ -189,81 +189,81 @@ void TestPrimitives::testNormalizeBounds()
 {
     QFETCH(GeoCoordinates::Pair, bounds);
 
-    QTEST(KMapHelperNormalizeBounds(bounds), "nbounds");
+    QTEST(KGeoMapHelperNormalizeBounds(bounds), "nbounds");
 }
 
 void TestPrimitives::testGroupStateComputer()
 {
     {
         // test selected state:
-        KMapGroupStateComputer c1;
-        QCOMPARE(c1.getState(), KMapSelectedNone);
-        c1.addSelectedState(KMapSelectedNone);
-        QCOMPARE(c1.getState(), KMapSelectedNone);
-        c1.addSelectedState(KMapSelectedSome);
-        QCOMPARE(c1.getState(), KMapSelectedSome);
-        c1.addSelectedState(KMapSelectedAll);
-        QCOMPARE(c1.getState(), KMapSelectedSome);
+        KGeoMapGroupStateComputer c1;
+        QCOMPARE(c1.getState(), KGeoMapSelectedNone);
+        c1.addSelectedState(KGeoMapSelectedNone);
+        QCOMPARE(c1.getState(), KGeoMapSelectedNone);
+        c1.addSelectedState(KGeoMapSelectedSome);
+        QCOMPARE(c1.getState(), KGeoMapSelectedSome);
+        c1.addSelectedState(KGeoMapSelectedAll);
+        QCOMPARE(c1.getState(), KGeoMapSelectedSome);
         c1.clear();
-        QCOMPARE(c1.getState(), KMapSelectedNone);
-        c1.addSelectedState(KMapSelectedAll);
-        QCOMPARE(c1.getState(), KMapSelectedAll);
-        c1.addSelectedState(KMapSelectedSome);
-        QCOMPARE(c1.getState(), KMapSelectedSome);
+        QCOMPARE(c1.getState(), KGeoMapSelectedNone);
+        c1.addSelectedState(KGeoMapSelectedAll);
+        QCOMPARE(c1.getState(), KGeoMapSelectedAll);
+        c1.addSelectedState(KGeoMapSelectedSome);
+        QCOMPARE(c1.getState(), KGeoMapSelectedSome);
         c1.clear();
-        QCOMPARE(c1.getState(), KMapSelectedNone);
-        c1.addSelectedState(KMapSelectedAll);
-        QCOMPARE(c1.getState(), KMapSelectedAll);
-        c1.addSelectedState(KMapSelectedNone);
-        QCOMPARE(c1.getState(), KMapSelectedSome);
+        QCOMPARE(c1.getState(), KGeoMapSelectedNone);
+        c1.addSelectedState(KGeoMapSelectedAll);
+        QCOMPARE(c1.getState(), KGeoMapSelectedAll);
+        c1.addSelectedState(KGeoMapSelectedNone);
+        QCOMPARE(c1.getState(), KGeoMapSelectedSome);
     }
 
     {
         // test selected state:
-        KMapGroupStateComputer c1;
-        QCOMPARE(c1.getState(), KMapFilteredPositiveNone);
-        c1.addFilteredPositiveState(KMapFilteredPositiveNone);
-        QCOMPARE(c1.getState(), KMapFilteredPositiveNone);
-        c1.addFilteredPositiveState(KMapFilteredPositiveSome);
-        QCOMPARE(c1.getState(), KMapFilteredPositiveSome);
-        c1.addFilteredPositiveState(KMapFilteredPositiveAll);
-        QCOMPARE(c1.getState(), KMapFilteredPositiveSome);
+        KGeoMapGroupStateComputer c1;
+        QCOMPARE(c1.getState(), KGeoMapFilteredPositiveNone);
+        c1.addFilteredPositiveState(KGeoMapFilteredPositiveNone);
+        QCOMPARE(c1.getState(), KGeoMapFilteredPositiveNone);
+        c1.addFilteredPositiveState(KGeoMapFilteredPositiveSome);
+        QCOMPARE(c1.getState(), KGeoMapFilteredPositiveSome);
+        c1.addFilteredPositiveState(KGeoMapFilteredPositiveAll);
+        QCOMPARE(c1.getState(), KGeoMapFilteredPositiveSome);
         c1.clear();
-        QCOMPARE(c1.getState(), KMapFilteredPositiveNone);
-        c1.addFilteredPositiveState(KMapFilteredPositiveAll);
-        QCOMPARE(c1.getState(), KMapFilteredPositiveAll);
-        c1.addFilteredPositiveState(KMapFilteredPositiveSome);
-        QCOMPARE(c1.getState(), KMapFilteredPositiveSome);
+        QCOMPARE(c1.getState(), KGeoMapFilteredPositiveNone);
+        c1.addFilteredPositiveState(KGeoMapFilteredPositiveAll);
+        QCOMPARE(c1.getState(), KGeoMapFilteredPositiveAll);
+        c1.addFilteredPositiveState(KGeoMapFilteredPositiveSome);
+        QCOMPARE(c1.getState(), KGeoMapFilteredPositiveSome);
         c1.clear();
-        QCOMPARE(c1.getState(), KMapFilteredPositiveNone);
-        c1.addFilteredPositiveState(KMapFilteredPositiveAll);
-        QCOMPARE(c1.getState(), KMapFilteredPositiveAll);
-        c1.addFilteredPositiveState(KMapFilteredPositiveNone);
-        QCOMPARE(c1.getState(), KMapFilteredPositiveSome);
+        QCOMPARE(c1.getState(), KGeoMapFilteredPositiveNone);
+        c1.addFilteredPositiveState(KGeoMapFilteredPositiveAll);
+        QCOMPARE(c1.getState(), KGeoMapFilteredPositiveAll);
+        c1.addFilteredPositiveState(KGeoMapFilteredPositiveNone);
+        QCOMPARE(c1.getState(), KGeoMapFilteredPositiveSome);
     }
 
     {
         // test selected state:
-        KMapGroupStateComputer c1;
-        QCOMPARE(c1.getState(), KMapRegionSelectedNone);
-        c1.addRegionSelectedState(KMapRegionSelectedNone);
-        QCOMPARE(c1.getState(), KMapRegionSelectedNone);
-        c1.addRegionSelectedState(KMapRegionSelectedSome);
-        QCOMPARE(c1.getState(), KMapRegionSelectedSome);
-        c1.addRegionSelectedState(KMapRegionSelectedAll);
-        QCOMPARE(c1.getState(), KMapRegionSelectedSome);
+        KGeoMapGroupStateComputer c1;
+        QCOMPARE(c1.getState(), KGeoMapRegionSelectedNone);
+        c1.addRegionSelectedState(KGeoMapRegionSelectedNone);
+        QCOMPARE(c1.getState(), KGeoMapRegionSelectedNone);
+        c1.addRegionSelectedState(KGeoMapRegionSelectedSome);
+        QCOMPARE(c1.getState(), KGeoMapRegionSelectedSome);
+        c1.addRegionSelectedState(KGeoMapRegionSelectedAll);
+        QCOMPARE(c1.getState(), KGeoMapRegionSelectedSome);
         c1.clear();
-        QCOMPARE(c1.getState(), KMapRegionSelectedNone);
-        c1.addRegionSelectedState(KMapRegionSelectedAll);
-        QCOMPARE(c1.getState(), KMapRegionSelectedAll);
-        c1.addRegionSelectedState(KMapRegionSelectedSome);
-        QCOMPARE(c1.getState(), KMapRegionSelectedSome);
+        QCOMPARE(c1.getState(), KGeoMapRegionSelectedNone);
+        c1.addRegionSelectedState(KGeoMapRegionSelectedAll);
+        QCOMPARE(c1.getState(), KGeoMapRegionSelectedAll);
+        c1.addRegionSelectedState(KGeoMapRegionSelectedSome);
+        QCOMPARE(c1.getState(), KGeoMapRegionSelectedSome);
         c1.clear();
-        QCOMPARE(c1.getState(), KMapRegionSelectedNone);
-        c1.addRegionSelectedState(KMapRegionSelectedAll);
-        QCOMPARE(c1.getState(), KMapRegionSelectedAll);
-        c1.addRegionSelectedState(KMapRegionSelectedNone);
-        QCOMPARE(c1.getState(), KMapRegionSelectedSome);
+        QCOMPARE(c1.getState(), KGeoMapRegionSelectedNone);
+        c1.addRegionSelectedState(KGeoMapRegionSelectedAll);
+        QCOMPARE(c1.getState(), KGeoMapRegionSelectedAll);
+        c1.addRegionSelectedState(KGeoMapRegionSelectedNone);
+        QCOMPARE(c1.getState(), KGeoMapRegionSelectedSome);
     }
 
     /// @todo Test addState

@@ -5,7 +5,7 @@
  * <a href="http://www.digikam.org">http://www.digikam.org</a>
  *
  * @date   2010-03-18
- * @brief  Drag-and-drop handler for KMap
+ * @brief  Drag-and-drop handler for KGeoMap
  *
  * @author Copyright (C) 2010 by Michael G. Hansen
  *         <a href="mailto:mike at mghansen dot de">mike at mghansen dot de</a>
@@ -34,7 +34,7 @@
 #include "kgeomap_primitives.h"
 #include "libkgeomap_export.h"
 
-namespace KMap
+namespace KGeoMap
 {
 
 DragDropHandler::DragDropHandler(QObject* const parent)
@@ -46,4 +46,4 @@ DragDropHandler::~DragDropHandler()
 {
 }
 
-} /* namespace KMap */
+} /* namespace KGeoMap */

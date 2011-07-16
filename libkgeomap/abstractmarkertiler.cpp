@@ -26,7 +26,7 @@
 
 #include "abstractmarkertiler.moc"
 
-namespace KMap
+namespace KGeoMap
 {
 
 typedef QPair<int, int> QIntPair;
@@ -473,4 +473,4 @@ void AbstractMarkerTiler::clear()
     d->rootTile = 0;
 }
 
-} /* namespace KMap */
+} /* namespace KGeoMap */

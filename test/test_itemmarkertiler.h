@@ -33,7 +33,7 @@
 #include "itemmarkertiler.h"
 #include "modelhelper.h"
 
-class MarkerModelHelper : public KMap::ModelHelper
+class MarkerModelHelper : public KGeoMap::ModelHelper
 {
 Q_OBJECT
 
@@ -43,7 +43,7 @@ public:
 
     virtual QAbstractItemModel* model() const;
     virtual QItemSelectionModel* selectionModel() const;
-    virtual bool itemCoordinates(const QModelIndex& index, KMap::GeoCoordinates* const coordinates) const;
+    virtual bool itemCoordinates(const QModelIndex& index, KGeoMap::GeoCoordinates* const coordinates) const;
 
 private Q_SLOTS:
     void slotDataChanged(const QModelIndex& topLeft, const QModelIndex& bottomRight);

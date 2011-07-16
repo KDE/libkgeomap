@@ -39,7 +39,7 @@ namespace KIO
 class KJob;
 /// @endcond
 
-namespace KMap
+namespace KGeoMap
 {
 
 class KGEOMAP_EXPORT LookupAltitudeGeonames : public LookupAltitude
@@ -76,6 +76,6 @@ private:
     LookupAltitudeGeonamesPrivate* const d;
 };
 
-} /* namespace KMap */
+} /* namespace KGeoMap */
 
 #endif /* LOOKUP_ALTITUDE_GEONAMES_H */

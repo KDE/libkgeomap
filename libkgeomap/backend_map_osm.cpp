@@ -5,7 +5,7 @@
  * <a href="http://www.digikam.org">http://www.digikam.org</a>
  *
  * @date   2009-12-01
- * @brief  OpenStreetMap-backend for KMap
+ * @brief  OpenStreetMap-backend for KGeoMap
  *
  * @author Copyright (C) 2009-2011 by Michael G. Hansen
  *         <a href="mailto:mike at mghansen dot de">mike at mghansen dot de</a>
@@ -43,7 +43,7 @@
 #include "kgeomap.h"
 #include "markermodel.h"
 
-namespace KMap
+namespace KGeoMap
 {
 
 class BackendOSM::BackendOSMPrivate
@@ -69,7 +69,7 @@ public:
     QPair<GeoCoordinates, GeoCoordinates> cacheBounds;
 };
 
-BackendOSM::BackendOSM(const QExplicitlySharedDataPointer<KMapSharedData>& sharedData, QObject* const parent)
+BackendOSM::BackendOSM(const QExplicitlySharedDataPointer<KGeoMapSharedData>& sharedData, QObject* const parent)
           : MapBackend(sharedData, parent), d(new BackendOSMPrivate())
 {
     d->htmlWidgetWrapper = new QWidget();
@@ -88,7 +88,7 @@ BackendOSM::BackendOSM(const QExplicitlySharedDataPointer<KMapSharedData>& share
 
 void BackendOSM::loadInitialHTML()
 {
-    const KUrl htmlUrl = KMapGlobalObject::instance()->locateDataFile("backend-osm.html");
+    const KUrl htmlUrl = KGeoMapGlobalObject::instance()->locateDataFile("backend-osm.html");
 
     d->htmlWidget->openUrl(htmlUrl);
 }
@@ -346,7 +346,7 @@ void BackendOSM::slotHTMLEvents(const QStringList& events)
     if (mapBoundsProbablyChanged)
     {
         const QString mapBoundsString = d->htmlWidget->runScript("kgeomapGetBounds();").toString();
-        KMapHelperParseBoundsString(mapBoundsString, &d->cacheBounds);
+        KGeoMapHelperParseBoundsString(mapBoundsString, &d->cacheBounds);
     }
 
     if (mapBoundsProbablyChanged||!movedClusters.isEmpty())
@@ -369,7 +369,7 @@ void BackendOSM::updateClusters()
     d->htmlWidget->runScript(QLatin1String("kgeomapClearClusters();"));
     for (int currentIndex = 0; currentIndex<s->clusterList.size(); ++currentIndex)
     {
-        const KMapCluster& currentCluster = s->clusterList.at(currentIndex);
+        const KGeoMapCluster& currentCluster = s->clusterList.at(currentIndex);
 
         // determine the colors:
         QColor       fillColor;
@@ -399,7 +399,7 @@ bool BackendOSM::screenCoordinates(const GeoCoordinates& coordinates, QPoint* co
     if (!d->isReady)
         return false;
 
-    const bool isValid = KMapHelperParseXYStringToPoint(
+    const bool isValid = KGeoMapHelperParseXYStringToPoint(
             d->htmlWidget->runScript(
                 QLatin1String("kgeomapLatLngToPixel(%1, %2);")
                     .arg(coordinates.latString())
@@ -505,7 +505,7 @@ int BackendOSM::getMarkerModelLevel()
 
 GeoCoordinates::PairList BackendOSM::getNormalizedBounds()
 {
-    return KMapHelperNormalizeBounds(d->cacheBounds);
+    return KGeoMapHelperNormalizeBounds(d->cacheBounds);
 }
 
-} /* namespace KMap */
+} /* namespace KGeoMap */

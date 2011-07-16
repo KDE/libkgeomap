@@ -5,7 +5,7 @@
  * <a href="http://www.digikam.org">http://www.digikam.org</a>
  *
  * @date   2010-03-18
- * @brief  Drag-and-drop handler for KMap
+ * @brief  Drag-and-drop handler for KGeoMap
  *
  * @author Copyright (C) 2010 by Michael G. Hansen
  *         <a href="mailto:mike at mghansen dot de">mike at mghansen dot de</a>
@@ -34,7 +34,7 @@
 
 class QDropEvent;
 
-namespace KMap
+namespace KGeoMap
 {
 
 class KGEOMAP_EXPORT DragDropHandler : public QObject
@@ -51,6 +51,6 @@ public:
     virtual QMimeData* createMimeData(const QList<QPersistentModelIndex>& modelIndices) = 0;
 };
 
-} /* namespace KMap */
+} /* namespace KGeoMap */
 
 #endif /* KGEOMAP_DRAGDROPHANDLER_H */

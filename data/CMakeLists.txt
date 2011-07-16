@@ -59,4 +59,4 @@ INSTALL(FILES backend-osm.html
               marker-ff7f00-selected.png
               marker-ffff00-selected.png
               marker-icon-16x16.png
-        DESTINATION ${DATA_INSTALL_DIR}/libkmap/)
+        DESTINATION ${DATA_INSTALL_DIR}/libkgeomap/)

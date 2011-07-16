@@ -38,7 +38,7 @@
 #include "kgeomap_primitives.h"
 #include "libkgeomap_export.h"
 
-namespace KMap
+namespace KGeoMap
 {
 
 class KGEOMAP_EXPORT TileIndex
@@ -149,7 +149,7 @@ public:
         return result;
     }
 
-    static TileIndex fromCoordinates(const KMap::GeoCoordinates& coordinate, const int getLevel);
+    static TileIndex fromCoordinates(const KGeoMap::GeoCoordinates& coordinate, const int getLevel);
 
     GeoCoordinates toCoordinates() const;
 
@@ -218,14 +218,14 @@ private:
     int m_indices[MaxIndexCount];
 };
 
-} /* namespace KMap */
+} /* namespace KGeoMap */
 
-inline QDebug operator<<(QDebug debugOut, const KMap::TileIndex& tileIndex)
+inline QDebug operator<<(QDebug debugOut, const KGeoMap::TileIndex& tileIndex)
 {
     debugOut << tileIndex.toIntList();
     return debugOut;
 }
 
-Q_DECLARE_TYPEINFO(KMap::TileIndex, Q_MOVABLE_TYPE);
+Q_DECLARE_TYPEINFO(KGeoMap::TileIndex, Q_MOVABLE_TYPE);
 
 #endif /* KGEOMAP_TILEINDEX_H */

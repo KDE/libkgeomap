@@ -29,7 +29,7 @@
 
 #include "kgeomap_primitives.h"
 
-namespace KMap
+namespace KGeoMap
 {
 
 class LookupAltitude;
@@ -42,6 +42,6 @@ public:
 
 };
 
-} /* namespace KMap */
+} /* namespace KGeoMap */
 
 #endif /* LOOKUP_FACTORY_H */

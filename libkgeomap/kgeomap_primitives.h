@@ -5,7 +5,7 @@
  * <a href="http://www.digikam.org">http://www.digikam.org</a>
  *
  * @date   2009-12-01
- * @brief  Primitive datatypes for KMap
+ * @brief  Primitive datatypes for KGeoMap
  *
  * @author Copyright (C) 2009-2010 by Michael G. Hansen
  *         <a href="mailto:mike at mghansen dot de">mike at mghansen dot de</a>
@@ -49,12 +49,12 @@ Q_DECLARE_METATYPE(QPersistentModelIndex)
 #include <valgrind/valgrind.h>
 #endif /* KGEOMAP_HAVE_VALGRIND */
 
-#define KGEOMAP_ASSERT(cond) ((!(cond)) ? KMap::KMap_assert(#cond,__FILE__,__LINE__) : qt_noop())
+#define KGEOMAP_ASSERT(cond) ((!(cond)) ? KGeoMap::KGeoMap_assert(#cond,__FILE__,__LINE__) : qt_noop())
 
-namespace KMap
+namespace KGeoMap
 {
 
-inline void KMap_assert(const char* const condition, const char* const filename, const int lineNumber)
+inline void KGeoMap_assert(const char* const condition, const char* const filename, const int lineNumber)
 {
     const QString debugString = QString::fromLatin1( "ASSERT: %1 - %2:%3").arg(QLatin1String( condition )).arg(QLatin1String( filename )).arg(lineNumber);
 #ifdef KGEOMAP_HAVE_VALGRIND
@@ -110,84 +110,84 @@ typedef QPair<int, int> QIntPair;
  * make sure that once you reach an object with ___None, and the computed
  * state is ___All, to set the ___Some bit.
  *
- * KMapSelected___: An object is selected.
- * KMapFilteredPositive___: An object was highlighted by a filter. This usually
+ * KGeoMapSelected___: An object is selected.
+ * KGeoMapFilteredPositive___: An object was highlighted by a filter. This usually
  *                          means that not-positively-filtered objects should be hidden.
- * KMapRegionSelected___: An object is inside a region of interest on the map.
+ * KGeoMapRegionSelected___: An object is inside a region of interest on the map.
  */
-enum KMapGroupStateEnum
+enum KGeoMapGroupStateEnum
 {
-    KMapSelectedMask = 0x03 << 0,
-    KMapSelectedNone = 0x00 << 0,
-    KMapSelectedSome = 0x03 << 0,
-    KMapSelectedAll  = 0x02 << 0,
+    KGeoMapSelectedMask = 0x03 << 0,
+    KGeoMapSelectedNone = 0x00 << 0,
+    KGeoMapSelectedSome = 0x03 << 0,
+    KGeoMapSelectedAll  = 0x02 << 0,
 
-    KMapFilteredPositiveMask = 0x03 << 2,
-    KMapFilteredPositiveNone = 0x00 << 2,
-    KMapFilteredPositiveSome = 0x03 << 2,
-    KMapFilteredPositiveAll  = 0x02 << 2,
+    KGeoMapFilteredPositiveMask = 0x03 << 2,
+    KGeoMapFilteredPositiveNone = 0x00 << 2,
+    KGeoMapFilteredPositiveSome = 0x03 << 2,
+    KGeoMapFilteredPositiveAll  = 0x02 << 2,
 
-    KMapRegionSelectedMask = 0x03 << 4,
-    KMapRegionSelectedNone = 0x00 << 4,
-    KMapRegionSelectedSome = 0x03 << 4,
-    KMapRegionSelectedAll  = 0x02 << 4
+    KGeoMapRegionSelectedMask = 0x03 << 4,
+    KGeoMapRegionSelectedNone = 0x00 << 4,
+    KGeoMapRegionSelectedSome = 0x03 << 4,
+    KGeoMapRegionSelectedAll  = 0x02 << 4
 };
 
-/// @todo KMapGroupState -> KMapGroupStates?
-Q_DECLARE_FLAGS(KMapGroupState, KMapGroupStateEnum)
-Q_DECLARE_OPERATORS_FOR_FLAGS(KMapGroupState)
+/// @todo KGeoMapGroupState -> KGeoMapGroupStates?
+Q_DECLARE_FLAGS(KGeoMapGroupState, KGeoMapGroupStateEnum)
+Q_DECLARE_OPERATORS_FOR_FLAGS(KGeoMapGroupState)
 
-class KMapGroupStateComputer
+class KGeoMapGroupStateComputer
 {
 private:
 
-    KMapGroupState m_state;
-    KMapGroupState m_stateMask;
+    KGeoMapGroupState m_state;
+    KGeoMapGroupState m_stateMask;
 
 public:
 
     /// @todo Make member functions non-inline?
 
-    KMapGroupStateComputer()
-    : m_state(KMapSelectedNone),
-      m_stateMask(KMapSelectedNone)
+    KGeoMapGroupStateComputer()
+    : m_state(KGeoMapSelectedNone),
+      m_stateMask(KGeoMapSelectedNone)
     {
     }
 
-    KMapGroupState getState() const
+    KGeoMapGroupState getState() const
     {
         return m_state;
     }
 
     void clear()
     {
-        m_state = KMapSelectedNone;
-        m_stateMask = KMapSelectedNone;
+        m_state = KGeoMapSelectedNone;
+        m_stateMask = KGeoMapSelectedNone;
     }
 
-    void addState(const KMapGroupState state)
+    void addState(const KGeoMapGroupState state)
     {
         addSelectedState(state);
         addFilteredPositiveState(state);
         addRegionSelectedState(state);
     }
 
-    void addSelectedState(const KMapGroupState state)
+    void addSelectedState(const KGeoMapGroupState state)
     {
-        if (!(m_stateMask & KMapSelectedMask))
+        if (!(m_stateMask & KGeoMapSelectedMask))
         {
             m_state|= state;
-            m_stateMask|= KMapSelectedMask;
+            m_stateMask|= KGeoMapSelectedMask;
         }
         else
         {
-            if ((state&KMapSelectedMask)==KMapSelectedAll)
+            if ((state&KGeoMapSelectedMask)==KGeoMapSelectedAll)
             {
-                m_state|=KMapSelectedAll;
+                m_state|=KGeoMapSelectedAll;
             }
-            else if ((m_state&KMapSelectedMask)==KMapSelectedAll)
+            else if ((m_state&KGeoMapSelectedMask)==KGeoMapSelectedAll)
             {
-                m_state|=KMapSelectedSome;
+                m_state|=KGeoMapSelectedSome;
             }
             else
             {
@@ -196,22 +196,22 @@ public:
         }
     }
 
-    void addFilteredPositiveState(const KMapGroupState state)
+    void addFilteredPositiveState(const KGeoMapGroupState state)
     {
-        if (!(m_stateMask & KMapFilteredPositiveMask))
+        if (!(m_stateMask & KGeoMapFilteredPositiveMask))
         {
             m_state|= state;
-            m_stateMask|= KMapFilteredPositiveMask;
+            m_stateMask|= KGeoMapFilteredPositiveMask;
         }
         else
         {
-            if ((state&KMapFilteredPositiveMask)==KMapFilteredPositiveAll)
+            if ((state&KGeoMapFilteredPositiveMask)==KGeoMapFilteredPositiveAll)
             {
-                m_state|=KMapFilteredPositiveAll;
+                m_state|=KGeoMapFilteredPositiveAll;
             }
-            else if ((m_state&KMapFilteredPositiveMask)==KMapFilteredPositiveAll)
+            else if ((m_state&KGeoMapFilteredPositiveMask)==KGeoMapFilteredPositiveAll)
             {
-                m_state|=KMapFilteredPositiveSome;
+                m_state|=KGeoMapFilteredPositiveSome;
             }
             else
             {
@@ -220,22 +220,22 @@ public:
         }
     }
 
-    void addRegionSelectedState(const KMapGroupState state)
+    void addRegionSelectedState(const KGeoMapGroupState state)
     {
-        if (!(m_stateMask & KMapRegionSelectedMask))
+        if (!(m_stateMask & KGeoMapRegionSelectedMask))
         {
             m_state|= state;
-            m_stateMask|= KMapRegionSelectedMask;
+            m_stateMask|= KGeoMapRegionSelectedMask;
         }
         else
         {
-            if ((state&KMapRegionSelectedMask)==KMapRegionSelectedAll)
+            if ((state&KGeoMapRegionSelectedMask)==KGeoMapRegionSelectedAll)
             {
-                m_state|=KMapRegionSelectedAll;
+                m_state|=KGeoMapRegionSelectedAll;
             }
-            else if ((m_state&KMapRegionSelectedMask)==KMapRegionSelectedAll)
+            else if ((m_state&KGeoMapRegionSelectedMask)==KGeoMapRegionSelectedAll)
             {
-                m_state|=KMapRegionSelectedSome;
+                m_state|=KGeoMapRegionSelectedSome;
             }
             else
             {
@@ -245,8 +245,8 @@ public:
     }
 };
 
-} /* namespace KMap */
+} /* namespace KGeoMap */
 
-Q_DECLARE_METATYPE(KMap::MouseModes)
+Q_DECLARE_METATYPE(KGeoMap::MouseModes)
 
 #endif /* KGEOMAP_PRIMITIVES_H */

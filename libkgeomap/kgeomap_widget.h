@@ -43,22 +43,22 @@ class QDragEnterEvent;
 class QDropEvent;
 class QMenu;
 
-namespace KMap
+namespace KGeoMap
 {
 
 class AbstractMarkerTiler;
 class DragDropHandler;
-class KMapSharedData;
+class KGeoMapSharedData;
 class ModelHelper;
 
-class KGEOMAP_EXPORT KMapWidget : public QWidget
+class KGEOMAP_EXPORT KGeoMapWidget : public QWidget
 {
   Q_OBJECT
 
 public:
 
-    KMapWidget(QWidget* const parent = 0);
-    ~KMapWidget();
+    KGeoMapWidget(QWidget* const parent = 0);
+    ~KGeoMapWidget();
 
     void saveSettingsToGroup(KConfigGroup* const group);
     void readSettingsFromGroup(const KConfigGroup* const group);
@@ -133,16 +133,16 @@ public:
 
     void getColorInfos(const int clusterIndex, QColor *fillColor, QColor *strokeColor,
                        Qt::PenStyle *strokeStyle, QString *labelText, QColor *labelColor,
-                       const KMapGroupState* const overrideSelection = 0,
+                       const KGeoMapGroupState* const overrideSelection = 0,
                        const int* const overrideCount = 0) const;
 
-    void getColorInfos(const KMapGroupState groupState,
+    void getColorInfos(const KGeoMapGroupState groupState,
                        const int nMarkers,
                        QColor *fillColor, QColor *strokeColor,
                        Qt::PenStyle *strokeStyle, QString *labelText, QColor *labelColor) const;
 
     QString convertZoomToBackendZoom(const QString& someZoom, const QString& targetBackend) const;
-    QPixmap getDecoratedPixmapForCluster(const int clusterId, const KMapGroupState* const selectedStateOverride, const int* const countOverride, QPoint* const centerPoint);
+    QPixmap getDecoratedPixmapForCluster(const int clusterId, const KGeoMapGroupState* const selectedStateOverride, const int* const countOverride, QPoint* const centerPoint);
     QVariant getClusterRepresentativeMarker(const int clusterIndex, const int sortKey);
     //@}
 
@@ -170,7 +170,7 @@ Q_SIGNALS:
     void signalRegionSelectionChanged();
     void signalRemoveCurrentFilter();
     void signalStickyModeChanged();
-    void signalMouseModeChanged(const KMap::MouseModes& currentMouseMode);
+    void signalMouseModeChanged(const KGeoMap::MouseModes& currentMouseMode);
 
 public:
 
@@ -210,7 +210,7 @@ protected Q_SLOTS:
     void slotLazyReclusteringRequestCallBack();
     void slotItemDisplaySettingsChanged();
     void slotUngroupedModelChanged();
-    void slotNewSelectionFromMap(const KMap::GeoCoordinates::Pair& sel);
+    void slotNewSelectionFromMap(const KGeoMap::GeoCoordinates::Pair& sel);
 
     /// @name Mouse modes
     //@{
@@ -220,14 +220,14 @@ protected Q_SLOTS:
 
 private:
 
-    const QExplicitlySharedDataPointer<KMapSharedData> s;
+    const QExplicitlySharedDataPointer<KGeoMapSharedData> s;
 
-    class KMapWidgetPrivate;
-    KMapWidgetPrivate* const d;
+    class KGeoMapWidgetPrivate;
+    KGeoMapWidgetPrivate* const d;
 
-    Q_DISABLE_COPY(KMapWidget)
+    Q_DISABLE_COPY(KGeoMapWidget)
 };
 
-} /* namespace KMap */
+} /* namespace KGeoMap */
 
 #endif /* KGEOMAP_WIDGET_H */

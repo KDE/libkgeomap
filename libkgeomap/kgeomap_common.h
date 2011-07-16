@@ -44,25 +44,25 @@
 #include "kgeomap_primitives.h"
 #include "tileindex.h"
 
-namespace KMap
+namespace KGeoMap
 {
 
 class AbstractMarkerTiler;
-class KMapWidget;
+class KGeoMapWidget;
 class MapBackend;
 class ModelHelper;
 class TileGrouper;
 
 /**
- * @brief Class to hold information about map widgets stored in the KMapGlobalObject
+ * @brief Class to hold information about map widgets stored in the KGeoMapGlobalObject
  *
  * @todo The list of these info structures has to be cleaned up periodically
  */
-class KMapInternalWidgetInfo
+class KGeoMapInternalWidgetInfo
 {
 public:
 
-    typedef void (*DeleteFunction)(KMapInternalWidgetInfo* const info);
+    typedef void (*DeleteFunction)(KGeoMapInternalWidgetInfo* const info);
 
     enum InternalWidgetState
     {
@@ -80,7 +80,7 @@ public:
     QPointer<QObject>    currentOwner;
     DeleteFunction       deleteFunction;
 
-    KMapInternalWidgetInfo()
+    KGeoMapInternalWidgetInfo()
      : state(),
        widget(),
        backendData(),
@@ -91,17 +91,17 @@ public:
     }
 };
 
-Q_DECLARE_OPERATORS_FOR_FLAGS(KMapInternalWidgetInfo::InternalWidgetStates)
+Q_DECLARE_OPERATORS_FOR_FLAGS(KGeoMapInternalWidgetInfo::InternalWidgetStates)
 
 /**
- * @brief Global object for libkgeomap to hold items common to all KMapWidget instances
+ * @brief Global object for libkgeomap to hold items common to all KGeoMapWidget instances
  */
-class KMapGlobalObject : public QObject
+class KGeoMapGlobalObject : public QObject
 {
     Q_OBJECT
 
 public:
-    static KMapGlobalObject* instance();
+    static KGeoMapGlobalObject* instance();
 
     /// @name Shared pixmaps
     //@{
@@ -113,37 +113,37 @@ public:
     /// @name Shared internal map widgets
     //@{
     void removeMyInternalWidgetFromPool(const MapBackend* const mapBackend);
-    bool getInternalWidgetFromPool(const MapBackend* const mapBackend, KMapInternalWidgetInfo* const targetInfo);
-    void addMyInternalWidgetToPool(const KMapInternalWidgetInfo& info);
-    void updatePooledWidgetState(const QWidget* const widget, const KMapInternalWidgetInfo::InternalWidgetState newState);
+    bool getInternalWidgetFromPool(const MapBackend* const mapBackend, KGeoMapInternalWidgetInfo* const targetInfo);
+    void addMyInternalWidgetToPool(const KGeoMapInternalWidgetInfo& info);
+    void updatePooledWidgetState(const QWidget* const widget, const KGeoMapInternalWidgetInfo::InternalWidgetState newState);
     void clearWidgetPool();
     //@}
 
 private:
-    KMapGlobalObject();
-    ~KMapGlobalObject();
+    KGeoMapGlobalObject();
+    ~KGeoMapGlobalObject();
 
     class Private;
     Private* const d;
 
-    Q_DISABLE_COPY(KMapGlobalObject)
+    Q_DISABLE_COPY(KGeoMapGlobalObject)
 
-    friend class KMapGlobalObjectCreator;
+    friend class KGeoMapGlobalObjectCreator;
 };
 
-class KMapCluster
+class KGeoMapCluster
 {
 public:
 
-    typedef QList<KMapCluster> List;
+    typedef QList<KGeoMapCluster> List;
 
-    KMapCluster()
+    KGeoMapCluster()
         : tileIndicesList(),
           markerCount(0),
           markerSelectedCount(0),
           coordinates(),
           pixelPos(),
-          groupState(KMapSelectedNone),
+          groupState(KGeoMapSelectedNone),
           representativeMarkers(),
           pixmapSize(),
           pixmapOffset()
@@ -155,7 +155,7 @@ public:
     int                 markerSelectedCount;
     GeoCoordinates      coordinates;
     QPoint              pixelPos;
-    KMapGroupState      groupState;
+    KGeoMapGroupState      groupState;
     QMap<int, QVariant> representativeMarkers;
 
     enum PixmapType
@@ -171,9 +171,9 @@ public:
 };
 
 /// @todo Move these somewhere else
-const int KMapMinMarkerGroupingRadius        = 1;
-const int KMapMinThumbnailGroupingRadius     = 15;
-const int KMapMinThumbnailSize               = KMapMinThumbnailGroupingRadius * 2;
+const int KGeoMapMinMarkerGroupingRadius        = 1;
+const int KGeoMapMinThumbnailGroupingRadius     = 15;
+const int KGeoMapMinThumbnailSize               = KGeoMapMinThumbnailGroupingRadius * 2;
 
 /**
  * @brief Helper function, returns the square of the distance between two points
@@ -188,20 +188,20 @@ inline int QPointSquareDistance(const QPoint& a, const QPoint& b)
     return (a.x()-b.x())*(a.x()-b.x()) + (a.y()-b.y())*(a.y()-b.y());
 }
 
-class KMapSharedData : public QSharedData
+class KGeoMapSharedData : public QSharedData
 {
 public:
 
-    KMapSharedData()
+    KGeoMapSharedData()
         : QSharedData(),
           worldMapWidget(0),
           tileGrouper(0),
           markerModel(0),
           clusterList(),
           showThumbnails(true),
-          thumbnailSize(KMapMinThumbnailSize),
-          thumbnailGroupingRadius(KMapMinThumbnailGroupingRadius),
-          markerGroupingRadius(KMapMinMarkerGroupingRadius),
+          thumbnailSize(KGeoMapMinThumbnailSize),
+          thumbnailGroupingRadius(KGeoMapMinThumbnailGroupingRadius),
+          markerGroupingRadius(KGeoMapMinMarkerGroupingRadius),
           previewSingleItems(true),
           previewGroupedItems(true),
           showNumbersOnItems(true),
@@ -218,10 +218,10 @@ public:
 
     /// @name Objects
     //@{
-    KMapWidget*               worldMapWidget;
+    KGeoMapWidget*               worldMapWidget;
     TileGrouper*              tileGrouper;
     AbstractMarkerTiler*      markerModel;
-    KMapCluster::List         clusterList;
+    KGeoMapCluster::List         clusterList;
     QList<ModelHelper*>       ungroupedModels;
     //@}
 
@@ -254,11 +254,11 @@ public:
 
 // helper functions:
 
-KGEOMAP_EXPORT bool KMapHelperParseLatLonString(const QString& latLonString, GeoCoordinates* const coordinates);
-KGEOMAP_EXPORT bool KMapHelperParseXYStringToPoint(const QString& xyString, QPoint* const point);
-KGEOMAP_EXPORT bool KMapHelperParseBoundsString(const QString& boundsString, QPair<GeoCoordinates, GeoCoordinates>* const boundsCoordinates);
-KGEOMAP_EXPORT GeoCoordinates::PairList KMapHelperNormalizeBounds(const GeoCoordinates::Pair& boundsPair);
+KGEOMAP_EXPORT bool KGeoMapHelperParseLatLonString(const QString& latLonString, GeoCoordinates* const coordinates);
+KGEOMAP_EXPORT bool KGeoMapHelperParseXYStringToPoint(const QString& xyString, QPoint* const point);
+KGEOMAP_EXPORT bool KGeoMapHelperParseBoundsString(const QString& boundsString, QPair<GeoCoordinates, GeoCoordinates>* const boundsCoordinates);
+KGEOMAP_EXPORT GeoCoordinates::PairList KGeoMapHelperNormalizeBounds(const GeoCoordinates::Pair& boundsPair);
 
-} /* namespace KMap */
+} /* namespace KGeoMap */
 
 #endif /* KGEOMAP_COMMON_H */

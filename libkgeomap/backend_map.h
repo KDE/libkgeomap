@@ -5,7 +5,7 @@
  * <a href="http://www.digikam.org">http://www.digikam.org</a>
  *
  * @date   2009-12-01
- * @brief  Base-class for backends for KMap
+ * @brief  Base-class for backends for KGeoMap
  *
  * @author Copyright (C) 2009-2011 by Michael G. Hansen
  *         <a href="mailto:mike at mghansen dot de">mike at mghansen dot de</a>
@@ -43,10 +43,10 @@
 class QMenu;
 class KConfigGroup;
 
-namespace KMap
+namespace KGeoMap
 {
 
-class KMapSharedData;
+class KGeoMapSharedData;
 
 class MapBackend : public QObject
 {
@@ -55,13 +55,13 @@ Q_OBJECT
 
 public:
 
-    MapBackend(const QExplicitlySharedDataPointer<KMapSharedData>& sharedData, QObject* const parent);
+    MapBackend(const QExplicitlySharedDataPointer<KGeoMapSharedData>& sharedData, QObject* const parent);
     virtual ~MapBackend();
 
     virtual QString backendName() const = 0;
     virtual QString backendHumanName() const = 0;
     virtual QWidget* mapWidget() = 0;
-    virtual void releaseWidget(KMapInternalWidgetInfo* const info) = 0;
+    virtual void releaseWidget(KGeoMapInternalWidgetInfo* const info) = 0;
     virtual void mapWidgetDocked(const bool state) = 0;
 
     virtual GeoCoordinates getCenter() const = 0;
@@ -90,7 +90,7 @@ public:
     virtual int getMarkerModelLevel() = 0;
     virtual GeoCoordinates::PairList getNormalizedBounds() = 0;
 
-//     virtual void updateDragDropMarker(const QPoint& pos, const KMapDragData* const dragData) = 0;
+//     virtual void updateDragDropMarker(const QPoint& pos, const KGeoMapDragData* const dragData) = 0;
 //     virtual void updateDragDropMarkerPosition(const QPoint& pos) = 0;
 
     virtual void updateActionAvailability() = 0;
@@ -98,7 +98,7 @@ public:
     virtual void regionSelectionChanged() = 0;
     virtual void mouseModeChanged() = 0;
 
-    const QExplicitlySharedDataPointer<KMapSharedData> s;
+    const QExplicitlySharedDataPointer<KGeoMapSharedData> s;
 
     virtual void centerOn(const Marble::GeoDataLatLonBox& box, const bool useSaneZoomLevel = true) = 0;
     virtual void setActive(const bool state) = 0;
@@ -115,10 +115,10 @@ Q_SIGNALS:
     void signalClustersClicked(const QIntList& clusterIndices);
     void signalMarkersMoved(const QIntList& markerIndices);
     void signalZoomChanged(const QString& newZoom);
-    void signalSelectionHasBeenMade(const KMap::GeoCoordinates::Pair& coordinates);
+    void signalSelectionHasBeenMade(const KGeoMap::GeoCoordinates::Pair& coordinates);
 
 };
 
-} /* namespace KMap */
+} /* namespace KGeoMap */
 
 #endif /* BACKEND_MAP_H */

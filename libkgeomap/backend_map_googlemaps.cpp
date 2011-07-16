@@ -5,7 +5,7 @@
  * <a href="http://www.digikam.org">http://www.digikam.org</a>
  *
  * @date   2009-12-01
- * @brief  Google-Maps-backend for KMap
+ * @brief  Google-Maps-backend for KGeoMap
  *
  * @author Copyright (C) 2009-2011 by Michael G. Hansen
  *         <a href="mailto:mike at mghansen dot de">mike at mghansen dot de</a>
@@ -46,7 +46,7 @@
 #include "abstractmarkertiler.h"
 #include "modelhelper.h"
 
-namespace KMap
+namespace KGeoMap
 {
 
 class GMInternalWidgetInfo
@@ -55,11 +55,11 @@ public:
     HTMLWidget* htmlWidget;
 };
 
-} /* KMap */
+} /* KGeoMap */
 
-Q_DECLARE_METATYPE(KMap::GMInternalWidgetInfo)
+Q_DECLARE_METATYPE(KGeoMap::GMInternalWidgetInfo)
 
-namespace KMap
+namespace KGeoMap
 {
 
 class BackendGoogleMaps::BackendGoogleMapsPrivate
@@ -111,7 +111,7 @@ public:
     bool                                      widgetIsDocked;
 };
 
-BackendGoogleMaps::BackendGoogleMaps(const QExplicitlySharedDataPointer<KMapSharedData>& sharedData, QObject* const parent)
+BackendGoogleMaps::BackendGoogleMaps(const QExplicitlySharedDataPointer<KGeoMapSharedData>& sharedData, QObject* const parent)
                  : MapBackend(sharedData, parent), d(new BackendGoogleMapsPrivate())
 {
     createActions();
@@ -192,9 +192,9 @@ QWidget* BackendGoogleMaps::mapWidget()
 {
     if (!d->htmlWidgetWrapper)
     {
-        KMapGlobalObject* const go = KMapGlobalObject::instance();
+        KGeoMapGlobalObject* const go = KGeoMapGlobalObject::instance();
 
-        KMapInternalWidgetInfo info;
+        KGeoMapInternalWidgetInfo info;
         bool foundReusableWidget = go->getInternalWidgetFromPool(this, &info);
         if (foundReusableWidget)
         {
@@ -217,10 +217,10 @@ QWidget* BackendGoogleMaps::mapWidget()
         connect(d->htmlWidget, SIGNAL(signalHTMLEvents(const QStringList&)),
                 this, SLOT(slotHTMLEvents(const QStringList&)));
 
-        connect(d->htmlWidget, SIGNAL(selectionHasBeenMade(const KMap::GeoCoordinates::Pair&)),
-                this, SLOT(slotSelectionHasBeenMade(const KMap::GeoCoordinates::Pair&)));
+        connect(d->htmlWidget, SIGNAL(selectionHasBeenMade(const KGeoMap::GeoCoordinates::Pair&)),
+                this, SLOT(slotSelectionHasBeenMade(const KGeoMap::GeoCoordinates::Pair&)));
 
-        d->htmlWidget->setSharedKMapObject(s.data());
+        d->htmlWidget->setSharedKGeoMapObject(s.data());
         d->htmlWidgetWrapper->installEventFilter(this);
 
         if (foundReusableWidget)
@@ -229,7 +229,7 @@ QWidget* BackendGoogleMaps::mapWidget()
         }
         else
         {
-            const KUrl htmlUrl = KMapGlobalObject::instance()->locateDataFile(QLatin1String("backend-googlemaps.html"));
+            const KUrl htmlUrl = KGeoMapGlobalObject::instance()->locateDataFile(QLatin1String("backend-googlemaps.html"));
 
             d->htmlWidget->openUrl(htmlUrl);
         }
@@ -650,7 +650,7 @@ void BackendGoogleMaps::slotHTMLEvents(const QStringList& events)
     if (mapBoundsProbablyChanged)
     {
         const QString mapBoundsString = d->htmlWidget->runScript(QLatin1String("kgeomapGetBounds();")).toString();
-        KMapHelperParseBoundsString(mapBoundsString, &d->cacheBounds);
+        KGeoMapHelperParseBoundsString(mapBoundsString, &d->cacheBounds);
     }
 
     if (mapBoundsProbablyChanged||!movedClusters.isEmpty())
@@ -676,7 +676,7 @@ void BackendGoogleMaps::updateClusters()
     d->htmlWidget->runScript(QString::fromLatin1("kgeomapSetIsInEditMode(%1);").arg(s->showThumbnails?QLatin1String("false" ):QLatin1String("true" )));
     for (int currentIndex = 0; currentIndex<s->clusterList.size(); ++currentIndex)
     {
-        const KMapCluster& currentCluster = s->clusterList.at(currentIndex);
+        const KGeoMapCluster& currentCluster = s->clusterList.at(currentIndex);
 
         d->htmlWidget->runScript(QString::fromLatin1("kgeomapAddCluster(%1, %2, %3, %4, %5, %6);")
                 .arg(currentIndex)
@@ -712,7 +712,7 @@ bool BackendGoogleMaps::screenCoordinates(const GeoCoordinates& coordinates, QPo
                     .arg(coordinates.latString())
                     .arg(coordinates.lonString())
                     ).toString();
-    const bool isValid = KMapHelperParseXYStringToPoint(
+    const bool isValid = KGeoMapHelperParseXYStringToPoint(
             pointStringResult,
             point);
 
@@ -879,10 +879,10 @@ int BackendGoogleMaps::getMarkerModelLevel()
 
 GeoCoordinates::PairList BackendGoogleMaps::getNormalizedBounds()
 {
-    return KMapHelperNormalizeBounds(d->cacheBounds);
+    return KGeoMapHelperNormalizeBounds(d->cacheBounds);
 }
 
-// void BackendGoogleMaps::updateDragDropMarker(const QPoint& pos, const KMapDragData* const dragData)
+// void BackendGoogleMaps::updateDragDropMarker(const QPoint& pos, const KGeoMapDragData* const dragData)
 // {
 //     if (!isReady())
 //         return;
@@ -1080,7 +1080,7 @@ void BackendGoogleMaps::mouseModeChanged()
     d->htmlWidget->mouseModeChanged(s->currentMouseMode);
 }
 
-void BackendGoogleMaps::slotSelectionHasBeenMade(const KMap::GeoCoordinates::Pair& searchCoordinates)
+void BackendGoogleMaps::slotSelectionHasBeenMade(const KGeoMap::GeoCoordinates::Pair& searchCoordinates)
 {
     emit signalSelectionHasBeenMade(searchCoordinates);
 }
@@ -1112,25 +1112,25 @@ void BackendGoogleMaps::setActive(const bool state)
         if ((!state)&&d->htmlWidgetWrapper)
         {
             // we should share our widget in the list of widgets in the global object
-            KMapInternalWidgetInfo info;
+            KGeoMapInternalWidgetInfo info;
             info.deleteFunction = deleteInfoFunction;
             info.widget = d->htmlWidgetWrapper.data();
             info.currentOwner = this;
             info.backendName = backendName();
-            info.state = d->widgetIsDocked ? KMapInternalWidgetInfo::InternalWidgetStillDocked : KMapInternalWidgetInfo::InternalWidgetUndocked;
+            info.state = d->widgetIsDocked ? KGeoMapInternalWidgetInfo::InternalWidgetStillDocked : KGeoMapInternalWidgetInfo::InternalWidgetUndocked;
 
             GMInternalWidgetInfo intInfo;
             intInfo.htmlWidget = d->htmlWidget.data();
             info.backendData.setValue(intInfo);
 
-            KMapGlobalObject* const go = KMapGlobalObject::instance();
+            KGeoMapGlobalObject* const go = KGeoMapGlobalObject::instance();
             go->addMyInternalWidgetToPool(info);
         }
 
         if (state&&d->htmlWidgetWrapper)
         {
             // we should remove our widget from the list of widgets in the global object
-            KMapGlobalObject* const go = KMapGlobalObject::instance();
+            KGeoMapGlobalObject* const go = KGeoMapGlobalObject::instance();
             go->removeMyInternalWidgetFromPool(this);
 
             /// @todo re-cluster, update markers?
@@ -1143,7 +1143,7 @@ void BackendGoogleMaps::setActive(const bool state)
     }
 }
 
-void BackendGoogleMaps::releaseWidget(KMapInternalWidgetInfo* const info)
+void BackendGoogleMaps::releaseWidget(KGeoMapInternalWidgetInfo* const info)
 {
     disconnect(d->htmlWidget, SIGNAL(signalJavaScriptReady()),
                this, SLOT(slotHTMLInitialized()));
@@ -1151,17 +1151,17 @@ void BackendGoogleMaps::releaseWidget(KMapInternalWidgetInfo* const info)
     disconnect(d->htmlWidget, SIGNAL(signalHTMLEvents(const QStringList&)),
                this, SLOT(slotHTMLEvents(const QStringList&)));
 
-    disconnect(d->htmlWidget, SIGNAL(selectionHasBeenMade(const KMap::GeoCoordinates::Pair&)),
-               this, SLOT(slotSelectionHasBeenMade(const KMap::GeoCoordinates::Pair&)));
+    disconnect(d->htmlWidget, SIGNAL(selectionHasBeenMade(const KGeoMap::GeoCoordinates::Pair&)),
+               this, SLOT(slotSelectionHasBeenMade(const KGeoMap::GeoCoordinates::Pair&)));
 
-    d->htmlWidget->setSharedKMapObject(0);
+    d->htmlWidget->setSharedKGeoMapObject(0);
     d->htmlWidgetWrapper->removeEventFilter(this);
 
     d->htmlWidget = 0;
     d->htmlWidgetWrapper = 0;
 
     info->currentOwner = 0;
-    info->state = KMapInternalWidgetInfo::InternalWidgetReleased;
+    info->state = KGeoMapInternalWidgetInfo::InternalWidgetReleased;
 
     d->isReady = false;
     emit(signalBackendReadyChanged(backendName()));
@@ -1171,13 +1171,13 @@ void BackendGoogleMaps::mapWidgetDocked(const bool state)
 {
     if (d->widgetIsDocked!=state)
     {
-        KMapGlobalObject* const go = KMapGlobalObject::instance();
-        go->updatePooledWidgetState(d->htmlWidgetWrapper, state ? KMapInternalWidgetInfo::InternalWidgetStillDocked : KMapInternalWidgetInfo::InternalWidgetUndocked);
+        KGeoMapGlobalObject* const go = KGeoMapGlobalObject::instance();
+        go->updatePooledWidgetState(d->htmlWidgetWrapper, state ? KGeoMapInternalWidgetInfo::InternalWidgetStillDocked : KGeoMapInternalWidgetInfo::InternalWidgetUndocked);
     }
     d->widgetIsDocked = state;
 }
 
-void BackendGoogleMaps::deleteInfoFunction(KMapInternalWidgetInfo* const info)
+void BackendGoogleMaps::deleteInfoFunction(KGeoMapInternalWidgetInfo* const info)
 {
     if (info->currentOwner)
     {
@@ -1189,4 +1189,4 @@ void BackendGoogleMaps::deleteInfoFunction(KMapInternalWidgetInfo* const info)
 
     delete info->widget.data();
 }
-} /* namespace KMap */
+} /* namespace KGeoMap */

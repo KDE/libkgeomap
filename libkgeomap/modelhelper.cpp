@@ -26,7 +26,7 @@
 
 #include "modelhelper.moc"
 
-namespace KMap
+namespace KGeoMap
 {
 
 /**
@@ -139,4 +139,4 @@ void ModelHelper::onIndicesMoved(const QList<QPersistentModelIndex>& movedIndice
     Q_UNUSED(targetSnapIndex);
 }
 
-} /* namespace KMap */
+} /* namespace KGeoMap */

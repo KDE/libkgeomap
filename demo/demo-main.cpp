@@ -4,7 +4,7 @@
  * <a href="http://www.digikam.org">http://www.digikam.org</a>
  *
  * @date   2009-12-01
- * @brief  demo-program for KMap
+ * @brief  demo-program for KGeoMap
  *
  * @author Copyright (C) 2009-2010 by Michael G. Hansen
  *         <a href="mailto:mike at mghansen dot de">mike at mghansen dot de</a>
@@ -43,7 +43,7 @@ int main(int argc, char* argv[])
     KAboutData aboutData(
         "demo-kgeomap",
         0,
-        ki18n("KMap demo application"),
+        ki18n("KGeoMap demo application"),
         kgeomap_version,                                      // version
         ki18n("Presents the World Map Widget Interface"),
         KAboutData::License_GPL,
@@ -54,7 +54,7 @@ int main(int argc, char* argv[])
     );
 
     aboutData.addAuthor(ki18n("Michael G. Hansen"),
-                        ki18n("KMap library"),
+                        ki18n("KGeoMap library"),
                         "mike@mghansen.de",
                         "http://www.mghansen.de");
 

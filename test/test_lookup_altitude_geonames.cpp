@@ -29,7 +29,7 @@
 #include "lookup_factory.h"
 #include "kgeomap_common.h"
 
-using namespace KMap;
+using namespace KGeoMap;
 
 void TestLookupAltitudeGeonames::testNoOp()
 {

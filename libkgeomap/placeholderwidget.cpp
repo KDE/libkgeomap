@@ -33,7 +33,7 @@
 
 #include <klocale.h>
 
-namespace KMap
+namespace KGeoMap
 {
 
 class PlaceholderWidget::PlaceholderWidgetPrivate
@@ -53,7 +53,7 @@ PlaceholderWidget::PlaceholderWidget(QWidget* parent)
     QVBoxLayout* const vboxlayout = new QVBoxLayout();
     setLayout(vboxlayout);
 
-    d->messageLabel = new QLabel(i18n("KMap"), this);
+    d->messageLabel = new QLabel(i18n("KGeoMap"), this);
 }
 
 PlaceholderWidget::~PlaceholderWidget()
@@ -66,5 +66,5 @@ void PlaceholderWidget::setMessage(const QString& message)
     d->messageLabel->setText(message);
 }
 
-} /* KMap */
+} /* KGeoMap */
 

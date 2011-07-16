@@ -1,4 +1,4 @@
-# Try to find the KMap library
+# Try to find the KGeoMap library
 #
 # Parameters:
 #  KGEOMAP_LOCAL_DIR - If you have put a local version of libkgeomap into
