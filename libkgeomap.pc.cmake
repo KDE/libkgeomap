@@ -7,6 +7,6 @@ Name: libkface
 Description: A world map library. This library is used by digiKam and kipi-plugins.
 URL: http://www.digikam.org
 Requires:
-Version: ${KMAP_LIB_VERSION_STRING}
-Libs: -L${LIB_INSTALL_DIR} -lkmap
+Version: ${KGEOMAP_LIB_VERSION_STRING}
+Libs: -L${LIB_INSTALL_DIR} -lkgeomap
 Cflags: -I${INCLUDE_INSTALL_DIR}

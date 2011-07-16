@@ -24,10 +24,10 @@
 #
 # ============================================================
 
-PROJECT(libkmap)
+PROJECT(libkgeomap)
 
 MESSAGE(STATUS "----------------------------------------------------------------------------------")
-MESSAGE(STATUS "Starting CMake configuration for: libkmap")
+MESSAGE(STATUS "Starting CMake configuration for: libkgeomap")
 
 FIND_PACKAGE(Qt4 4.6.0 REQUIRED)
 FIND_PACKAGE(KDE4 REQUIRED)
@@ -52,8 +52,8 @@ MACRO_OPTIONAL_FIND_PACKAGE(Kexiv2)
 ADD_DEFINITIONS(${QT_DEFINITIONS} ${QT_QTDBUS_DEFINITIONS} ${KDE4_DEFINITIONS} -DQT_USE_FAST_CONCATENATION -DQT_USE_FAST_OPERATOR_PLUS)
 INCLUDE_DIRECTORIES(${QDBUS_INCLUDE_DIRS} ${CMAKE_SOURCE_DIR} ${CMAKE_BINARY_DIR} ${KDE4_INCLUDES})
 
-SET(LIBKMAP_AREA_CODE_GENERAL 51006)
-ADD_DEFINITIONS(-DKDE_DEFAULT_DEBUG_AREA=${LIBKMAP_AREA_CODE_GENERAL})
+SET(LIBKGEOMAP_AREA_CODE_GENERAL 51006)
+ADD_DEFINITIONS(-DKDE_DEFAULT_DEBUG_AREA=${LIBKGEOMAP_AREA_CODE_GENERAL})
 
 # =======================================================
 # Information to update before to release this library.
@@ -64,9 +64,9 @@ ADD_DEFINITIONS(-DKDE_DEFAULT_DEBUG_AREA=${LIBKMAP_AREA_CODE_GENERAL})
 # 2.0.0 => 1.0.0     (Included into digiKam 2.0.0 Software Collection)
 
 # Library API version
-SET(KMAP_LIB_MAJOR_VERSION "2")
-SET(KMAP_LIB_MINOR_VERSION "0")
-SET(KMAP_LIB_PATCH_VERSION "0")
+SET(KGEOMAP_LIB_MAJOR_VERSION "2")
+SET(KGEOMAP_LIB_MINOR_VERSION "0")
+SET(KGEOMAP_LIB_PATCH_VERSION "0")
 
 # Suffix to add at end of version string. Usual values are:
 # "-git"   : alpha code unstable from git. Do not use in production
@@ -75,24 +75,24 @@ SET(KMAP_LIB_PATCH_VERSION "0")
 # "-beta3" : beta3 release.
 # "-rc"    : release candidate.
 # ""       : final relase. Can be used in production.
-SET(KMAP_LIB_SUFFIX_VERSION "")
+SET(KGEOMAP_LIB_SUFFIX_VERSION "")
 
 # Library ABI version used by linker.
 # For details : http://www.gnu.org/software/libtool/manual/libtool.html#Updating-version-info
-SET(KMAP_LIB_SO_CUR_VERSION "1")
-SET(KMAP_LIB_SO_REV_VERSION "0")
-SET(KMAP_LIB_SO_AGE_VERSION "0")
+SET(KGEOMAP_LIB_SO_CUR_VERSION "1")
+SET(KGEOMAP_LIB_SO_REV_VERSION "0")
+SET(KGEOMAP_LIB_SO_AGE_VERSION "0")
 
 # =======================================================
 # Set env. variables accordinly.
 
-SET(KMAP_LIB_VERSION_STRING "${KMAP_LIB_MAJOR_VERSION}.${KMAP_LIB_MINOR_VERSION}.${KMAP_LIB_PATCH_VERSION}${KMAP_LIB_SUFFIX_VERSION}")
-SET(KMAP_LIB_VERSION_ID "0x0${KMAP_LIB_MAJOR_VERSION}0${KMAP_LIB_MINOR_VERSION}0${KMAP_LIB_PATCH_VERSION}")
-SET(KMAP_LIB_SO_VERSION_STRING "${KMAP_LIB_SO_CUR_VERSION}.${KMAP_LIB_SO_REV_VERSION}.${KMAP_LIB_SO_AGE_VERSION}")
+SET(KGEOMAP_LIB_VERSION_STRING "${KGEOMAP_LIB_MAJOR_VERSION}.${KGEOMAP_LIB_MINOR_VERSION}.${KGEOMAP_LIB_PATCH_VERSION}${KGEOMAP_LIB_SUFFIX_VERSION}")
+SET(KGEOMAP_LIB_VERSION_ID "0x0${KGEOMAP_LIB_MAJOR_VERSION}0${KGEOMAP_LIB_MINOR_VERSION}0${KGEOMAP_LIB_PATCH_VERSION}")
+SET(KGEOMAP_LIB_SO_VERSION_STRING "${KGEOMAP_LIB_SO_CUR_VERSION}.${KGEOMAP_LIB_SO_REV_VERSION}.${KGEOMAP_LIB_SO_AGE_VERSION}")
 
 # =======================================================
 
-SUBDIRS(libkmap)
+SUBDIRS(libkgeomap)
 SUBDIRS(test)
 SUBDIRS(calibrator)
 IF(KEXIV2_FOUND)
@@ -104,9 +104,9 @@ ENDIF(KEXIV2_FOUND)
 SUBDIRS(data)
 
 IF(NOT WIN32)
-  CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/libkmap.pc.cmake ${CMAKE_CURRENT_BINARY_DIR}/libkmap.pc)
-  CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/libkmap.lsm.cmake ${CMAKE_CURRENT_BINARY_DIR}/libkmap.lsm)
-  INSTALL(FILES ${CMAKE_CURRENT_BINARY_DIR}/libkmap.pc DESTINATION ${LIB_INSTALL_DIR}/pkgconfig )
+  CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/libkgeomap.pc.cmake ${CMAKE_CURRENT_BINARY_DIR}/libkgeomap.pc)
+  CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/libkgeomap.lsm.cmake ${CMAKE_CURRENT_BINARY_DIR}/libkgeomap.lsm)
+  INSTALL(FILES ${CMAKE_CURRENT_BINARY_DIR}/libkgeomap.pc DESTINATION ${LIB_INSTALL_DIR}/pkgconfig )
 ENDIF(NOT WIN32)
 
 # Install find cmake script to the system for client applications.
