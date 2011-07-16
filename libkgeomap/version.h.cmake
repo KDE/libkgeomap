@@ -21,12 +21,12 @@
  *
  * ============================================================ */
 
-#ifndef KMAP_VERSION_H
-#define KMAP_VERSION_H
+#ifndef KGEOMAP_VERSION_H
+#define KGEOMAP_VERSION_H
 
-// Before changing the line below, make sure that FindKmap.cmake can still parse it
-static const char kmap_version[] = "${KMAP_LIB_VERSION_STRING}";
+// Before changing the line below, make sure that FindKGeoMap.cmake can still parse it
+static const char kgeomap_version[] = "${KGEOMAP_LIB_VERSION_STRING}";
 
-#define KMAP_VERSION ${KMAP_LIB_VERSION_ID}
+#define KGEOMAP_VERSION ${KGEOMAP_LIB_VERSION_ID}
 
-#endif // KMAP_VERSION_H
+#endif // KGEOMAP_VERSION_H

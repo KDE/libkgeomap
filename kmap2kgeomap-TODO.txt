@@ -1,3 +1,4 @@
 - change LIBKMAP_AREA_CODE_GENERAL to LIBKGEOMAP_AREA_CODE_GENERAL somewhere in KDE
 - update translations file (see Messages.sh)
 - update bugs.kde.org component name
+- spelling: KGeoMap or Kgeomap -> prefer KGeoMap

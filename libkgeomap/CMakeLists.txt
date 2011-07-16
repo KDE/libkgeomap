@@ -28,7 +28,7 @@ INCLUDE_DIRECTORIES(${MARBLE_INCLUDE_DIR})
 INCLUDE(CheckIncludeFile)
 CHECK_INCLUDE_FILE("valgrind/valgrind.h" HAVE_VALGRIND)
 IF(${HAVE_VALGRIND})
-    ADD_DEFINITIONS(-DKMAP_HAVE_VALGRIND)
+    ADD_DEFINITIONS(-DKGEOMAP_HAVE_VALGRIND)
 ENDIF(${HAVE_VALGRIND})
 
 CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/version.h.cmake ${CMAKE_CURRENT_BINARY_DIR}/version.h)
@@ -39,8 +39,8 @@ SET(widget_sources
     dragdrophandler.cpp
     html_widget.cpp
     itemmarkertiler.cpp
-    kmap_widget.cpp
-    kmap_common.cpp
+    kgeomap_widget.cpp
+    kgeomap_common.cpp
     lookup_altitude.cpp
     lookup_altitude_geonames.cpp
     lookup_factory.cpp
@@ -55,7 +55,7 @@ SET(backend_map_marble_sources
    )
 
 IF (${KDE_VERSION} VERSION_GREATER "4.4.66")
-    ADD_DEFINITIONS(-DKMAP_MARBLE_ADD_LAYER)
+    ADD_DEFINITIONS(-DKGEOMAP_MARBLE_ADD_LAYER)
     SET( backend_map_marble_sources ${backend_map_marble_sources} backend_map_marble_layer.cpp )
 ELSE (${KDE_VERSION} VERSION_GREATER "4.4.66")
     SET( backend_map_marble_sources ${backend_map_marble_sources} backend_map_marble_subwidget.cpp )
@@ -69,13 +69,13 @@ SET(backend_map_osm_sources
     #backend_map_osm.cpp
    )
 
-KDE4_ADD_LIBRARY(kmap SHARED ${widget_sources} 
+KDE4_ADD_LIBRARY(kgeomap SHARED ${widget_sources} 
                              ${backend_map_marble_sources}
                              ${backend_map_googlemaps_sources}
                              ${backend_map_osm_sources}
                 )
 
-TARGET_LINK_LIBRARIES(kmap ${QT_QTGUI_LIBRARY}
+TARGET_LINK_LIBRARIES(kgeomap ${QT_QTGUI_LIBRARY}
                            ${KDE4_KDECORE_LIBS}
                            ${KDE4_UI_LIBS}
                            ${KDE4_KPARTS_LIBS}
@@ -83,22 +83,22 @@ TARGET_LINK_LIBRARIES(kmap ${QT_QTGUI_LIBRARY}
                            ${MARBLE_LIBRARIES}
                            )
 
-SET_TARGET_PROPERTIES(kmap PROPERTIES VERSION ${KMAP_LIB_SO_VERSION_STRING}
-                           SOVERSION ${KMAP_LIB_SO_CUR_VERSION})
+SET_TARGET_PROPERTIES(kgeomap PROPERTIES VERSION ${KGEOMAP_LIB_SO_VERSION_STRING}
+                           SOVERSION ${KGEOMAP_LIB_SO_CUR_VERSION})
 
-INSTALL(TARGETS kmap ${INSTALL_TARGETS_DEFAULT_ARGS})
+INSTALL(TARGETS kgeomap ${INSTALL_TARGETS_DEFAULT_ARGS})
 
-INSTALL(FILES libkmap_export.h
+INSTALL(FILES libkgeomap_export.h
               abstractmarkertiler.h
               dragdrophandler.h
               geocoordinates.h
               itemmarkertiler.h
-              kmap_primitives.h
-              kmap_widget.h
+              kgeomap_primitives.h
+              kgeomap_widget.h
               lookup_altitude.h
               lookup_factory.h
               modelhelper.h
               tileindex.h
               ${CMAKE_CURRENT_BINARY_DIR}/version.h
-        DESTINATION ${INCLUDE_INSTALL_DIR}/libkmap COMPONENT Devel
+        DESTINATION ${INCLUDE_INSTALL_DIR}/libkgeomap COMPONENT Devel
        )
