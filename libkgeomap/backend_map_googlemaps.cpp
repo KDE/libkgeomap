@@ -119,9 +119,17 @@ BackendGoogleMaps::BackendGoogleMaps(const QExplicitlySharedDataPointer<KGeoMapS
 
 BackendGoogleMaps::~BackendGoogleMaps()
 {
-    if (d->htmlWidgetWrapper)
-        delete d->htmlWidgetWrapper;
+    /// @todo Should we leave our widget in this list and not destroy it?
+    ///       Maybe for now this should simply be limited to leaving one
+    ///       unused widget in the global cache.
+    KGeoMapGlobalObject* const go = KGeoMapGlobalObject::instance();
+    go->removeMyInternalWidgetFromPool(this);
 
+    if (d->htmlWidgetWrapper)
+    {
+        delete d->htmlWidgetWrapper;
+    }
+    
     delete d;
 }
 
