@@ -36,8 +36,8 @@ MarkerModelHelper::MarkerModelHelper(QAbstractItemModel* const itemModel, QItemS
    m_itemModel(itemModel),
    m_itemSelectionModel(itemSelectionModel)
 {
-    connect(itemModel, SIGNAL(dataChanged(const QModelIndex&, const QModelIndex&)),
-            this, SLOT(slotDataChanged(const QModelIndex&, const QModelIndex&)));
+    connect(itemModel, SIGNAL(dataChanged(QModelIndex,QModelIndex)),
+            this, SLOT(slotDataChanged(QModelIndex,QModelIndex)));
 }
 
 MarkerModelHelper::~MarkerModelHelper()

@@ -123,15 +123,15 @@ void ItemMarkerTiler::setMarkerModelHelper(ModelHelper* const modelHelper)
     if (d->markerModel!=0)
     {
         // TODO: disconnect the old model if there was one
-        connect(d->markerModel, SIGNAL(rowsInserted(const QModelIndex&, int, int)),
-                this, SLOT(slotSourceModelRowsInserted(const QModelIndex&, int, int)));
+        connect(d->markerModel, SIGNAL(rowsInserted(QModelIndex,int,int)),
+                this, SLOT(slotSourceModelRowsInserted(QModelIndex,int,int)));
 
-        connect(d->markerModel, SIGNAL(rowsAboutToBeRemoved(const QModelIndex&, int, int)),
-                this, SLOT(slotSourceModelRowsAboutToBeRemoved(const QModelIndex&, int, int)));
+        connect(d->markerModel, SIGNAL(rowsAboutToBeRemoved(QModelIndex,int,int)),
+                this, SLOT(slotSourceModelRowsAboutToBeRemoved(QModelIndex,int,int)));
 
         // TODO: this signal now has to be monitored in the model helper
-//         connect(d->markerModel, SIGNAL(dataChanged(const QModelIndex&, const QModelIndex&)),
-//                 this, SLOT(slotSourceModelDataChanged(const QModelIndex&, const QModelIndex&)));
+//         connect(d->markerModel, SIGNAL(dataChanged(QModelIndex,QModelIndex)),
+//                 this, SLOT(slotSourceModelDataChanged(QModelIndex,QModelIndex)));
 
         connect(d->modelHelper, SIGNAL(signalModelChangedDrastically()),
                 this, SLOT(slotSourceModelReset()));
@@ -142,13 +142,13 @@ void ItemMarkerTiler::setMarkerModelHelper(ModelHelper* const modelHelper)
         connect(d->markerModel, SIGNAL(layoutChanged()),
                 this, SLOT(slotSourceModelLayoutChanged()));
 
-        connect(d->modelHelper, SIGNAL(signalThumbnailAvailableForIndex(const QPersistentModelIndex&, const QPixmap&)),
-                this, SLOT(slotThumbnailAvailableForIndex(const QPersistentModelIndex&, const QPixmap&)));
+        connect(d->modelHelper, SIGNAL(signalThumbnailAvailableForIndex(QPersistentModelIndex,QPixmap)),
+                this, SLOT(slotThumbnailAvailableForIndex(QPersistentModelIndex,QPixmap)));
 
         if (d->selectionModel)
         {
-            connect(d->selectionModel, SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)),
-                this, SLOT(slotSelectionChanged(const QItemSelection&, const QItemSelection&)));
+            connect(d->selectionModel, SIGNAL(selectionChanged(QItemSelection,QItemSelection)),
+                this, SLOT(slotSelectionChanged(QItemSelection,QItemSelection)));
         }
     }
 

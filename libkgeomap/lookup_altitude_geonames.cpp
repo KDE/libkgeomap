@@ -180,8 +180,8 @@ void LookupAltitudeGeonames::startNextRequest()
 
     d->kioJob = KIO::get(jobUrl, KIO::NoReload, KIO::HideProgressInfo);
 
-    connect(d->kioJob, SIGNAL(data(KIO::Job*, const QByteArray&)),
-            this, SLOT(slotData(KIO::Job*, const QByteArray&)));
+    connect(d->kioJob, SIGNAL(data(KIO::Job*,QByteArray)),
+            this, SLOT(slotData(KIO::Job*,QByteArray)));
 
     connect(d->kioJob, SIGNAL(result(KJob*)),
             this, SLOT(slotResult(KJob*)));

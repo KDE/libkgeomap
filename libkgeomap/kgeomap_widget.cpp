@@ -323,7 +323,7 @@ void KGeoMapWidget::createActions()
     d->actionStickyMode->setCheckable(true);
     d->actionStickyMode->setToolTip(i18n("Lock the map position"));
 
-    connect(d->actionStickyMode, SIGNAL(triggered(const bool)),
+    connect(d->actionStickyMode, SIGNAL(triggered(bool)),
             this, SLOT(slotStickyModeChanged()));
 
     connect(d->actionIncreaseThumbnailSize, SIGNAL(triggered(bool)),
@@ -413,29 +413,29 @@ bool KGeoMapWidget::setBackend(const QString& backendName)
     {
         d->currentBackend->setActive(false);
 
-        disconnect(d->currentBackend, SIGNAL(signalBackendReadyChanged(const QString&)),
-                this, SLOT(slotBackendReadyChanged(const QString&)));
+        disconnect(d->currentBackend, SIGNAL(signalBackendReadyChanged(QString)),
+                this, SLOT(slotBackendReadyChanged(QString)));
 
-        disconnect(d->currentBackend, SIGNAL(signalZoomChanged(const QString&)),
-                this, SLOT(slotBackendZoomChanged(const QString&)));
+        disconnect(d->currentBackend, SIGNAL(signalZoomChanged(QString)),
+                this, SLOT(slotBackendZoomChanged(QString)));
 
-        disconnect(d->currentBackend, SIGNAL(signalClustersMoved(const QIntList&, const QPair<int, QModelIndex>&)),
-                this, SLOT(slotClustersMoved(const QIntList&, const QPair<int, QModelIndex>&)));
+        disconnect(d->currentBackend, SIGNAL(signalClustersMoved(QIntList,QPair<int,QModelIndex>)),
+                this, SLOT(slotClustersMoved(QIntList,QPair<int,QModelIndex>)));
 
-        disconnect(d->currentBackend, SIGNAL(signalClustersClicked(const QIntList&)),
-                    this, SLOT(slotClustersClicked(const QIntList&)));
+        disconnect(d->currentBackend, SIGNAL(signalClustersClicked(QIntList)),
+                    this, SLOT(slotClustersClicked(QIntList)));
 
-        disconnect(this, SIGNAL(signalUngroupedModelChanged(const int)),
-                    d->currentBackend, SLOT(slotUngroupedModelChanged(const int)));
+        disconnect(this, SIGNAL(signalUngroupedModelChanged(int)),
+                    d->currentBackend, SLOT(slotUngroupedModelChanged(int)));
 
         if (s->markerModel)
         {
-            disconnect(s->markerModel, SIGNAL(signalThumbnailAvailableForIndex(const QVariant&, const QPixmap&)),
-                        d->currentBackend, SLOT(slotThumbnailAvailableForIndex(const QVariant&, const QPixmap&)));
+            disconnect(s->markerModel, SIGNAL(signalThumbnailAvailableForIndex(QVariant,QPixmap)),
+                        d->currentBackend, SLOT(slotThumbnailAvailableForIndex(QVariant,QPixmap)));
         }
 
-        disconnect(d->currentBackend, SIGNAL(signalSelectionHasBeenMade(const KGeoMap::GeoCoordinates::Pair&)),
-                this, SLOT(slotNewSelectionFromMap(const KGeoMap::GeoCoordinates::Pair&)));
+        disconnect(d->currentBackend, SIGNAL(signalSelectionHasBeenMade(KGeoMap::GeoCoordinates::Pair)),
+                this, SLOT(slotNewSelectionFromMap(KGeoMap::GeoCoordinates::Pair)));
 
     }
 
@@ -448,33 +448,33 @@ bool KGeoMapWidget::setBackend(const QString& backendName)
             d->currentBackend = backend;
             d->currentBackendName = backendName;
 
-            connect(d->currentBackend, SIGNAL(signalBackendReadyChanged(const QString&)),
-                    this, SLOT(slotBackendReadyChanged(const QString&)));
+            connect(d->currentBackend, SIGNAL(signalBackendReadyChanged(QString)),
+                    this, SLOT(slotBackendReadyChanged(QString)));
 
-            connect(d->currentBackend, SIGNAL(signalZoomChanged(const QString&)),
-                    this, SLOT(slotBackendZoomChanged(const QString&)));
+            connect(d->currentBackend, SIGNAL(signalZoomChanged(QString)),
+                    this, SLOT(slotBackendZoomChanged(QString)));
 
-            connect(d->currentBackend, SIGNAL(signalClustersMoved(const QIntList&, const QPair<int, QModelIndex>&)),
-                    this, SLOT(slotClustersMoved(const QIntList&, const QPair<int, QModelIndex>&)));
+            connect(d->currentBackend, SIGNAL(signalClustersMoved(QIntList,QPair<int,QModelIndex>)),
+                    this, SLOT(slotClustersMoved(QIntList,QPair<int,QModelIndex>)));
 
-            connect(d->currentBackend, SIGNAL(signalClustersClicked(const QIntList&)),
-                    this, SLOT(slotClustersClicked(const QIntList&)));
+            connect(d->currentBackend, SIGNAL(signalClustersClicked(QIntList)),
+                    this, SLOT(slotClustersClicked(QIntList)));
 
             /**
              * @todo This connection is queued because otherwise QAbstractItemModel::itemSelected does not
              *       reflect the true state. Maybe monitor another signal instead?
              */
-            connect(this, SIGNAL(signalUngroupedModelChanged(const int)),
-                    d->currentBackend, SLOT(slotUngroupedModelChanged(const int)), Qt::QueuedConnection);
+            connect(this, SIGNAL(signalUngroupedModelChanged(int)),
+                    d->currentBackend, SLOT(slotUngroupedModelChanged(int)), Qt::QueuedConnection);
 
             if (s->markerModel)
             {
-                connect(s->markerModel, SIGNAL(signalThumbnailAvailableForIndex(const QVariant&, const QPixmap&)),
-                        d->currentBackend, SLOT(slotThumbnailAvailableForIndex(const QVariant&, const QPixmap&)));
+                connect(s->markerModel, SIGNAL(signalThumbnailAvailableForIndex(QVariant,QPixmap)),
+                        d->currentBackend, SLOT(slotThumbnailAvailableForIndex(QVariant,QPixmap)));
             }
 
-            connect(d->currentBackend, SIGNAL(signalSelectionHasBeenMade(const KGeoMap::GeoCoordinates::Pair&)),
-                    this, SLOT(slotNewSelectionFromMap(const KGeoMap::GeoCoordinates::Pair&)));
+            connect(d->currentBackend, SIGNAL(signalSelectionHasBeenMade(KGeoMap::GeoCoordinates::Pair)),
+                    this, SLOT(slotNewSelectionFromMap(KGeoMap::GeoCoordinates::Pair)));
 
             if (s->activeState)
             {
@@ -1196,9 +1196,9 @@ void KGeoMapWidget::addUngroupedModel(ModelHelper* const modelHelper)
     s->ungroupedModels << modelHelper;
 
     /// @todo monitor all model signals!
-    connect(modelHelper->model(), SIGNAL(dataChanged(const QModelIndex&, const QModelIndex&)),
+    connect(modelHelper->model(), SIGNAL(dataChanged(QModelIndex,QModelIndex)),
             this, SLOT(slotUngroupedModelChanged()));
-    connect(modelHelper->model(), SIGNAL(rowsInserted(const QModelIndex&, int, int)),
+    connect(modelHelper->model(), SIGNAL(rowsInserted(QModelIndex,int,int)),
             this, SLOT(slotUngroupedModelChanged()));
     connect(modelHelper->model(), SIGNAL(modelReset()),
             this, SLOT(slotUngroupedModelChanged()));
@@ -1207,7 +1207,7 @@ void KGeoMapWidget::addUngroupedModel(ModelHelper* const modelHelper)
 
     if (modelHelper->selectionModel())
     {
-        connect(modelHelper->selectionModel(), SIGNAL(currentChanged(const QModelIndex&, const QModelIndex&)),
+        connect(modelHelper->selectionModel(), SIGNAL(currentChanged(QModelIndex,QModelIndex)),
             this, SLOT(slotUngroupedModelChanged()));
     }
 
@@ -1224,9 +1224,9 @@ void KGeoMapWidget::removeUngroupedModel(ModelHelper* const modelHelper)
         return;
 
     /// @todo monitor all model signals!
-    disconnect(modelHelper->model(), SIGNAL(dataChanged(const QModelIndex&, const QModelIndex&)),
+    disconnect(modelHelper->model(), SIGNAL(dataChanged(QModelIndex,QModelIndex)),
             this, SLOT(slotUngroupedModelChanged()));
-    disconnect(modelHelper->model(), SIGNAL(rowsInserted(const QModelIndex&, int, int)),
+    disconnect(modelHelper->model(), SIGNAL(rowsInserted(QModelIndex,int,int)),
             this, SLOT(slotUngroupedModelChanged()));
     disconnect(modelHelper->model(), SIGNAL(modelReset()),
             this, SLOT(slotUngroupedModelChanged()));
@@ -1235,7 +1235,7 @@ void KGeoMapWidget::removeUngroupedModel(ModelHelper* const modelHelper)
 
     if (modelHelper->selectionModel())
     {
-        disconnect(modelHelper->selectionModel(), SIGNAL(currentChanged(const QModelIndex&, const QModelIndex&)),
+        disconnect(modelHelper->selectionModel(), SIGNAL(currentChanged(QModelIndex,QModelIndex)),
             this, SLOT(slotUngroupedModelChanged()));
     }
 
@@ -1264,8 +1264,8 @@ void KGeoMapWidget::setGroupedModel(AbstractMarkerTiler* const markerModel)
 
         if (d->currentBackend)
         {
-            connect(s->markerModel, SIGNAL(signalThumbnailAvailableForIndex(const QVariant&, const QPixmap&)),
-                d->currentBackend, SLOT(slotThumbnailAvailableForIndex(const QVariant&, const QPixmap&)));
+            connect(s->markerModel, SIGNAL(signalThumbnailAvailableForIndex(QVariant,QPixmap)),
+                d->currentBackend, SLOT(slotThumbnailAvailableForIndex(QVariant,QPixmap)));
         }
     }
 

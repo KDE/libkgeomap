@@ -80,7 +80,7 @@ MarkerModelHelper::MarkerModelHelper(QAbstractItemModel* const itemModel, QItemS
    m_itemModel(itemModel),
    m_itemSelectionModel(itemSelectionModel)
 {
-    connect(itemModel, SIGNAL(dataChanged(const QModelIndex&, const QModelIndex&)),
+    connect(itemModel, SIGNAL(dataChanged(QModelIndex,QModelIndex)),
             this, SIGNAL(signalModelChangedDrastically()));
 }
 
@@ -213,8 +213,8 @@ MainWindow::MainWindow(KCmdLineArgs* const cmdLineArgs, QWidget* const parent)
     d->mapWidget->setVisibleMouseModes(KGeoMap::MouseModePan|KGeoMap::MouseModeZoomIntoGroup|KGeoMap::MouseModeSelectThumbnail);
     d->mapWidget->setAvailableMouseModes(KGeoMap::MouseModePan|KGeoMap::MouseModeZoomIntoGroup|KGeoMap::MouseModeSelectThumbnail);
 
-    connect(d->markerModelHelper, SIGNAL(signalMarkersMoved(const QList<QPersistentModelIndex>&)),
-            this, SLOT(slotMarkersMoved(const QList<QPersistentModelIndex>&)));
+    connect(d->markerModelHelper, SIGNAL(signalMarkersMoved(QList<QPersistentModelIndex>)),
+            this, SLOT(slotMarkersMoved(QList<QPersistentModelIndex>)));
 
 //     d->mapWidget->resize(d->mapWidget->width(), 200);
     d->splitter->addWidget(d->mapWidget);
@@ -413,8 +413,8 @@ void MainWindow::slotScheduleImagesForLoading(const KUrl::List imagesToSchedule)
     d->progressBar->setValue(d->imageLoadingCurrentCount);
     QFutureWatcher<MyImageData>* watcher = new QFutureWatcher<MyImageData>(this);
 
-    connect(watcher, SIGNAL(resultsReadyAt(int, int)),
-            this, SLOT(slotFutureResultsReadyAt(int, int)));
+    connect(watcher, SIGNAL(resultsReadyAt(int,int)),
+            this, SLOT(slotFutureResultsReadyAt(int,int)));
 
     QFuture<MyImageData> future = QtConcurrent::mapped(imagesToSchedule, LoadImageData);
     watcher->setFuture(future);
@@ -458,8 +458,8 @@ void MainWindow::slotMarkersMoved(const QList<QPersistentModelIndex>& markerIndi
     {
         LookupAltitude* const myAltitudeLookup = LookupFactory::getAltitudeLookup("geonames", this);
 
-        connect(myAltitudeLookup, SIGNAL(signalRequestsReady(const QList<int>&)),
-                this, SLOT(slotAltitudeRequestsReady(const QList<int>&)));
+        connect(myAltitudeLookup, SIGNAL(signalRequestsReady(QList<int>)),
+                this, SLOT(slotAltitudeRequestsReady(QList<int>)));
 
         connect(myAltitudeLookup, SIGNAL(signalDone()),
                 this, SLOT(slotAltitudeLookupDone()));

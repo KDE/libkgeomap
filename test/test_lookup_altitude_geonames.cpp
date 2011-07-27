@@ -40,7 +40,7 @@ void TestLookupAltitudeGeonames::testSimpleLookup()
 {
     LookupAltitude* const myLookup = LookupFactory::getAltitudeLookup("geonames", this);
 
-    QSignalSpy spyRequestsReady(myLookup, SIGNAL(signalRequestsReady(const QList<int>&)));
+    QSignalSpy spyRequestsReady(myLookup, SIGNAL(signalRequestsReady(QList<int>)));
     QSignalSpy spyLookupDone(myLookup, SIGNAL(signalDone()));
 
     LookupAltitude::Request::List requestsList;

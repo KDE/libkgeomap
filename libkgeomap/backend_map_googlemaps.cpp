@@ -222,11 +222,11 @@ QWidget* BackendGoogleMaps::mapWidget()
         connect(d->htmlWidget, SIGNAL(signalJavaScriptReady()),
                 this, SLOT(slotHTMLInitialized()));
 
-        connect(d->htmlWidget, SIGNAL(signalHTMLEvents(const QStringList&)),
-                this, SLOT(slotHTMLEvents(const QStringList&)));
+        connect(d->htmlWidget, SIGNAL(signalHTMLEvents(QStringList)),
+                this, SLOT(slotHTMLEvents(QStringList)));
 
-        connect(d->htmlWidget, SIGNAL(selectionHasBeenMade(const KGeoMap::GeoCoordinates::Pair&)),
-                this, SLOT(slotSelectionHasBeenMade(const KGeoMap::GeoCoordinates::Pair&)));
+        connect(d->htmlWidget, SIGNAL(selectionHasBeenMade(KGeoMap::GeoCoordinates::Pair)),
+                this, SLOT(slotSelectionHasBeenMade(KGeoMap::GeoCoordinates::Pair)));
 
         d->htmlWidget->setSharedKGeoMapObject(s.data());
         d->htmlWidgetWrapper->installEventFilter(this);
@@ -1156,11 +1156,11 @@ void BackendGoogleMaps::releaseWidget(KGeoMapInternalWidgetInfo* const info)
     disconnect(d->htmlWidget, SIGNAL(signalJavaScriptReady()),
                this, SLOT(slotHTMLInitialized()));
 
-    disconnect(d->htmlWidget, SIGNAL(signalHTMLEvents(const QStringList&)),
-               this, SLOT(slotHTMLEvents(const QStringList&)));
+    disconnect(d->htmlWidget, SIGNAL(signalHTMLEvents(QStringList)),
+               this, SLOT(slotHTMLEvents(QStringList)));
 
-    disconnect(d->htmlWidget, SIGNAL(selectionHasBeenMade(const KGeoMap::GeoCoordinates::Pair&)),
-               this, SLOT(slotSelectionHasBeenMade(const KGeoMap::GeoCoordinates::Pair&)));
+    disconnect(d->htmlWidget, SIGNAL(selectionHasBeenMade(KGeoMap::GeoCoordinates::Pair)),
+               this, SLOT(slotSelectionHasBeenMade(KGeoMap::GeoCoordinates::Pair)));
 
     d->htmlWidget->setSharedKGeoMapObject(0);
     d->htmlWidgetWrapper->removeEventFilter(this);

@@ -80,8 +80,8 @@ BackendOSM::BackendOSM(const QExplicitlySharedDataPointer<KGeoMapSharedData>& sh
     connect(d->htmlWidget, SIGNAL(signalJavaScriptReady()),
             this, SLOT(slotHTMLInitialized()));
 
-    connect(d->htmlWidget, SIGNAL(signalHTMLEvents(const QStringList&)),
-            this, SLOT(slotHTMLEvents(const QStringList&)));
+    connect(d->htmlWidget, SIGNAL(signalHTMLEvents(QStringList)),
+            this, SLOT(slotHTMLEvents(QStringList)));
 
     loadInitialHTML();
 }
