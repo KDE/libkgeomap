@@ -107,9 +107,9 @@ void TileGrouper::updateClusters()
 
     // constants for clusters
     const int ClusterRadius          = s->showThumbnails ? s->thumbnailGroupingRadius : s->markerGroupingRadius;
-    const QSize ClusterDefaultSize   = QSize(2*ClusterRadius, 2*ClusterRadius);
+//    const QSize ClusterDefaultSize   = QSize(2*ClusterRadius, 2*ClusterRadius);
     const int ClusterGridSizeScreen  = 4*ClusterRadius;
-    const QSize ClusterMaxPixmapSize = QSize(ClusterGridSizeScreen, ClusterGridSizeScreen);
+//    const QSize ClusterMaxPixmapSize = QSize(ClusterGridSizeScreen, ClusterGridSizeScreen);
 
 //     kDebug()<<"updateClusters starting...";
 
