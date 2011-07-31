@@ -46,6 +46,8 @@ MarkerModelHelper::~MarkerModelHelper()
 
 void MarkerModelHelper::slotDataChanged(const QModelIndex& topLeft, const QModelIndex& bottomRight)
 {
+    Q_UNUSED(topLeft)
+    Q_UNUSED(bottomRight)
     emit(signalModelChangedDrastically());
 }
 
