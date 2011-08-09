@@ -59,7 +59,7 @@ IF(KDE4_BUILD_TESTS)
         test_tileindex.cpp
        )
     KDE4_ADD_EXECUTABLE(kgeomap_test_tileindex ${test_tileindex_sources})
-    TARGET_LINK_LIBRARIES(kgeomap_test_tileindex kgeomap ${QT_QTTEST_LIBRARY})
+    TARGET_LINK_LIBRARIES(kgeomap_test_tileindex kgeomap ${QT_QTTEST_LIBRARY} ${KDE4_KDECORE_LIBS})
     ADD_TEST(kgeomap_test_tileindex ${EXECUTABLE_OUTPUT_PATH}/kgeomap_test_tileindex)
 
     # test the LookupAltitudeGeonames class
