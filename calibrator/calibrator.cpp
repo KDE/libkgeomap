@@ -30,7 +30,6 @@
 #include <QButtonGroup>
 #include <QHBoxLayout>
 #include <QLabel>
-#include <QLineEdit>
 #include <QPushButton>
 #include <QRadioButton>
 #include <QSpinBox>
@@ -44,6 +43,7 @@
 #include <kapplication.h>
 #include <KAboutData>
 #include <KCmdLineArgs>
+#include <klineedit.h>
 
 // local includes
 
@@ -127,7 +127,7 @@ public:
 
     QButtonGroup               *groupingMode;
     QSpinBox                   *sbLevel;
-    QLineEdit                  *zoomDisplay;
+    KLineEdit                  *zoomDisplay;
 
     QTimer                     *zoomDisplayTimer;
 };
@@ -161,7 +161,7 @@ Calibrator::Calibrator()
     QLabel* const labelsbLevel = new QLabel(i18nc("Tile level", "Level:"), this);
     labelsbLevel->setBuddy(d->sbLevel);
 
-    d->zoomDisplay = new QLineEdit(this);
+    d->zoomDisplay = new KLineEdit(this);
     d->zoomDisplay->setReadOnly(true);
     QLabel* const labelZoomDisplay = new QLabel(i18n("Zoom:"), this);
     labelZoomDisplay->setBuddy(d->zoomDisplay);
