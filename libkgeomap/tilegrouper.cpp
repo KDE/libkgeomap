@@ -188,7 +188,7 @@ void TileGrouper::updateClusters()
     }
 
     // re-add the markers to clusters:
-    int lastTooCloseClusterIndex = 0;
+//     int lastTooCloseClusterIndex = 0;
     Q_FOREVER
     {
         // here we store candidates for clusters:
@@ -233,8 +233,8 @@ void TileGrouper::updateClusters()
                         continue;
 
                     tooClose = QPointSquareDistance(s->clusterList.at(i).pixelPos, markerPosition) < pow(ClusterGridSizeScreen/2, 2);
-                    if (tooClose)
-                        lastTooCloseClusterIndex = i;
+//                     if (tooClose)
+//                         lastTooCloseClusterIndex = i;
                 }
 
                 if (tooClose)

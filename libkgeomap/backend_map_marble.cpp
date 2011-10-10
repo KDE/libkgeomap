@@ -1464,8 +1464,7 @@ bool BackendMarble::findSnapPoint(const QPoint& actualPoint, QPoint* const snapP
     GeoCoordinates bestSnapCoordinates;
     int bestSnapDistanceSquared = -1;
     QModelIndex bestSnapIndex;
-    int bestSnapUngroupedModel;
-    Q_UNUSED(bestSnapUngroupedModel); // actually not unused, but prevent compiler warning
+    int bestSnapUngroupedModel = -1;
 
     // now handle snapping: is there any object close by?
     for (int im = 0; im<s->ungroupedModels.count(); ++im)
