@@ -875,7 +875,7 @@ void KGeoMapWidget::slotUpdateActionsEnabled()
 
     // make sure the action for the current mouse mode is checked
     const QList<QAction*> mouseModeActions = d->mouseModeActionGroup->actions();
-    foreach (QAction* const action, mouseModeActions)
+    foreach(QAction* const action, mouseModeActions)
     {
         if (action->data().value<MouseModes>()==s->currentMouseMode)
         {
