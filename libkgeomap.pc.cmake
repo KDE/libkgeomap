@@ -3,7 +3,7 @@ exec_prefix=${BIN_INSTALL_DIR}
 libdir=${LIB_INSTALL_DIR}
 includedir=${INCLUDE_INSTALL_DIR}
 
-Name: libkface
+Name: libkgeomap
 Description: A world map library. This library is used by digiKam and kipi-plugins.
 URL: http://www.digikam.org
 Requires:
