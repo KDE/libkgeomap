@@ -971,7 +971,7 @@ void KGeoMapWidget::getColorInfos(const KGeoMapGroupState groupState,
     else
     {
         // convert to "1E5" notation for numbers >=20k:
-        qreal exponent = floor(log(nMarkers)/log(10));
+        qreal exponent = floor(log((qreal)nMarkers)/log((qreal)10));
         qreal nMarkersFirstDigit=round(qreal(nMarkers)/pow(10,exponent));
         if (nMarkersFirstDigit>=10)
         {
