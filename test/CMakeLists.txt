@@ -30,14 +30,6 @@ IF(KDE4_BUILD_TESTS)
     INCLUDE(CTest)
     ENABLE_TESTING()
 
-    # test the marker model
-    SET(test_itemmarkertiler_sources
-        test_itemmarkertiler.cpp
-       )
-    KDE4_ADD_EXECUTABLE(kgeomap_test_itemmarkertiler ${test_itemmarkertiler_sources})
-    TARGET_LINK_LIBRARIES(kgeomap_test_itemmarkertiler kgeomap ${QT_QTTEST_LIBRARY} ${KDE4_KDEUI_LIBS})
-    ADD_TEST(kgeomap_test_itemmarkertiler ${EXECUTABLE_OUTPUT_PATH}/kgeomap_test_itemmarkertiler)
-
     # test the primitive datatypes and helper functions
     SET(test_primitives_sources
         test_primitives.cpp
@@ -68,7 +60,18 @@ IF(KDE4_BUILD_TESTS)
        )
     KDE4_ADD_EXECUTABLE(kgeomap_test_lookup_altitude_geonames ${test_lookup_altitude_geonames_sources})
     TARGET_LINK_LIBRARIES(kgeomap_test_lookup_altitude_geonames kgeomap ${QT_QTCORE_LIBRARY} ${QT_QTTEST_LIBRARY})
-    # do not add this as a test because it only works if there is an internet connection
-#     ADD_TEST(kgeomap_test_lookup_altitude_geonames ${EXECUTABLE_OUTPUT_PATH}/kgeomap_test_lookup_altitude_geonames)
-ENDIF(KDE4_BUILD_TESTS)
 
+    IF(NOT WIN32)
+	# test the marker model
+	SET(test_itemmarkertiler_sources
+	    test_itemmarkertiler.cpp
+	   )
+	KDE4_ADD_EXECUTABLE(kgeomap_test_itemmarkertiler ${test_itemmarkertiler_sources})
+	TARGET_LINK_LIBRARIES(kgeomap_test_itemmarkertiler kgeomap ${QT_QTCORE_LIBRARY} ${QT_QTTEST_LIBRARY} ${KDE4_KDEUI_LIBS})
+	ADD_TEST(kgeomap_test_itemmarkertiler ${EXECUTABLE_OUTPUT_PATH}/kgeomap_test_itemmarkertiler)
+    ENDIF(NOT WIN32)
+	
+    # do not add this as a test because it only works if there is an internet connection
+    # ADD_TEST(kgeomap_test_lookup_altitude_geonames ${EXECUTABLE_OUTPUT_PATH}/kgeomap_test_lookup_altitude_geonames)
+
+ENDIF(KDE4_BUILD_TESTS)
