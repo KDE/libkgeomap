@@ -9,7 +9,7 @@
  *
  * @author Copyright (C) 2009-2010 by Michael G. Hansen
  *         <a href="mailto:mike at mghansen dot de">mike at mghansen dot de</a>
- * @author Copyright (C) 2010 by Gilles Caulier
+ * @author Copyright (C) 2010-2012 by Gilles Caulier
  *         <a href="mailto:caulier dot gilles at gmail dot com">caulier dot gilles at gmail dot com</a>
  *
  * This program is free software; you can redistribute it
@@ -210,6 +210,21 @@ public:
         return position;
     }
 
+    bool operator==(const GeoCoordinates& other) const
+    {
+        return
+            ( hasCoordinates() == other.hasCoordinates() ) &&
+            ( hasCoordinates() ?
+                ( ( lat() == other.lat() ) &&
+                  ( lon() == other.lon() )
+                ) : true
+            ) &&
+            ( hasAltitude() == other.hasAltitude() ) &&
+            ( hasAltitude() ?
+                ( alt() == other.alt() )
+                            : true );
+    }
+
 private:
 
     double   m_lat;
@@ -228,23 +243,9 @@ inline QDebug operator<<(QDebug debugOut, const KGeoMap::GeoCoordinates& coordin
     return debugOut;
 }
 
-inline bool operator==(const KGeoMap::GeoCoordinates& a, const KGeoMap::GeoCoordinates& b)
-{
-    return
-        ( a.hasCoordinates() == b.hasCoordinates() ) &&
-        ( a.hasCoordinates() ?
-            ( ( a.lat() == b.lat() ) &&
-              ( a.lon() == b.lon() )
-            ) : true
-        ) &&
-        ( a.hasAltitude() == b.hasAltitude() ) &&
-        ( a.hasAltitude() ? ( a.alt() == b.alt() ) : true );
-}
-
 Q_DECLARE_TYPEINFO(KGeoMap::GeoCoordinates, Q_MOVABLE_TYPE);
 Q_DECLARE_METATYPE(KGeoMap::GeoCoordinates)
 Q_DECLARE_METATYPE(KGeoMap::GeoCoordinates::Pair)
 Q_DECLARE_METATYPE(KGeoMap::GeoCoordinates::PairList)
-
 
 #endif /* KGEOMAP_GEOCOORDINATES_H */
