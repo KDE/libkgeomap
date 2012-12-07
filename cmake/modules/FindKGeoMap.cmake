@@ -77,36 +77,37 @@ else (KGEOMAP_INCLUDE_DIR AND KGEOMAP_LIBRARIES AND KGEOMAP_DEFINITIONS AND KGEO
       # in the find_path() and find_library() calls
       include(FindPkgConfig)
 
-      pkg_search_module(KGEOMAP libkgeomap)
+      pkg_search_module(PC_KGEOMAP libkgeomap)
 
-      if (KGEOMAP_FOUND)
+      if (PC_KGEOMAP_FOUND)
         # make sure the version is >= 0.1.0
         # TODO: WHY?
-        if (KGEOMAP_VERSION VERSION_LESS 0.1.0)
+        if (PC_KGEOMAP_VERSION VERSION_LESS 0.1.0)
           message(STATUS "Found libkgeomap release < 0.1.0, too old")
           set(KGEOMAP_VERSION_GOOD_FOUND FALSE)
           set(KGEOMAP_FOUND FALSE)
-        else (KGEOMAP_VERSION VERSION_LESS 0.1.0)
+        else (PC_KGEOMAP_VERSION VERSION_LESS 0.1.0)
+          set(KGEOMAP_VERSION "${PC_KGEOMAP_VERSION}")
           if (NOT KGeoMap_FIND_QUIETLY)
             message(STATUS "Found libkgeomap release ${KGEOMAP_VERSION}")
           endif (NOT KGeoMap_FIND_QUIETLY)
           set(KGEOMAP_VERSION_GOOD_FOUND TRUE)
-        endif (KGEOMAP_VERSION VERSION_LESS 0.1.0)
-      else (KGEOMAP_FOUND)
+        endif (PC_KGEOMAP_VERSION VERSION_LESS 0.1.0)
+      else (PC_KGEOMAP_FOUND)
         set(KGEOMAP_VERSION_GOOD_FOUND FALSE)
-      endif (KGEOMAP_FOUND)
+      endif (PC_KGEOMAP_FOUND)
     else (NOT WIN32)
       # TODO: Why do we just assume the version is good?
       set(KGEOMAP_VERSION_GOOD_FOUND TRUE)
     endif (NOT WIN32)
 
     if (KGEOMAP_VERSION_GOOD_FOUND)
-      set(KGEOMAP_DEFINITIONS "${KGEOMAP_CFLAGS}")
+      set(KGEOMAP_DEFINITIONS "${PC_KGEOMAP_CFLAGS}")
 
-      find_path(KGEOMAP_INCLUDE_DIR libkgeomap/version.h ${KGEOMAP_INCLUDEDIR})
+      find_path(KGEOMAP_INCLUDE_DIR libkgeomap/version.h ${PC_KGEOMAP_INCLUDEDIR})
       set(kgeomap_version_h_filename "${KGEOMAP_INCLUDE_DIR}/libkgeomap/version.h")
 
-      find_library(KGEOMAP_LIBRARIES NAMES kgeomap PATHS ${KGEOMAP_LIBDIR})
+      find_library(KGEOMAP_LIBRARIES NAMES kgeomap PATHS ${PC_KGEOMAP_LIBDIR})
 
       if (KGEOMAP_INCLUDE_DIR AND KGEOMAP_LIBRARIES)
         set(KGEOMAP_FOUND TRUE)
