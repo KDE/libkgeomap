@@ -9,7 +9,7 @@
  *
  * @author Copyright (C) 2010 by Michael G. Hansen
  *         <a href="mailto:mike at mghansen dot de">mike at mghansen dot de</a>
- * @author Copyright (C) 2010 by Gilles Caulier
+ * @author Copyright (C) 2010-2013 by Gilles Caulier
  *         <a href="mailto:caulier dot gilles at gmail dot com">caulier dot gilles at gmail dot com</a>
  *
  * This program is free software; you can redistribute it
@@ -78,8 +78,8 @@ public:
         {
             for (QStringList::const_iterator sit = stateNames.constBegin(); sit!=stateNames.constEnd(); ++sit)
             {
-                const QString pixmapName = *it + *sit;
-                const KUrl markerUrl = KGeoMapGlobalObject::instance()->locateDataFile(
+                const QString pixmapName  = *it + *sit;
+                const KUrl markerUrl      = KGeoMapGlobalObject::instance()->locateDataFile(
                         QString::fromLatin1( "marker-%1.png").arg(pixmapName));
                 markerPixmaps[pixmapName] = QPixmap(markerUrl.toLocalFile());
             }
@@ -122,10 +122,7 @@ QPixmap KGeoMapGlobalObject::getStandardMarkerPixmap()
 
 KUrl KGeoMapGlobalObject::locateDataFile(const QString filename)
 {
-    return KStandardDirs::locate(
-                "data",
-                QLatin1String("libkgeomap/")+filename
-                          );
+    return KStandardDirs::locate("data", QLatin1String("libkgeomap/") + filename);
 }
 
 /**
@@ -136,15 +133,19 @@ bool KGeoMapHelperParseLatLonString(const QString& latLonString, GeoCoordinates*
 {
     // parse a 'lat,lon' string:
     const QStringList coordinateStrings = latLonString.trimmed().split(QLatin1Char( ',' ));
-    bool valid = ( coordinateStrings.size() == 2 );
+    bool valid                          = ( coordinateStrings.size() == 2 );
+
     if (valid)
     {
-        double    ptLatitude  = 0.0;
-        double    ptLongitude = 0.0;
+        double ptLatitude  = 0.0;
+        double ptLongitude = 0.0;
 
         ptLatitude = coordinateStrings.at(0).toDouble(&valid);
+
         if (valid)
+        {
             ptLongitude = coordinateStrings.at(1).toDouble(&valid);
+        }
 
         if (valid)
         {
@@ -168,13 +169,15 @@ bool KGeoMapHelperParseXYStringToPoint(const QString& xyString, QPoint* const po
     // a point is returned as (X.xxx, Y.yyy)
 
     const QString myXYString = xyString.trimmed();
-    bool valid = myXYString.startsWith(QLatin1Char( '(' )) && myXYString.endsWith(QLatin1Char( ')' ));
-    QStringList pointStrings;
+    bool          valid      = myXYString.startsWith(QLatin1Char( '(' )) && myXYString.endsWith(QLatin1Char( ')' ));
+    QStringList   pointStrings;
+
     if (valid)
     {
         pointStrings = myXYString.mid(1, myXYString.length()-2).split(QLatin1Char( ',' ));
-        valid = ( pointStrings.size() == 2 );
+        valid        = ( pointStrings.size() == 2 );
     }
+
     if (valid)
     {
         int ptX = 0;
@@ -183,8 +186,11 @@ bool KGeoMapHelperParseXYStringToPoint(const QString& xyString, QPoint* const po
         // we do not actually care about the float part, only about the integer part
         // but we have to parse floats since this is what the data is
         ptX = pointStrings.at(0).toFloat(&valid);
+
         if (valid)
+        {
             ptY = pointStrings.at(1).toFloat(&valid);
+        }
 
         if (valid)
         {
@@ -210,8 +216,8 @@ bool KGeoMapHelperParseBoundsString(const QString& boundsString, QPair<GeoCoordi
     const QString myBoundsString = boundsString.trimmed();
 
     // check for minimum length
-    bool valid =  myBoundsString.size() >= 13;
-    valid      &= myBoundsString.startsWith(QLatin1Char( '(' )) && myBoundsString.endsWith(QLatin1Char( ')' ));
+    bool valid                   =  myBoundsString.size() >= 13;
+    valid                       &= myBoundsString.startsWith(QLatin1Char( '(' )) && myBoundsString.endsWith(QLatin1Char( ')' ));
 
     if (valid)
     {
@@ -219,22 +225,24 @@ bool KGeoMapHelperParseBoundsString(const QString& boundsString, QPair<GeoCoordi
         const QString string1 = myBoundsString.mid(1, myBoundsString.length()-2).trimmed();
 
         // split the string at the middle comma:
-        const int dumpComma  = string1.indexOf(QLatin1String("," ), 0);
-        const int splitComma = string1.indexOf(QLatin1String("," ), dumpComma+1);
-        valid                = (dumpComma>=0) && (splitComma>=0);
+        const int dumpComma   = string1.indexOf(QLatin1String("," ), 0);
+        const int splitComma  = string1.indexOf(QLatin1String("," ), dumpComma+1);
+        valid                 = (dumpComma>=0) && (splitComma>=0);
 
         if (valid)
         {
-            const QString coord1String =  string1.mid(0, splitComma).trimmed();
-            const QString coord2String =  string1.mid(splitComma+1).trimmed();
+            const QString coord1String  = string1.mid(0, splitComma).trimmed();
+            const QString coord2String  = string1.mid(splitComma+1).trimmed();
             valid                      &= coord1String.startsWith(QLatin1Char( '(' )) && coord1String.endsWith(QLatin1Char( ')' ));
             valid                      &= coord2String.startsWith(QLatin1Char( '(' )) && coord2String.endsWith(QLatin1Char( ')' ));
 
             GeoCoordinates coord1, coord2;
+
             if (valid)
             {
                 valid = KGeoMapHelperParseLatLonString(coord1String.mid(1, coord1String.length()-2), &coord1);
             }
+
             if (valid)
             {
                 valid = KGeoMapHelperParseLatLonString(coord2String.mid(1, coord2String.length()-2), &coord2);
@@ -274,6 +282,7 @@ GeoCoordinates::PairList KGeoMapHelperNormalizeBounds(const GeoCoordinates::Pair
     {
         boundsList << GeoCoordinates::makePair(bSouth, bWest, bNorth, bEast);
     }
+
 //     kDebug()<<boundsList;
     return boundsList;
 }
@@ -295,9 +304,10 @@ bool KGeoMapGlobalObject::getInternalWidgetFromPool(const MapBackend* const mapB
     const QString requestingBackendName = mapBackend->backendName();
 
     // try to find an available widget:
-    int bestDockedWidget   = -1;
-    int bestUndockedWidget = -1;
-    int bestReleasedWidget = -1;
+    int bestDockedWidget                = -1;
+    int bestUndockedWidget              = -1;
+    int bestReleasedWidget              = -1;
+
     for (int i=0; i<d->internalMapWidgetsPool.count(); ++i)
     {
         const KGeoMapInternalWidgetInfo& info = d->internalMapWidgetsPool.at(i);
@@ -325,6 +335,7 @@ bool KGeoMapGlobalObject::getInternalWidgetFromPool(const MapBackend* const mapB
     }
 
     int widgetToUse = bestReleasedWidget;
+
     if ((widgetToUse<0)&&(bestUndockedWidget>=0))
     {
         widgetToUse = bestUndockedWidget;
@@ -361,9 +372,9 @@ void KGeoMapGlobalObject::updatePooledWidgetState(const QWidget* const widget, c
         if (d->internalMapWidgetsPool.at(i).widget==widget)
         {
             KGeoMapInternalWidgetInfo& info = d->internalMapWidgetsPool[i];
-            info.state = newState;
+            info.state                      = newState;
 
-            if (newState==KGeoMapInternalWidgetInfo::InternalWidgetReleased)
+            if (newState == KGeoMapInternalWidgetInfo::InternalWidgetReleased)
             {
                 info.currentOwner = 0;
             }
@@ -378,7 +389,8 @@ void KGeoMapGlobalObject::clearWidgetPool()
     while (!d->internalMapWidgetsPool.isEmpty())
     {
         KGeoMapInternalWidgetInfo info = d->internalMapWidgetsPool.takeLast();
-        kDebug()<<info.backendName<<info.deleteFunction;
+        kDebug() << info.backendName << info.deleteFunction;
+
         if (info.deleteFunction)
         {
             info.deleteFunction(&info);

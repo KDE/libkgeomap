@@ -9,7 +9,7 @@
  *
  * @author Copyright (C) 2010, 2011 by Michael G. Hansen
  *         <a href="mailto:mike at mghansen dot de">mike at mghansen dot de</a>
- * @author Copyright (C) 2010 by Gilles Caulier
+ * @author Copyright (C) 2010-2013 by Gilles Caulier
  *         <a href="mailto:caulier dot gilles at gmail dot com">caulier dot gilles at gmail dot com</a>
  *
  * This program is free software; you can redistribute it
@@ -73,22 +73,24 @@ public:
 
     Q_DECLARE_FLAGS(InternalWidgetStates, InternalWidgetState)
 
+    KGeoMapInternalWidgetInfo()
+        : state(),
+          widget(),
+          backendData(),
+          backendName(),
+          currentOwner(0),
+          deleteFunction(0)
+    {
+    }
+
+public:
+
     InternalWidgetStates state;
     QPointer<QWidget>    widget;
     QVariant             backendData;
     QString              backendName;
     QPointer<QObject>    currentOwner;
     DeleteFunction       deleteFunction;
-
-    KGeoMapInternalWidgetInfo()
-     : state(),
-       widget(),
-       backendData(),
-       backendName(),
-       currentOwner(0),
-       deleteFunction(0)
-    {
-    }
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(KGeoMapInternalWidgetInfo::InternalWidgetStates)
@@ -101,13 +103,14 @@ class KGeoMapGlobalObject : public QObject
     Q_OBJECT
 
 public:
+
     static KGeoMapGlobalObject* instance();
 
     /// @name Shared pixmaps
     //@{
     QPixmap getMarkerPixmap(const QString pixmapId);
     QPixmap getStandardMarkerPixmap();
-    KUrl locateDataFile(const QString filename);
+    KUrl    locateDataFile(const QString filename);
     //@}
 
     /// @name Shared internal map widgets
@@ -120,6 +123,7 @@ public:
     //@}
 
 private:
+
     KGeoMapGlobalObject();
     ~KGeoMapGlobalObject();
 
@@ -145,6 +149,7 @@ public:
           pixelPos(),
           groupState(KGeoMapSelectedNone),
           representativeMarkers(),
+          pixmapType(PixmapMarker),
           pixmapSize(),
           pixmapOffset()
     {
@@ -155,7 +160,7 @@ public:
     int                 markerSelectedCount;
     GeoCoordinates      coordinates;
     QPoint              pixelPos;
-    KGeoMapGroupState      groupState;
+    KGeoMapGroupState   groupState;
     QMap<int, QVariant> representativeMarkers;
 
     enum PixmapType
@@ -164,16 +169,17 @@ public:
         PixmapCircle,
         PixmapImage
     } pixmapType;
-    QSize pixmapSize;
+
+    QSize               pixmapSize;
 
     //! anchor point of the image, measured from bottom-left
-    QPoint pixmapOffset;
+    QPoint              pixmapOffset;
 };
 
 /// @todo Move these somewhere else
-const int KGeoMapMinMarkerGroupingRadius        = 1;
-const int KGeoMapMinThumbnailGroupingRadius     = 15;
-const int KGeoMapMinThumbnailSize               = KGeoMapMinThumbnailGroupingRadius * 2;
+const int KGeoMapMinMarkerGroupingRadius    = 1;
+const int KGeoMapMinThumbnailGroupingRadius = 15;
+const int KGeoMapMinThumbnailSize           = KGeoMapMinThumbnailGroupingRadius * 2;
 
 /**
  * @brief Helper function, returns the square of the distance between two points
@@ -216,12 +222,21 @@ public:
     {
     }
 
+
+    /// @todo De-inline?
+    bool hasRegionSelection() const
+    {
+        return selectionRectangle.first.hasCoordinates();
+    }
+
+public:
+
     /// @name Objects
     //@{
-    KGeoMapWidget*               worldMapWidget;
+    KGeoMapWidget*            worldMapWidget;
     TileGrouper*              tileGrouper;
     AbstractMarkerTiler*      markerModel;
-    KGeoMapCluster::List         clusterList;
+    KGeoMapCluster::List      clusterList;
     QList<ModelHelper*>       ungroupedModels;
     //@}
 
@@ -247,9 +262,6 @@ public:
     MouseModes                visibleMouseModes;
     bool                      activeState;
     //@}
-
-    /// @todo De-inline?
-    bool                      hasRegionSelection() const { return selectionRectangle.first.hasCoordinates(); }
 };
 
 // helper functions:

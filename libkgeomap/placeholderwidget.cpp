@@ -36,19 +36,20 @@
 namespace KGeoMap
 {
 
-class PlaceholderWidget::PlaceholderWidgetPrivate
+class PlaceholderWidget::Private
 {
 public:
 
-    PlaceholderWidgetPrivate()
+    Private()
     {
+        messageLabel = 0;
     }
 
-    QLabel*     messageLabel;
+    QLabel* messageLabel;
 };
 
-PlaceholderWidget::PlaceholderWidget(QWidget* parent)
- : QFrame(parent), d(new PlaceholderWidgetPrivate())
+PlaceholderWidget::PlaceholderWidget(QWidget* const parent)
+ : QFrame(parent), d(new Private())
 {
     QVBoxLayout* const vboxlayout = new QVBoxLayout();
     setLayout(vboxlayout);
@@ -66,5 +67,5 @@ void PlaceholderWidget::setMessage(const QString& message)
     d->messageLabel->setText(message);
 }
 
-} /* KGeoMap */
+} /* namespace KGeoMap */
 

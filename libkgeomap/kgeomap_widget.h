@@ -9,7 +9,7 @@
  *
  * @author Copyright (C) 2009-2011 by Michael G. Hansen
  *         <a href="mailto:mike at mghansen dot de">mike at mghansen dot de</a>
- * @author Copyright (C) 2010 by Gilles Caulier
+ * @author Copyright (C) 2010-2013 by Gilles Caulier
  *         <a href="mailto:caulier dot gilles at gmail dot com">caulier dot gilles at gmail dot com</a>
  *
  * This program is free software; you can redistribute it
@@ -110,8 +110,8 @@ public:
     void setThumnailSize(const int newThumbnailSize);
     void setThumbnailGroupingRadius(const int newGroupingRadius);
     void setMarkerGroupingRadius(const int newGroupingRadius);
-    int getThumbnailSize() const;
-    int getUndecoratedThumbnailSize() const;
+    int  getThumbnailSize() const;
+    int  getUndecoratedThumbnailSize() const;
     void setShowThumbnails(const bool state);
     //@}
 
@@ -131,15 +131,15 @@ public:
     void updateClusters();
     void markClustersAsDirty();
 
-    void getColorInfos(const int clusterIndex, QColor *fillColor, QColor *strokeColor,
-                       Qt::PenStyle *strokeStyle, QString *labelText, QColor *labelColor,
+    void getColorInfos(const int clusterIndex, QColor* fillColor, QColor* strokeColor,
+                       Qt::PenStyle* strokeStyle, QString* labelText, QColor* labelColor,
                        const KGeoMapGroupState* const overrideSelection = 0,
                        const int* const overrideCount = 0) const;
 
     void getColorInfos(const KGeoMapGroupState groupState,
                        const int nMarkers,
-                       QColor *fillColor, QColor *strokeColor,
-                       Qt::PenStyle *strokeStyle, QString *labelText, QColor *labelColor) const;
+                       QColor* fillColor, QColor* strokeColor,
+                       Qt::PenStyle* strokeStyle, QString* labelText, QColor* labelColor) const;
 
     QString convertZoomToBackendZoom(const QString& someZoom, const QString& targetBackend) const;
     QPixmap getDecoratedPixmapForCluster(const int clusterId, const KGeoMapGroupState* const selectedStateOverride, const int* const countOverride, QPoint* const centerPoint);
@@ -222,8 +222,8 @@ private:
 
     const QExplicitlySharedDataPointer<KGeoMapSharedData> s;
 
-    class KGeoMapWidgetPrivate;
-    KGeoMapWidgetPrivate* const d;
+    class Private;
+    Private* const d;
 
     Q_DISABLE_COPY(KGeoMapWidget)
 };

@@ -37,7 +37,7 @@ class PlaceholderWidget : public QFrame
     Q_OBJECT
 
 public:
-    PlaceholderWidget(QWidget* parent = 0);
+    PlaceholderWidget(QWidget* const parent = 0);
     ~PlaceholderWidget();
 
     void setMessage(const QString& message);
@@ -46,11 +46,10 @@ private:
 
     Q_DISABLE_COPY(PlaceholderWidget)
 
-    class PlaceholderWidgetPrivate;
-    PlaceholderWidgetPrivate* const d;
-
+    class Private;
+    Private* const d;
 };
 
-} /* KGeoMap */
+} /* namespace KGeoMap */
 
 #endif /* PLACEHOLDERWIDGET_H */
