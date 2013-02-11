@@ -54,7 +54,10 @@
 // Marbel Widget includes
 
 #include <marble/GeoDataLineString.h>
-#include <marble/MarbleGlobal.h>
+
+// TODO: Use new Marble header in the future.
+#include <marble/global.h>
+//#include <marble/MarbleGlobal.h>
 
 // local includes
 
