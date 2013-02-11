@@ -54,7 +54,7 @@
 // Marbel Widget includes
 
 #include <marble/GeoDataLineString.h>
-#include <marble/global.h>
+#include <marble/MArbleGlobal.h>
 
 // local includes
 
