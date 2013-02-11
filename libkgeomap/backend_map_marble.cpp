@@ -112,6 +112,9 @@ public:
         activeState(false),
         widgetIsDocked(false),
         blockingZoomWhileChangingTheme(false)
+#ifdef KGEOMAP_MARBLE_ADD_LAYER
+        , bmLayer(0)
+#endif
     {
     }
 

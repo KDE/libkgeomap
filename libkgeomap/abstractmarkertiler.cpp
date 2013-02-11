@@ -78,7 +78,8 @@ public:
           startIndex(),
           endIndex(),
           currentIndex(),
-          atEnd(false)
+          atEnd(false),
+          atStartOfLevel(true)
     {
     }
 
