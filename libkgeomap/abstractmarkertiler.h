@@ -77,6 +77,14 @@ public:
         {
         }
 
+        /**
+         * Note: Tile is only deleted by AbstractMarkerTiler::tileDelete.
+         * All subclasses of AbstractMarkerTiler have to reimplement tileDelete
+         * to delete their Tile subclasses.
+         * This was done in order not to have any virtual functions
+         * in Tile and its subclasses in order to save memory, since there
+         * can be a lot of tiles in a MarkerTiler.
+         */
         ~Tile()
         {
         }
