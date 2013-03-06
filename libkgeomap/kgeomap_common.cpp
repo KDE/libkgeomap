@@ -7,7 +7,7 @@
  * @date   2010-07-14
  * @brief  Common internal data structures for libkgeomap
  *
- * @author Copyright (C) 2010 by Michael G. Hansen
+ * @author Copyright (C) 2010,2013 by Michael G. Hansen
  *         <a href="mailto:mike at mghansen dot de">mike at mghansen dot de</a>
  * @author Copyright (C) 2010-2013 by Gilles Caulier
  *         <a href="mailto:caulier dot gilles at gmail dot com">caulier dot gilles at gmail dot com</a>
@@ -183,8 +183,8 @@ bool KGeoMapHelperParseXYStringToPoint(const QString& xyString, QPoint* const po
         int ptX = 0;
         int ptY = 0;
 
-        // we do not actually care about the float part, only about the integer part
-        // but we have to parse floats since this is what the data is
+        // We do not actually care about the float part, only about the integer part
+        // but we have to parse floats since this is what the data is.
         ptX = pointStrings.at(0).toFloat(&valid);
 
         if (valid)
@@ -196,6 +196,7 @@ bool KGeoMapHelperParseXYStringToPoint(const QString& xyString, QPoint* const po
         {
             if (point)
             {
+                // This will round to 0.
                 *point = QPoint(ptX, ptY);
             }
 

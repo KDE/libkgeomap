@@ -6,7 +6,7 @@
  * @date   2010-02-07
  * @brief  test for the simple datatypes and helper functions
  *
- * @author Copyright (C) 2010, 2011 by Michael G. Hansen
+ * @author Copyright (C) 2010,2011,2013 by Michael G. Hansen
  *         <a href="mailto:mike at mghansen dot de">mike at mghansen dot de</a>
  *
  * This program is free software; you can redistribute it
@@ -88,10 +88,13 @@ void TestPrimitives::testParseXYStringToPoint()
     QVERIFY(KGeoMapHelperParseXYStringToPoint(QLatin1String("  ( 52, 6 )  "), &point));
     QCOMPARE(point, QPoint(52,6));
 
-    // we used to expect integer results, but floats are also possible
+    // We used to expect integer string results, but floats are also possible.
     // BKO 270624
+    // KGeoMapHelperParseXYStringToPoint always rounds them to 0.
     QVERIFY(KGeoMapHelperParseXYStringToPoint(QLatin1String("  ( 52.5, 6.5 )  "), &point));
-    QCOMPARE(point, QPoint(52.5,6.5));
+    QCOMPARE(point, QPoint(52,6));
+    QVERIFY(KGeoMapHelperParseXYStringToPoint(QLatin1String("  ( -52.5, 6.5 )  "), &point));
+    QCOMPARE(point, QPoint(-52,6));
 
     QVERIFY(KGeoMapHelperParseXYStringToPoint("(204.94641003022224, 68.00444002512285)", &point));
 
