@@ -47,6 +47,7 @@
 #include <kaction.h>
 #include <kconfig.h>
 #include <kconfiggroup.h>
+#include <kdeversion.h>
 #include <khbox.h>
 #include <klocale.h>
 #include <kseparator.h>
@@ -55,9 +56,13 @@
 
 #include <marble/GeoDataLineString.h>
 
-// TODO: Use new Marble header in the future.
+#if KDE_IS_VERSION(4,9,0)
+#include <marble/MarbleGlobal.h>
+#else
+// This file was deprecated in 4.9
 #include <marble/global.h>
-//#include <marble/MarbleGlobal.h>
+#endif
+
 
 // local includes
 
