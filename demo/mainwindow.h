@@ -42,9 +42,10 @@ class KCmdLineArgs;
 
 class MarkerModelHelper : public KGeoMap::ModelHelper
 {
-Q_OBJECT
+    Q_OBJECT
 
 public:
+
     MarkerModelHelper(QAbstractItemModel* const itemModel, QItemSelectionModel* const itemSelectionModel);
     ~MarkerModelHelper();
 
@@ -55,14 +56,16 @@ public:
     virtual Flags modelFlags() const;
 
 private:
+
     QAbstractItemModel* const m_itemModel;
     QItemSelectionModel* const m_itemSelectionModel;
 
 Q_SIGNALS:
+
     void signalMarkersMoved(const QList<QPersistentModelIndex>& movedIndices);
 };
 
-class MainWindowPrivate;
+// ------------------------------------------------------------------------------------------------
 
 class MainWindow : public KMainWindow
 {
@@ -95,7 +98,8 @@ private Q_SLOTS:
 
 private:
 
-    MainWindowPrivate* const d;
+    class Private;
+    Private* const d;
 };
 
 #endif /* MAINWINDOW_H */

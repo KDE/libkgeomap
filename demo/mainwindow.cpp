@@ -121,19 +121,23 @@ void MarkerModelHelper::onIndicesMoved(const QList<QPersistentModelIndex>& moved
     emit(signalMarkersMoved(movedIndices));
 }
 
+// ----------------------------------------------------------------------
+
 class MyImageData
 {
 public:
 
     GeoCoordinates coordinates;
-    KUrl             url;
+    KUrl           url;
 };
 
-class MainWindowPrivate
+// ----------------------------------------------------------------------
+
+class MainWindow::Private
 {
 public:
 
-    MainWindowPrivate()
+    Private()
       : splitter(0),
         mapWidget(0),
         lookupAltitudeList(),
@@ -146,13 +150,16 @@ public:
         imageLoadingBuncher(),
         imageLoadingBunchTimer(0),
         cmdLineArgs(0),
-        lastImageOpenDir()
+        lastImageOpenDir(),
+        displayMarkersModel(0),
+        selectionModel(0),
+        markerModelHelper(0)
     {
 
     }
 
     QSplitter*                          splitter;
-    KGeoMapWidget*                         mapWidget;
+    KGeoMapWidget*                      mapWidget;
     QList<LookupAltitude*>              lookupAltitudeList;
     MyTreeWidget*                       treeWidget;
     QPointer<QProgressBar>              progressBar;
@@ -171,7 +178,7 @@ public:
 };
 
 MainWindow::MainWindow(KCmdLineArgs* const cmdLineArgs, QWidget* const parent)
-          : KMainWindow(parent), d(new MainWindowPrivate())
+          : KMainWindow(parent), d(new Private())
 {
     // initialize kexiv2 before doing any multitasking
     KExiv2Iface::KExiv2::initializeExiv2();
@@ -181,10 +188,9 @@ MainWindow::MainWindow(KCmdLineArgs* const cmdLineArgs, QWidget* const parent)
     d->treeWidget->setHeaderLabels(QStringList()<<i18n("Filename")<<i18n("Coordinates"));
     d->treeWidget->setSelectionMode(QAbstractItemView::ExtendedSelection);
 
-    d->displayMarkersModel = d->treeWidget->model();
-    d->selectionModel = d->treeWidget->selectionModel();
-    d->markerModelHelper = new MarkerModelHelper(d->displayMarkersModel, d->selectionModel);
-
+    d->displayMarkersModel    = d->treeWidget->model();
+    d->selectionModel         = d->treeWidget->selectionModel();
+    d->markerModelHelper      = new MarkerModelHelper(d->displayMarkersModel, d->selectionModel);
     ItemMarkerTiler* const mm = new ItemMarkerTiler(d->markerModelHelper, this);
 
     resize(512, 512);
@@ -196,6 +202,7 @@ MainWindow::MainWindow(KCmdLineArgs* const cmdLineArgs, QWidget* const parent)
 
     d->imageLoadingBunchTimer = new QTimer(this);
     d->imageLoadingBunchTimer->setSingleShot(false);
+
     connect(d->imageLoadingBunchTimer, SIGNAL(timeout()),
             this, SLOT(slotImageLoadingBunchReady()));
 
@@ -223,10 +230,9 @@ MainWindow::MainWindow(KCmdLineArgs* const cmdLineArgs, QWidget* const parent)
     d->splitter->setStretchFactor(0, 10);
 
     QWidget* const dummyWidget = new QWidget(this);
-    QVBoxLayout* const vbox = new QVBoxLayout(dummyWidget);
+    QVBoxLayout* const vbox    = new QVBoxLayout(dummyWidget);
 
     vbox->addWidget(d->mapWidget->getControlWidget());
-
     vbox->addWidget(d->treeWidget);
 
     d->progressBar = new QProgressBar();
@@ -291,6 +297,7 @@ void MainWindow::readSettings()
 
     KConfigGroup groupMainWindowConfig = config.group(QLatin1String("MainWindowConfig"));
     d->lastImageOpenDir                = groupMainWindowConfig.readEntry("Last Image Open Directory", KUrl());
+
     if (groupMainWindowConfig.hasKey("SplitterState"))
     {
         const QByteArray splitterState = QByteArray::fromBase64(groupMainWindowConfig.readEntry(QLatin1String("SplitterState"), QByteArray()));
@@ -331,6 +338,7 @@ MyImageData LoadImageData(const KUrl& urlToLoad)
     KExiv2Iface::KExiv2 exiv2Iface;
     exiv2Iface.load(urlToLoad.path());
     double lat, lon, alt;
+
     if (exiv2Iface.getGPSInfo(alt, lat, lon))
     {
         imageData.coordinates.setLatLon(lat, lon);
@@ -347,10 +355,12 @@ void MainWindow::slotFutureResultsReadyAt(int startIndex, int endIndex)
     // determine the sender:
     QFutureWatcher<MyImageData>* const futureSender = reinterpret_cast<QFutureWatcher<MyImageData>*>(sender());
     KGEOMAP_ASSERT(futureSender!=0);
+
     if (futureSender==0)
         return;
 
     int futureIndex = -1;
+
     for (int i = 0; i<d->imageLoadingFutureWatchers.size(); ++i)
     {
         if (d->imageLoadingFutureWatchers.at(i)==futureSender)
@@ -359,7 +369,9 @@ void MainWindow::slotFutureResultsReadyAt(int startIndex, int endIndex)
             break;
         }
     }
+
     KGEOMAP_ASSERT(futureIndex>=0);
+
     if (futureIndex<0)
     {
         // TODO: error!
@@ -375,6 +387,7 @@ void MainWindow::slotFutureResultsReadyAt(int startIndex, int endIndex)
     }
 
     d->imageLoadingCurrentCount+= endIndex-startIndex;
+
     if (d->imageLoadingCurrentCount < d->imageLoadingTotalCount)
     {
         d->progressBar->setValue(d->imageLoadingCurrentCount);
@@ -384,7 +397,7 @@ void MainWindow::slotFutureResultsReadyAt(int startIndex, int endIndex)
         statusBar()->removeWidget(d->progressBar);
         statusBar()->showMessage(i18np("%1 image has been loaded.", "%1 images have been loaded.", d->imageLoadingTotalCount), 3000);
         d->imageLoadingCurrentCount = 0;
-        d->imageLoadingTotalCount = 0;
+        d->imageLoadingTotalCount   = 0;
 
         // remove the QFutures:
         qDeleteAll(d->imageLoadingFutureWatchers);
@@ -408,6 +421,7 @@ void MainWindow::slotScheduleImagesForLoading(const KUrl::List imagesToSchedule)
         statusBar()->addWidget(d->progressBar);
         d->imageLoadingBunchTimer->start(100);
     }
+
     d->imageLoadingTotalCount+=imagesToSchedule.count();
     d->progressBar->setRange(0, d->imageLoadingTotalCount);
     d->progressBar->setValue(d->imageLoadingCurrentCount);
@@ -443,14 +457,15 @@ void MainWindow::slotMarkersMoved(const QList<QPersistentModelIndex>& markerIndi
 {
     // prepare altitude lookups
     LookupAltitude::Request::List altitudeQueries;
+
     for (int i=0; i<markerIndices.count(); ++i)
     {
         const QPersistentModelIndex currentIndex = markerIndices.at(i);
-        const GeoCoordinates newCoordinates = currentIndex.data(RoleCoordinates).value<GeoCoordinates>();
+        const GeoCoordinates newCoordinates      = currentIndex.data(RoleCoordinates).value<GeoCoordinates>();
 
         LookupAltitude::Request myLookup;
         myLookup.coordinates = newCoordinates;
-        myLookup.data = QVariant::fromValue(QPersistentModelIndex(currentIndex));
+        myLookup.data        = QVariant::fromValue(QPersistentModelIndex(currentIndex));
         altitudeQueries << myLookup;
     }
 
@@ -476,8 +491,9 @@ void MainWindow::slotMarkersMoved(const QList<QPersistentModelIndex>& markerIndi
 
 void MainWindow::slotAltitudeRequestsReady(const QList<int>& readyRequests)
 {
-    kDebug()<<readyRequests.count()<<" items ready!";
+    kDebug()<<readyRequests.count() << " items ready!";
     LookupAltitude* const myAltitudeLookup = qobject_cast<LookupAltitude*>(sender());
+
     if (!myAltitudeLookup)
     {
         return;
@@ -486,8 +502,7 @@ void MainWindow::slotAltitudeRequestsReady(const QList<int>& readyRequests)
     for (int i=0; i<readyRequests.count(); ++i)
     {
         const KGeoMap::LookupAltitude::Request& myLookup = myAltitudeLookup->getRequest(readyRequests.at(i));
-
-        const QPersistentModelIndex markerIndex = myLookup.data.value<QPersistentModelIndex>();
+        const QPersistentModelIndex markerIndex          = myLookup.data.value<QPersistentModelIndex>();
 
         if (!markerIndex.isValid())
         {
@@ -503,6 +518,7 @@ void MainWindow::slotAltitudeRequestsReady(const QList<int>& readyRequests)
 void MainWindow::slotAltitudeLookupDone()
 {
     LookupAltitude* const myAltitudeLookup = qobject_cast<LookupAltitude*>(sender());
+
     if (!myAltitudeLookup)
     {
         return;
@@ -527,9 +543,9 @@ void MainWindow::slotAddImages()
 void MainWindow::createMenus()
 {
     QMenu* const fileMenu         = menuBar()->addMenu(i18n("File"));
-
     KAction* const addFilesAction = new KAction(i18n("Add images..."), fileMenu);
     fileMenu->addAction(addFilesAction);
+
     connect(addFilesAction, SIGNAL(triggered()),
             this, SLOT(slotAddImages()));
 
