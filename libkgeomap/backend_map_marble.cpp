@@ -639,7 +639,9 @@ void BackendMarble::marbleCustomPaint(Marble::GeoPainter* painter)
     }
 
     painter->save();
+#if MARBLE_VERSION < 0x000f14
     painter->autoMapQuality();
+#endif
 
     QPen circlePen(Qt::green);
     QBrush circleBrush(Qt::blue);
