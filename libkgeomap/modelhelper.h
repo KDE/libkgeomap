@@ -66,7 +66,7 @@ public:
 
     Q_DECLARE_FLAGS(Flags, Flag)
 
-    ModelHelper(QObject* const parent = 0);
+    explicit ModelHelper(QObject* const parent = 0);
     virtual ~ModelHelper();
 
     void snapItemsTo(const QModelIndex& targetIndex, const QList<QPersistentModelIndex>& snappedIndices);

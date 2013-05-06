@@ -48,7 +48,7 @@ class KGEOMAP_EXPORT LookupAltitudeGeonames : public LookupAltitude
 
 public:
 
-    LookupAltitudeGeonames(QObject* const parent);
+    explicit LookupAltitudeGeonames(QObject* const parent);
     virtual ~LookupAltitudeGeonames();
 
     virtual QString backendName() const;

@@ -57,7 +57,7 @@ class KGEOMAP_EXPORT KGeoMapWidget : public QWidget
 
 public:
 
-    KGeoMapWidget(QWidget* const parent = 0);
+    explicit KGeoMapWidget(QWidget* const parent = 0);
     ~KGeoMapWidget();
 
     void saveSettingsToGroup(KConfigGroup* const group);

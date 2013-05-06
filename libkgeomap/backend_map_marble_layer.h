@@ -53,7 +53,7 @@ class BMLayer : public Marble::LayerInterface
 {
 public:
 
-    BMLayer(BackendMarble* const pMarbleBackend);
+    explicit BMLayer(BackendMarble* const pMarbleBackend);
     virtual ~BMLayer();
 
     virtual bool render(Marble::GeoPainter* painter, Marble::ViewportParams* viewport,

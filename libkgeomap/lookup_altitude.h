@@ -66,7 +66,7 @@ public:
     };
     Q_DECLARE_FLAGS(Status, StatusEnum)
 
-    LookupAltitude(QObject* const parent);
+    explicit LookupAltitude(QObject* const parent);
     virtual ~LookupAltitude();
 
     virtual QString backendName() const = 0;

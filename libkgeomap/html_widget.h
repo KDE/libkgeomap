@@ -47,7 +47,7 @@ class KGEOMAP_EXPORT HTMLWidget : public KHTMLPart
 
 public:
 
-    HTMLWidget(QWidget* const parent = 0);
+    explicit HTMLWidget(QWidget* const parent = 0);
     ~HTMLWidget();
 
     void loadInitialHTML(const QString& initialHTML);

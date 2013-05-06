@@ -44,7 +44,7 @@ class MyTreeWidget : public QTreeWidget
 
 public:
 
-    MyTreeWidget(QWidget* const parent = 0);
+    explicit MyTreeWidget(QWidget* const parent = 0);
     ~MyTreeWidget();
 
 protected:
