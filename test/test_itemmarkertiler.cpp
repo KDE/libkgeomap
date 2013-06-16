@@ -616,6 +616,7 @@ void TestItemMarkerTiler::testSelectionState1()
 void TestItemMarkerTiler::benchmarkIteratorWholeWorld()
 {
     return;
+#if 0
 //     QBENCHMARK
     {
         QScopedPointer<QStandardItemModel> itemModel(new QStandardItemModel());
@@ -649,6 +650,7 @@ void TestItemMarkerTiler::benchmarkIteratorWholeWorld()
             }
         }
     }
+#endif
 }
 
 QTEST_MAIN(TestItemMarkerTiler)
