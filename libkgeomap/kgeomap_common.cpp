@@ -27,10 +27,15 @@
 
 #include "kgeomap_common.moc"
 
+// KDE includes
+
+#include <klibloader.h>
+
 // local includes
 
 #include "backend_map.h"
 
+static const KCatalogLoader loader("libkgeomap");
 
 namespace KGeoMap
 {
