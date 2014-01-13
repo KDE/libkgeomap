@@ -7,7 +7,7 @@
  * @date   2010-09-18
  * @brief  A tool to calibrate the tiling levels used in libkgeomap
  *
- * @author Copyright (C) 2009-2010 by Michael G. Hansen
+ * @author Copyright (C) 2009-2010,2014 by Michael G. Hansen
  *         <a href="mailto:mike at mghansen dot de">mike at mghansen dot de</a>
  *
  * This program is free software; you can redistribute it
@@ -58,6 +58,7 @@ class CalibratorModelHelper::CalibratorModelHelperPrivate
 {
 public:
     CalibratorModelHelperPrivate()
+     : model(0)
     {
     }
 
