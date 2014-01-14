@@ -142,10 +142,8 @@ bool KGeoMapHelperParseLatLonString(const QString& latLonString, GeoCoordinates*
 
     if (valid)
     {
-        double ptLatitude  = 0.0;
         double ptLongitude = 0.0;
-
-        ptLatitude = coordinateStrings.at(0).toDouble(&valid);
+        const double ptLatitude = coordinateStrings.at(0).toDouble(&valid);
 
         if (valid)
         {

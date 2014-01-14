@@ -175,16 +175,19 @@ public:
         {
             bool okay              = true;
             double ptLongitude     = 0.0;
-            double ptLatitude      = 0.0;
             double ptAltitude      = 0.0;
             const bool hasAltitude = parts.size()==3;
 
-            ptLatitude = parts[0].toDouble(&okay);
+            const double ptLatitude = parts[0].toDouble(&okay);
             if (okay)
+            {
                 ptLongitude = parts[1].toDouble(&okay);
+            }
 
             if (okay&&(hasAltitude))
+            {
                 ptAltitude = parts[2].toDouble(&okay);
+            }
 
             if (!okay)
             {
