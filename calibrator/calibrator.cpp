@@ -117,6 +117,14 @@ class Calibrator::CalibratorPrivate
 {
 public:
     CalibratorPrivate()
+     : hBoxLayout(0),
+       model(0),
+       modelHelper(0),
+       markerTiler(0),
+       groupingMode(0),
+       sbLevel(0),
+       zoomDisplay(0),
+       zoomDisplayTimer(0)
     {
     }
 
