@@ -211,8 +211,8 @@ QWidget* BackendMarble::mapWidget()
         if (go->getInternalWidgetFromPool(this, &info))
         {
             d->marbleWidget = qobject_cast<Marble::MarbleWidget*>(info.widget);
-            const BMInternalWidgetInfo intInfo = info.backendData.value<BMInternalWidgetInfo>();
 #ifdef KGEOMAP_MARBLE_ADD_LAYER
+            const BMInternalWidgetInfo intInfo = info.backendData.value<BMInternalWidgetInfo>();
             d->bmLayer = intInfo.bmLayer;
             d->bmLayer->setBackend(this);
 #endif
@@ -255,8 +255,8 @@ void BackendMarble::releaseWidget(KGeoMapInternalWidgetInfo* const info)
 {
     info->widget->removeEventFilter(this);
 
-    BMInternalWidgetInfo intInfo = info->backendData.value<BMInternalWidgetInfo>();
 #ifdef KGEOMAP_MARBLE_ADD_LAYER
+    BMInternalWidgetInfo intInfo = info->backendData.value<BMInternalWidgetInfo>();
     if (intInfo.bmLayer)
     {
         intInfo.bmLayer->setBackend(0);
@@ -1698,8 +1698,8 @@ void BackendMarble::deleteInfoFunction(KGeoMapInternalWidgetInfo* const info)
         qobject_cast<MapBackend*>(info->currentOwner.data())->releaseWidget(info);
     }
 
-    BMInternalWidgetInfo intInfo = info->backendData.value<BMInternalWidgetInfo>();
 #ifdef KGEOMAP_MARBLE_ADD_LAYER
+    BMInternalWidgetInfo intInfo = info->backendData.value<BMInternalWidgetInfo>();
     if (intInfo.bmLayer)
     {
         delete intInfo.bmLayer;
