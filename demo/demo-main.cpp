@@ -58,6 +58,10 @@ int main(int argc, char* argv[])
                         "mike@mghansen.de",
                         "http://www.mghansen.de");
 
+    aboutData.addCredit(ki18n("Justus Schwartz"),
+                        ki18n("Patch for displaying tracks on the map."),
+                              "justus at gmx dot li");
+
     KCmdLineArgs::init(argc, argv, &aboutData);
     KCmdLineOptions options;
     options.add( "demopoints_single", ki18n("Add built-in demo points as single markers"));
