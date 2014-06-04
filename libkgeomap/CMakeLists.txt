@@ -102,6 +102,7 @@ INSTALL(FILES libkgeomap_export.h
               lookup_factory.h
               modelhelper.h
               tileindex.h
+              trackmodelhelper.h
               ${CMAKE_CURRENT_BINARY_DIR}/version.h
         DESTINATION ${INCLUDE_INSTALL_DIR}/libkgeomap COMPONENT Devel
        )
