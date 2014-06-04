@@ -6,8 +6,10 @@
  * @date   2009-12-01
  * @brief  main-window of the demo application
  *
- * @author Copyright (C) 2009-2010 by Michael G. Hansen
+ * @author Copyright (C) 2009-2010, 2014 by Michael G. Hansen
  *         <a href="mailto:mike at mghansen dot de">mike at mghansen dot de</a>
+ * @author Copyright (C) 2014 by Justus Schwartz
+ *         <a href="mailto:justus at gmx dot li">justus at gmx dot li</a>
  *
  * This program is free software; you can redistribute it
  * and/or modify it under the terms of the GNU General
@@ -37,6 +39,7 @@
 
 #include "libkgeomap/kgeomap_primitives.h"
 #include "libkgeomap/modelhelper.h"
+#include "libkgeomap/trackmodelhelper.h"
 
 class KCmdLineArgs;
 
@@ -64,6 +67,24 @@ Q_SIGNALS:
 
     void signalMarkersMoved(const QList<QPersistentModelIndex>& movedIndices);
 };
+
+class MyTrackModelHelper : public KGeoMap::TrackModelHelper
+{
+    Q_OBJECT
+
+    QList<KGeoMap::GeoCoordinates::List> m_tracks;
+    QAbstractItemModel* m_itemModel;
+  
+public:
+    MyTrackModelHelper(QAbstractItemModel* imageItemsModel);
+    
+    virtual QList<KGeoMap::GeoCoordinates::List> const& getTracks();
+
+public Q_SLOTS:
+    void slotTrackModelChanged();
+
+};
+
 
 // ------------------------------------------------------------------------------------------------
 

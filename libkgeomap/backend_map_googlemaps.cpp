@@ -7,10 +7,12 @@
  * @date   2009-12-01
  * @brief  Google-Maps-backend for KGeoMap
  *
- * @author Copyright (C) 2009-2011 by Michael G. Hansen
+ * @author Copyright (C) 2009-2011, 2014 by Michael G. Hansen
  *         <a href="mailto:mike at mghansen dot de">mike at mghansen dot de</a>
  * @author Copyright (C) 2010 by Gilles Caulier
  *         <a href="mailto:caulier dot gilles at gmail dot com">caulier dot gilles at gmail dot com</a>
+ * @author Copyright (C) 2014 by Justus Schwartz
+ *         <a href="mailto:justus at gmx dot li">justus at gmx dot li</a>
  *
  * This program is free software; you can redistribute it
  * and/or modify it under the terms of the GNU General
@@ -45,6 +47,7 @@
 #include "kgeomap_widget.h"
 #include "abstractmarkertiler.h"
 #include "modelhelper.h"
+#include "trackmodelhelper.h"
 
 namespace KGeoMap
 {
@@ -448,6 +451,11 @@ void BackendGoogleMaps::updateMarkers()
     {
         slotUngroupedModelChanged(i);
     }
+}
+
+void BackendGoogleMaps::updateTracks()
+{
+    slotTrackModelChanged();
 }
 
 void BackendGoogleMaps::slotHTMLEvents(const QStringList& events)
@@ -1197,4 +1205,57 @@ void BackendGoogleMaps::deleteInfoFunction(KGeoMapInternalWidgetInfo* const info
 
     delete info->widget.data();
 }
+
+void BackendGoogleMaps::slotTrackModelChanged()
+{
+    KGEOMAP_ASSERT(isReady());
+    if (!isReady())
+    {
+        return;
+    }
+
+    const QVariant successClear = d->htmlWidget->runScript(QString::fromLatin1("kgeomapClearTracks();"));
+
+    if (s->trackModel)
+    {
+        TrackModelHelper* const modelHelper = s->trackModel;
+        QList<GeoCoordinates::List> const& tracks = modelHelper->getTracks();
+        
+        for (int trackIdx = 0; trackIdx < tracks.count(); ++trackIdx)
+        {
+            GeoCoordinates::List const& track = tracks.at(trackIdx);
+            if (track.count() < 2)
+            {
+                continue;
+            }
+            const int numPointsToPassAtOnce = 1000;
+            for (int coordIdx = 0; coordIdx < track.count(); coordIdx += numPointsToPassAtOnce)
+            {
+                const GeoCoordinates::List trackPoints = track.mid(coordIdx, numPointsToPassAtOnce);
+                addPointsToTrack(trackIdx, trackPoints);
+            }
+        }
+    }
+}
+
+void BackendGoogleMaps::addPointsToTrack(int trackIdx, GeoCoordinates::List const& track)
+{
+    QString json;
+    QTextStream jsonBuilder(&json);
+    jsonBuilder << '[';
+    for (int coordIdx = 0; coordIdx < track.count(); ++coordIdx)
+    {
+        GeoCoordinates const& coordinates = track.at(coordIdx);
+        if (coordIdx > 0)
+        {
+            jsonBuilder << ',';
+        }
+        jsonBuilder << "{\"lat\":" << coordinates.latString() << ","
+                    << "\"lon\":" << coordinates.lonString() << "}";
+    }
+    jsonBuilder << ']';
+    const QString addTrackScript = QString::fromLatin1("kgeomapAddToTrack(%1,'%2');").arg(trackIdx).arg(json);
+    d->htmlWidget->runScript(addTrackScript);
+}
+
 } /* namespace KGeoMap */

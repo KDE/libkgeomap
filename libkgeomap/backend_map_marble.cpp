@@ -7,10 +7,12 @@
  * @date   2009-12-08
  * @brief  Marble-backend for KGeoMap
  *
- * @author Copyright (C) 2009-2011 by Michael G. Hansen
+ * @author Copyright (C) 2009-2011, 2014 by Michael G. Hansen
  *         <a href="mailto:mike at mghansen dot de">mike at mghansen dot de</a>
  * @author Copyright (C) 2010 by Gilles Caulier
  *         <a href="mailto:caulier dot gilles at gmail dot com">caulier dot gilles at gmail dot com</a>
+ * @author Copyright (C) 2014 by Justus Schwartz
+ *         <a href="mailto:justus at gmx dot li">justus at gmx dot li</a>
  *
  * This program is free software; you can redistribute it
  * and/or modify it under the terms of the GNU General
@@ -58,6 +60,7 @@
 #include "abstractmarkertiler.h"
 #include "kgeomap_widget.h"
 #include "modelhelper.h"
+#include "trackmodelhelper.h"
 
 namespace KGeoMap
 {
@@ -525,6 +528,17 @@ void BackendMarble::updateMarkers()
     d->marbleWidget->update();
 }
 
+void BackendMarble::updateTracks()
+{
+    if (!d->marbleWidget)
+    {
+        return;
+    }
+
+    // just redraw, that's it:
+    d->marbleWidget->update();
+}
+
 bool BackendMarble::screenCoordinates(const GeoCoordinates& coordinates, QPoint* const point)
 {
     if (!d->marbleWidget)
@@ -643,10 +657,40 @@ void BackendMarble::marbleCustomPaint(Marble::GeoPainter* painter)
     painter->autoMapQuality();
 #endif
 
-    QPen circlePen(Qt::green);
-    QBrush circleBrush(Qt::blue);
-    // TODO: use global radius instead, but check the code here first
-    //const int circleRadius = 15; // s->groupingRadius;
+    if (s->trackModel)
+    {
+        /// @TODO 5 looks a bit too thick IMHO when you zoom out.
+        ///       Maybe adjust to zoom level?
+        painter->setPen(QPen(QBrush(QColor(255,0,0,180)),5));
+
+        TrackModelHelper* const modelHelper = s->trackModel;
+        QList<GeoCoordinates::List> const& tracks = modelHelper->getTracks();
+        
+        for (int trackIdx = 0; trackIdx < tracks.count(); ++trackIdx)
+        {
+            GeoCoordinates::List const& track = tracks.at(trackIdx);
+            if (track.count() < 2)
+            {
+                continue;
+            }
+
+            /// @TODO Build the linestring once per model update, not on every redraw
+            Marble::GeoDataLineString lineString;
+            for (int coordIdx = 0; coordIdx < track.count(); ++coordIdx)
+            {
+                GeoCoordinates const& coordinates = track.at(coordIdx);
+                Marble::GeoDataCoordinates marbleCoordinates;
+                marbleCoordinates.setLongitude(coordinates.lon(), Marble::GeoDataCoordinates::Degree);
+                marbleCoordinates.setLatitude(coordinates.lat(), Marble::GeoDataCoordinates::Degree);
+                if (coordinates.hasAltitude())
+                {
+                    marbleCoordinates.setAltitude(coordinates.alt());
+                }
+                lineString << marbleCoordinates;
+            }
+            painter->drawPolyline(lineString);
+        }
+    }
 
     for (int i = 0; i<s->ungroupedModels.count(); ++i)
     {
@@ -1463,6 +1507,17 @@ void BackendMarble::slotUngroupedModelChanged(const int index)
     d->marbleWidget->update();
 }
 
+void BackendMarble::slotTrackModelChanged()
+{
+    if (!d->marbleWidget)
+    {
+        return;
+    }
+
+    d->marbleWidget->update();
+}
+
+  
 bool BackendMarble::findSnapPoint(const QPoint& actualPoint, QPoint* const snapPoint, GeoCoordinates* const snapCoordinates, QPair<int, QModelIndex>* const snapTargetIndex)
 {
     QPoint bestSnapPoint;

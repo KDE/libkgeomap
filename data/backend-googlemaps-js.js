@@ -3,7 +3,9 @@
  * Date        : 2010-02-05
  * Description : JavaScript part of the GoogleMaps-backend for WorldMapWidget2
  *
- * Copyright (C) 2010, 2011 by Michael G. Hansen <mike at mghansen dot de>
+ * Copyright (C) 2010, 2011, 2014 by Michael G. Hansen <mike at mghansen dot de>
+ * Copyright (C) 2014 by Justus Schwartz <justus at gmx dot li>
+
  *
  * This program is free software; you can redistribute it
  * and/or modify it under the terms of the GNU General
@@ -23,6 +25,7 @@ var eventBuffer = new Array();
 var markerList = new Object();
 var clusterList = new Object();
 var clusterDataList = new Object();
+var trackList = new Object();
 var isInEditMode = false;
 var dragMarker;
 var dragSnappingToMid = -1;
@@ -212,6 +215,50 @@ function kgeomapClearMarkers(mid)
         markerList[mid][i].marker.setMap(null);
     }
     markerList[mid] = new Object();
+}
+
+function kgeomapClearTracks() 
+{
+    for (var i in trackList) {
+        trackList[i].track.setMap(null);
+    }
+    trackList = new Object();
+
+    return true;
+}
+
+function kgeomapAddToTrack(tid, coordString)
+{
+    var coordArray = JSON.parse(coordString);
+    var track;
+    var trackCoordinates;
+    if (!trackList[tid]) 
+    {
+        trackList[tid] = new Object();
+        trackCoordinates = [];
+        track = new google.maps.Polyline({
+            geodesic: true,
+            strokeColor: '#FF0000',
+            strokeOpacity: 1.0,
+            strokeWeight: 2
+        });
+        trackList[tid].track = track;
+    }
+    else
+    {
+        trackCoordinates = trackList[tid].track.getPath();
+        track = trackList[tid].track;
+        track.setMap(null);
+    }
+    for (var i = 0; i < coordArray.length; ++i) 
+    {
+        var coord = coordArray[i];
+        trackCoordinates.push(new google.maps.LatLng(coord.lat,coord.lon));
+    }
+    track.setPath(trackCoordinates);
+    track.setMap(map);
+
+    return true;
 }
 
 function kgeomapSetMarkerPixmap(mid, id, pixmapWidth, pixmapHeight, xOffset, yOffset, pixmapurl)

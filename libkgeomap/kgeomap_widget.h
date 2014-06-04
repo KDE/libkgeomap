@@ -7,10 +7,12 @@
  * @date   2009-12-01
  * @brief  world map widget library
  *
- * @author Copyright (C) 2009-2011 by Michael G. Hansen
+ * @author Copyright (C) 2009-2011, 2014 by Michael G. Hansen
  *         <a href="mailto:mike at mghansen dot de">mike at mghansen dot de</a>
  * @author Copyright (C) 2010-2013 by Gilles Caulier
  *         <a href="mailto:caulier dot gilles at gmail dot com">caulier dot gilles at gmail dot com</a>
+ * @author Copyright (C) 2014 by Justus Schwartz
+ *         <a href="mailto:justus at gmx dot li">justus at gmx dot li</a>
  *
  * This program is free software; you can redistribute it
  * and/or modify it under the terms of the GNU General
@@ -50,6 +52,7 @@ class AbstractMarkerTiler;
 class DragDropHandler;
 class KGeoMapSharedData;
 class ModelHelper;
+class TrackModelHelper;
 
 class KGEOMAP_EXPORT KGeoMapWidget : public QWidget
 {
@@ -69,6 +72,7 @@ public:
     void removeUngroupedModel(ModelHelper* const modelHelper);
     void setGroupedModel(AbstractMarkerTiler* const markerModel);
     void setDragDropHandler(DragDropHandler* const dragDropHandler);
+    void setTrackModel(TrackModelHelper* const modelHelper);
     //@}
 
     /// @name UI setup
@@ -129,6 +133,7 @@ public:
     //@{
     void updateMarkers();
     void updateClusters();
+    void updateTracks();
     void markClustersAsDirty();
 
     void getColorInfos(const int clusterIndex, QColor* fillColor, QColor* strokeColor,
@@ -171,6 +176,7 @@ Q_SIGNALS:
     void signalRemoveCurrentFilter();
     void signalStickyModeChanged();
     void signalMouseModeChanged(const KGeoMap::MouseModes& currentMouseMode);
+    void signalTrackModelChanged();
 
 public:
 
@@ -210,6 +216,7 @@ protected Q_SLOTS:
     void slotLazyReclusteringRequestCallBack();
     void slotItemDisplaySettingsChanged();
     void slotUngroupedModelChanged();
+    void slotTrackModelChanged();
     void slotNewSelectionFromMap(const KGeoMap::GeoCoordinates::Pair& sel);
 
     /// @name Mouse modes

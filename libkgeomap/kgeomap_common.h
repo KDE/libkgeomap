@@ -7,10 +7,12 @@
  * @date   2010-07-14
  * @brief  Common internal data structures for libkgeomap
  *
- * @author Copyright (C) 2010, 2011 by Michael G. Hansen
+ * @author Copyright (C) 2010, 2011, 2014 by Michael G. Hansen
  *         <a href="mailto:mike at mghansen dot de">mike at mghansen dot de</a>
  * @author Copyright (C) 2010-2013 by Gilles Caulier
  *         <a href="mailto:caulier dot gilles at gmail dot com">caulier dot gilles at gmail dot com</a>
+ * @author Copyright (C) 2014 by Justus Schwartz
+ *         <a href="mailto:justus at gmx dot li">justus at gmx dot li</a>
  *
  * This program is free software; you can redistribute it
  * and/or modify it under the terms of the GNU General
@@ -52,6 +54,7 @@ class KGeoMapWidget;
 class MapBackend;
 class ModelHelper;
 class TileGrouper;
+class TrackModelHelper;
 
 /**
  * @brief Class to hold information about map widgets stored in the KGeoMapGlobalObject
@@ -204,6 +207,7 @@ public:
           tileGrouper(0),
           markerModel(0),
           clusterList(),
+          trackModel(0),
           showThumbnails(true),
           thumbnailSize(KGeoMapMinThumbnailSize),
           thumbnailGroupingRadius(KGeoMapMinThumbnailGroupingRadius),
@@ -238,6 +242,7 @@ public:
     AbstractMarkerTiler*      markerModel;
     KGeoMapCluster::List      clusterList;
     QList<ModelHelper*>       ungroupedModels;
+    TrackModelHelper*         trackModel;
     //@}
 
     /// @name Display options

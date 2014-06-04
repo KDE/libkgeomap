@@ -6,8 +6,10 @@
  * @date   2009-12-01
  * @brief  main-window of the demo application
  *
- * @author Copyright (C) 2009-2010 by Michael G. Hansen
+ * @author Copyright (C) 2009-2010, 2014 by Michael G. Hansen
  *         <a href="mailto:mike at mghansen dot de">mike at mghansen dot de</a>
+ * @author Copyright (C) 2014 by Justus Schwartz
+ *         <a href="mailto:justus at gmx dot li">justus at gmx dot li</a>
  *
  * This program is free software; you can redistribute it
  * and/or modify it under the terms of the GNU General
@@ -131,6 +133,45 @@ public:
     KUrl           url;
 };
 
+MyTrackModelHelper::MyTrackModelHelper(QAbstractItemModel* imageItemsModel)
+  : KGeoMap::TrackModelHelper (imageItemsModel),
+    m_itemModel (imageItemsModel)
+{
+    connect(imageItemsModel, SIGNAL(dataChanged(QModelIndex,QModelIndex)),
+            this, SLOT(slotTrackModelChanged()));
+
+    connect(imageItemsModel, SIGNAL(rowsInserted(QModelIndex,int,int)),
+            this, SLOT(slotTrackModelChanged()));
+
+    connect(imageItemsModel, SIGNAL(modelReset()),
+            this, SLOT(slotTrackModelChanged()));
+    
+}
+void MyTrackModelHelper::slotTrackModelChanged()
+{
+    m_tracks.clear();
+
+    GeoCoordinates::List track;
+    for (int row = 0; row<m_itemModel->rowCount(); ++row)
+    {
+        const QModelIndex currentIndex = m_itemModel->index(row, 0);
+        if (!currentIndex.data(RoleCoordinates).canConvert<GeoCoordinates>())
+            continue;
+
+        const GeoCoordinates markerCoordinates = currentIndex.data(RoleCoordinates).value<GeoCoordinates>();
+        track << markerCoordinates;
+    }
+
+    m_tracks << track;
+
+    emit(signalModelChanged());
+}
+
+QList<KGeoMap::GeoCoordinates::List> const& MyTrackModelHelper::getTracks() const
+{
+    return m_tracks;
+}
+
 // ----------------------------------------------------------------------
 
 class MainWindow::Private
@@ -153,7 +194,8 @@ public:
         lastImageOpenDir(),
         displayMarkersModel(0),
         selectionModel(0),
-        markerModelHelper(0)
+        markerModelHelper(0),
+        trackModelHelper(0)
     {
 
     }
@@ -175,6 +217,7 @@ public:
     QAbstractItemModel*                 displayMarkersModel;
     QItemSelectionModel*                selectionModel;
     MarkerModelHelper*                  markerModelHelper;
+    TrackModelHelper*                   trackModelHelper;
 };
 
 MainWindow::MainWindow(KCmdLineArgs* const cmdLineArgs, QWidget* const parent)
@@ -191,6 +234,7 @@ MainWindow::MainWindow(KCmdLineArgs* const cmdLineArgs, QWidget* const parent)
     d->displayMarkersModel    = d->treeWidget->model();
     d->selectionModel         = d->treeWidget->selectionModel();
     d->markerModelHelper      = new MarkerModelHelper(d->displayMarkersModel, d->selectionModel);
+    d->trackModelHelper       = new MyTrackModelHelper(d->treeWidget->model());
     ItemMarkerTiler* const mm = new ItemMarkerTiler(d->markerModelHelper, this);
 
     resize(512, 512);
@@ -219,6 +263,7 @@ MainWindow::MainWindow(KCmdLineArgs* const cmdLineArgs, QWidget* const parent)
     d->mapWidget->setDragDropHandler(new DemoDragDropHandler(d->displayMarkersModel, d->mapWidget));
     d->mapWidget->setVisibleMouseModes(KGeoMap::MouseModePan|KGeoMap::MouseModeZoomIntoGroup|KGeoMap::MouseModeSelectThumbnail);
     d->mapWidget->setAvailableMouseModes(KGeoMap::MouseModePan|KGeoMap::MouseModeZoomIntoGroup|KGeoMap::MouseModeSelectThumbnail);
+    d->mapWidget->setTrackModel(d->trackModelHelper);
 
     connect(d->markerModelHelper, SIGNAL(signalMarkersMoved(QList<QPersistentModelIndex>)),
             this, SLOT(slotMarkersMoved(QList<QPersistentModelIndex>)));
@@ -451,6 +496,14 @@ void MainWindow::slotImageLoadingBunchReady()
     }
 
     d->imageLoadingBuncher.clear();
+
+    if (d->imageLoadingTotalCount == 0)
+    {
+        // remove the QFutures:
+        qDeleteAll(d->imageLoadingFutureWatchers);
+        d->imageLoadingFutureWatchers.clear();
+        d->imageLoadingRunningFutures.clear();
+    }
 }
 
 void MainWindow::slotMarkersMoved(const QList<QPersistentModelIndex>& markerIndices)
