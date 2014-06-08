@@ -37,7 +37,7 @@
 
 // local includes
 
-#include <kgeomap_primitives.h>
+#include "kgeomap_primitives.h"
 #include "libkgeomap_export.h"
 
 class TestGPXParsing;
