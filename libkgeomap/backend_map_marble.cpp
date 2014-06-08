@@ -629,7 +629,7 @@ void BackendMarble::GeoPainter_drawPixmapAtCoordinates(Marble::GeoPainter* const
     }
 
     // convert to Marble datatype and draw:
-    const Marble::GeoDataCoordinates mcoord(drawGeoCoordinates.lon(), drawGeoCoordinates.lat(), 0, Marble::GeoDataCoordinates::Degree);
+    const Marble::GeoDataCoordinates mcoord = drawGeoCoordinates.toMarbleCoordinates();
     painter->drawPixmap(mcoord, pixmap);
 }
 
@@ -679,13 +679,7 @@ void BackendMarble::marbleCustomPaint(Marble::GeoPainter* painter)
             for (int coordIdx = 0; coordIdx < track.count(); ++coordIdx)
             {
                 GeoCoordinates const& coordinates = track.at(coordIdx);
-                Marble::GeoDataCoordinates marbleCoordinates;
-                marbleCoordinates.setLongitude(coordinates.lon(), Marble::GeoDataCoordinates::Degree);
-                marbleCoordinates.setLatitude(coordinates.lat(), Marble::GeoDataCoordinates::Degree);
-                if (coordinates.hasAltitude())
-                {
-                    marbleCoordinates.setAltitude(coordinates.alt());
-                }
+                const Marble::GeoDataCoordinates marbleCoordinates = coordinates.toMarbleCoordinates();
                 lineString << marbleCoordinates;
             }
             painter->drawPolyline(lineString);

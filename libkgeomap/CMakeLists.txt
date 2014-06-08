@@ -39,6 +39,7 @@ SET(widget_sources
     abstractmarkertiler.cpp
     backend_map.cpp
     dragdrophandler.cpp
+    geocoordinates.cpp
     html_widget.cpp
     itemmarkertiler.cpp
     kgeomap_widget.cpp

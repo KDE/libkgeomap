@@ -29,7 +29,7 @@
 using namespace KGeoMap;
 
 TrackModelHelper::TrackModelHelper(QObject* const parent)
-  : QObject (parent)
+  : QObject(parent)
 {
 
 }
