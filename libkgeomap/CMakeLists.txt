@@ -106,6 +106,7 @@ INSTALL(FILES libkgeomap_export.h
               tileindex.h
               trackmodelhelper.h
               tracks.h
+              track_reader.h
               ${CMAKE_CURRENT_BINARY_DIR}/version.h
         DESTINATION ${INCLUDE_INSTALL_DIR}/libkgeomap COMPONENT Devel
        )
