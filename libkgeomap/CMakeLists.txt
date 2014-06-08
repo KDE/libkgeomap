@@ -51,6 +51,8 @@ SET(widget_sources
     placeholderwidget.cpp
     tilegrouper.cpp
     tileindex.cpp
+    tracks.cpp
+    track_reader.cpp
    )
 
 SET(backend_map_marble_sources
@@ -103,6 +105,7 @@ INSTALL(FILES libkgeomap_export.h
               modelhelper.h
               tileindex.h
               trackmodelhelper.h
+              tracks.h
               ${CMAKE_CURRENT_BINARY_DIR}/version.h
         DESTINATION ${INCLUDE_INSTALL_DIR}/libkgeomap COMPONENT Devel
        )

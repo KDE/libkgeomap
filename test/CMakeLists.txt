@@ -60,6 +60,8 @@ IF(KDE4_BUILD_TESTS)
        )
     KDE4_ADD_EXECUTABLE(kgeomap_test_lookup_altitude_geonames ${test_lookup_altitude_geonames_sources})
     TARGET_LINK_LIBRARIES(kgeomap_test_lookup_altitude_geonames kgeomap ${QT_QTCORE_LIBRARY} ${QT_QTTEST_LIBRARY})
+    # do not add this as a test because it only works if there is an internet connection
+    # ADD_TEST(kgeomap_test_lookup_altitude_geonames ${EXECUTABLE_OUTPUT_PATH}/kgeomap_test_lookup_altitude_geonames)
 
     IF(NOT WIN32)
 	# test the marker model
@@ -70,8 +72,13 @@ IF(KDE4_BUILD_TESTS)
 	TARGET_LINK_LIBRARIES(kgeomap_test_itemmarkertiler kgeomap ${QT_QTCORE_LIBRARY} ${QT_QTTEST_LIBRARY} ${KDE4_KDEUI_LIBS})
 	ADD_TEST(kgeomap_test_itemmarkertiler ${EXECUTABLE_OUTPUT_PATH}/kgeomap_test_itemmarkertiler)
     ENDIF(NOT WIN32)
-	
-    # do not add this as a test because it only works if there is an internet connection
-    # ADD_TEST(kgeomap_test_lookup_altitude_geonames ${EXECUTABLE_OUTPUT_PATH}/kgeomap_test_lookup_altitude_geonames)
+
+    # test the track management classes
+    SET(test_tracks_sources
+        test_tracks.cpp
+       )
+    KDE4_ADD_EXECUTABLE(kgeomap_test_tracks ${test_tracks_sources})
+    TARGET_LINK_LIBRARIES(kgeomap_test_tracks kgeomap ${QT_QTCORE_LIBRARY} ${QT_QTTEST_LIBRARY} ${KDE4_KDECORE_LIBS})
+    ADD_TEST(kgeomap_test_tracks ${EXECUTABLE_OUTPUT_PATH}/kgeomap_test_tracks)
 
 ENDIF(KDE4_BUILD_TESTS)
