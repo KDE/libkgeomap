@@ -151,7 +151,7 @@ void MyTrackModelHelper::slotTrackModelChanged()
 {
     m_tracks.clear();
 
-    GeoCoordinates::List track;
+    TrackManager::Track track;
     for (int row = 0; row<m_itemModel->rowCount(); ++row)
     {
         const QModelIndex currentIndex = m_itemModel->index(row, 0);
@@ -159,7 +159,9 @@ void MyTrackModelHelper::slotTrackModelChanged()
             continue;
 
         const GeoCoordinates markerCoordinates = currentIndex.data(RoleCoordinates).value<GeoCoordinates>();
-        track << markerCoordinates;
+        TrackManager::TrackPoint trackPoint;
+        trackPoint.coordinates = markerCoordinates;
+        track.points << trackPoint;
     }
 
     m_tracks << track;
@@ -167,7 +169,7 @@ void MyTrackModelHelper::slotTrackModelChanged()
     emit(signalModelChanged());
 }
 
-QList<KGeoMap::GeoCoordinates::List> const& MyTrackModelHelper::getTracks() const
+TrackManager::Track::List MyTrackModelHelper::getTracks() const
 {
     return m_tracks;
 }

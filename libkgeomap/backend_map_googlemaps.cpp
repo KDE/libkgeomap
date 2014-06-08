@@ -1219,33 +1219,37 @@ void BackendGoogleMaps::slotTrackModelChanged()
     if (s->trackModel)
     {
         TrackModelHelper* const modelHelper = s->trackModel;
-        QList<GeoCoordinates::List> const& tracks = modelHelper->getTracks();
+        TrackManager::Track::List const& tracks = modelHelper->getTracks();
         
         for (int trackIdx = 0; trackIdx < tracks.count(); ++trackIdx)
         {
-            GeoCoordinates::List const& track = tracks.at(trackIdx);
-            if (track.count() < 2)
+            TrackManager::Track const& track = tracks.at(trackIdx);
+            if (track.points.count() < 2)
             {
                 continue;
             }
             const int numPointsToPassAtOnce = 1000;
-            for (int coordIdx = 0; coordIdx < track.count(); coordIdx += numPointsToPassAtOnce)
+            for (int coordIdx = 0; coordIdx < track.points.count(); coordIdx += numPointsToPassAtOnce)
             {
-                const GeoCoordinates::List trackPoints = track.mid(coordIdx, numPointsToPassAtOnce);
-                addPointsToTrack(trackIdx, trackPoints);
+                addPointsToTrack(trackIdx, track.points, coordIdx, numPointsToPassAtOnce);
             }
         }
     }
 }
 
-void BackendGoogleMaps::addPointsToTrack(int trackIdx, GeoCoordinates::List const& track)
+void BackendGoogleMaps::addPointsToTrack(int trackIdx, TrackManager::TrackPoint::List const& track, const int firstPoint, const int nPoints)
 {
     QString json;
     QTextStream jsonBuilder(&json);
     jsonBuilder << '[';
-    for (int coordIdx = 0; coordIdx < track.count(); ++coordIdx)
+    int lastPoint = track.count()-1;
+    if (nPoints>0)
     {
-        GeoCoordinates const& coordinates = track.at(coordIdx);
+        lastPoint = firstPoint - nPoints;
+    }
+    for (int coordIdx = firstPoint; coordIdx <= lastPoint; ++coordIdx)
+    {
+        GeoCoordinates const& coordinates = track.at(coordIdx).coordinates;
         if (coordIdx > 0)
         {
             jsonBuilder << ',';

@@ -27,19 +27,10 @@
 #ifndef KGEOMAP_TRACKMODELHELPER
 #define KGEOMAP_TRACKMODELHELPER
 
-// Qt includes
-
-#include <QtCore/QPoint>
-
-// Kde includes
-
-#include <kdebug.h>
-
 // local includes
 
 #include "libkgeomap_export.h"
-#include "kgeomap_primitives.h"
-#include "geocoordinates.h"
+#include "tracks.h"
 
 namespace KGeoMap
 {
@@ -52,7 +43,7 @@ public:
     explicit TrackModelHelper(QObject* const parent = 0);
     virtual ~TrackModelHelper();
 
-    virtual QList<GeoCoordinates::List> getTracks() const = 0;
+    virtual TrackManager::Track::List getTracks() const = 0;
     
 Q_SIGNALS:
 
@@ -60,6 +51,5 @@ Q_SIGNALS:
 };
 
 }
-
 
 #endif /* KGEOMAP_TRACKMODELHELPER */

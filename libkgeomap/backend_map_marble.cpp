@@ -664,11 +664,11 @@ void BackendMarble::marbleCustomPaint(Marble::GeoPainter* painter)
         painter->setPen(QPen(QBrush(QColor(255,0,0,180)),5));
 
         TrackModelHelper* const modelHelper = s->trackModel;
-        QList<GeoCoordinates::List> const& tracks = modelHelper->getTracks();
+        TrackManager::Track::List const& tracks = modelHelper->getTracks();
         
         for (int trackIdx = 0; trackIdx < tracks.count(); ++trackIdx)
         {
-            GeoCoordinates::List const& track = tracks.at(trackIdx);
+            TrackManager::TrackPoint::List const& track = tracks.at(trackIdx).points;
             if (track.count() < 2)
             {
                 continue;
@@ -678,7 +678,7 @@ void BackendMarble::marbleCustomPaint(Marble::GeoPainter* painter)
             Marble::GeoDataLineString lineString;
             for (int coordIdx = 0; coordIdx < track.count(); ++coordIdx)
             {
-                GeoCoordinates const& coordinates = track.at(coordIdx);
+                GeoCoordinates const& coordinates = track.at(coordIdx).coordinates;
                 const Marble::GeoDataCoordinates marbleCoordinates = coordinates.toMarbleCoordinates();
                 lineString << marbleCoordinates;
             }

@@ -72,13 +72,13 @@ class MyTrackModelHelper : public KGeoMap::TrackModelHelper
 {
     Q_OBJECT
 
-    QList<KGeoMap::GeoCoordinates::List> m_tracks;
+    KGeoMap::TrackManager::Track::List m_tracks;
     QAbstractItemModel* m_itemModel;
   
 public:
     MyTrackModelHelper(QAbstractItemModel* imageItemsModel);
     
-    virtual QList<KGeoMap::GeoCoordinates::List> const& getTracks();
+    virtual KGeoMap::TrackManager::Track::List getTracks() const;
 
 public Q_SLOTS:
     void slotTrackModelChanged();

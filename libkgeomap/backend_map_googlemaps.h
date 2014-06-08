@@ -32,6 +32,7 @@
 // local includes
 
 #include "backend_map.h"
+#include "tracks.h"
 
 namespace KGeoMap
 {
@@ -122,7 +123,7 @@ private:
 
     void updateZoomMinMaxCache();
     static void deleteInfoFunction(KGeoMapInternalWidgetInfo* const info);
-    void addPointsToTrack(int trackIdx, GeoCoordinates::List const& track);
+    void addPointsToTrack(int trackIdx, TrackManager::TrackPoint::List const& track, const int firstPoint, const int nPoints);
   
 private:
 
