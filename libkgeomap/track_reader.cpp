@@ -112,11 +112,13 @@ bool TrackReader::characters(const QString& ch)
     return true;
 }
 
+static QString GPX10("http://www.topografix.com/GPX/1/0");
+static QString GPX11("http://www.topografix.com/GPX/1/1");
+
 QString TrackReader::myQName(const QString& namespaceURI, const QString& localName)
 {
-    /// @TODO use static QStrings for the constants!
-    if ( (namespaceURI=="http://www.topografix.com/GPX/1/0")  ||
-         (namespaceURI=="http://www.topografix.com/GPX/1/1") )
+    if ( (namespaceURI==GPX10)  ||
+         (namespaceURI==GPX11) )
     {
         return "gpx:"+localName;
     }
