@@ -87,7 +87,7 @@ QDateTime TrackReader::ParseTime(QString timeString)
     return theTime;
 }
 
-TrackReader::TrackReader(TrackManager::Track* const dataTarget)
+TrackReader::TrackReader(TrackReadResult* const dataTarget)
   : QXmlDefaultHandler(),
     fileData(dataTarget),
     currentElementPath(),
@@ -138,7 +138,7 @@ bool TrackReader::endElement(const QString& namespaceURI, const QString& localNa
     {
         if (currentDataPoint.dateTime.isValid()&&currentDataPoint.coordinates.hasCoordinates())
         {
-            fileData->points << currentDataPoint;
+            fileData->track.points << currentDataPoint;
         }
 
         currentDataPoint = TrackManager::TrackPoint();
@@ -262,11 +262,11 @@ void TrackReader::rebuildElementPath()
     currentElementPath = currentElements.join("/");
 }
 
-TrackManager::Track TrackReader::loadTrackFile(const KUrl& url)
+TrackReader::TrackReadResult TrackReader::loadTrackFile(const KUrl& url)
 {
     // TODO: store some kind of error message
-    TrackManager::Track parsedData;
-    parsedData.url = url;
+    TrackReadResult parsedData;
+    parsedData.track.url = url;
     parsedData.isValid = false;
 
     QFile file(url.toLocalFile());
@@ -299,7 +299,7 @@ TrackManager::Track TrackReader::loadTrackFile(const KUrl& url)
         return parsedData;
     }
 
-    parsedData.isValid = !parsedData.points.isEmpty();
+    parsedData.isValid = !parsedData.track.points.isEmpty();
 
     if (!parsedData.isValid)
     {
@@ -316,7 +316,7 @@ TrackManager::Track TrackReader::loadTrackFile(const KUrl& url)
     }
 
     // the correlation algorithm relies on sorted data, therefore sort now
-    qSort(parsedData.points.begin(), parsedData.points.end(), TrackManager::TrackPoint::EarlierThan);
+    qSort(parsedData.track.points.begin(), parsedData.track.points.end(), TrackManager::TrackPoint::EarlierThan);
 
     return parsedData;
 }

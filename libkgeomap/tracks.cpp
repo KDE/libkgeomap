@@ -66,10 +66,10 @@ public:
 
     }
 
-    QFutureWatcher<TrackManager::Track>* trackLoadFutureWatcher;
-    QFuture<TrackManager::Track>         trackLoadFuture;
-    TrackManager::Track::List            trackList;
-    QList<QPair<KUrl, QString> >         loadErrorFiles;
+    QFutureWatcher<TrackReader::TrackReadResult>* trackLoadFutureWatcher;
+    QFuture<TrackReader::TrackReadResult> trackLoadFuture;
+    TrackManager::Track::List trackList;
+    QList<QPair<KUrl, QString> > loadErrorFiles;
 };
 
 TrackManager::TrackManager(QObject* const parent)
@@ -95,7 +95,7 @@ const TrackManager::Track& TrackManager::getTrack(const int index) const
 
 void TrackManager::loadTrackFiles(const KUrl::List& urls)
 {
-    d->trackLoadFutureWatcher = new QFutureWatcher<Track>(this);
+    d->trackLoadFutureWatcher = new QFutureWatcher<TrackReader::TrackReadResult>(this);
 
     connect(d->trackLoadFutureWatcher, SIGNAL(resultsReadyAt(int,int)),
             this, SLOT(slotTrackFilesReadyAt(int,int)));
@@ -116,15 +116,15 @@ void TrackManager::slotTrackFilesReadyAt(int beginIndex, int endIndex)
     // note that endIndex is exclusive!
     for (int i=beginIndex; i<endIndex; ++i)
     {
-        const Track nextFile = d->trackLoadFuture.resultAt(i);
+        const TrackReader::TrackReadResult nextFile = d->trackLoadFuture.resultAt(i);
 
         if (nextFile.isValid)
         {
-            d->trackList << nextFile;
+            d->trackList << nextFile.track;
         }
         else
         {
-            d->loadErrorFiles << QPair<KUrl, QString>(nextFile.url, nextFile.loadError);
+            d->loadErrorFiles << QPair<KUrl, QString>(nextFile.track.url, nextFile.loadError);
         }
     }
 

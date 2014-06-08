@@ -168,7 +168,7 @@ void TestTracks::testFileLoading()
     QCOMPARE(spyTrackFiles.count(), 1);
 
     const TrackManager::Track& file1 = myParser.getTrack(0);
-    QVERIFY(file1.isValid);
+    QVERIFY(!file1.points.isEmpty());
 }
 
 /**
@@ -178,14 +178,14 @@ void TestTracks::testSaxLoader()
 {
     const KUrl testDataDir = GetTestDataDirectory();
 
-    TrackManager::Track fileData = TrackReader::loadTrackFile(KUrl(testDataDir, "gpxfile-1.gpx"));
+    TrackReader::TrackReadResult fileData = TrackReader::loadTrackFile(KUrl(testDataDir, "gpxfile-1.gpx"));
     QVERIFY(fileData.isValid);
     QVERIFY(fileData.loadError.isEmpty());
 
     // verify that the points are sorted by date:
-    for (int i = 1; i<fileData.points.count(); ++i)
+    for (int i = 1; i<fileData.track.points.count(); ++i)
     {
-        QVERIFY(TrackManager::TrackPoint::EarlierThan(fileData.points.at(i-1), fileData.points.at(i)));
+        QVERIFY(TrackManager::TrackPoint::EarlierThan(fileData.track.points.at(i-1), fileData.track.points.at(i)));
     }
 }
 
@@ -197,21 +197,21 @@ void TestTracks::testSaxLoaderError()
     const KUrl testDataDir = GetTestDataDirectory();
 
     {
-        TrackManager::Track fileData = TrackReader::loadTrackFile(KUrl(testDataDir, "gpx-invalid-empty.gpx"));
+        TrackReader::TrackReadResult fileData = TrackReader::loadTrackFile(KUrl(testDataDir, "gpx-invalid-empty.gpx"));
         QVERIFY(!fileData.isValid);
         QVERIFY(!fileData.loadError.isEmpty());
         kDebug()<<fileData.loadError;
     }
 
     {
-        TrackManager::Track fileData = TrackReader::loadTrackFile(KUrl(testDataDir, "gpx-invalid-xml-error.gpx"));
+        TrackReader::TrackReadResult fileData = TrackReader::loadTrackFile(KUrl(testDataDir, "gpx-invalid-xml-error.gpx"));
         QVERIFY(!fileData.isValid);
         QVERIFY(!fileData.loadError.isEmpty());
         kDebug()<<fileData.loadError;
     }
 
     {
-        TrackManager::Track fileData = TrackReader::loadTrackFile(KUrl(testDataDir, "gpx-invalid-no-points.gpx"));
+        TrackReader::TrackReadResult fileData = TrackReader::loadTrackFile(KUrl(testDataDir, "gpx-invalid-no-points.gpx"));
         QVERIFY(!fileData.isValid);
         QVERIFY(!fileData.loadError.isEmpty());
         kDebug()<<fileData.loadError;

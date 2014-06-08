@@ -89,17 +89,14 @@ public:
 
         Track()
         : url(),
-          isValid(false),
-          loadError(),
           points()
         {
         }
 
-        KUrl                       url;
-        bool                       isValid;
-        QString                    loadError;
-        QList<TrackPoint>          points;
-        typedef QList<Track>       List;
+        KUrl url;
+        QList<TrackPoint> points;
+
+        typedef QList<Track> List;
     };
 
 public:

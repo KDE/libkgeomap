@@ -47,13 +47,31 @@ class KGEOMAP_EXPORT TrackReader : public QXmlDefaultHandler
 {
 public:
 
-    explicit TrackReader(TrackManager::Track* const dataTarget);
+    class TrackReadResult
+    {
+    public:
+        TrackReadResult()
+          : track(),
+            isValid(false),
+            loadError()
+        {
+
+        }
+
+        TrackManager::Track track;
+        bool isValid;
+        QString loadError;
+
+        typedef QList<TrackReadResult> List;
+    };
+
+    explicit TrackReader(TrackReadResult* const dataTarget);
 
     virtual bool characters(const QString& ch);
     virtual bool endElement(const QString& namespaceURI, const QString& localName, const QString& qName);
     virtual bool startElement(const QString& namespaceURI, const QString& localName, const QString& qName, const QXmlAttributes& atts);
 
-    static TrackManager::Track loadTrackFile(const KUrl& url);
+    static TrackReadResult loadTrackFile(const KUrl& url);
     static QDateTime ParseTime(QString timeString);
 
 private:
@@ -64,7 +82,7 @@ private:
 
 private:
 
-    TrackManager::Track* const        fileData;
+    TrackReadResult* const            fileData;
     QString                           currentElementPath;
     QStringList                       currentElements;
     QString                           currentText;
