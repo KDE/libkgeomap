@@ -28,12 +28,8 @@
 
 // Qt includes
 
-#include <qtconcurrentmap.h>
 #include <QDomDocument>
 #include <QFile>
-#include <QFuture>
-#include <QFutureWatcher>
-#include <QString>
 
 // KDE includes
 

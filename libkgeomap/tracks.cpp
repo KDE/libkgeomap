@@ -31,7 +31,6 @@
 #include <qtconcurrentmap.h>
 #include <QFuture>
 #include <QFutureWatcher>
-#include <QString>
 
 // KDE includes
 

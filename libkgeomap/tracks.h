@@ -30,15 +30,14 @@
 // Qt includes
 
 #include <QDateTime>
-#include <QThread>
 
 // KDE includes
 
 #include <kurl.h>
 
-// Libkgeomap includes
+// local includes
 
-#include <libkgeomap/kgeomap_primitives.h>
+#include <kgeomap_primitives.h>
 #include "libkgeomap_export.h"
 
 class TestGPXParsing;
