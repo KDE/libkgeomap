@@ -25,7 +25,7 @@ var eventBuffer = new Array();
 var markerList = new Object();
 var clusterList = new Object();
 var clusterDataList = new Object();
-var trackList = new Object();
+var trackList = new Array();
 var isInEditMode = false;
 var dragMarker;
 var dragSnappingToMid = -1;
@@ -222,41 +222,68 @@ function kgeomapClearTracks()
     for (var i in trackList) {
         trackList[i].track.setMap(null);
     }
-    trackList = new Object();
+    trackList = new Array();
 
     return true;
 }
 
-function kgeomapAddToTrack(tid, coordString)
+function kgeomapGetTrackIndex(tid)
 {
-    var coordArray = JSON.parse(coordString);
-    var track;
-    var trackCoordinates;
-    if (!trackList[tid]) 
+    for (var i=0; i<trackList.length; ++i)
     {
-        trackList[tid] = new Object();
-        trackCoordinates = [];
-        track = new google.maps.Polyline({
+        if (trackList[i].id==tid)
+        {
+            return i;
+        }
+    }
+
+    return -1;
+}
+function kgeomapCreateTrack(tid, trackColor)
+{
+    // trackColor has to have the form '#FF0000'
+    var oldIndex = kgeomapGetTrackIndex(tid);
+    if (oldIndex>=0)
+    {
+        trackList[oldIndex].track.setMap(null);
+        trackList.splice(oldIndex, 1);
+    }
+
+    var trackEntry = new Object();
+    trackEntry.id = tid;
+    trackEntry.track = new google.maps.Polyline({
             geodesic: true,
-            strokeColor: '#FF0000',
+            strokeColor: trackColor,
             strokeOpacity: 1.0,
             strokeWeight: 2
         });
-        trackList[tid].track = track;
-    }
-    else
+
+    trackList.push(trackEntry);
+
+    return trackList.length-1;
+}
+
+function kgeomapAddToTrack(tid, coordString)
+{
+    var trackIndex = kgeomapGetTrackIndex(tid);
+    if (trackIndex<0)
     {
-        trackCoordinates = trackList[tid].track.getPath();
-        track = trackList[tid].track;
-        track.setMap(null);
+        return false;
     }
-    for (var i = 0; i < coordArray.length; ++i) 
+
+    var track = trackList[trackIndex].track;
+    track.setMap(null);
+
+    var trackCoordinates = track.getPath();
+    var coordArray = JSON.parse(coordString);
+    for (var i = 0; i < coordArray.length; ++i)
     {
         var coord = coordArray[i];
         trackCoordinates.push(new google.maps.LatLng(coord.lat,coord.lon));
     }
     track.setPath(trackCoordinates);
     track.setMap(map);
+    trackList[trackIndex].track = track;
 
     return true;
 }

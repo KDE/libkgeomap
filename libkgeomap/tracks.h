@@ -29,6 +29,7 @@
 
 // Qt includes
 
+#include <QColor>
 #include <QDateTime>
 
 // KDE includes
@@ -86,11 +87,19 @@ public:
     class Track
     {
     public:
+        enum Flags
+        {
+            FlagVisible = 1,
+
+            FlagDefault = FlagVisible
+        };
 
         Track()
         : url(),
           points(),
-          id(0)
+          id(0),
+          color(Qt::red),
+          flags(FlagDefault)
         {
         }
 
@@ -98,6 +107,8 @@ public:
         QList<TrackPoint> points;
         /// 0 means no track id assigned yet
         quint64 id;
+        QColor color;
+        Flags flags;
 
         typedef QList<Track> List;
     };
@@ -115,6 +126,7 @@ public:
     int trackCount() const;
     quint64 getNextFreeTrackId();
     Track getTrackById(const quint64 trackId) const;
+    QColor getNextFreeTrackColor();
 
 Q_SIGNALS:
 

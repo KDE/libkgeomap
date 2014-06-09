@@ -62,7 +62,8 @@ public:
         trackLoadFuture(),
         trackList(),
         loadErrorFiles(),
-        nextTrackId(1)
+        nextTrackId(1),
+        nextTrackColor(0)
     {
 
     }
@@ -74,6 +75,7 @@ public:
 
     // We assume here that we will never load more than uint64_max tracks.
     quint64 nextTrackId;
+    int nextTrackColor;
 };
 
 TrackManager::TrackManager(QObject* const parent)
@@ -126,6 +128,7 @@ void TrackManager::slotTrackFilesReadyAt(int beginIndex, int endIndex)
         {
             Track nextTrack = nextFile.track;
             nextTrack.id = getNextFreeTrackId();
+            nextTrack.color = getNextFreeTrackColor();
             d->trackList << nextTrack;
         }
         else
@@ -182,6 +185,21 @@ TrackManager::Track TrackManager::getTrackById(const quint64 trackId) const
     }
 
     return TrackManager::Track();
+}
+
+QColor TrackManager::getNextFreeTrackColor()
+{
+    QList<QColor> colorList;
+    colorList << Qt::red << Qt::blue << Qt::green << Qt::magenta;
+
+    const QColor nextColor = colorList.at(d->nextTrackColor);
+    ++(d->nextTrackColor);
+    if (d->nextTrackColor >= colorList.count())
+    {
+        d->nextTrackColor = 0;
+    }
+
+    return nextColor;
 }
 
 } // namespace KGeoMap

@@ -114,7 +114,8 @@ public:
         firstSelectionPoint(),
         activeState(false),
         widgetIsDocked(false),
-        blockingZoomWhileChangingTheme(false)
+        blockingZoomWhileChangingTheme(false),
+        trackCache()
 #ifdef KGEOMAP_MARBLE_ADD_LAYER
         , bmLayer(0)
 #endif
@@ -156,6 +157,8 @@ public:
     bool                   activeState;
     bool                   widgetIsDocked;
     bool                   blockingZoomWhileChangingTheme;
+
+    QHash<quint64, Marble::GeoDataLineString> trackCache;
 
 #ifdef KGEOMAP_MARBLE_ADD_LAYER
     BMLayer*               bmLayer;
@@ -530,12 +533,15 @@ void BackendMarble::updateMarkers()
 
 void BackendMarble::updateTracks()
 {
+    // clear the cache
+    d->trackCache.clear();
+
     if (!d->marbleWidget)
     {
         return;
     }
 
-    // just redraw, that's it:
+    // and redraw
     d->marbleWidget->update();
 }
 
@@ -659,29 +665,37 @@ void BackendMarble::marbleCustomPaint(Marble::GeoPainter* painter)
 
     if (s->trackModel)
     {
-        /// @TODO 5 looks a bit too thick IMHO when you zoom out.
-        ///       Maybe adjust to zoom level?
-        painter->setPen(QPen(QBrush(QColor(255,0,0,180)),5));
-
         TrackModelHelper* const modelHelper = s->trackModel;
         TrackManager::Track::List const& tracks = modelHelper->getTracks();
         
         for (int trackIdx = 0; trackIdx < tracks.count(); ++trackIdx)
         {
-            TrackManager::TrackPoint::List const& track = tracks.at(trackIdx).points;
-            if (track.count() < 2)
+            TrackManager::Track const& track = tracks.at(trackIdx);
+            if (track.points.count() < 2)
             {
                 continue;
             }
 
-            /// @TODO Build the linestring once per model update, not on every redraw
             Marble::GeoDataLineString lineString;
-            for (int coordIdx = 0; coordIdx < track.count(); ++coordIdx)
+            if (d->trackCache.contains(track.id))
             {
-                GeoCoordinates const& coordinates = track.at(coordIdx).coordinates;
-                const Marble::GeoDataCoordinates marbleCoordinates = coordinates.toMarbleCoordinates();
-                lineString << marbleCoordinates;
+                lineString = d->trackCache.value(track.id);
             }
+            else
+            {
+                for (int coordIdx = 0; coordIdx < track.points.count(); ++coordIdx)
+                {
+                    GeoCoordinates const& coordinates = track.points.at(coordIdx).coordinates;
+                    const Marble::GeoDataCoordinates marbleCoordinates = coordinates.toMarbleCoordinates();
+                    lineString << marbleCoordinates;
+                }
+                d->trackCache.insert(track.id, lineString);
+            }
+            /// @TODO 5 looks a bit too thick IMHO when you zoom out.
+            ///       Maybe adjust to zoom level?
+            QColor trackColor = track.color;
+            trackColor.setAlpha(180);
+            painter->setPen(QPen(QBrush(trackColor),5));
             painter->drawPolyline(lineString);
         }
     }

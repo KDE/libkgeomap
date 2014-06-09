@@ -123,7 +123,7 @@ private:
 
     void updateZoomMinMaxCache();
     static void deleteInfoFunction(KGeoMapInternalWidgetInfo* const info);
-    void addPointsToTrack(int trackIdx, TrackManager::TrackPoint::List const& track, const int firstPoint, const int nPoints);
+    void addPointsToTrack(const quint64 trackId, TrackManager::TrackPoint::List const& track, const int firstPoint, const int nPoints);
   
 private:
 

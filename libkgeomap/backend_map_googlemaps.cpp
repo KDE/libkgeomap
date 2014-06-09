@@ -1214,6 +1214,10 @@ void BackendGoogleMaps::slotTrackModelChanged()
         return;
     }
 
+    /// @TODO Tracks have to be cleared in JavaScript everytime the
+    ///       htmlwidget is passed to another mapwidget.
+    /// @TODO Clearing all tracks and re-adding them takes too long. We
+    ///       have to see which track changed, and whether coordinates or only properties changed.
     const QVariant successClear = d->htmlWidget->runScript(QString::fromLatin1("kgeomapClearTracks();"));
 
     if (s->trackModel)
@@ -1228,16 +1232,28 @@ void BackendGoogleMaps::slotTrackModelChanged()
             {
                 continue;
             }
+
+            const QString createTrackScript =
+                QString::fromLatin1(
+                        "kgeomapCreateTrack(%1,'%2');"
+                    ).arg(track.id).arg(track.color.name());
+                    kDebug()<<track.color.name();
+            d->htmlWidget->runScript(createTrackScript);
+
             const int numPointsToPassAtOnce = 1000;
             for (int coordIdx = 0; coordIdx < track.points.count(); coordIdx += numPointsToPassAtOnce)
             {
-                addPointsToTrack(trackIdx, track.points, coordIdx, numPointsToPassAtOnce);
+                /// @TODO Even by passing only a few points each time, we can
+                ///       block the UI for a long time. Instead, it may be better
+                ///       to call addPointsToTrack via the eventloop repeatedly
+                ///       to allow processing of other events.
+                addPointsToTrack(track.id, track.points, coordIdx, numPointsToPassAtOnce);
             }
         }
     }
 }
 
-void BackendGoogleMaps::addPointsToTrack(int trackIdx, TrackManager::TrackPoint::List const& track, const int firstPoint, const int nPoints)
+void BackendGoogleMaps::addPointsToTrack(const quint64 trackId, TrackManager::TrackPoint::List const& track, const int firstPoint, const int nPoints)
 {
     QString json;
     QTextStream jsonBuilder(&json);
@@ -1245,20 +1261,21 @@ void BackendGoogleMaps::addPointsToTrack(int trackIdx, TrackManager::TrackPoint:
     int lastPoint = track.count()-1;
     if (nPoints>0)
     {
-        lastPoint = firstPoint - nPoints;
+        lastPoint = qMin(firstPoint + nPoints - 1, track.count()-1);
     }
     for (int coordIdx = firstPoint; coordIdx <= lastPoint; ++coordIdx)
     {
         GeoCoordinates const& coordinates = track.at(coordIdx).coordinates;
-        if (coordIdx > 0)
+        if (coordIdx > firstPoint)
         {
             jsonBuilder << ',';
         }
+        /// @TODO This looks like a lot of text to parse. Is there a more compact way?
         jsonBuilder << "{\"lat\":" << coordinates.latString() << ","
                     << "\"lon\":" << coordinates.lonString() << "}";
     }
     jsonBuilder << ']';
-    const QString addTrackScript = QString::fromLatin1("kgeomapAddToTrack(%1,'%2');").arg(trackIdx).arg(json);
+    const QString addTrackScript = QString::fromLatin1("kgeomapAddToTrack(%1,'%2');").arg(trackId).arg(json);
     d->htmlWidget->runScript(addTrackScript);
 }
 
