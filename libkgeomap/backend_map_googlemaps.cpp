@@ -1234,10 +1234,11 @@ void BackendGoogleMaps::slotTrackModelChanged()
             }
 
             const QString createTrackScript =
-                QString::fromLatin1(
-                        "kgeomapCreateTrack(%1,'%2');"
-                    ).arg(track.id).arg(track.color.name());
-                    kDebug()<<track.color.name();
+                    QString::fromLatin1(
+                            "kgeomapCreateTrack(%1,'%2');"
+                        )
+                        .arg(track.id)
+                        .arg(track.color.name()); // QColor::name() returns #ff00ff
             d->htmlWidget->runScript(createTrackScript);
 
             const int numPointsToPassAtOnce = 1000;
