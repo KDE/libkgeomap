@@ -89,12 +89,15 @@ public:
 
         Track()
         : url(),
-          points()
+          points(),
+          id(0)
         {
         }
 
         KUrl url;
         QList<TrackPoint> points;
+        /// 0 means no track id assigned yet
+        quint64 id;
 
         typedef QList<Track> List;
     };
@@ -110,6 +113,8 @@ public:
     const Track& getTrack(const int index) const;
     Track::List getTrackList() const;
     int trackCount() const;
+    quint64 getNextFreeTrackId();
+    Track getTrackById(const quint64 trackId) const;
 
 Q_SIGNALS:
 

@@ -61,7 +61,8 @@ public:
       : trackLoadFutureWatcher(0),
         trackLoadFuture(),
         trackList(),
-        loadErrorFiles()
+        loadErrorFiles(),
+        nextTrackId(1)
     {
 
     }
@@ -70,6 +71,9 @@ public:
     QFuture<TrackReader::TrackReadResult> trackLoadFuture;
     TrackManager::Track::List trackList;
     QList<QPair<KUrl, QString> > loadErrorFiles;
+
+    // We assume here that we will never load more than uint64_max tracks.
+    quint64 nextTrackId;
 };
 
 TrackManager::TrackManager(QObject* const parent)
@@ -120,7 +124,9 @@ void TrackManager::slotTrackFilesReadyAt(int beginIndex, int endIndex)
 
         if (nextFile.isValid)
         {
-            d->trackList << nextFile.track;
+            Track nextTrack = nextFile.track;
+            nextTrack.id = getNextFreeTrackId();
+            d->trackList << nextTrack;
         }
         else
         {
@@ -155,6 +161,27 @@ QList<QPair<KUrl, QString> > TrackManager::readLoadErrors()
     d->loadErrorFiles.clear();
 
     return result;
+}
+
+quint64 TrackManager::getNextFreeTrackId()
+{
+    const quint64 nextId = d->nextTrackId;
+    ++(d->nextTrackId);
+
+    return nextId;
+}
+
+TrackManager::Track TrackManager::getTrackById(const quint64 trackId) const
+{
+    Q_FOREACH(const Track& track, d->trackList)
+    {
+        if (track.id == trackId)
+        {
+            return track;
+        }
+    }
+
+    return TrackManager::Track();
 }
 
 } // namespace KGeoMap
