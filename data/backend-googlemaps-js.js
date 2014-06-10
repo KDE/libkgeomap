@@ -275,6 +275,12 @@ function kgeomapAddToTrack(tid, coordString)
     track.setMap(null);
 
     var trackCoordinates = track.getPath();
+//     for (var i = 0; i < coordString.length; i+=2)
+//     {
+//         var cLat = coordString[i];
+//         var cLon = coordString[i+1];
+//         trackCoordinates.push(new google.maps.LatLng(cLat,cLon));
+//     }
     var coordArray = JSON.parse(coordString);
     for (var i = 0; i < coordArray.length; ++i)
     {

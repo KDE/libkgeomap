@@ -1241,6 +1241,7 @@ void BackendGoogleMaps::slotTrackModelChanged()
                         .arg(track.color.name()); // QColor::name() returns #ff00ff
             d->htmlWidget->runScript(createTrackScript);
 
+//             QDateTime t1 = QDateTime::currentDateTime();
             const int numPointsToPassAtOnce = 1000;
             for (int coordIdx = 0; coordIdx < track.points.count(); coordIdx += numPointsToPassAtOnce)
             {
@@ -1250,6 +1251,8 @@ void BackendGoogleMaps::slotTrackModelChanged()
                 ///       to allow processing of other events.
                 addPointsToTrack(track.id, track.points, coordIdx, numPointsToPassAtOnce);
             }
+//             QDateTime t2 = QDateTime::currentDateTime();
+//             kDebug()<<track.url.fileName()<<t1.msecsTo(t2);
         }
     }
 }
@@ -1271,6 +1274,11 @@ void BackendGoogleMaps::addPointsToTrack(const quint64 trackId, TrackManager::Tr
         {
             jsonBuilder << ',';
         }
+        // Pass data in plain array format. In KHTML, this is much slower than
+        // using JSON. In Firefox, the speed is roughly the same.
+//         jsonBuilder /*<< "{\"lat\":" */<< coordinates.latString() << ","
+//                     /*<< "\"lon\":" */<< coordinates.lonString() /*<< "}"*/;
+
         /// @TODO This looks like a lot of text to parse. Is there a more compact way?
         jsonBuilder << "{\"lat\":" << coordinates.latString() << ","
                     << "\"lon\":" << coordinates.lonString() << "}";
