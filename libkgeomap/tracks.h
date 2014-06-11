@@ -35,6 +35,7 @@
 // KDE includes
 
 #include <kurl.h>
+#include <boost/graph/buffer_concepts.hpp>
 
 // local includes
 
@@ -84,6 +85,9 @@ public:
 
     // -------------------------------------
 
+    // We assume here that we will never load more than uint32_max tracks.
+    typedef quint32 Id;
+
     class Track
     {
     public:
@@ -106,12 +110,23 @@ public:
         KUrl url;
         QList<TrackPoint> points;
         /// 0 means no track id assigned yet
-        quint64 id;
+        Id id;
         QColor color;
         Flags flags;
 
         typedef QList<Track> List;
     };
+
+    enum ChangeFlag
+    {
+        ChangeTrackPoints = 1,
+        ChangeMetadata = 2,
+
+        ChangeRemoved = 4,
+        ChangeAdd = ChangeTrackPoints | ChangeMetadata
+    };
+
+    typedef QPair<Id, ChangeFlag> TrackChanges;
 
 public:
 
@@ -132,6 +147,7 @@ Q_SIGNALS:
 
     void signalTrackFilesReadyAt(const int startIndex, const int endIndex);
     void signalAllTrackFilesReady();
+    void signalTracksChanged(const QList<TrackManager::TrackChanges> trackChanges);
 
 private Q_SLOTS:
 

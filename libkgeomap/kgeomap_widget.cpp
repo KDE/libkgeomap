@@ -75,7 +75,7 @@
 #include "kgeomap_common.h"
 #include "dragdrophandler.h"
 #include "modelhelper.h"
-#include "trackmodelhelper.h"
+#include "tracks.h"
 #include "placeholderwidget.h"
 #include "tilegrouper.h"
 #include "version.h"
@@ -452,9 +452,6 @@ bool KGeoMapWidget::setBackend(const QString& backendName)
         disconnect(this, SIGNAL(signalUngroupedModelChanged(int)),
                    d->currentBackend, SLOT(slotUngroupedModelChanged(int)));
 
-        disconnect(this, SIGNAL(signalTrackModelChanged()),
-                   d->currentBackend, SLOT(slotTrackModelChanged()));
-
         if (s->markerModel)
         {
             disconnect(s->markerModel, SIGNAL(signalThumbnailAvailableForIndex(QVariant,QPixmap)),
@@ -494,9 +491,6 @@ bool KGeoMapWidget::setBackend(const QString& backendName)
              */
             connect(this, SIGNAL(signalUngroupedModelChanged(int)),
                     d->currentBackend, SLOT(slotUngroupedModelChanged(int)), Qt::QueuedConnection);
-
-            connect(this, SIGNAL(signalTrackModelChanged()),
-                    d->currentBackend, SLOT(slotTrackModelChanged()), Qt::QueuedConnection);
 
             if (s->markerModel)
             {
@@ -609,7 +603,6 @@ void KGeoMapWidget::slotBackendReadyChanged(const QString& backendName)
     }
 
     updateMarkers();
-    updateTracks();
     markClustersAsDirty();
     rebuildConfigurationMenu();
 }
@@ -950,17 +943,6 @@ void KGeoMapWidget::updateMarkers()
 
     // tell the backend to update the markers
     d->currentBackend->updateMarkers();
-}
-
-void KGeoMapWidget::updateTracks()
-{
-    if (!currentBackendReady())
-    {
-        return;
-    }
-
-    // tell the backend to update the tracks
-    d->currentBackend->updateTracks();
 }
 
 void KGeoMapWidget::updateClusters()
@@ -2015,12 +1997,6 @@ void KGeoMapWidget::slotUngroupedModelChanged()
     }
 }
 
-void KGeoMapWidget::slotTrackModelChanged()
-{
-    emit(signalTrackModelChanged());
-}
-  
-
 void KGeoMapWidget::addWidgetToControlWidget(QWidget* const newWidget)
 {
     // make sure the control widget exists
@@ -2298,24 +2274,16 @@ void KGeoMapWidget::setMouseMode(const MouseModes mouseMode)
     slotUpdateActionsEnabled();
 }
 
-void KGeoMapWidget::setTrackModel(TrackModelHelper* const modelHelper)
+void KGeoMapWidget::setTrackManager(TrackManager* const trackManager)
 {
-    if (s->trackModel)
-    {
-        disconnect(s->trackModel, SIGNAL(signalModelChanged()),
-                   this, SLOT(slotTrackModelChanged()));
-  
-    }
-
-    s->trackModel = modelHelper;
-
-    if (s->trackModel)
-    {
-        connect(modelHelper, SIGNAL(signalModelChanged()),
-                this, SLOT(slotTrackModelChanged()));
-    }
+    s->trackManager = trackManager;
     
-    emit(signalTrackModelChanged());
+    // Some backends track the track manager activity even when not active
+    // therefore they have to be notified.
+    Q_FOREACH(MapBackend* const backend, d->loadedBackends)
+    {
+        backend->slotTrackManagerChanged();
+    }
 }
 
 } /* namespace KGeoMap */

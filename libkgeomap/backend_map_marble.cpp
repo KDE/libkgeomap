@@ -60,7 +60,7 @@
 #include "abstractmarkertiler.h"
 #include "kgeomap_widget.h"
 #include "modelhelper.h"
-#include "trackmodelhelper.h"
+#include "tracks.h"
 
 namespace KGeoMap
 {
@@ -531,20 +531,6 @@ void BackendMarble::updateMarkers()
     d->marbleWidget->update();
 }
 
-void BackendMarble::updateTracks()
-{
-    // clear the cache
-    d->trackCache.clear();
-
-    if (!d->marbleWidget)
-    {
-        return;
-    }
-
-    // and redraw
-    d->marbleWidget->update();
-}
-
 bool BackendMarble::screenCoordinates(const GeoCoordinates& coordinates, QPoint* const point)
 {
     if (!d->marbleWidget)
@@ -663,10 +649,9 @@ void BackendMarble::marbleCustomPaint(Marble::GeoPainter* painter)
     painter->autoMapQuality();
 #endif
 
-    if (s->trackModel)
+    if (s->trackManager)
     {
-        TrackModelHelper* const modelHelper = s->trackModel;
-        TrackManager::Track::List const& tracks = modelHelper->getTracks();
+        TrackManager::Track::List const& tracks = s->trackManager->getTrackList();
         
         for (int trackIdx = 0; trackIdx < tracks.count(); ++trackIdx)
         {
@@ -1515,14 +1500,17 @@ void BackendMarble::slotUngroupedModelChanged(const int index)
     d->marbleWidget->update();
 }
 
-void BackendMarble::slotTrackModelChanged()
+void BackendMarble::slotTrackManagerChanged()
 {
-    if (!d->marbleWidget)
+    d->trackCache.clear();
+
+    if (s->trackManager)
     {
-        return;
+        connect(s->trackManager, SIGNAL(signalTracksChanged(const QList<TrackManager::TrackChanges>)),
+                this, SLOT(slotTracksChanged(const QList<TrackManager::TrackChanges>)));
     }
 
-    d->marbleWidget->update();
+    slotScheduleUpdate();
 }
 
   
@@ -1785,6 +1773,29 @@ void BackendMarble::applyCacheToWidget()
     setShowCompass(d->cacheShowCompass);
     setShowOverviewMap(d->cacheShowOverviewMap);
     setShowScaleBar(d->cacheShowScaleBar);
+}
+
+void BackendMarble::slotTracksChanged(const QList<TrackManager::TrackChanges> trackChanges)
+{
+    // invalidate the cache for all changed tracks
+    Q_FOREACH(const TrackManager::TrackChanges& tc, trackChanges)
+    {
+        if (tc.second & (TrackManager::ChangeTrackPoints | TrackManager::ChangeRemoved) )
+        {
+            d->trackCache.remove(tc.first);
+        }
+    }
+
+    slotScheduleUpdate();
+}
+
+void BackendMarble::slotScheduleUpdate()
+{
+    if (d->marbleWidget && d->activeState)
+    {
+        /// @TODO Put this onto the eventloop to collect update calls into one.
+        d->marbleWidget->update();
+    }
 }
 
 } /* namespace KGeoMap */

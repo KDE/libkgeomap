@@ -32,6 +32,7 @@
 // local includes
 
 #include "backend_map.h"
+#include "tracks.h"
 
 /// @cond false
 namespace Marble
@@ -73,7 +74,6 @@ public:
 
     virtual void updateMarkers();
     virtual void updateClusters();
-    virtual void updateTracks();
 
     QString getMapTheme() const;
     void setMapTheme(const QString& newMapTheme);
@@ -112,7 +112,7 @@ public Q_SLOTS:
     virtual void slotClustersNeedUpdating();
     virtual void slotThumbnailAvailableForIndex(const QVariant& index, const QPixmap& pixmap);
     void slotUngroupedModelChanged(const int index);
-    void slotTrackModelChanged();
+    void slotTrackManagerChanged();
 
 protected:
 
@@ -131,6 +131,8 @@ protected Q_SLOTS:
     void slotProjectionActionTriggered(QAction* action);
     void slotFloatSettingsTriggered(QAction* action);
     void slotMarbleZoomChanged();
+    void slotTracksChanged(const QList<TrackManager::TrackChanges> trackChanges);
+    void slotScheduleUpdate();
 
 private:
 

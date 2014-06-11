@@ -67,7 +67,6 @@ public:
 
     virtual void updateMarkers();
     virtual void updateClusters();
-    virtual void updateTracks();
 
     virtual bool screenCoordinates(const GeoCoordinates& coordinates, QPoint* const point);
     virtual bool geoCoordinates(const QPoint& point, GeoCoordinates* const coordinates) const;
@@ -101,7 +100,6 @@ public Q_SLOTS:
     virtual void slotClustersNeedUpdating();
     virtual void slotThumbnailAvailableForIndex(const QVariant& index, const QPixmap& pixmap);
     void slotUngroupedModelChanged(const int mindex);
-    void slotTrackModelChanged();
   
 protected:
 
@@ -110,6 +108,7 @@ protected:
     void setClusterPixmap(const int clusterId, const QPoint& centerPoint, const QPixmap& clusterPixmap);
     void setMarkerPixmap(const int modelId, const int markerId, const QPoint& centerPoint, const QPixmap& markerPixmap);
     void setMarkerPixmap(const int modelId, const int markerId, const QPoint& centerPoint, const QSize& iconSize, const KUrl& iconUrl);
+    void storeTrackChanges(const TrackManager::TrackChanges trackChanges);
 
 private Q_SLOTS:
 
@@ -118,6 +117,8 @@ private Q_SLOTS:
     void slotHTMLEvents(const QStringList& eventStrings);
     void slotFloatSettingsTriggered(QAction* action);
     void slotSelectionHasBeenMade(const KGeoMap::GeoCoordinates::Pair& searchCoordinates);
+    void slotTrackManagerChanged();
+    void slotTracksChanged(const QList<TrackManager::TrackChanges> trackChanges);
 
 private:
 

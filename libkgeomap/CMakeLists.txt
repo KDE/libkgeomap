@@ -48,7 +48,6 @@ SET(widget_sources
     lookup_altitude_geonames.cpp
     lookup_factory.cpp
     modelhelper.cpp
-    trackmodelhelper.cpp
     placeholderwidget.cpp
     tilegrouper.cpp
     tileindex.cpp
@@ -105,7 +104,6 @@ INSTALL(FILES libkgeomap_export.h
               lookup_factory.h
               modelhelper.h
               tileindex.h
-              trackmodelhelper.h
               tracks.h
               track_reader.h
               ${CMAKE_CURRENT_BINARY_DIR}/version.h

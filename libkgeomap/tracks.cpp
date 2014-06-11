@@ -70,11 +70,11 @@ public:
 
     QFutureWatcher<TrackReader::TrackReadResult>* trackLoadFutureWatcher;
     QFuture<TrackReader::TrackReadResult> trackLoadFuture;
+    TrackManager::Track::List trackPendingList;
     TrackManager::Track::List trackList;
     QList<QPair<KUrl, QString> > loadErrorFiles;
 
-    // We assume here that we will never load more than uint64_max tracks.
-    quint64 nextTrackId;
+    Id nextTrackId;
     int nextTrackColor;
 };
 
@@ -91,6 +91,7 @@ TrackManager::~TrackManager()
 
 void TrackManager::clear()
 {
+    /// @TODO send a signal
     d->trackList.clear();
 }
 
@@ -129,23 +130,29 @@ void TrackManager::slotTrackFilesReadyAt(int beginIndex, int endIndex)
             Track nextTrack = nextFile.track;
             nextTrack.id = getNextFreeTrackId();
             nextTrack.color = getNextFreeTrackColor();
-            d->trackList << nextTrack;
+            d->trackPendingList << nextTrack;
         }
         else
         {
             d->loadErrorFiles << QPair<KUrl, QString>(nextFile.track.url, nextFile.loadError);
         }
     }
-
-    // note that endIndex is exclusive!
-    emit(signalTrackFilesReadyAt(nFilesBefore, d->trackList.count()));
 }
 
 void TrackManager::slotTrackFilesFinished()
 {
     d->trackLoadFutureWatcher->deleteLater();
 
+    d->trackList << d->trackPendingList;
+    QList<TrackChanges> trackChanges;
+    Q_FOREACH(const Track& track, d->trackPendingList)
+    {
+        trackChanges << TrackChanges(track.id, ChangeAdd);
+    }
+    d->trackPendingList.clear();
+
     emit(signalAllTrackFilesReady());
+    emit(signalTracksChanged(trackChanges));
 }
 
 TrackManager::Track::List TrackManager::getTrackList() const

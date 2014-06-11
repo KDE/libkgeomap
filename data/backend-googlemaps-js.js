@@ -239,6 +239,19 @@ function kgeomapGetTrackIndex(tid)
 
     return -1;
 }
+
+function kgeomapRemoveTrack(tid)
+{
+    var idx = kgeomapGetTrackIndex(tid);
+    if (idx<0)
+    {
+        return;
+    }
+
+    trackList[idx].track.setMap(null);
+    trackList.splice(idx, 1);
+}
+
 function kgeomapCreateTrack(tid, trackColor)
 {
     // trackColor has to have the form '#FF0000'
@@ -272,6 +285,8 @@ function kgeomapAddToTrack(tid, coordString)
     }
 
     var track = trackList[trackIndex].track;
+    /// @TODO Does setting and unsetting the map take long? Maybe it is better
+    ///       to create, add points, then add map instead.
     track.setMap(null);
 
     var trackCoordinates = track.getPath();

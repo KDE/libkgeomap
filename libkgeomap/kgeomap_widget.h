@@ -52,7 +52,7 @@ class AbstractMarkerTiler;
 class DragDropHandler;
 class KGeoMapSharedData;
 class ModelHelper;
-class TrackModelHelper;
+class TrackManager;
 
 class KGEOMAP_EXPORT KGeoMapWidget : public QWidget
 {
@@ -72,7 +72,7 @@ public:
     void removeUngroupedModel(ModelHelper* const modelHelper);
     void setGroupedModel(AbstractMarkerTiler* const markerModel);
     void setDragDropHandler(DragDropHandler* const dragDropHandler);
-    void setTrackModel(TrackModelHelper* const modelHelper);
+    void setTrackManager(TrackManager* const trackManager);
     //@}
 
     /// @name UI setup
@@ -133,7 +133,6 @@ public:
     //@{
     void updateMarkers();
     void updateClusters();
-    void updateTracks();
     void markClustersAsDirty();
 
     void getColorInfos(const int clusterIndex, QColor* fillColor, QColor* strokeColor,
@@ -176,7 +175,6 @@ Q_SIGNALS:
     void signalRemoveCurrentFilter();
     void signalStickyModeChanged();
     void signalMouseModeChanged(const KGeoMap::MouseModes& currentMouseMode);
-    void signalTrackModelChanged();
 
 public:
 
@@ -216,7 +214,6 @@ protected Q_SLOTS:
     void slotLazyReclusteringRequestCallBack();
     void slotItemDisplaySettingsChanged();
     void slotUngroupedModelChanged();
-    void slotTrackModelChanged();
     void slotNewSelectionFromMap(const KGeoMap::GeoCoordinates::Pair& sel);
 
     /// @name Mouse modes

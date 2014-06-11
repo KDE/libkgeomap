@@ -54,7 +54,7 @@ class KGeoMapWidget;
 class MapBackend;
 class ModelHelper;
 class TileGrouper;
-class TrackModelHelper;
+class TrackManager;
 
 /**
  * @brief Class to hold information about map widgets stored in the KGeoMapGlobalObject
@@ -207,7 +207,7 @@ public:
           tileGrouper(0),
           markerModel(0),
           clusterList(),
-          trackModel(0),
+          trackManager(0),
           showThumbnails(true),
           thumbnailSize(KGeoMapMinThumbnailSize),
           thumbnailGroupingRadius(KGeoMapMinThumbnailGroupingRadius),
@@ -242,7 +242,7 @@ public:
     AbstractMarkerTiler*      markerModel;
     KGeoMapCluster::List      clusterList;
     QList<ModelHelper*>       ungroupedModels;
-    TrackModelHelper*         trackModel;
+    TrackManager*             trackManager;
     //@}
 
     /// @name Display options

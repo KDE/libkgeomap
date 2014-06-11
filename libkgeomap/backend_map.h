@@ -81,7 +81,6 @@ public:
 
     virtual void updateMarkers() = 0;
     virtual void updateClusters() = 0;
-    virtual void updateTracks() = 0;
 
     virtual bool screenCoordinates(const GeoCoordinates& coordinates, QPoint* const point) = 0;
     virtual bool geoCoordinates(const QPoint& point, GeoCoordinates* const coordinates) const = 0;
@@ -110,6 +109,7 @@ public Q_SLOTS:
 
     virtual void slotClustersNeedUpdating() = 0;
     virtual void slotThumbnailAvailableForIndex(const QVariant& index, const QPixmap& pixmap);
+    virtual void slotTrackManagerChanged();
 
 Q_SIGNALS:
 

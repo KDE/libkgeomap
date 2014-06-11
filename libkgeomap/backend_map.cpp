@@ -44,4 +44,9 @@ void MapBackend::slotThumbnailAvailableForIndex(const QVariant& index, const QPi
     Q_UNUSED(pixmap)
 }
 
+void MapBackend::slotTrackManagerChanged()
+{
+
+}
+
 } /* namespace KGeoMap */
