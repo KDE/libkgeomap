@@ -53,7 +53,7 @@ class KGEOMAP_EXPORT TrackManager : public QObject
 
 public:
 
-    class TrackPoint
+    class KGEOMAP_EXPORT TrackPoint
     {
     public:
 
