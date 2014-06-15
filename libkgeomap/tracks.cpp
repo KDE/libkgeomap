@@ -118,17 +118,17 @@ void TrackManager::loadTrackFiles(const KUrl::List& urls)
 
 void TrackManager::slotTrackFilesReadyAt(int beginIndex, int endIndex)
 {
-    const int nFilesBefore = d->trackList.count();
+    //const int nFilesBefore = d->trackList.count();
 
     // note that endIndex is exclusive!
-    for (int i=beginIndex; i<endIndex; ++i)
+    for (int i = beginIndex; i < endIndex; ++i)
     {
         const TrackReader::TrackReadResult nextFile = d->trackLoadFuture.resultAt(i);
 
         if (nextFile.isValid)
         {
             Track nextTrack = nextFile.track;
-            nextTrack.id = getNextFreeTrackId();
+            nextTrack.id    = getNextFreeTrackId();
             nextTrack.color = getNextFreeTrackColor();
             d->trackPendingList << nextTrack;
         }
