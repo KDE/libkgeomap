@@ -651,37 +651,40 @@ void BackendMarble::marbleCustomPaint(Marble::GeoPainter* painter)
 
     if (s->trackManager)
     {
-        TrackManager::Track::List const& tracks = s->trackManager->getTrackList();
-        
-        for (int trackIdx = 0; trackIdx < tracks.count(); ++trackIdx)
+        if (s->trackManager->getVisibility())
         {
-            TrackManager::Track const& track = tracks.at(trackIdx);
-            if (track.points.count() < 2)
-            {
-                continue;
-            }
+            TrackManager::Track::List const& tracks = s->trackManager->getTrackList();
 
-            Marble::GeoDataLineString lineString;
-            if (d->trackCache.contains(track.id))
+            for (int trackIdx = 0; trackIdx < tracks.count(); ++trackIdx)
             {
-                lineString = d->trackCache.value(track.id);
-            }
-            else
-            {
-                for (int coordIdx = 0; coordIdx < track.points.count(); ++coordIdx)
+                TrackManager::Track const& track = tracks.at(trackIdx);
+                if (track.points.count() < 2)
                 {
-                    GeoCoordinates const& coordinates = track.points.at(coordIdx).coordinates;
-                    const Marble::GeoDataCoordinates marbleCoordinates = coordinates.toMarbleCoordinates();
-                    lineString << marbleCoordinates;
+                    continue;
                 }
-                d->trackCache.insert(track.id, lineString);
+
+                Marble::GeoDataLineString lineString;
+                if (d->trackCache.contains(track.id))
+                {
+                    lineString = d->trackCache.value(track.id);
+                }
+                else
+                {
+                    for (int coordIdx = 0; coordIdx < track.points.count(); ++coordIdx)
+                    {
+                        GeoCoordinates const& coordinates = track.points.at(coordIdx).coordinates;
+                        const Marble::GeoDataCoordinates marbleCoordinates = coordinates.toMarbleCoordinates();
+                        lineString << marbleCoordinates;
+                    }
+                    d->trackCache.insert(track.id, lineString);
+                }
+                /// @TODO 5 looks a bit too thick IMHO when you zoom out.
+                ///       Maybe adjust to zoom level?
+                QColor trackColor = track.color;
+                trackColor.setAlpha(180);
+                painter->setPen(QPen(QBrush(trackColor),5));
+                painter->drawPolyline(lineString);
             }
-            /// @TODO 5 looks a bit too thick IMHO when you zoom out.
-            ///       Maybe adjust to zoom level?
-            QColor trackColor = track.color;
-            trackColor.setAlpha(180);
-            painter->setPen(QPen(QBrush(trackColor),5));
-            painter->drawPolyline(lineString);
         }
     }
 
@@ -1508,11 +1511,14 @@ void BackendMarble::slotTrackManagerChanged()
     {
         connect(s->trackManager, SIGNAL(signalTracksChanged(const QList<TrackManager::TrackChanges>)),
                 this, SLOT(slotTracksChanged(const QList<TrackManager::TrackChanges>)));
+
+        // when the visibility of the tracks is changed, we simple schedule a redraw
+        connect(s->trackManager, SIGNAL(signalVisibilityChanged(bool)),
+                this, SLOT(slotScheduleUpdate()));
     }
 
     slotScheduleUpdate();
 }
-
   
 bool BackendMarble::findSnapPoint(const QPoint& actualPoint, QPoint* const snapPoint, GeoCoordinates* const snapCoordinates, QPair<int, QModelIndex>* const snapTargetIndex)
 {

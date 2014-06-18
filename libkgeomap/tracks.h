@@ -142,12 +142,15 @@ public:
     quint64 getNextFreeTrackId();
     Track getTrackById(const quint64 trackId) const;
     QColor getNextFreeTrackColor();
+    void setVisibility(const bool value);
+    bool getVisibility() const;
 
 Q_SIGNALS:
 
     void signalTrackFilesReadyAt(const int startIndex, const int endIndex);
     void signalAllTrackFilesReady();
     void signalTracksChanged(const QList<TrackManager::TrackChanges> trackChanges);
+    void signalVisibilityChanged(const bool newValue);
 
 private Q_SLOTS:
 

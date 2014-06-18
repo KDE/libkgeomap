@@ -63,7 +63,8 @@ public:
         trackList(),
         loadErrorFiles(),
         nextTrackId(1),
-        nextTrackColor(0)
+        nextTrackColor(0),
+        visibility(true)
     {
 
     }
@@ -76,6 +77,7 @@ public:
 
     Id nextTrackId;
     int nextTrackColor;
+    bool visibility;
 };
 
 TrackManager::TrackManager(QObject* const parent)
@@ -87,6 +89,22 @@ TrackManager::TrackManager(QObject* const parent)
 TrackManager::~TrackManager()
 {
 
+}
+
+bool TrackManager::getVisibility() const
+{
+    return d->visibility;
+}
+
+void TrackManager::setVisibility(const bool value)
+{
+    if (d->visibility==value)
+    {
+        return;
+    }
+
+    d->visibility = value;
+    emit(signalVisibilityChanged(value));
 }
 
 void TrackManager::clear()

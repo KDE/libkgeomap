@@ -1233,6 +1233,8 @@ void BackendGoogleMaps::slotTrackManagerChanged()
         connect(s->trackManager, SIGNAL(signalTracksChanged(const QList<TrackManager::TrackChanges>)),
                 this, SLOT(slotTracksChanged(const QList<TrackManager::TrackChanges>)));
 
+        connect(s->trackManager, SIGNAL(signalVisibilityChanged(bool)),
+                this, SLOT(slotTrackVisibilityChanged(bool)));
 
         // store all tracks which are already in the manager as changed
         const TrackManager::Track::List trackList = s->trackManager->getTrackList();
@@ -1245,7 +1247,12 @@ void BackendGoogleMaps::slotTrackManagerChanged()
 
 void BackendGoogleMaps::slotTracksChanged(const QList<TrackManager::TrackChanges> trackChanges)
 {
-    if (!d->activeState)
+    bool needToTrackChanges = !d->activeState;
+    if (s->trackManager)
+    {
+        needToTrackChanges|=!s->trackManager->getVisibility();
+    }
+    if (needToTrackChanges)
     {
         Q_FOREACH(const TrackManager::TrackChanges& tc, trackChanges)
         {
@@ -1339,6 +1346,27 @@ void BackendGoogleMaps::addPointsToTrack(const quint64 trackId, TrackManager::Tr
     jsonBuilder << ']';
     const QString addTrackScript = QString::fromLatin1("kgeomapAddToTrack(%1,'%2');").arg(trackId).arg(json);
     d->htmlWidget->runScript(addTrackScript);
+}
+
+void BackendGoogleMaps::slotTrackVisibilityChanged(const bool newState)
+{
+    /// @TODO Now we remove all tracks and re-add them on visibility change.
+    ///       This is very slow.
+    if (newState)
+    {
+        // store all tracks which are already in the manager as changed
+        const TrackManager::Track::List trackList = s->trackManager->getTrackList();
+        QList<TrackManager::TrackChanges> trackChanges;
+        Q_FOREACH(const TrackManager::Track& t, trackList)
+        {
+            trackChanges << TrackManager::TrackChanges(t.id, TrackManager::ChangeAdd);
+        }
+        slotTracksChanged(trackChanges);
+    }
+    else
+    {
+        const QVariant successClear = d->htmlWidget->runScript(QString::fromLatin1("kgeomapClearTracks();"));
+    }
 }
 
 } /* namespace KGeoMap */

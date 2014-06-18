@@ -119,6 +119,7 @@ private Q_SLOTS:
     void slotSelectionHasBeenMade(const KGeoMap::GeoCoordinates::Pair& searchCoordinates);
     void slotTrackManagerChanged();
     void slotTracksChanged(const QList<TrackManager::TrackChanges> trackChanges);
+    void slotTrackVisibilityChanged(const bool newState);
 
 private:
 
