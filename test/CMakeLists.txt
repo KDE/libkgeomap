@@ -81,4 +81,11 @@ IF(KDE4_BUILD_TESTS)
     TARGET_LINK_LIBRARIES(kgeomap_test_tracks kgeomap ${QT_QTCORE_LIBRARY} ${QT_QTTEST_LIBRARY} ${KDE4_KDECORE_LIBS})
     ADD_TEST(kgeomap_test_tracks ${EXECUTABLE_OUTPUT_PATH}/kgeomap_test_tracks)
 
+    # track loading application for timing tests
+    SET(loadtrack_sources
+        loadtrack.cpp
+       )
+    KDE4_ADD_EXECUTABLE(loadtrack ${loadtrack_sources})
+    TARGET_LINK_LIBRARIES(loadtrack kgeomap ${QT_QTCORE_LIBRARY} ${QT_QTTEST_LIBRARY} ${KDE4_KDECORE_LIBS})
+
 ENDIF(KDE4_BUILD_TESTS)
