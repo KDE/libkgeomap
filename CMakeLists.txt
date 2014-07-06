@@ -6,7 +6,7 @@
 # @date   2010-06-29
 # @brief  world maps library interface for KDE
 #
-# @author Copyright (C) 2010 by Gilles Caulier
+# @author Copyright (C) 2010-2014 by Gilles Caulier
 #         <a href="mailto:caulier dot gilles at gmail dot com">caulier dot gilles at gmail dot com</a>
 # @author Copyright (C) 2009-2010 by Michael G. Hansen
 #         <a href="mailto:mike at mghansen dot de">mike at mghansen dot de</a>
@@ -93,7 +93,12 @@ SET(KGEOMAP_LIB_SO_VERSION_STRING "${KGEOMAP_LIB_SO_CUR_VERSION}.${KGEOMAP_LIB_S
 # =======================================================
 
 SUBDIRS(libkgeomap)
-SUBDIRS(test)
+SUBDIRS(data)
+
+IF(KDE4_BUILD_TESTS)
+    MACRO_OPTIONAL_ADD_SUBDIRECTORY(tests)
+ENDIF(KDE4_BUILD_TESTS)
+
 #SUBDIRS(calibrator)
 # IF(KEXIV2_FOUND)
 #     SUBDIRS(demo)
@@ -101,7 +106,6 @@ SUBDIRS(test)
 # ELSE(KEXIV2_FOUND)
 #     MESSAGE(STATUS "kexiv2 NOT found, the demo application will NOT be compiled.")
 # ENDIF(KEXIV2_FOUND)
-SUBDIRS(data)
 
 IF(NOT WIN32)
   CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/libkgeomap.pc.cmake ${CMAKE_CURRENT_BINARY_DIR}/libkgeomap.pc)
