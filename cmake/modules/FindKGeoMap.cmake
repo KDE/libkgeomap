@@ -14,7 +14,7 @@
 #  KGEOMAP_DEFINITIONS - Compiler switches required for using libkgeomap
 #  KGEOMAP_VERSION - Version of libkgeomap which was found
 #
-# Copyright (c) 2010, Gilles Caulier, <caulier.gilles@gmail.com>
+# Copyright (c) 2010-2014, Gilles Caulier, <caulier.gilles@gmail.com>
 # Copyright (c) 2011, Michael G. Hansen, <mike@mghansen.de>
 #
 # Redistribution and use is allowed according to the terms of the BSD license.
@@ -39,16 +39,16 @@ else (KGEOMAP_INCLUDE_DIR AND KGEOMAP_LIBRARIES AND KGEOMAP_DEFINITIONS AND KGEO
 
   # Check for a local version of the library.
   if (KGEOMAP_LOCAL_DIR)
-    find_file(KGEOMAP_LOCAL_FOUND libkgeomap/version.h.cmake.in ${CMAKE_SOURCE_DIR}/${KGEOMAP_LOCAL_DIR} NO_DEFAULT_PATH)
+    find_file(KGEOMAP_LOCAL_FOUND libkgeomap/libkgeomap_export.h ${CMAKE_SOURCE_DIR}/${KGEOMAP_LOCAL_DIR} NO_DEFAULT_PATH)
     if (NOT KGEOMAP_LOCAL_FOUND)
       message(WARNING "KGEOMAP_LOCAL_DIR specified as \"${KGEOMAP_LOCAL_DIR}\" but libkgeomap could not be found there.")
     endif (NOT KGEOMAP_LOCAL_FOUND)
   else (KGEOMAP_LOCAL_DIR)
-    find_file(KGEOMAP_LOCAL_FOUND libkgeomap/version.h.cmake.in ${CMAKE_SOURCE_DIR}/libkgeomap NO_DEFAULT_PATH)
+    find_file(KGEOMAP_LOCAL_FOUND libkgeomap/libkgeomap_export.h ${CMAKE_SOURCE_DIR}/libkgeomap NO_DEFAULT_PATH)
     if (KGEOMAP_LOCAL_FOUND)
       set(KGEOMAP_LOCAL_DIR libkgeomap)
     endif (KGEOMAP_LOCAL_FOUND)
-    find_file(KGEOMAP_LOCAL_FOUND libkgeomap/version.h.cmake.in ${CMAKE_SOURCE_DIR}/libs/libkgeomap NO_DEFAULT_PATH)
+    find_file(KGEOMAP_LOCAL_FOUND libkgeomap/libkgeomap_export.h ${CMAKE_SOURCE_DIR}/libs/libkgeomap NO_DEFAULT_PATH)
     if (KGEOMAP_LOCAL_FOUND)
       set(KGEOMAP_LOCAL_DIR libs/libkgeomap)
     endif (KGEOMAP_LOCAL_FOUND)
