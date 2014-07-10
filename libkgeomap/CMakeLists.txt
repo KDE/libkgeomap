@@ -6,9 +6,9 @@
 # @date   2010-06-29
 # @brief  world maps library interface for KDE
 #
-# @author Copyright (C) 2010 by Gilles Caulier
+# @author Copyright (C) 2010-2014 by Gilles Caulier
 #         <a href="mailto:caulier dot gilles at gmail dot com">caulier dot gilles at gmail dot com</a>
-# @author Copyright (C) 2009-2010, 2014 by Michael G. Hansen
+# @author Copyright (C) 2009-2014 by Michael G. Hansen
 #         <a href="mailto:mike at mghansen dot de">mike at mghansen dot de</a>
 # @author Copyright (C) 2014 by Justus Schwartz
 #         <a href="mailto:justus at gmx dot li">justus at gmx dot li</a>
@@ -33,7 +33,7 @@ IF(${HAVE_VALGRIND})
     ADD_DEFINITIONS(-DKGEOMAP_HAVE_VALGRIND)
 ENDIF(${HAVE_VALGRIND})
 
-CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/version.h.cmake ${CMAKE_CURRENT_BINARY_DIR}/version.h)
+CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/version.h.cmake.in ${CMAKE_CURRENT_BINARY_DIR}/version.h)
 
 SET(widget_sources
     abstractmarkertiler.cpp
