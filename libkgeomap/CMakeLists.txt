@@ -93,19 +93,24 @@ SET_TARGET_PROPERTIES(kgeomap PROPERTIES VERSION ${KGEOMAP_LIB_SO_VERSION_STRING
 
 INSTALL(TARGETS kgeomap ${INSTALL_TARGETS_DEFAULT_ARGS})
 
-INSTALL(FILES libkgeomap_export.h
-              abstractmarkertiler.h
-              dragdrophandler.h
-              geocoordinates.h
-              itemmarkertiler.h
-              kgeomap_primitives.h
-              kgeomap_widget.h
-              lookup_altitude.h
-              lookup_factory.h
-              modelhelper.h
-              tileindex.h
-              tracks.h
-              track_reader.h
-              ${CMAKE_CURRENT_BINARY_DIR}/version.h
-        DESTINATION ${INCLUDE_INSTALL_DIR}/libkgeomap COMPONENT Devel
-       )
+# Check if compilation is done through digiKam SC or not. If yes, do not install header files.
+IF(NOT DIGIKAMSC_USE_PRIVATE_SHAREDLIBS)
+
+    INSTALL(FILES libkgeomap_export.h
+                  abstractmarkertiler.h
+                  dragdrophandler.h
+                  geocoordinates.h
+                  itemmarkertiler.h
+                  kgeomap_primitives.h
+                  kgeomap_widget.h
+                  lookup_altitude.h
+                  lookup_factory.h
+                  modelhelper.h
+                  tileindex.h
+                  tracks.h
+                  track_reader.h
+                  ${CMAKE_CURRENT_BINARY_DIR}/version.h
+            DESTINATION ${INCLUDE_INSTALL_DIR}/libkgeomap COMPONENT Devel
+        )
+
+ENDIF()
