@@ -1,8 +1,8 @@
 - change LIBKMAP_AREA_CODE_GENERAL to LIBKGEOMAP_AREA_CODE_GENERAL somewhere in KDE
-- update translations file (see Messages.sh)
 - spelling: KGeoMap or Kgeomap -> prefer KGeoMap
 
 DONE:
++ update translations file (see Messages.sh)
 + update bugs.kde.org component names
 + update directory names in digikam-sc/extras/CMakeLists.txt
 + update projects.kde.org path in digikam-sc/README
