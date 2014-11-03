@@ -31,7 +31,7 @@ INCLUDE(CheckIncludeFile)
 CHECK_INCLUDE_FILE("valgrind/valgrind.h" HAVE_VALGRIND)
 IF(${HAVE_VALGRIND})
     ADD_DEFINITIONS(-DKGEOMAP_HAVE_VALGRIND)
-ENDIF(${HAVE_VALGRIND})
+ENDIF()
 
 CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/version.h.cmake.in ${CMAKE_CURRENT_BINARY_DIR}/version.h)
 
@@ -59,12 +59,12 @@ SET(backend_map_marble_sources
     backend_map_marble.cpp
    )
 
-IF (${KDE_VERSION} VERSION_GREATER "4.4.66")
+IF(${KDE_VERSION} VERSION_GREATER "4.4.66")
     ADD_DEFINITIONS(-DKGEOMAP_MARBLE_ADD_LAYER)
-    SET( backend_map_marble_sources ${backend_map_marble_sources} backend_map_marble_layer.cpp )
-ELSE (${KDE_VERSION} VERSION_GREATER "4.4.66")
-    SET( backend_map_marble_sources ${backend_map_marble_sources} backend_map_marble_subwidget.cpp )
-ENDIF (${KDE_VERSION} VERSION_GREATER "4.4.66")
+    SET(backend_map_marble_sources ${backend_map_marble_sources} backend_map_marble_layer.cpp)
+ELSE()
+    SET(backend_map_marble_sources ${backend_map_marble_sources} backend_map_marble_subwidget.cpp)
+ENDIF()
 
 SET(backend_map_googlemaps_sources
     backend_map_googlemaps.cpp
@@ -89,7 +89,7 @@ TARGET_LINK_LIBRARIES(kgeomap ${QT_QTGUI_LIBRARY}
                            )
 
 SET_TARGET_PROPERTIES(kgeomap PROPERTIES VERSION ${KGEOMAP_LIB_SO_VERSION_STRING}
-                           SOVERSION ${KGEOMAP_LIB_SO_CUR_VERSION})
+                      SOVERSION ${KGEOMAP_LIB_SO_CUR_VERSION})
 
 INSTALL(TARGETS kgeomap ${INSTALL_TARGETS_DEFAULT_ARGS})
 

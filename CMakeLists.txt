@@ -41,11 +41,11 @@ INCLUDE(FindPackageHandleStandardArgs)
 # Special handling for Marble: support both FindMarbleWidget and FindMarble,
 # assuming FindMarble is the way of the future.
 FIND_PACKAGE(Marble)
-IF (NOT MARBLE_FOUND)
-  FIND_PACKAGE(MarbleWidget REQUIRED)
-  SET(MARBLE_INCLUDE_DIR ${MARBLEWIDGET_INCLUDE_DIR})
-  SET(MARBLE_LIBRARIES ${LIBMARBLEWIDGET_LIBRARY})
-ENDIF (NOT MARBLE_FOUND)
+IF(NOT MARBLE_FOUND)
+    FIND_PACKAGE(MarbleWidget REQUIRED)
+    SET(MARBLE_INCLUDE_DIR ${MARBLEWIDGET_INCLUDE_DIR})
+    SET(MARBLE_LIBRARIES ${LIBMARBLEWIDGET_LIBRARY})
+ENDIF()
 
 MACRO_OPTIONAL_FIND_PACKAGE(Kexiv2)
 
@@ -98,21 +98,21 @@ SUBDIRS(data)
 
 IF(KDE4_BUILD_TESTS)
     MACRO_OPTIONAL_ADD_SUBDIRECTORY(tests)
-ENDIF(KDE4_BUILD_TESTS)
+ENDIF()
 
 #SUBDIRS(calibrator)
 # IF(KEXIV2_FOUND)
 #     SUBDIRS(demo)
 #     MESSAGE(STATUS "kexiv2 found, the demo application will be compiled.")
-# ELSE(KEXIV2_FOUND)
+# ELSE()
 #     MESSAGE(STATUS "kexiv2 NOT found, the demo application will NOT be compiled.")
-# ENDIF(KEXIV2_FOUND)
+# ENDIF()
 
 IF(NOT WIN32)
-  CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/cmake/templates/libkgeomap.pc.cmake.in ${CMAKE_CURRENT_BINARY_DIR}/libkgeomap.pc)
-  CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/cmake/templates/libkgeomap.lsm.cmake.in ${CMAKE_CURRENT_BINARY_DIR}/libkgeomap.lsm)
-  INSTALL(FILES ${CMAKE_CURRENT_BINARY_DIR}/libkgeomap.pc DESTINATION ${LIB_INSTALL_DIR}/pkgconfig )
-ENDIF(NOT WIN32)
+    CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/cmake/templates/libkgeomap.pc.cmake.in ${CMAKE_CURRENT_BINARY_DIR}/libkgeomap.pc)
+    CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/cmake/templates/libkgeomap.lsm.cmake.in ${CMAKE_CURRENT_BINARY_DIR}/libkgeomap.lsm)
+    INSTALL(FILES ${CMAKE_CURRENT_BINARY_DIR}/libkgeomap.pc DESTINATION ${LIB_INSTALL_DIR}/pkgconfig )
+ENDIF()
 
 # Install find cmake script to the system for client applications.
 

@@ -64,14 +64,14 @@ IF(KDE4_BUILD_TESTS)
     # ADD_TEST(kgeomap_test_lookup_altitude_geonames ${EXECUTABLE_OUTPUT_PATH}/kgeomap_test_lookup_altitude_geonames)
 
     IF(NOT WIN32)
-	# test the marker model
-	SET(test_itemmarkertiler_sources
-	    test_itemmarkertiler.cpp
-	   )
-	KDE4_ADD_EXECUTABLE(kgeomap_test_itemmarkertiler ${test_itemmarkertiler_sources})
-	TARGET_LINK_LIBRARIES(kgeomap_test_itemmarkertiler kgeomap ${QT_QTCORE_LIBRARY} ${QT_QTTEST_LIBRARY} ${KDE4_KDEUI_LIBS})
-	ADD_TEST(kgeomap_test_itemmarkertiler ${EXECUTABLE_OUTPUT_PATH}/kgeomap_test_itemmarkertiler)
-    ENDIF(NOT WIN32)
+        # test the marker model
+        SET(test_itemmarkertiler_sources
+            test_itemmarkertiler.cpp
+           )
+        KDE4_ADD_EXECUTABLE(kgeomap_test_itemmarkertiler ${test_itemmarkertiler_sources})
+        TARGET_LINK_LIBRARIES(kgeomap_test_itemmarkertiler kgeomap ${QT_QTCORE_LIBRARY} ${QT_QTTEST_LIBRARY} ${KDE4_KDEUI_LIBS})
+        ADD_TEST(kgeomap_test_itemmarkertiler ${EXECUTABLE_OUTPUT_PATH}/kgeomap_test_itemmarkertiler)
+    ENDIF()
 
     # test the track management classes
     SET(test_tracks_sources
@@ -88,4 +88,4 @@ IF(KDE4_BUILD_TESTS)
     KDE4_ADD_EXECUTABLE(loadtrack ${loadtrack_sources})
     TARGET_LINK_LIBRARIES(loadtrack kgeomap ${QT_QTCORE_LIBRARY} ${QT_QTTEST_LIBRARY} ${KDE4_KDECORE_LIBS})
 
-ENDIF(KDE4_BUILD_TESTS)
+ENDIF()

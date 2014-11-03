@@ -27,14 +27,15 @@ INCLUDE_DIRECTORIES(BEFORE ${CMAKE_CURRENT_SOURCE_DIR}/../ ${CMAKE_CURRENT_BINAR
 
 SET(calibrator_sources
         calibrator.cpp
-    )
+   )
 
 KDE4_ADD_EXECUTABLE(libkgeomap_calibrator ${calibrator_sources})
+
 TARGET_LINK_LIBRARIES(libkgeomap_calibrator
-                        kgeomap
-                        ${QT_QTGUI_LIBRARY}
-                        ${KDE4_KDECORE_LIBS}
-                        ${KDE4_UI_LIBS}
-                        ${KDE4_KPARTS_LIBS}
-                        ${KDE4_KHTML_LIBS}
-                    )
+                       kgeomap
+                       ${QT_QTGUI_LIBRARY}
+                       ${KDE4_KDECORE_LIBS}
+                       ${KDE4_UI_LIBS}
+                       ${KDE4_KPARTS_LIBS}
+                       ${KDE4_KHTML_LIBS}
+                     )
