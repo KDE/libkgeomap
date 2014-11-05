@@ -1,59 +1,40 @@
-# ===========================================================
 #
-# This file is a part of digiKam project
-# <a href="http://www.digikam.org">http://www.digikam.org</a>
+# Copyright (c) 2010-2014, Gilles Caulier, <caulier dot gilles at gmail dot com>
 #
-# @date   2010-06-29
-# @brief  world maps library interface for KDE
-#
-# @author Copyright (C) 2010-2014 by Gilles Caulier
-#         <a href="mailto:caulier dot gilles at gmail dot com">caulier dot gilles at gmail dot com</a>
-# @author Copyright (C) 2009-2010 by Michael G. Hansen
-#         <a href="mailto:mike at mghansen dot de">mike at mghansen dot de</a>
-#
-# This program is free software; you can redistribute it
-# and/or modify it under the terms of the GNU General
-# Public License as published by the Free Software Foundation;
-# either version 2, or (at your option)
-# any later version.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-# GNU General Public License for more details.
-#
-# ============================================================
+# Redistribution and use is allowed according to the terms of the BSD license.
+# For details see the accompanying COPYING-CMAKE-SCRIPTS file.
 
-PROJECT(libkgeomap)
+project(libkgeomap)
 
-MESSAGE(STATUS "----------------------------------------------------------------------------------")
-MESSAGE(STATUS "Starting CMake configuration for: libkgeomap")
+message(STATUS "----------------------------------------------------------------------------------")
+message(STATUS "Starting CMake configuration for: libkgeomap")
 
-FIND_PACKAGE(Qt4 4.6.0 REQUIRED)
-FIND_PACKAGE(KDE4 REQUIRED)
+find_package(Qt4 4.6.0 REQUIRED)
+find_package(KDE4 REQUIRED)
 
-INCLUDE(KDE4Defaults)
-INCLUDE(MacroLibrary)
-INCLUDE(MacroOptionalAddSubdirectory)
-INCLUDE(MacroOptionalFindPackage)
-INCLUDE(FindPackageHandleStandardArgs)
+include(KDE4Defaults)
+include(MacroLibrary)
+include(MacroOptionalAddSubdirectory)
+include(MacroOptionalFindPackage)
+include(FindPackageHandleStandardArgs)
 
 # Special handling for Marble: support both FindMarbleWidget and FindMarble,
 # assuming FindMarble is the way of the future.
-FIND_PACKAGE(Marble)
-IF(NOT MARBLE_FOUND)
-    FIND_PACKAGE(MarbleWidget REQUIRED)
-    SET(MARBLE_INCLUDE_DIR ${MARBLEWIDGET_INCLUDE_DIR})
-    SET(MARBLE_LIBRARIES ${LIBMARBLEWIDGET_LIBRARY})
-ENDIF()
+find_package(Marble)
+
+if(NOT MARBLE_FOUND)
+    find_package(MarbleWidget REQUIRED)
+    set(MARBLE_INCLUDE_DIR ${MARBLEWIDGET_INCLUDE_DIR})
+    set(MARBLE_LIBRARIES ${LIBMARBLEWIDGET_LIBRARY})
+endif()
 
 MACRO_OPTIONAL_FIND_PACKAGE(Kexiv2)
 
-ADD_DEFINITIONS(${QT_DEFINITIONS} ${QT_QTDBUS_DEFINITIONS} ${KDE4_DEFINITIONS} -DQT_USE_FAST_CONCATENATION -DQT_USE_FAST_OPERATOR_PLUS)
-INCLUDE_DIRECTORIES(${QDBUS_INCLUDE_DIRS} ${CMAKE_SOURCE_DIR} ${CMAKE_BINARY_DIR} ${KDE4_INCLUDES})
+add_definitions(${QT_DEFINITIONS} ${QT_QTDBUS_DEFINITIONS} ${KDE4_DEFINITIONS} -DQT_USE_FAST_CONCATENATION -DQT_USE_FAST_OPERATOR_PLUS)
+include_directories(${QDBUS_INCLUDE_DIRS} ${CMAKE_SOURCE_DIR} ${CMAKE_BINARY_DIR} ${KDE4_INCLUDES})
 
-SET(LIBKGEOMAP_AREA_CODE_GENERAL 51006)
-ADD_DEFINITIONS(-DKDE_DEFAULT_DEBUG_AREA=${LIBKGEOMAP_AREA_CODE_GENERAL})
+set(LIBKGEOMAP_AREA_CODE_GENERAL 51006)
+add_definitions(-DKDE_DEFAULT_DEBUG_AREA=${LIBKGEOMAP_AREA_CODE_GENERAL})
 
 # =======================================================
 # Information to update before to release this library.
@@ -65,9 +46,9 @@ ADD_DEFINITIONS(-DKDE_DEFAULT_DEBUG_AREA=${LIBKGEOMAP_AREA_CODE_GENERAL})
 # 3.0.0 => 2.0.0     (Including track manager, see bug #333622)
 
 # Library API version
-SET(KGEOMAP_LIB_MAJOR_VERSION "3")
-SET(KGEOMAP_LIB_MINOR_VERSION "0")
-SET(KGEOMAP_LIB_PATCH_VERSION "0")
+set(KGEOMAP_LIB_MAJOR_VERSION "3")
+set(KGEOMAP_LIB_MINOR_VERSION "0")
+set(KGEOMAP_LIB_PATCH_VERSION "0")
 
 # Suffix to add at end of version string. Usual values are:
 # "-git"   : alpha code unstable from git. Do not use in production
@@ -76,45 +57,45 @@ SET(KGEOMAP_LIB_PATCH_VERSION "0")
 # "-beta3" : beta3 release.
 # "-rc"    : release candidate.
 # ""       : final relase. Can be used in production.
-SET(KGEOMAP_LIB_SUFFIX_VERSION "")
+set(KGEOMAP_LIB_SUFFIX_VERSION "")
 
 # Library ABI version used by linker.
 # For details : http://www.gnu.org/software/libtool/manual/libtool.html#Updating-version-info
-SET(KGEOMAP_LIB_SO_CUR_VERSION "2")
-SET(KGEOMAP_LIB_SO_REV_VERSION "0")
-SET(KGEOMAP_LIB_SO_AGE_VERSION "0")
+set(KGEOMAP_LIB_SO_CUR_VERSION "2")
+set(KGEOMAP_LIB_SO_REV_VERSION "0")
+set(KGEOMAP_LIB_SO_AGE_VERSION "0")
 
 # =======================================================
 # Set env. variables accordinly.
 
-SET(KGEOMAP_LIB_VERSION_STRING    "${KGEOMAP_LIB_MAJOR_VERSION}.${KGEOMAP_LIB_MINOR_VERSION}.${KGEOMAP_LIB_PATCH_VERSION}${KGEOMAP_LIB_SUFFIX_VERSION}")
-SET(KGEOMAP_LIB_VERSION_ID        "0x0${KGEOMAP_LIB_MAJOR_VERSION}0${KGEOMAP_LIB_MINOR_VERSION}0${KGEOMAP_LIB_PATCH_VERSION}")
-SET(KGEOMAP_LIB_SO_VERSION_STRING "${KGEOMAP_LIB_SO_CUR_VERSION}.${KGEOMAP_LIB_SO_REV_VERSION}.${KGEOMAP_LIB_SO_AGE_VERSION}")
+set(KGEOMAP_LIB_VERSION_STRING    "${KGEOMAP_LIB_MAJOR_VERSION}.${KGEOMAP_LIB_MINOR_VERSION}.${KGEOMAP_LIB_PATCH_VERSION}${KGEOMAP_LIB_SUFFIX_VERSION}")
+set(KGEOMAP_LIB_VERSION_ID        "0x0${KGEOMAP_LIB_MAJOR_VERSION}0${KGEOMAP_LIB_MINOR_VERSION}0${KGEOMAP_LIB_PATCH_VERSION}")
+set(KGEOMAP_LIB_SO_VERSION_STRING "${KGEOMAP_LIB_SO_CUR_VERSION}.${KGEOMAP_LIB_SO_REV_VERSION}.${KGEOMAP_LIB_SO_AGE_VERSION}")
 
 # =======================================================
 
-SUBDIRS(libkgeomap)
-SUBDIRS(data)
+subdirs(libkgeomap)
+subdirs(data)
 
-IF(KDE4_BUILD_TESTS)
+if(KDE4_BUILD_TESTS)
     MACRO_OPTIONAL_ADD_SUBDIRECTORY(tests)
-ENDIF()
+endif()
 
-#SUBDIRS(calibrator)
-# IF(KEXIV2_FOUND)
-#     SUBDIRS(demo)
-#     MESSAGE(STATUS "kexiv2 found, the demo application will be compiled.")
-# ELSE()
-#     MESSAGE(STATUS "kexiv2 NOT found, the demo application will NOT be compiled.")
-# ENDIF()
+#subdirs(calibrator)
+# if(KEXIV2_FOUND)
+#     subdirs(demo)
+#     message(STATUS "kexiv2 found, the demo application will be compiled.")
+# else()
+#     message(STATUS "kexiv2 NOT found, the demo application will NOT be compiled.")
+# endif()
 
-IF(NOT WIN32)
-    CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/cmake/templates/libkgeomap.pc.cmake.in ${CMAKE_CURRENT_BINARY_DIR}/libkgeomap.pc)
-    CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/cmake/templates/libkgeomap.lsm.cmake.in ${CMAKE_CURRENT_BINARY_DIR}/libkgeomap.lsm)
-    INSTALL(FILES ${CMAKE_CURRENT_BINARY_DIR}/libkgeomap.pc DESTINATION ${LIB_INSTALL_DIR}/pkgconfig )
-ENDIF()
+if(NOT WIN32)
+    configure_file(${CMAKE_CURRENT_SOURCE_DIR}/cmake/templates/libkgeomap.pc.cmake.in ${CMAKE_CURRENT_BINARY_DIR}/libkgeomap.pc)
+    configure_file(${CMAKE_CURRENT_SOURCE_DIR}/cmake/templates/libkgeomap.lsm.cmake.in ${CMAKE_CURRENT_BINARY_DIR}/libkgeomap.lsm)
+    install(FILES ${CMAKE_CURRENT_BINARY_DIR}/libkgeomap.pc DESTINATION ${LIB_INSTALL_DIR}/pkgconfig )
+endif()
 
 # Install find cmake script to the system for client applications.
 
-INSTALL(FILES ${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules/FindKGeoMap.cmake
+install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules/FindKGeoMap.cmake
         DESTINATION ${DATA_INSTALL_DIR}/cmake/modules)
