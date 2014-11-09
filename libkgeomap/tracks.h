@@ -7,9 +7,9 @@
  * @date   2006-09-19
  * @brief  Track file loading and managing
  *
- * @author Copyright (C) 2006-2013 by Gilles Caulier
+ * @author Copyright (C) 2006-2014 by Gilles Caulier
  *         <a href="mailto:caulier dot gilles at gmail dot com">caulier dot gilles at gmail dot com</a>
- * @author Copyright (C) 2010, 2014 by Michael G. Hansen
+ * @author Copyright (C) 2010-2014 by Michael G. Hansen
  *         <a href="mailto:mike at mghansen dot de">mike at mghansen dot de</a>
  *
  * This program is free software; you can redistribute it
@@ -35,7 +35,19 @@
 // KDE includes
 
 #include <kurl.h>
+
+// Boost includes
+
+#if defined(__APPLE__) && defined(__clang__)
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wundef"
+#endif
+
 #include <boost/graph/buffer_concepts.hpp>
+
+#if defined(__APPLE__) && defined(__clang__)
+#pragma clang diagnostic pop
+#endif
 
 // local includes
 
