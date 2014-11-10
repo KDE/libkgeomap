@@ -36,19 +36,6 @@
 
 #include <kurl.h>
 
-// Boost includes
-
-#if defined(__APPLE__) && defined(__clang__)
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wundef"
-#endif
-
-#include <boost/graph/buffer_concepts.hpp>
-
-#if defined(__APPLE__) && defined(__clang__)
-#pragma clang diagnostic pop
-#endif
-
 // local includes
 
 #include "kgeomap_primitives.h"
@@ -111,20 +98,20 @@ public:
         };
 
         Track()
-        : url(),
-          points(),
-          id(0),
-          color(Qt::red),
-          flags(FlagDefault)
+          : url(),
+            points(),
+            id(0),
+            color(Qt::red),
+            flags(FlagDefault)
         {
         }
 
-        KUrl url;
+        KUrl              url;
         QList<TrackPoint> points;
         /// 0 means no track id assigned yet
-        Id id;
-        QColor color;
-        Flags flags;
+        Id                id;
+        QColor            color;
+        Flags             flags;
 
         typedef QList<Track> List;
     };
@@ -132,10 +119,10 @@ public:
     enum ChangeFlag
     {
         ChangeTrackPoints = 1,
-        ChangeMetadata = 2,
+        ChangeMetadata    = 2,
 
-        ChangeRemoved = 4,
-        ChangeAdd = ChangeTrackPoints | ChangeMetadata
+        ChangeRemoved     = 4,
+        ChangeAdd         = ChangeTrackPoints | ChangeMetadata
     };
 
     typedef QPair<Id, ChangeFlag> TrackChanges;

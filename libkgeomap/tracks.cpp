@@ -75,20 +75,18 @@ public:
     TrackManager::Track::List trackList;
     QList<QPair<KUrl, QString> > loadErrorFiles;
 
-    Id nextTrackId;
-    int nextTrackColor;
+    Id   nextTrackId;
+    int  nextTrackColor;
     bool visibility;
 };
 
 TrackManager::TrackManager(QObject* const parent)
     : QObject(parent), d(new Private())
 {
-
 }
 
 TrackManager::~TrackManager()
 {
-
 }
 
 bool TrackManager::getVisibility() const
@@ -163,10 +161,12 @@ void TrackManager::slotTrackFilesFinished()
 
     d->trackList << d->trackPendingList;
     QList<TrackChanges> trackChanges;
+
     Q_FOREACH(const Track& track, d->trackPendingList)
     {
         trackChanges << TrackChanges(track.id, ChangeAdd);
     }
+
     d->trackPendingList.clear();
 
     emit(signalAllTrackFilesReady());
@@ -219,6 +219,7 @@ QColor TrackManager::getNextFreeTrackColor()
 
     const QColor nextColor = colorList.at(d->nextTrackColor);
     ++(d->nextTrackColor);
+
     if (d->nextTrackColor >= colorList.count())
     {
         d->nextTrackColor = 0;
