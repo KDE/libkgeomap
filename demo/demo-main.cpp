@@ -23,10 +23,9 @@
 
 // KDE includes
 
-#include <KApplication>
-#include <KAboutData>
-#include <KCmdLineArgs>
-#include <KCmdLineOptions>
+#include <kapplication.h>
+#include <kaboutdata.h>
+#include <kcmdlineargs.h>
 #include <kdebug.h>
 #include <kicon.h>
 
@@ -40,18 +39,17 @@
 
 int main(int argc, char* argv[])
 {
-    KAboutData aboutData(
-        "demo-kgeomap",
-        0,
-        ki18n("KGeoMap demo application"),
-        kgeomap_version,                                   // version
-        ki18n("Presents the World Map Widget Interface"),
-        KAboutData::License_GPL,
-        ki18n("(c) 2009-2010 Michael G. Hansen"),
-        ki18n(""),                                         // optional text
-        "http://www.digikam.org/sharedlibs",               // URI of homepage
-        ""                                                 // bugs e-mail address
-    );
+    KAboutData aboutData("demo-kgeomap",
+                         0,
+                         ki18n("KGeoMap demo application"),
+                         kgeomap_version,                                   // version
+                         ki18n("Presents the World Map Widget Interface"),
+                         KAboutData::License_GPL,
+                         ki18n("(c) 2009-2010 Michael G. Hansen"),
+                         ki18n(""),                                         // optional text
+                         "http://www.digikam.org/sharedlibs",               // URI of homepage
+                         ""                                                 // bugs e-mail address
+                        );
 
     aboutData.addAuthor(ki18n("Michael G. Hansen"),
                         ki18n("KGeoMap library"),
@@ -75,7 +73,7 @@ int main(int argc, char* argv[])
     // get the list of images to load on startup:
     KUrl::List imagesList;
 
-    for (int i=0; i<args->count(); ++i)
+    for (int i=0; i < args->count(); ++i)
     {
         const KUrl argUrl = args->url(i);
 //         kDebug()<<argUrl;

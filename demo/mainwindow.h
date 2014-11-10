@@ -52,11 +52,11 @@ public:
     MarkerModelHelper(QAbstractItemModel* const itemModel, QItemSelectionModel* const itemSelectionModel);
     ~MarkerModelHelper();
 
-    virtual QAbstractItemModel* model() const;
+    virtual QAbstractItemModel*  model()          const;
     virtual QItemSelectionModel* selectionModel() const;
+    virtual Flags                modelFlags()     const;
     virtual bool itemCoordinates(const QModelIndex& index, KGeoMap::GeoCoordinates* const coordinates) const;
     virtual void onIndicesMoved(const QList<QPersistentModelIndex>& movedIndices, const KGeoMap::GeoCoordinates& targetCoordinates, const QPersistentModelIndex& targetSnapIndex);
-    virtual Flags modelFlags() const;
 
 private:
 

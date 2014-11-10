@@ -78,9 +78,9 @@
 using namespace KGeoMap;
 
 MarkerModelHelper::MarkerModelHelper(QAbstractItemModel* const itemModel, QItemSelectionModel* const itemSelectionModel)
- : ModelHelper(itemModel),
-   m_itemModel(itemModel),
-   m_itemSelectionModel(itemSelectionModel)
+    : ModelHelper(itemModel),
+      m_itemModel(itemModel),
+      m_itemSelectionModel(itemSelectionModel)
 {
     connect(itemModel, SIGNAL(dataChanged(QModelIndex,QModelIndex)),
             this, SIGNAL(signalModelChangedDrastically()));
@@ -115,7 +115,7 @@ void MarkerModelHelper::onIndicesMoved(const QList<QPersistentModelIndex>& moved
 {
     Q_UNUSED(targetSnapIndex);
 
-    for (int i=0; i<movedIndices.count(); ++i)
+    for (int i = 0; i < movedIndices.count(); ++i)
     {
         m_itemModel->setData(movedIndices.at(i), QVariant::fromValue(targetCoordinates), RoleCoordinates);
     }
@@ -155,7 +155,7 @@ void MyTrackModelHelper::slotTrackModelChanged()
 
     TrackManager::Track track;
 
-    for (int row = 0; row<m_itemModel->rowCount(); ++row)
+    for (int row = 0; row < m_itemModel->rowCount(); ++row)
     {
         const QModelIndex currentIndex = m_itemModel->index(row, 0);
 
@@ -164,7 +164,7 @@ void MyTrackModelHelper::slotTrackModelChanged()
 
         const GeoCoordinates markerCoordinates = currentIndex.data(RoleCoordinates).value<GeoCoordinates>();
         TrackManager::TrackPoint trackPoint;
-        trackPoint.coordinates = markerCoordinates;
+        trackPoint.coordinates                 = markerCoordinates;
         track.points << trackPoint;
     }
 
@@ -226,7 +226,7 @@ public:
 };
 
 MainWindow::MainWindow(KCmdLineArgs* const cmdLineArgs, QWidget* const parent)
-          : KMainWindow(parent), d(new Private())
+    : KMainWindow(parent), d(new Private())
 {
     // initialize kexiv2 before doing any multitasking
     KExiv2Iface::KExiv2::initializeExiv2();
@@ -312,9 +312,9 @@ MainWindow::MainWindow(KCmdLineArgs* const cmdLineArgs, QWidget* const parent)
     // Sagrada Familia in Spain
     markerList<<GeoCoordinates::fromGeoUrl(QLatin1String("geo:41.4036480511,2.1743756533,46" ));
 
-    if (cmdLineArgs->isSet("demopoints_single")||cmdLineArgs->isSet("demopoints_group"))
+    if (cmdLineArgs->isSet("demopoints_single") || cmdLineArgs->isSet("demopoints_group"))
     {
-        for (int i=0; i<markerList.count(); ++i)
+        for (int i = 0; i < markerList.count(); ++i)
         {
             QTreeWidgetItem* const treeItem = new QTreeWidgetItem();
             treeItem->setText(0, QString::fromLatin1("item %1").arg(i));
@@ -351,6 +351,7 @@ void MainWindow::readSettings()
     if (groupMainWindowConfig.hasKey("SplitterState"))
     {
         const QByteArray splitterState = QByteArray::fromBase64(groupMainWindowConfig.readEntry(QLatin1String("SplitterState"), QByteArray()));
+
         if (!splitterState.isEmpty())
         {
             d->splitter->restoreState(splitterState);
@@ -406,29 +407,29 @@ void MainWindow::slotFutureResultsReadyAt(int startIndex, int endIndex)
     QFutureWatcher<MyImageData>* const futureSender = reinterpret_cast<QFutureWatcher<MyImageData>*>(sender());
     KGEOMAP_ASSERT(futureSender!=0);
 
-    if (futureSender==0)
+    if (futureSender == 0)
         return;
 
     int futureIndex = -1;
 
-    for (int i = 0; i<d->imageLoadingFutureWatchers.size(); ++i)
+    for (int i = 0; i < d->imageLoadingFutureWatchers.size(); ++i)
     {
-        if (d->imageLoadingFutureWatchers.at(i)==futureSender)
+        if (d->imageLoadingFutureWatchers.at(i) == futureSender)
         {
             futureIndex = i;
             break;
         }
     }
 
-    KGEOMAP_ASSERT(futureIndex>=0);
+    KGEOMAP_ASSERT(futureIndex >= 0);
 
-    if (futureIndex<0)
+    if (futureIndex < 0)
     {
         // TODO: error!
         return;
     }
 
-    for (int index = startIndex; index<endIndex; ++index)
+    for (int index = startIndex; index < endIndex; ++index)
     {
         MyImageData newData = d->imageLoadingRunningFutures.at(futureIndex).resultAt(index);
 //         kDebug()<<"future"<<newData.url<<newData.coordinates.geoUrl();
@@ -466,7 +467,7 @@ void MainWindow::slotScheduleImagesForLoading(const KUrl::List imagesToSchedule)
     if (imagesToSchedule.isEmpty())
         return;
 
-    if (d->imageLoadingTotalCount==0)
+    if (d->imageLoadingTotalCount == 0)
     {
         statusBar()->addWidget(d->progressBar);
         d->imageLoadingBunchTimer->start(100);
@@ -475,7 +476,7 @@ void MainWindow::slotScheduleImagesForLoading(const KUrl::List imagesToSchedule)
     d->imageLoadingTotalCount+=imagesToSchedule.count();
     d->progressBar->setRange(0, d->imageLoadingTotalCount);
     d->progressBar->setValue(d->imageLoadingCurrentCount);
-    QFutureWatcher<MyImageData>* watcher = new QFutureWatcher<MyImageData>(this);
+    QFutureWatcher<MyImageData>* const watcher = new QFutureWatcher<MyImageData>(this);
 
     connect(watcher, SIGNAL(resultsReadyAt(int,int)),
             this, SLOT(slotFutureResultsReadyAt(int,int)));
@@ -491,7 +492,7 @@ void MainWindow::slotImageLoadingBunchReady()
 {
     kDebug()<<"slotImageLoadingBunchReady";
 
-    for (int i=0; i<d->imageLoadingBuncher.count(); ++i)
+    for (int i = 0; i < d->imageLoadingBuncher.count(); ++i)
     {
         const MyImageData& currentInfo = d->imageLoadingBuncher.at(i);
 
@@ -516,7 +517,7 @@ void MainWindow::slotMarkersMoved(const QList<QPersistentModelIndex>& markerIndi
     // prepare altitude lookups
     LookupAltitude::Request::List altitudeQueries;
 
-    for (int i=0; i<markerIndices.count(); ++i)
+    for (int i = 0; i < markerIndices.count(); ++i)
     {
         const QPersistentModelIndex currentIndex = markerIndices.at(i);
         const GeoCoordinates newCoordinates      = currentIndex.data(RoleCoordinates).value<GeoCoordinates>();
@@ -557,7 +558,7 @@ void MainWindow::slotAltitudeRequestsReady(const QList<int>& readyRequests)
         return;
     }
 
-    for (int i=0; i<readyRequests.count(); ++i)
+    for (int i = 0; i < readyRequests.count(); ++i)
     {
         const KGeoMap::LookupAltitude::Request& myLookup = myAltitudeLookup->getRequest(readyRequests.at(i));
         const QPersistentModelIndex markerIndex          = myLookup.data.value<QPersistentModelIndex>();
@@ -593,7 +594,7 @@ void MainWindow::slotAddImages()
     if (fileNames.isEmpty())
         return;
 
-    d->lastImageOpenDir = fileNames.first().upUrl();
+    d->lastImageOpenDir        = fileNames.first().upUrl();
 
     slotScheduleImagesForLoading(fileNames);
 }
