@@ -49,7 +49,7 @@ public:
 private:
 
     KGeoMap::GeoCoordinates coordinates;
-    KUrl                        imageUrl;
+    KUrl                    imageUrl;
 };
 
 #endif /* MYIMAGEITEM_H */

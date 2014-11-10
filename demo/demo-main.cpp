@@ -44,13 +44,13 @@ int main(int argc, char* argv[])
         "demo-kgeomap",
         0,
         ki18n("KGeoMap demo application"),
-        kgeomap_version,                                      // version
+        kgeomap_version,                                   // version
         ki18n("Presents the World Map Widget Interface"),
         KAboutData::License_GPL,
         ki18n("(c) 2009-2010 Michael G. Hansen"),
         ki18n(""),                                         // optional text
         "http://www.digikam.org/sharedlibs",               // URI of homepage
-        ""                                                  // bugs e-mail address
+        ""                                                 // bugs e-mail address
     );
 
     aboutData.addAuthor(ki18n("Michael G. Hansen"),
@@ -74,6 +74,7 @@ int main(int argc, char* argv[])
 
     // get the list of images to load on startup:
     KUrl::List imagesList;
+
     for (int i=0; i<args->count(); ++i)
     {
         const KUrl argUrl = args->url(i);
@@ -83,7 +84,7 @@ int main(int argc, char* argv[])
 
     KApplication app;
 
-    MainWindow* myMainWindow = new MainWindow(args);
+    MainWindow* const myMainWindow = new MainWindow(args);
     myMainWindow->show();
     myMainWindow->slotScheduleImagesForLoading(imagesList);
 

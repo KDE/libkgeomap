@@ -26,14 +26,14 @@ if(KEXIV2_FOUND)
     KDE4_ADD_EXECUTABLE(libkgeomap_demo ${demo_sources})
 
     target_link_libraries(libkgeomap_demo
-                        kgeomap
-                        ${KEXIV2_LIBRARIES}
-                        ${QT_QTGUI_LIBRARY}
-                        ${KDE4_KDECORE_LIBS}
-                        ${KDE4_UI_LIBS}
-                        ${KDE4_KPARTS_LIBS}
-                        ${KDE4_KHTML_LIBS}
-                        )
+                          kgeomap
+                          ${KEXIV2_LIBRARIES}
+                          ${QT_QTGUI_LIBRARY}
+                          ${KDE4_KDECORE_LIBS}
+                          ${KDE4_UI_LIBS}
+                          ${KDE4_KPARTS_LIBS}
+                          ${KDE4_KHTML_LIBS}
+                         )
 
     install(TARGETS libkgeomap_demo ${INSTALL_TARGETS_DEFAULT_ARGS})
 

@@ -39,6 +39,7 @@ class MyDragData : public QMimeData
     Q_OBJECT
 
 public:
+
     MyDragData()
         : QMimeData(),
           draggedIndices()

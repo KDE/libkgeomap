@@ -33,7 +33,6 @@
 
 #include "myimageitem.h"
 
-class MyTreeWidgetPrivate;
 class QMouseEvent;
 
 Q_DECLARE_METATYPE(QTreeWidgetItem*)
@@ -57,7 +56,8 @@ protected:
 
 private:
 
-    MyTreeWidgetPrivate* const d;
+    class Private;
+    Private* const d;
 };
 
 #endif /* MYTREEWIDGET_H */

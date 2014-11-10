@@ -133,9 +133,11 @@ public:
     KUrl           url;
 };
 
-MyTrackModelHelper::MyTrackModelHelper(QAbstractItemModel* imageItemsModel)
-  : KGeoMap::TrackModelHelper (imageItemsModel),
-    m_itemModel (imageItemsModel)
+// ----------------------------------------------------------------------
+
+MyTrackModelHelper::MyTrackModelHelper(QAbstractItemModel* const imageItemsModel)
+    : QObject(imageItemsModel),
+      m_itemModel(imageItemsModel)
 {
     connect(imageItemsModel, SIGNAL(dataChanged(QModelIndex,QModelIndex)),
             this, SLOT(slotTrackModelChanged()));
@@ -145,16 +147,18 @@ MyTrackModelHelper::MyTrackModelHelper(QAbstractItemModel* imageItemsModel)
 
     connect(imageItemsModel, SIGNAL(modelReset()),
             this, SLOT(slotTrackModelChanged()));
-    
 }
+
 void MyTrackModelHelper::slotTrackModelChanged()
 {
     m_tracks.clear();
 
     TrackManager::Track track;
+
     for (int row = 0; row<m_itemModel->rowCount(); ++row)
     {
         const QModelIndex currentIndex = m_itemModel->index(row, 0);
+
         if (!currentIndex.data(RoleCoordinates).canConvert<GeoCoordinates>())
             continue;
 
@@ -166,7 +170,7 @@ void MyTrackModelHelper::slotTrackModelChanged()
 
     m_tracks << track;
 
-    emit(signalModelChanged());
+    emit signalModelChanged();
 }
 
 TrackManager::Track::List MyTrackModelHelper::getTracks() const
@@ -199,7 +203,6 @@ public:
         markerModelHelper(0),
         trackModelHelper(0)
     {
-
     }
 
     QSplitter*                          splitter;
@@ -219,7 +222,7 @@ public:
     QAbstractItemModel*                 displayMarkersModel;
     QItemSelectionModel*                selectionModel;
     MarkerModelHelper*                  markerModelHelper;
-    TrackModelHelper*                   trackModelHelper;
+    MyTrackModelHelper*                 trackModelHelper;
 };
 
 MainWindow::MainWindow(KCmdLineArgs* const cmdLineArgs, QWidget* const parent)

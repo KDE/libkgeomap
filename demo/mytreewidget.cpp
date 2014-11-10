@@ -36,11 +36,11 @@
 
 #include "dragdrophandler.h"
 
-class MyTreeWidgetPrivate
+class MyTreeWidget::Private
 {
 public:
 
-    MyTreeWidgetPrivate()
+    Private()
         : dragStartPos()
     {
     }
@@ -49,7 +49,7 @@ public:
 };
 
 MyTreeWidget::MyTreeWidget(QWidget* const parent)
-            : QTreeWidget(parent), d(new MyTreeWidgetPrivate())
+    : QTreeWidget(parent), d(new Private())
 {
     setDragEnabled(true);
     setDragDropMode(QAbstractItemView::DragOnly);
@@ -78,7 +78,7 @@ QMimeData* MyTreeWidget::mimeData(const QModelIndexList itemsToDrag) const
     MyDragData* const mimeData = new MyDragData;
 
     // TODO: determine the indices of the items to drag!
-    for (int i=0; i<itemsToDrag.count(); ++i)
+    for (int i = 0; i < itemsToDrag.count(); ++i)
     {
         mimeData->draggedIndices << QPersistentModelIndex(itemsToDrag.at(i));
     }
