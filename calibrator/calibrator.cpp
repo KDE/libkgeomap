@@ -41,8 +41,8 @@
 // KDE includes
 
 #include <kapplication.h>
-#include <KAboutData>
-#include <KCmdLineArgs>
+#include <kaboutdata.h>
+#include <kcmdlineargs.h>
 #include <klineedit.h>
 
 // local includes
@@ -54,10 +54,10 @@
 
 const int CoordinatesRole = Qt::UserRole + 1;
 
-class CalibratorModelHelper::CalibratorModelHelperPrivate
+class CalibratorModelHelper::Private
 {
 public:
-    CalibratorModelHelperPrivate()
+    Private()
      : model(0)
     {
     }
@@ -66,7 +66,7 @@ public:
 };
 
 CalibratorModelHelper::CalibratorModelHelper(QStandardItemModel* const model, QObject* const parent)
-    : ModelHelper(parent), d(new CalibratorModelHelperPrivate())
+    : ModelHelper(parent), d(new Private())
 {
     d->model = model;
 }
@@ -91,7 +91,7 @@ bool CalibratorModelHelper::itemCoordinates(const QModelIndex& index, KGeoMap::G
     if (!index.isValid())
         return false;
 
-    const QVariant coordinatesVariant = index.data(CoordinatesRole);
+    const QVariant coordinatesVariant       = index.data(CoordinatesRole);
     KGeoMap::GeoCoordinates itemCoordinates = coordinatesVariant.value<KGeoMap::GeoCoordinates>();
 
     if (coordinates)
@@ -228,7 +228,7 @@ void Calibrator::updateGroupingMode()
 {
     const bool shouldBeGrouped = d->groupingMode->checkedId()==0;
 
-    for (int i = 0; i<d->extraWidgetHolders.count(); ++i)
+    for (int i = 0; i < d->extraWidgetHolders.count(); ++i)
     {
         KGeoMap::KGeoMapWidget* const mapWidget = d->extraWidgetHolders.at(i).second;
 
@@ -259,7 +259,7 @@ void Calibrator::updateMarkers()
     d->model->clear();
 
     const int newLevel = d->sbLevel->value();
-    const int Tiling = KGeoMap::TileIndex::Tiling;
+    const int Tiling   = KGeoMap::TileIndex::Tiling;
 
     // add markers in all four corners and in the middle of the edges:
     typedef QPair<int, int> QIntPair;
@@ -309,14 +309,15 @@ void Calibrator::updateMarkers()
 
         const int smallPart = followingIndex % Tiling;
 
-        for (int i = -1; i<=1; ++i)
+        for (int i = -1; i <= 1; ++i)
         {
-            if ((smallPart+i>=0)&&(smallPart+i<Tiling))
+            if ((smallPart+i >= 0) && (smallPart+i < Tiling))
             {
                 for (int j = -1; j<=1; ++j)
                 {
                     const int newLinIndex = followingIndex + i + j*Tiling;
-                    if ((newLinIndex>=0)&&(newLinIndex<Tiling*Tiling))
+
+                    if ((newLinIndex >= 0) && (newLinIndex < Tiling*Tiling))
                     {
                         KGeoMap::TileIndex newIndex = markerIndex;
                         newIndex.appendLinearIndex(newLinIndex);
@@ -383,7 +384,7 @@ void Calibrator::slotRemoveMapWidget()
         return;
     }
 
-    QPair<QWidget*, KGeoMap::KGeoMapWidget*> info =  d->extraWidgetHolders.takeLast();
+    QPair<QWidget*, KGeoMap::KGeoMapWidget*> info = d->extraWidgetHolders.takeLast();
     d->hBoxLayout->removeWidget(info.first);
     delete info.first;
 }
@@ -403,18 +404,17 @@ void Calibrator::slotActivateMapActionTriggered(bool state)
 
 int main(int argc, char* argv[])
 {
-    KAboutData aboutData(
-        "calibrator-kgeomap",
-        0,
-        ki18n("KGeoMap calibration tool"),
-        kgeomap_version,                                      // version
-        ki18n("Used to calibrate the KGeoMap library tiling level"),
-        KAboutData::License_GPL,
-        ki18n("(c) 2010 Michael G. Hansen"),
-        ki18n(""),                                           // optional text
-        "http://www.digikam.org/sharedlibs",                 // URI of homepage
-        ""                                                   // bugs e-mail address
-    );
+    KAboutData aboutData("calibrator-kgeomap",
+                         0,
+                         ki18n("KGeoMap calibration tool"),
+                         kgeomap_version,                                     // version
+                         ki18n("Used to calibrate the KGeoMap library tiling level"),
+                         KAboutData::License_GPL,
+                         ki18n("(c) 2010 Michael G. Hansen"),
+                         ki18n(""),                                           // optional text
+                         "http://www.digikam.org/sharedlibs",                 // URI of homepage
+                         ""                                                   // bugs e-mail address
+                        );
 
     aboutData.addAuthor(ki18n("Michael G. Hansen"),
                         ki18n("KGeoMap library"),
@@ -425,7 +425,7 @@ int main(int argc, char* argv[])
 
     KApplication app;
 
-    Calibrator* calibrator = new Calibrator();
+    Calibrator* const calibrator = new Calibrator();
     calibrator->show();
 
     return app.exec();
