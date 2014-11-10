@@ -28,8 +28,6 @@ if(NOT MARBLE_FOUND)
     set(MARBLE_LIBRARIES ${LIBMARBLEWIDGET_LIBRARY})
 endif()
 
-MACRO_OPTIONAL_FIND_PACKAGE(Kexiv2)
-
 add_definitions(${QT_DEFINITIONS} ${QT_QTDBUS_DEFINITIONS} ${KDE4_DEFINITIONS} -DQT_USE_FAST_CONCATENATION -DQT_USE_FAST_OPERATOR_PLUS)
 include_directories(${QDBUS_INCLUDE_DIRS} ${CMAKE_SOURCE_DIR} ${CMAKE_BINARY_DIR} ${KDE4_INCLUDES})
 
@@ -79,15 +77,9 @@ subdirs(data)
 
 if(KDE4_BUILD_TESTS)
     MACRO_OPTIONAL_ADD_SUBDIRECTORY(tests)
+#    MACRO_OPTIONAL_ADD_SUBDIRECTORY(demo)
+    MACRO_OPTIONAL_ADD_SUBDIRECTORY(calibrator)
 endif()
-
-#subdirs(calibrator)
-# if(KEXIV2_FOUND)
-#     subdirs(demo)
-#     message(STATUS "kexiv2 found, the demo application will be compiled.")
-# else()
-#     message(STATUS "kexiv2 NOT found, the demo application will NOT be compiled.")
-# endif()
 
 if(NOT WIN32)
     configure_file(${CMAKE_CURRENT_SOURCE_DIR}/cmake/templates/libkgeomap.pc.cmake.in ${CMAKE_CURRENT_BINARY_DIR}/libkgeomap.pc)

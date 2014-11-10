@@ -66,7 +66,7 @@ public:
 };
 
 CalibratorModelHelper::CalibratorModelHelper(QStandardItemModel* const model, QObject* const parent)
- : ModelHelper(parent), d(new CalibratorModelHelperPrivate())
+    : ModelHelper(parent), d(new CalibratorModelHelperPrivate())
 {
     d->model = model;
 }
@@ -113,10 +113,12 @@ KGeoMap::ModelHelper::Flags CalibratorModelHelper::modelFlags() const
     return FlagVisible;
 }
 
-class Calibrator::CalibratorPrivate
+// ---------------------------------------------------------------------------------------------------------------------
+
+class Calibrator::Private
 {
 public:
-    CalibratorPrivate()
+    Private()
      : hBoxLayout(0),
        model(0),
        modelHelper(0),
@@ -128,49 +130,49 @@ public:
     {
     }
 
-    QHBoxLayout                *hBoxLayout;
-    QList<QPair<QWidget*, KGeoMap::KGeoMapWidget*> >        extraWidgetHolders;
-    QStandardItemModel         *model;
-    CalibratorModelHelper      *modelHelper;
-    KGeoMap::ItemMarkerTiler      *markerTiler;
+    QHBoxLayout*                                     hBoxLayout;
+    QList<QPair<QWidget*, KGeoMap::KGeoMapWidget*> > extraWidgetHolders;
+    QStandardItemModel*                              model;
+    CalibratorModelHelper*                           modelHelper;
+    KGeoMap::ItemMarkerTiler*                        markerTiler;
 
-    QButtonGroup               *groupingMode;
-    QSpinBox                   *sbLevel;
-    KLineEdit                  *zoomDisplay;
+    QButtonGroup*                                    groupingMode;
+    QSpinBox*                                        sbLevel;
+    KLineEdit*                                       zoomDisplay;
 
-    QTimer                     *zoomDisplayTimer;
+    QTimer*                                          zoomDisplayTimer;
 };
 
 Calibrator::Calibrator()
- : KMainWindow(), d(new CalibratorPrivate())
+    : KMainWindow(), d(new Private())
 {
-    d->model = new QStandardItemModel(this);
+    d->model       = new QStandardItemModel(this);
     d->modelHelper = new CalibratorModelHelper(d->model, this);
     d->markerTiler = new KGeoMap::ItemMarkerTiler(d->modelHelper, this);
 
     QVBoxLayout* const vboxLayout1 = new QVBoxLayout();
-    QWidget* const dummy1 = new QWidget(this);
+    QWidget* const dummy1          = new QWidget(this);
     dummy1->setLayout(vboxLayout1);
     setCentralWidget(dummy1);
 
     d->hBoxLayout = new QHBoxLayout();
     vboxLayout1->addLayout(d->hBoxLayout);
 
-    d->groupingMode = new QButtonGroup(this);
+    d->groupingMode                     = new QButtonGroup(this);
     d->groupingMode->setExclusive(true);
-    QRadioButton* const buttonGrouped = new QRadioButton(i18n("Grouped"), this);
+    QRadioButton* const buttonGrouped   = new QRadioButton(i18n("Grouped"), this);
     d->groupingMode->addButton(buttonGrouped, 0);
     QRadioButton* const buttonUngrouped = new QRadioButton(i18n("Ungrouped"), this);
     d->groupingMode->addButton(buttonUngrouped, 1);
     buttonGrouped->setChecked(true);
 
-    d->sbLevel = new QSpinBox(this);
+    d->sbLevel                 = new QSpinBox(this);
     d->sbLevel->setMinimum(1);
     d->sbLevel->setMaximum(KGeoMap::TileIndex::MaxLevel);
     QLabel* const labelsbLevel = new QLabel(i18nc("Tile level", "Level:"), this);
     labelsbLevel->setBuddy(d->sbLevel);
 
-    d->zoomDisplay = new KLineEdit(this);
+    d->zoomDisplay                 = new KLineEdit(this);
     d->zoomDisplay->setReadOnly(true);
     QLabel* const labelZoomDisplay = new QLabel(i18n("Zoom:"), this);
     labelZoomDisplay->setBuddy(d->zoomDisplay);
@@ -187,7 +189,7 @@ Calibrator::Calibrator()
     vboxLayout1->addLayout(hboxLayout1);
 
     QHBoxLayout* const hboxLayout2 = new QHBoxLayout(this);
-    QPushButton* const pbAddMap = new QPushButton(i18n("Add Map Widget"), this);
+    QPushButton* const pbAddMap    = new QPushButton(i18n("Add Map Widget"), this);
     hboxLayout2->addWidget(pbAddMap);
     QPushButton* const pbRemoveMap = new QPushButton(i18n("Remove Map Widget"), this);
     hboxLayout2->addWidget(pbRemoveMap);
@@ -293,8 +295,8 @@ void Calibrator::updateMarkers()
 
     for (int ptp = 0; ptp<partialTilePositions.count(); ++ptp)
     {
-        QIntPair currentPair = partialTilePositions.at(ptp);
-        const int level0Index = currentPair.first;
+        QIntPair currentPair     = partialTilePositions.at(ptp);
+        const int level0Index    = currentPair.first;
         const int followingIndex = currentPair.second;
 
         KGeoMap::TileIndex markerIndex;
@@ -306,6 +308,7 @@ void Calibrator::updateMarkers()
         }
 
         const int smallPart = followingIndex % Tiling;
+
         for (int i = -1; i<=1; ++i)
         {
             if ((smallPart+i>=0)&&(smallPart+i<Tiling))
@@ -339,7 +342,8 @@ void Calibrator::updateZoomView()
     }
 
     KGeoMap::KGeoMapWidget* const firstMapWidget = d->extraWidgetHolders.first().second;
-    const QString newZoom = firstMapWidget->getZoom();
+    const QString newZoom                        = firstMapWidget->getZoom();
+
     if (newZoom!=d->zoomDisplay->text())
     {
         d->zoomDisplay->setText(newZoom);
@@ -348,15 +352,15 @@ void Calibrator::updateZoomView()
 
 void Calibrator::slotAddMapWidget()
 {
-    QVBoxLayout* boxLayout = new QVBoxLayout();
-    KGeoMap::KGeoMapWidget* mapWidget = new KGeoMap::KGeoMapWidget();
+    QVBoxLayout* const boxLayout            = new QVBoxLayout();
+    KGeoMap::KGeoMapWidget* const mapWidget = new KGeoMap::KGeoMapWidget();
     boxLayout->addWidget(mapWidget);
     boxLayout->addWidget(mapWidget->getControlWidget());
 
     QAction* const activateMapAction = new QAction(i18nc("Set the widget active", "Active"), mapWidget);
     activateMapAction->setData(QVariant::fromValue<void*>(mapWidget));
     activateMapAction->setCheckable(true);
-    QToolButton* const toolButton = new QToolButton(mapWidget);
+    QToolButton* const toolButton    = new QToolButton(mapWidget);
     toolButton->setDefaultAction(activateMapAction);
     mapWidget->addWidgetToControlWidget(toolButton);
 
@@ -387,6 +391,7 @@ void Calibrator::slotRemoveMapWidget()
 void Calibrator::slotActivateMapActionTriggered(bool state)
 {
     QAction* const senderAction = qobject_cast<QAction*>(sender());
+
     if (!senderAction)
     {
         return;
@@ -406,9 +411,9 @@ int main(int argc, char* argv[])
         ki18n("Used to calibrate the KGeoMap library tiling level"),
         KAboutData::License_GPL,
         ki18n("(c) 2010 Michael G. Hansen"),
-        ki18n(""),                                         // optional text
-        "http://www.digikam.org/sharedlibs",               // URI of homepage
-        ""                                                 // bugs e-mail address
+        ki18n(""),                                           // optional text
+        "http://www.digikam.org/sharedlibs",                 // URI of homepage
+        ""                                                   // bugs e-mail address
     );
 
     aboutData.addAuthor(ki18n("Michael G. Hansen"),
@@ -425,4 +430,3 @@ int main(int argc, char* argv[])
 
     return app.exec();
 }
-

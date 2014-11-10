@@ -37,7 +37,7 @@ class QStandardItemModel;
 
 class CalibratorModelHelper : public KGeoMap::ModelHelper
 {
-Q_OBJECT
+    Q_OBJECT
 
 public:
     explicit CalibratorModelHelper(QStandardItemModel* const model, QObject* const parent = 0);
@@ -58,9 +58,11 @@ private:
     Q_DISABLE_COPY(CalibratorModelHelper)
 };
 
+// -----------------------------------------------------------------------------------------------------------
+
 class Calibrator : public KMainWindow
 {
-Q_OBJECT
+    Q_OBJECT
 
 public:
     Calibrator();
@@ -81,8 +83,8 @@ private Q_SLOTS:
 
 private:
 
-    class CalibratorPrivate;
-    CalibratorPrivate* const d;
+    class Private;
+    Private* const d;
 
     Q_DISABLE_COPY(Calibrator)
 };
