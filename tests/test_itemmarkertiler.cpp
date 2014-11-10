@@ -72,8 +72,8 @@ bool MarkerModelHelper::itemCoordinates(const QModelIndex& index, GeoCoordinates
     return true;
 }
 
-const GeoCoordinates coord_1_2 = GeoCoordinates::fromGeoUrl(QLatin1String("geo:1,2"));
-const GeoCoordinates coord_50_60 = GeoCoordinates::fromGeoUrl(QLatin1String("geo:50,60"));
+const GeoCoordinates coord_1_2     = GeoCoordinates::fromGeoUrl(QLatin1String("geo:1,2"));
+const GeoCoordinates coord_50_60   = GeoCoordinates::fromGeoUrl(QLatin1String("geo:50,60"));
 const GeoCoordinates coord_m50_m60 = GeoCoordinates::fromGeoUrl(QLatin1String("geo:-50,-60"));
 
 QStandardItem* MakeItemAt(const GeoCoordinates& coordinates)
@@ -90,10 +90,11 @@ QStandardItem* MakeItemAt(const GeoCoordinates& coordinates)
 int CountMarkersInIterator(ItemMarkerTiler::NonEmptyIterator* const it)
 {
     int markerCount = 0;
+
     while (!it->atEnd())
     {
         const TileIndex currentIndex = it->currentIndex();
-        markerCount += it->model()->getTileMarkerCount(currentIndex);
+        markerCount                 += it->model()->getTileMarkerCount(currentIndex);
         it->nextIndex();
 //         kDebug()<<currentIndex;
     }
@@ -109,7 +110,7 @@ void TestItemMarkerTiler::testIndices()
 {
     const int maxLevel = TileIndex::MaxLevel;
 
-    for (int l = 0; l<=maxLevel; ++l)
+    for (int l = 0; l <= maxLevel; ++l)
     {
         const TileIndex tileIndex = TileIndex::fromCoordinates(coord_1_2, l);
         QVERIFY(tileIndex.level() == l);
@@ -124,7 +125,7 @@ void TestItemMarkerTiler::testAddMarkers1()
     const int maxLevel = TileIndex::MaxLevel;
 
     // there should be no tiles in the model yet:
-    for (int l = 0; l<=maxLevel; ++l)
+    for (int l = 0; l <= maxLevel; ++l)
     {
         QVERIFY(mm.getTile(TileIndex::fromCoordinates(coord_50_60, l), true) == 0);
     }
@@ -132,9 +133,9 @@ void TestItemMarkerTiler::testAddMarkers1()
     itemModel->appendRow(MakeItemAt(coord_50_60));
 
     // now there should be tiles with one marker:
-    for (int l = 0; l<=maxLevel; ++l)
+    for (int l = 0; l <= maxLevel; ++l)
     {
-        const TileIndex tileIndex = TileIndex::fromCoordinates(coord_50_60, l);
+        const TileIndex tileIndex           = TileIndex::fromCoordinates(coord_50_60, l);
         ItemMarkerTiler::Tile* const myTile = mm.getTile(tileIndex, true);
         QVERIFY(myTile != 0);
         QVERIFY(myTile->childrenEmpty());
@@ -144,9 +145,9 @@ void TestItemMarkerTiler::testAddMarkers1()
     itemModel->appendRow(MakeItemAt(coord_50_60));
 
     // now there should be tiles with two markers:
-    for (int l = 0; l<=maxLevel; ++l)
+    for (int l = 0; l <= maxLevel; ++l)
     {
-        const TileIndex tileIndex = TileIndex::fromCoordinates(coord_50_60, l);
+        const TileIndex tileIndex           = TileIndex::fromCoordinates(coord_50_60, l);
         ItemMarkerTiler::Tile* const myTile = mm.getTile(tileIndex, true);
         QVERIFY(myTile != 0);
         QCOMPARE(mm.getTileMarkerCount(tileIndex), 2);
@@ -165,9 +166,9 @@ void TestItemMarkerTiler::testRemoveMarkers2()
     itemModel->appendRow(item2);
 
     // now there should be tiles with two markers:
-    for (int l = 0; l<=maxLevel; ++l)
+    for (int l = 0; l <= maxLevel; ++l)
     {
-        const TileIndex tileIndex = TileIndex::fromCoordinates(coord_50_60, l);
+        const TileIndex tileIndex           = TileIndex::fromCoordinates(coord_50_60, l);
         ItemMarkerTiler::Tile* const myTile = mm.getTile(tileIndex, true);
         QVERIFY(myTile != 0);
         QCOMPARE(mm.getTileMarkerCount(tileIndex), 2);
@@ -175,9 +176,10 @@ void TestItemMarkerTiler::testRemoveMarkers2()
 
     // remove one item:
     qDeleteAll(itemModel->takeRow(itemModel->indexFromItem(item2).row()));
-    for (int l = 0; l<=maxLevel; ++l)
+
+    for (int l = 0; l <= maxLevel; ++l)
     {
-        const TileIndex tileIndex = TileIndex::fromCoordinates(coord_50_60, l);
+        const TileIndex tileIndex           = TileIndex::fromCoordinates(coord_50_60, l);
         ItemMarkerTiler::Tile* const myTile = mm.getTile(tileIndex, true);
         QVERIFY(myTile != 0);
         QCOMPARE(mm.getTileMarkerCount(tileIndex), 1);
@@ -188,19 +190,19 @@ void TestItemMarkerTiler::testMoveMarkers1()
 {
     QScopedPointer<QStandardItemModel> itemModel(new QStandardItemModel());
     ItemMarkerTiler mm(new MarkerModelHelper(itemModel.data(), 0));
-    const int maxLevel = TileIndex::MaxLevel;
-
+    const int maxLevel  = TileIndex::MaxLevel;
     const int fillLevel = maxLevel - 2;
 
     // add a marker to the model and create tiles up to a certain level:
-    QStandardItem* const item1 = MakeItemAt(coord_1_2);
+    QStandardItem* const item1     = MakeItemAt(coord_1_2);
     itemModel->appendRow(item1);
     const QModelIndex markerIndex1 = itemModel->indexFromItem(item1);
 
     KGEOMAP_ASSERT(markerIndex1.isValid());
-    for (int l = 1; l<=fillLevel; ++l)
+
+    for (int l = 1; l <= fillLevel; ++l)
     {
-        const TileIndex tileIndex = TileIndex::fromCoordinates(coord_1_2, l);
+        const TileIndex tileIndex           = TileIndex::fromCoordinates(coord_1_2, l);
         ItemMarkerTiler::Tile* const myTile = mm.getTile(tileIndex, true);
         QVERIFY(myTile != 0);
         QVERIFY(myTile->childrenEmpty());
@@ -210,7 +212,7 @@ void TestItemMarkerTiler::testMoveMarkers1()
     // now move marker 1:
     itemModel->setData(markerIndex1, QVariant::fromValue(coord_50_60), CoordinatesRole);
 
-    for (int l = 0; l<=fillLevel; ++l)
+    for (int l = 0; l <= fillLevel; ++l)
     {
         // make sure the marker can not be found at the old position any more
         TileIndex tileIndex = TileIndex::fromCoordinates(coord_1_2, l);
@@ -219,7 +221,7 @@ void TestItemMarkerTiler::testMoveMarkers1()
         QVERIFY(mm.getTile(tileIndex, true) == 0);
 
         // find it at the new position:
-        tileIndex = TileIndex::fromCoordinates(coord_50_60, l);
+        tileIndex                           = TileIndex::fromCoordinates(coord_50_60, l);
         ItemMarkerTiler::Tile* const myTile = mm.getTile(tileIndex, true);
         QVERIFY(myTile != 0);
         QVERIFY(myTile->childrenEmpty());
@@ -238,26 +240,29 @@ void TestItemMarkerTiler::testMoveMarkers2()
     const int fillLevel = maxLevel - 2;
 
     // add markers to the model and create tiles up to a certain level:
-    QStandardItem* const item1 = MakeItemAt(coord_1_2);
+    QStandardItem* const item1     = MakeItemAt(coord_1_2);
     itemModel->appendRow(item1);
     const QModelIndex markerIndex1 = itemModel->indexFromItem(item1);
-    QStandardItem* const item2 = MakeItemAt(coord_1_2);
+    QStandardItem* const item2     = MakeItemAt(coord_1_2);
     itemModel->appendRow(item2);
     const QModelIndex markerIndex2 = itemModel->indexFromItem(item2);
-    for (int l = 1; l<=fillLevel; ++l)
+
+    for (int l = 1; l <= fillLevel; ++l)
     {
-        const TileIndex tileIndex = TileIndex::fromCoordinates(coord_1_2, l);
+        const TileIndex tileIndex           = TileIndex::fromCoordinates(coord_1_2, l);
         ItemMarkerTiler::Tile* const myTile = mm.getTile(tileIndex, true);
         QVERIFY(myTile != 0);
         QVERIFY(myTile->childrenEmpty());
         QVERIFY(mm.getTileMarkerCount(tileIndex) == 2);
     }
-    QStandardItem* const item3 = MakeItemAt(coord_50_60);
+
+    QStandardItem* const item3     = MakeItemAt(coord_50_60);
     itemModel->appendRow(item3);
     const QModelIndex markerIndex3 = itemModel->indexFromItem(item3);
-    for (int l = 1; l<=fillLevel; ++l)
+ 
+    for (int l = 1; l <= fillLevel; ++l)
     {
-        const TileIndex tileIndex = TileIndex::fromCoordinates(coord_50_60, l);
+        const TileIndex tileIndex           = TileIndex::fromCoordinates(coord_50_60, l);
         ItemMarkerTiler::Tile* const myTile = mm.getTile(tileIndex, true);
         QVERIFY(myTile != 0);
         QVERIFY(myTile->childrenEmpty());
@@ -270,20 +275,22 @@ void TestItemMarkerTiler::testMoveMarkers2()
     // make sure the item model was also updated:
     QVERIFY(item1->data(CoordinatesRole).value<GeoCoordinates>() == coord_50_60);
 
-    for (int l = 0; l<=fillLevel; ++l)
+    for (int l = 0; l <= fillLevel; ++l)
     {
         // make sure there is only one marker left at the old position:
         TileIndex tileIndex = TileIndex::fromCoordinates(coord_1_2, l);
         QVERIFY(mm.getTileMarkerCount(tileIndex) == 1);
 
         // find it at the new position:
-        tileIndex = TileIndex::fromCoordinates(coord_50_60, l);
+        tileIndex                           = TileIndex::fromCoordinates(coord_50_60, l);
         ItemMarkerTiler::Tile* const myTile = mm.getTile(tileIndex, true);
         QVERIFY(myTile != 0);
-        if (l>fillLevel)
+
+        if (l > fillLevel)
         {
             QVERIFY(myTile->childrenEmpty());
         }
+
         QVERIFY(mm.getTileMarkerCount(tileIndex) == 2);
     }
 

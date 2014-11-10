@@ -38,6 +38,7 @@ class MarkerModelHelper : public KGeoMap::ModelHelper
 Q_OBJECT
 
 public:
+
     MarkerModelHelper(QAbstractItemModel* const itemModel, QItemSelectionModel* const itemSelectionModel);
     ~MarkerModelHelper();
 
@@ -46,12 +47,16 @@ public:
     virtual bool itemCoordinates(const QModelIndex& index, KGeoMap::GeoCoordinates* const coordinates) const;
 
 private Q_SLOTS:
+
     void slotDataChanged(const QModelIndex& topLeft, const QModelIndex& bottomRight);
 
 private:
-    QAbstractItemModel* const m_itemModel;
+
+    QAbstractItemModel* const  m_itemModel;
     QItemSelectionModel* const m_itemSelectionModel;
 };
+
+// --------------------------------------------------------------------------------
 
 class TestItemMarkerTiler : public QObject
 {

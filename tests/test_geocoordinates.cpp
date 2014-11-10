@@ -100,4 +100,3 @@ void TestGeoCoordinates::testMovable()
 }
 
 QTEST_MAIN(TestGeoCoordinates)
-

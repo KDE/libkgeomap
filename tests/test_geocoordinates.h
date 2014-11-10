@@ -37,7 +37,6 @@ private Q_SLOTS:
     void testNoOp();
     void testGeoCoordinates();
     void testMovable();
-
 };
 
 #endif /* TEST_GEOCOORDINATES_H */

@@ -82,7 +82,8 @@ int main(int argc, char* argv[])
 
     const QString filename = argv[1];
     qerr << QString("Loading file: %1").arg(filename) << endl;
-    const bool success = testSaxLoader(filename);
+    const bool success     = testSaxLoader(filename);
+
     if (!success)
     {
         qerr << "Loading failed" << endl;
