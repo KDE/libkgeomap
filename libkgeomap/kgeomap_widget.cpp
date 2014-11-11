@@ -9,7 +9,7 @@
  *
  * @author Copyright (C) 2009-2011, 2014 by Michael G. Hansen
  *         <a href="mailto:mike at mghansen dot de">mike at mghansen dot de</a>
- * @author Copyright (C) 2010-2013 by Gilles Caulier
+ * @author Copyright (C) 2010-2014 by Gilles Caulier
  *         <a href="mailto:caulier dot gilles at gmail dot com">caulier dot gilles at gmail dot com</a>
  * @author Copyright (C) 2014 by Justus Schwartz
  *         <a href="mailto:justus at gmx dot li">justus at gmx dot li</a>
@@ -30,7 +30,7 @@
 
 // C++ includes
 
-#include <math.h>
+#include <cmath>
 
 // Qt includes
 
@@ -64,7 +64,6 @@
 // This file was deprecated in 4.9
 #include <marble/global.h>
 #endif
-
 
 // local includes
 
@@ -233,7 +232,7 @@ KGeoMapWidget::KGeoMapWidget(QWidget* const parent)
     s->worldMapWidget = this;
     s->tileGrouper    = new TileGrouper(s, this);
 
-    d->stackedLayout     = new QStackedLayout(this);
+    d->stackedLayout  = new QStackedLayout(this);
     setLayout(d->stackedLayout);
 
     d->placeholderWidget = new PlaceholderWidget();
@@ -395,7 +394,7 @@ void KGeoMapWidget::createActionsForBackendSelection()
 KGeoMapWidget::~KGeoMapWidget()
 {
     // release all widgets:
-    for (int i = 0; i<d->stackedLayout->count(); ++i)
+    for (int i = 0; i < d->stackedLayout->count(); ++i)
     {
         d->stackedLayout->removeWidget(d->stackedLayout->widget(i));
     }
@@ -534,7 +533,7 @@ void KGeoMapWidget::applyCacheToBackend()
 
     setCenter(d->cacheCenterCoordinate);
     /// @todo Only do this if the zoom was changed!
-    kDebug()<<d->cacheZoom;
+    kDebug() << d->cacheZoom;
     setZoom(d->cacheZoom);
     d->currentBackend->mouseModeChanged();
     d->currentBackend->regionSelectionChanged();
@@ -647,7 +646,7 @@ void KGeoMapWidget::saveSettingsToGroup(KConfigGroup* const group)
         group->writeEntry("Sticky Mode State", d->actionStickyMode->isChecked());
     }
 
-    for (int i=0; i<d->loadedBackends.size(); ++i)
+    for (int i = 0; i < d->loadedBackends.size(); ++i)
     {
         d->loadedBackends.at(i)->saveSettingsToGroup(group);
     }
@@ -677,7 +676,7 @@ void KGeoMapWidget::readSettingsFromGroup(const KConfigGroup* const group)
     d->actionStickyMode->setChecked(group->readEntry("Sticky Mode State",    d->actionStickyMode->isChecked()));
 
     // let the backends load their settings
-    for (int i=0; i<d->loadedBackends.size(); ++i)
+    for (int i = 0; i < d->loadedBackends.size(); ++i)
     {
         d->loadedBackends.at(i)->readSettingsFromGroup(group);
     }
@@ -701,7 +700,7 @@ void KGeoMapWidget::rebuildConfigurationMenu()
     d->configurationMenu->clear();
     const QList<QAction*> backendSelectionActions = d->actionGroupBackendSelection->actions();
 
-    for (int i=0; i<backendSelectionActions.count(); ++i)
+    for (int i = 0; i < backendSelectionActions.count(); ++i)
     {
         QAction* const backendAction = backendSelectionActions.at(i);
 
@@ -737,27 +736,27 @@ void KGeoMapWidget::rebuildConfigurationMenu()
 
 KAction* KGeoMapWidget::getControlAction(const QString& actionName)
 {
-    if (actionName==QLatin1String("zoomin"))
+    if (actionName == QLatin1String("zoomin"))
     {
         return d->actionZoomIn;
     }
-    else if (actionName==QLatin1String("zoomout"))
+    else if (actionName == QLatin1String("zoomout"))
     {
         return d->actionZoomOut;
     }
-    else if (actionName==QLatin1String("mousemode-regionselectionmode"))
+    else if (actionName == QLatin1String("mousemode-regionselectionmode"))
     {
         return d->actionSetRegionSelectionMode;
     }
-    else if (actionName==QLatin1String("mousemode-removecurrentregionselection"))
+    else if (actionName == QLatin1String("mousemode-removecurrentregionselection"))
     {
         return d->actionRemoveCurrentRegionSelection;
     }
-    else if (actionName==QLatin1String("mousemode-regionselectionfromiconmode"))
+    else if (actionName == QLatin1String("mousemode-regionselectionfromiconmode"))
     {
         return d->actionSetRegionSelectionFromIconMode;
     }
-    else if (actionName==QLatin1String("mousemode-removefilter"))
+    else if (actionName == QLatin1String("mousemode-removefilter"))
     {
         return d->actionRemoveFilter;
     }
@@ -915,7 +914,7 @@ void KGeoMapWidget::slotUpdateActionsEnabled()
 
     foreach(QAction* const action, mouseModeActions)
     {
-        if (action->data().value<MouseModes>()==s->currentMouseMode)
+        if (action->data().value<MouseModes>() == s->currentMouseMode)
         {
             action->setChecked(true);
             break;
@@ -992,16 +991,16 @@ void KGeoMapWidget::getColorInfos(const KGeoMapGroupState groupState,
                        QColor* fillColor, QColor* strokeColor,
                        Qt::PenStyle* strokeStyle, QString* labelText, QColor* labelColor) const
 {
-    if (nMarkers<1000)
+    if (nMarkers < 1000)
     {
         *labelText = QString::number(nMarkers);
     }
-    else if ((nMarkers>=1000)&&(nMarkers<=1950))
+    else if ((nMarkers >= 1000) && (nMarkers <= 1950))
     {
         /// @todo Use KDE-versions instead
         *labelText = QString::fromLatin1("%L1k").arg(qreal(nMarkers)/1000.0, 0, 'f', 1);
     }
-    else if ((nMarkers>=1951)&&(nMarkers<19500))
+    else if ((nMarkers >= 1951) && (nMarkers < 19500))
     {
         /// @todo Use KDE-versions instead
         *labelText = QString::fromLatin1("%L1k").arg(qreal(nMarkers)/1000.0, 0, 'f', 0);
@@ -1012,7 +1011,7 @@ void KGeoMapWidget::getColorInfos(const KGeoMapGroupState groupState,
         qreal exponent           = floor(log((qreal)nMarkers)/log((qreal)10));
         qreal nMarkersFirstDigit = round(qreal(nMarkers)/pow(10,exponent));
 
-        if (nMarkersFirstDigit>=10)
+        if (nMarkersFirstDigit >= 10)
         {
             nMarkersFirstDigit=round(nMarkersFirstDigit/10.0);
             exponent++;
@@ -1044,25 +1043,25 @@ void KGeoMapWidget::getColorInfos(const KGeoMapGroupState groupState,
     /// @todo These are the fill colors for the circles, for cases in which only some or all of the images are positively filtered. Filtering is implemented in libkgeomap, but the code here has not been adapted yet.
     QColor fillAll, fillSome, fillNone;
 
-    if (nMarkers>=100)
+    if (nMarkers >= 100)
     {
         fillAll  = QColor(255, 0,   0);
         fillSome = QColor(255, 188, 125);
         fillNone = QColor(255, 185, 185);
     }
-    else if (nMarkers>=50)
+    else if (nMarkers >= 50)
     {
         fillAll  = QColor(255, 127, 0);
         fillSome = QColor(255, 190, 125);
         fillNone = QColor(255, 220, 185);
     }
-    else if (nMarkers>=10)
+    else if (nMarkers >= 10)
     {
         fillAll  = QColor(255, 255, 0);
         fillSome = QColor(255, 255, 105);
         fillNone = QColor(255, 255, 185);
     }
-    else if (nMarkers>=2)
+    else if (nMarkers >= 2)
     {
         fillAll  = QColor(0,   255, 0);
         fillSome = QColor(125, 255, 125);
@@ -1100,10 +1099,10 @@ void KGeoMapWidget::getColorInfos(const KGeoMapGroupState groupState,
 QString KGeoMapWidget::convertZoomToBackendZoom(const QString& someZoom, const QString& targetBackend) const
 {
     const QStringList zoomParts = someZoom.split(QLatin1Char( ':' ));
-    KGEOMAP_ASSERT(zoomParts.count()==2);
+    KGEOMAP_ASSERT(zoomParts.count() == 2);
     const QString sourceBackend = zoomParts.first();
 
-    if (sourceBackend==targetBackend)
+    if (sourceBackend == targetBackend)
     {
         return someZoom;
     }
@@ -1114,55 +1113,55 @@ QString KGeoMapWidget::convertZoomToBackendZoom(const QString& someZoom, const Q
     // all of these values were found experimentally!
     if (targetBackend == QLatin1String("marble" ))
     {
-             if (sourceZoom== 0) { targetZoom =  900; }
-        else if (sourceZoom== 1) { targetZoom =  970; }
-        else if (sourceZoom== 2) { targetZoom = 1108; }
-        else if (sourceZoom== 3) { targetZoom = 1250; }
-        else if (sourceZoom== 4) { targetZoom = 1384; }
-        else if (sourceZoom== 5) { targetZoom = 1520; }
-        else if (sourceZoom== 6) { targetZoom = 1665; }
-        else if (sourceZoom== 7) { targetZoom = 1800; }
-        else if (sourceZoom== 8) { targetZoom = 1940; }
-        else if (sourceZoom== 9) { targetZoom = 2070; }
-        else if (sourceZoom==10) { targetZoom = 2220; }
-        else if (sourceZoom==11) { targetZoom = 2357; }
-        else if (sourceZoom==12) { targetZoom = 2510; }
-        else if (sourceZoom==13) { targetZoom = 2635; }
-        else if (sourceZoom==14) { targetZoom = 2775; }
-        else if (sourceZoom==15) { targetZoom = 2900; }
-        else if (sourceZoom==16) { targetZoom = 3051; }
-        else if (sourceZoom==17) { targetZoom = 3180; }
-        else if (sourceZoom==18) { targetZoom = 3295; }
-        else if (sourceZoom==19) { targetZoom = 3450; }
-        else                     { targetZoom = 3500; } /// @todo Find values for level 20 and up
+             if (sourceZoom == 0) { targetZoom =  900; }
+        else if (sourceZoom == 1) { targetZoom =  970; }
+        else if (sourceZoom == 2) { targetZoom = 1108; }
+        else if (sourceZoom == 3) { targetZoom = 1250; }
+        else if (sourceZoom == 4) { targetZoom = 1384; }
+        else if (sourceZoom == 5) { targetZoom = 1520; }
+        else if (sourceZoom == 6) { targetZoom = 1665; }
+        else if (sourceZoom == 7) { targetZoom = 1800; }
+        else if (sourceZoom == 8) { targetZoom = 1940; }
+        else if (sourceZoom == 9) { targetZoom = 2070; }
+        else if (sourceZoom ==10) { targetZoom = 2220; }
+        else if (sourceZoom ==11) { targetZoom = 2357; }
+        else if (sourceZoom ==12) { targetZoom = 2510; }
+        else if (sourceZoom ==13) { targetZoom = 2635; }
+        else if (sourceZoom ==14) { targetZoom = 2775; }
+        else if (sourceZoom ==15) { targetZoom = 2900; }
+        else if (sourceZoom ==16) { targetZoom = 3051; }
+        else if (sourceZoom ==17) { targetZoom = 3180; }
+        else if (sourceZoom ==18) { targetZoom = 3295; }
+        else if (sourceZoom ==19) { targetZoom = 3450; }
+        else                      { targetZoom = 3500; } /// @todo Find values for level 20 and up
     }
 
     if (targetBackend == QLatin1String("googlemaps" ))
     {
-             if (sourceZoom<= 900) { targetZoom =  0; }
-        else if (sourceZoom<= 970) { targetZoom =  1; }
-        else if (sourceZoom<=1108) { targetZoom =  2; }
-        else if (sourceZoom<=1250) { targetZoom =  3; }
-        else if (sourceZoom<=1384) { targetZoom =  4; }
-        else if (sourceZoom<=1520) { targetZoom =  5; }
-        else if (sourceZoom<=1665) { targetZoom =  6; }
-        else if (sourceZoom<=1800) { targetZoom =  7; }
-        else if (sourceZoom<=1940) { targetZoom =  8; }
-        else if (sourceZoom<=2070) { targetZoom =  9; }
-        else if (sourceZoom<=2220) { targetZoom = 10; }
-        else if (sourceZoom<=2357) { targetZoom = 11; }
-        else if (sourceZoom<=2510) { targetZoom = 12; }
-        else if (sourceZoom<=2635) { targetZoom = 13; }
-        else if (sourceZoom<=2775) { targetZoom = 14; }
-        else if (sourceZoom<=2900) { targetZoom = 15; }
-        else if (sourceZoom<=3051) { targetZoom = 16; }
-        else if (sourceZoom<=3180) { targetZoom = 17; }
-        else if (sourceZoom<=3295) { targetZoom = 18; }
-        else if (sourceZoom<=3450) { targetZoom = 19; }
-        else                       { targetZoom = 20; } /// @todo Find values for level 20 and up
+             if (sourceZoom <= 900) { targetZoom =  0; }
+        else if (sourceZoom <= 970) { targetZoom =  1; }
+        else if (sourceZoom <=1108) { targetZoom =  2; }
+        else if (sourceZoom <=1250) { targetZoom =  3; }
+        else if (sourceZoom <=1384) { targetZoom =  4; }
+        else if (sourceZoom <=1520) { targetZoom =  5; }
+        else if (sourceZoom <=1665) { targetZoom =  6; }
+        else if (sourceZoom <=1800) { targetZoom =  7; }
+        else if (sourceZoom <=1940) { targetZoom =  8; }
+        else if (sourceZoom <=2070) { targetZoom =  9; }
+        else if (sourceZoom <=2220) { targetZoom = 10; }
+        else if (sourceZoom <=2357) { targetZoom = 11; }
+        else if (sourceZoom <=2510) { targetZoom = 12; }
+        else if (sourceZoom <=2635) { targetZoom = 13; }
+        else if (sourceZoom <=2775) { targetZoom = 14; }
+        else if (sourceZoom <=2900) { targetZoom = 15; }
+        else if (sourceZoom <=3051) { targetZoom = 16; }
+        else if (sourceZoom <=3180) { targetZoom = 17; }
+        else if (sourceZoom <=3295) { targetZoom = 18; }
+        else if (sourceZoom <=3450) { targetZoom = 19; }
+        else                        { targetZoom = 20; } /// @todo Find values for level 20 and up
     }
 
-    KGEOMAP_ASSERT(targetZoom>=0);
+    KGEOMAP_ASSERT(targetZoom >= 0);
 
     return QString::fromLatin1("%1:%2").arg(targetBackend).arg(targetZoom);
 }
@@ -1199,14 +1198,14 @@ GeoCoordinates::Pair KGeoMapWidget::getRegionSelection()
 
 void KGeoMapWidget::slotClustersMoved(const QIntList& clusterIndices, const QPair<int, QModelIndex>& snapTarget)
 {
-    kDebug()<<clusterIndices;
+    kDebug() << clusterIndices;
 
     /// @todo We actually expect only one clusterindex
     int             clusterIndex      = clusterIndices.first();
     GeoCoordinates  targetCoordinates = s->clusterList.at(clusterIndex).coordinates;
     TileIndex::List movedTileIndices;
 
-    if (s->clusterList.at(clusterIndex).groupState==KGeoMapSelectedNone)
+    if (s->clusterList.at(clusterIndex).groupState == KGeoMapSelectedNone)
     {
         // a not-selected marker was moved. update all of its items:
         const KGeoMapCluster& cluster = s->clusterList.at(clusterIndex);
@@ -1214,7 +1213,7 @@ void KGeoMapWidget::slotClustersMoved(const QIntList& clusterIndices, const QPai
         for (int i=0; i<cluster.tileIndicesList.count(); ++i)
         {
             const TileIndex tileIndex = cluster.tileIndicesList.at(i);
-            movedTileIndices <<tileIndex;
+            movedTileIndices << tileIndex;
         }
     }
     else
@@ -1291,7 +1290,7 @@ void KGeoMapWidget::removeUngroupedModel(ModelHelper* const modelHelper)
     // the indices changed, therefore send out notifications
     // sending out a signal with i=s->ungroupedModel.count()
     // will cause the backends to see that the last model is missing
-    for (int i=modelIndex; i<=s->ungroupedModels.count(); ++i)
+    for (int i = modelIndex; i <= s->ungroupedModels.count(); ++i)
     {
         emit(signalUngroupedModelChanged(i));
     }
@@ -1376,16 +1375,16 @@ void KGeoMapWidget::slotClustersClicked(const QIntList& clusterIndices)
 
         Marble::GeoDataLineString tileString;
 
-        for (int i=0; i<clusterIndices.count(); ++i)
+        for (int i = 0; i < clusterIndices.count(); ++i)
         {
             const int clusterIndex              = clusterIndices.at(i);
             const KGeoMapCluster currentCluster = s->clusterList.at(clusterIndex);
 
-            for (int j=0; j<currentCluster.tileIndicesList.count(); ++j)
+            for (int j = 0; j < currentCluster.tileIndicesList.count(); ++j)
             {
                 const TileIndex& currentTileIndex = currentCluster.tileIndicesList.at(j);
 
-                for (int corner=1; corner<=4; ++corner)
+                for (int corner = 1; corner <= 4; ++corner)
                 {
                     GeoCoordinates currentTileCoordinate;
 
@@ -1416,7 +1415,8 @@ void KGeoMapWidget::slotClustersClicked(const QIntList& clusterIndices)
         Marble::GeoDataLatLonBox latLonBox = Marble::GeoDataLatLonBox::fromLineString(tileString);
 
         /// @todo Review this section
-/*        if (maxTileLevel != 0)
+/*
+        if (maxTileLevel != 0)
         {
             //increase the selection boundaries with 0.1 degrees because some thumbnails aren't caught by selection
             latLonBox.setWest((latLonBox.west(Marble::GeoDataCoordinates::Degree)-(0.1/maxTileLevel)), Marble::GeoDataCoordinates::Degree);
@@ -1425,7 +1425,8 @@ void KGeoMapWidget::slotClustersClicked(const QIntList& clusterIndices)
             latLonBox.setSouth((latLonBox.south(Marble::GeoDataCoordinates::Degree)-(0.1/maxTileLevel)), Marble::GeoDataCoordinates::Degree);
         }
         else
-        {*/
+        {
+*/
             latLonBox.setWest((latLonBox.west(Marble::GeoDataCoordinates::Degree)-0.0001), Marble::GeoDataCoordinates::Degree);
             latLonBox.setNorth((latLonBox.north(Marble::GeoDataCoordinates::Degree)+0.0001), Marble::GeoDataCoordinates::Degree);
             latLonBox.setEast((latLonBox.east(Marble::GeoDataCoordinates::Degree)+0.0001), Marble::GeoDataCoordinates::Degree);
@@ -1456,13 +1457,12 @@ void KGeoMapWidget::slotClustersClicked(const QIntList& clusterIndices)
         // update the selection and filtering state of the clusters
         for (int i=0; i<clusterIndices.count(); ++i)
         {
-            const int clusterIndex = clusterIndices.at(i);
+            const int clusterIndex              = clusterIndices.at(i);
             const KGeoMapCluster currentCluster = s->clusterList.at(clusterIndex);
-
-            const TileIndex::List tileIndices = currentCluster.tileIndicesList;
+            const TileIndex::List tileIndices   = currentCluster.tileIndicesList;
 
             /// @todo Isn't this cached in the cluster?
-            const QVariant representativeIndex = getClusterRepresentativeMarker(clusterIndex, s->sortKey);
+            const QVariant representativeIndex  = getClusterRepresentativeMarker(clusterIndex, s->sortKey);
 
             AbstractMarkerTiler::ClickInfo clickInfo;
             clickInfo.tileIndicesList     = tileIndices;
