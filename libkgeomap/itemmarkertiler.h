@@ -9,7 +9,7 @@
  *
  * @author Copyright (C) 2010, 2011 by Michael G. Hansen
  *         <a href="mailto:mike at mghansen dot de">mike at mghansen dot de</a>
- * @author Copyright (C) 2010-2013 by Gilles Caulier
+ * @author Copyright (C) 2010-2014 by Gilles Caulier
  *         <a href="mailto:caulier dot gilles at gmail dot com">caulier dot gilles at gmail dot com</a>
  *
  * This program is free software; you can redistribute it
@@ -44,10 +44,6 @@ class ModelHelper;
 class KGEOMAP_EXPORT ItemMarkerTiler : public AbstractMarkerTiler
 {
     Q_OBJECT
-
-private:
-
-    class MyTile;
 
 public:
 
@@ -93,6 +89,10 @@ private Q_SLOTS:
 private:
 
     QList<QPersistentModelIndex> getTileMarkerIndices(const TileIndex& tileIndex);
+
+private:
+
+    class MyTile;
 
     class Private;
     Private* const d;

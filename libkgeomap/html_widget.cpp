@@ -9,7 +9,7 @@
  *
  * @author Copyright (C) 2009-2011 by Michael G. Hansen
  *         <a href="mailto:mike at mghansen dot de">mike at mghansen dot de</a>
- * @author Copyright (C) 2010 by Gilles Caulier
+ * @author Copyright (C) 2010-2014 by Gilles Caulier
  *         <a href="mailto:caulier dot gilles at gmail dot com">caulier dot gilles at gmail dot com</a>
  *
  * This program is free software; you can redistribute it
@@ -43,11 +43,11 @@
 namespace KGeoMap
 {
 
-class HTMLWidget::HTMLWidgetPrivate
+class HTMLWidget::Private
 {
 public:
 
-    HTMLWidgetPrivate()
+    Private()
       : parent(0),
         isReady(false),
         javascriptScanTimer(0),
@@ -59,19 +59,19 @@ public:
     {
     }
 
-    QWidget*                parent;
-    bool                    isReady;
-    QTimer*                 javascriptScanTimer;
+    QWidget*       parent;
+    bool           isReady;
+    QTimer*        javascriptScanTimer;
 
-    bool                    selectionStatus;
-    GeoCoordinates          firstSelectionPoint;
-    GeoCoordinates          intermediateSelectionPoint;
-    QPoint                  firstSelectionScreenPoint;
-    QPoint                  intermediateSelectionScreenPoint;
+    bool           selectionStatus;
+    GeoCoordinates firstSelectionPoint;
+    GeoCoordinates intermediateSelectionPoint;
+    QPoint         firstSelectionScreenPoint;
+    QPoint         intermediateSelectionScreenPoint;
 };
 
 HTMLWidget::HTMLWidget(QWidget* const parent)
-          : KHTMLPart(parent), d(new HTMLWidgetPrivate()), s(0)
+    : KHTMLPart(parent), d(new Private()), s(0)
 {
     d->parent = parent;
 
@@ -101,7 +101,7 @@ HTMLWidget::~HTMLWidget()
 
 void HTMLWidget::loadInitialHTML(const QString& initialHTML)
 {
-//     kDebug()<<initialHTML;
+//     kDebug() << initialHTML;
     begin();
     write(initialHTML);
     end();
@@ -129,23 +129,24 @@ void HTMLWidget::khtmlMouseReleaseEvent(khtml::MouseReleaseEvent* e)
     {
         if (!d->firstSelectionPoint.hasCoordinates())
         {
-            runScript2Coordinates( QString::fromLatin1("kgeomapPixelToLatLng(%1, %2);")
-                                    .arg(e->x())
-                                    .arg(e->y()),
-                                   &d->firstSelectionPoint);
+            runScript2Coordinates(QString::fromLatin1("kgeomapPixelToLatLng(%1, %2);")
+                                  .arg(e->x())
+                                  .arg(e->y()),
+                                  &d->firstSelectionPoint);
 
             d->firstSelectionScreenPoint = QPoint(e->x(), e->y());
         }
         else
         {
-            runScript2Coordinates( QString::fromLatin1("kgeomapPixelToLatLng(%1, %2);")
-                                    .arg(e->x())
-                                    .arg(e->y()),
-                                    &d->intermediateSelectionPoint);
+            runScript2Coordinates(QString::fromLatin1("kgeomapPixelToLatLng(%1, %2);")
+                                  .arg(e->x())
+                                  .arg(e->y()),
+                                  &d->intermediateSelectionPoint);
 
             d->intermediateSelectionScreenPoint = QPoint(e->x(), e->y());
 
             qreal lonWest, latNorth, lonEast, latSouth;
+
             if (d->firstSelectionScreenPoint.x() < d->intermediateSelectionScreenPoint.x())
             {
                 lonWest  = d->firstSelectionPoint.lon();
@@ -169,13 +170,11 @@ void HTMLWidget::khtmlMouseReleaseEvent(khtml::MouseReleaseEvent* e)
             }
 
             runScript(QLatin1String("kgeomapRemoveTemporarySelectionRectangle();"));
-            runScript(
-                QString::fromLatin1("kgeomapSetSelectionRectangle(%1, %2, %3, %4);")
-                    .arg(lonWest)
-                    .arg(latNorth)
-                    .arg(lonEast)
-                    .arg(latSouth)
-                );
+            runScript(QString::fromLatin1("kgeomapSetSelectionRectangle(%1, %2, %3, %4);")
+                     .arg(lonWest)
+                     .arg(latNorth)
+                     .arg(lonEast)
+                     .arg(latSouth));
 
             const GeoCoordinates::Pair selectionCoordinates(
                     GeoCoordinates(latNorth, lonWest),
@@ -195,19 +194,20 @@ void HTMLWidget::khtmlMouseReleaseEvent(khtml::MouseReleaseEvent* e)
 
 void HTMLWidget::khtmlMouseMoveEvent(khtml::MouseMoveEvent *e)
 {
-    if (   s->currentMouseMode == MouseModeRegionSelection
-        && d->firstSelectionPoint.hasCoordinates() )
+    if (s->currentMouseMode == MouseModeRegionSelection &&
+        d->firstSelectionPoint.hasCoordinates())
     {
-        runScript2Coordinates( QString::fromLatin1("kgeomapPixelToLatLng(%1, %2);")
-                                    .arg(e->x())
-                                    .arg(e->y()),
-                                   &d->intermediateSelectionPoint);
+        runScript2Coordinates(QString::fromLatin1("kgeomapPixelToLatLng(%1, %2);")
+                              .arg(e->x())
+                              .arg(e->y()),
+                              &d->intermediateSelectionPoint);
 
         d->intermediateSelectionScreenPoint = QPoint(e->x(), e->y());
 
-        kDebug()<<d->firstSelectionScreenPoint<<QLatin1String(" " )<<d->intermediateSelectionScreenPoint;
+        kDebug() << d->firstSelectionScreenPoint << QLatin1String(" ") << d->intermediateSelectionScreenPoint;
 
         qreal lonWest, latNorth, lonEast, latSouth;
+
         if (d->firstSelectionScreenPoint.x() < d->intermediateSelectionScreenPoint.x())
         {
             lonWest  = d->firstSelectionPoint.lon();
@@ -230,13 +230,11 @@ void HTMLWidget::khtmlMouseMoveEvent(khtml::MouseMoveEvent *e)
             latSouth = d->firstSelectionPoint.lat();
         }
 
-        runScript(
-                QString::fromLatin1("kgeomapSetTemporarySelectionRectangle(%1, %2, %3, %4);")
-                    .arg(lonWest)
-                    .arg(latNorth)
-                    .arg(lonEast)
-                    .arg(latSouth)
-            );
+        runScript(QString::fromLatin1("kgeomapSetTemporarySelectionRectangle(%1, %2, %3, %4);")
+                  .arg(lonWest)
+                  .arg(latNorth)
+                  .arg(lonEast)
+                  .arg(latSouth));
     }
 
     slotScanForJSMessages();
@@ -250,8 +248,10 @@ void HTMLWidget::slotScanForJSMessages()
     if (status!=QLatin1String("(event)" ))
         return;
 
-    kDebug()<<status;
+    kDebug() << status;
+
     const QString eventBufferString = runScript(QLatin1String("kgeomapReadEventStrings();")).toString();
+
     if (eventBufferString.isEmpty())
         return;
 
@@ -270,7 +270,7 @@ QVariant HTMLWidget::runScript(const QString& scriptCode)
     if (!d->isReady)
         return QVariant();
 
-//     kDebug()<<scriptCode;
+//     kDebug() << scriptCode;
     return executeScript(scriptCode);
 }
 
@@ -292,6 +292,7 @@ bool HTMLWidget::eventFilter(QObject* object, QEvent* event)
         if (event->type()==QEvent::Resize)
         {
             QResizeEvent* const resizeEvent = dynamic_cast<QResizeEvent*>(event);
+
             if (resizeEvent)
             {
                 widget()->resize(resizeEvent->size());
@@ -299,6 +300,7 @@ bool HTMLWidget::eventFilter(QObject* object, QEvent* event)
             }
         }
     }
+
     return false;
 }
 
@@ -341,15 +343,13 @@ void HTMLWidget::mouseModeChanged(const MouseModes mouseMode)
 
 void HTMLWidget::centerOn(const qreal west, const qreal north, const qreal east, const qreal south, const bool useSaneZoomLevel)
 {
-//    kDebug()<<"West:"<<west<<" North:"<<north<<" East:"<<east<<" South:"<<south;
-    runScript(
-            QString::fromLatin1("kgeomapSetMapBoundaries(%1, %2, %3, %4, %5);")
-                .arg(west)
-                .arg(north)
-                .arg(east)
-                .arg(south)
-                .arg(useSaneZoomLevel?1:0)
-        );
+//    kDebug() << "West:" << west << " North:" << north << " East:" << east << " South:" << south;
+    runScript(QString::fromLatin1("kgeomapSetMapBoundaries(%1, %2, %3, %4, %5);")
+              .arg(west)
+              .arg(north)
+              .arg(east)
+              .arg(south)
+              .arg(useSaneZoomLevel ? 1 : 0));
 }
 
 void HTMLWidget::setSharedKGeoMapObject(KGeoMapSharedData* const sharedData)

@@ -9,7 +9,7 @@
  *
  * @author Copyright (C) 2010, 2011 by Michael G. Hansen
  *         <a href="mailto:mike at mghansen dot de">mike at mghansen dot de</a>
- * @author Copyright (C) 2010-2013 by Gilles Caulier
+ * @author Copyright (C) 2010-2014 by Gilles Caulier
  *         <a href="mailto:caulier dot gilles at gmail dot com">caulier dot gilles at gmail dot com</a>
  *
  * This program is free software; you can redistribute it
@@ -38,9 +38,9 @@ class ItemMarkerTiler::MyTile : public Tile
 public:
 
     MyTile()
-    : Tile(),
-        markerIndices(),
-        selectedCount(0)
+        : Tile(),
+          markerIndices(),
+          selectedCount(0)
     {
     }
 
@@ -97,6 +97,7 @@ void ItemMarkerTiler::MyTile::removeMarkerIndexOrInvalidIndex(const QModelIndex&
 class ItemMarkerTiler::Private
 {
 public:
+
     Private()
       : modelHelper(0),
         selectionModel(0),
@@ -112,7 +113,7 @@ public:
 };
 
 ItemMarkerTiler::ItemMarkerTiler(ModelHelper* const modelHelper, QObject* const parent)
-               : AbstractMarkerTiler(parent), d(new Private())
+    : AbstractMarkerTiler(parent), d(new Private())
 {
     resetRootTile();
     setMarkerModelHelper(modelHelper);
@@ -133,7 +134,7 @@ void ItemMarkerTiler::setMarkerModelHelper(ModelHelper* const modelHelper)
     d->markerModel    = modelHelper->model();
     d->selectionModel = modelHelper->selectionModel();
 
-    if (d->markerModel!=0)
+    if (d->markerModel != 0)
     {
         // TODO: disconnect the old model if there was one
         connect(d->markerModel, SIGNAL(rowsInserted(QModelIndex,int,int)),
@@ -187,7 +188,7 @@ QVariant ItemMarkerTiler::bestRepresentativeIndexFromList(const QList<QVariant>&
 {
     QList<QPersistentModelIndex> indexList;
 
-    for (int i=0; i<indices.count(); ++i)
+    for (int i = 0; i < indices.count(); ++i)
     {
         indexList << indices.at(i).value<QPersistentModelIndex>();
     }
@@ -206,11 +207,11 @@ void ItemMarkerTiler::slotSelectionChanged(const QItemSelection& selected, const
 //     emit(signalTilesOrSelectionChanged());
 //     return;
 
-    for (int i=0; i<selected.count(); ++i)
+    for (int i = 0; i < selected.count(); ++i)
     {
         const QItemSelectionRange selectionRange = selected.at(i);
 
-        for (int row = selectionRange.top(); row<=selectionRange.bottom(); ++row)
+        for (int row = selectionRange.top(); row <= selectionRange.bottom(); ++row)
         {
             // get the coordinates of the item
             GeoCoordinates coordinates;
@@ -218,7 +219,7 @@ void ItemMarkerTiler::slotSelectionChanged(const QItemSelection& selected, const
             if (!d->modelHelper->itemCoordinates(d->markerModel->index(row, 0, selectionRange.parent()), &coordinates))
                 continue;
 
-            for (int l=0; l<=TileIndex::MaxLevel; ++l)
+            for (int l = 0; l <= TileIndex::MaxLevel; ++l)
             {
                 const TileIndex tileIndex = TileIndex::fromCoordinates(coordinates, l);
                 MyTile* const myTile      = static_cast<MyTile*>(getTile(tileIndex, true));
@@ -227,7 +228,7 @@ void ItemMarkerTiler::slotSelectionChanged(const QItemSelection& selected, const
                     break;
 
                 myTile->selectedCount++;
-//                 kDebug()<<l<<tileIndex<<myTile->selectedCount;
+//                 kDebug() << l << tileIndex << myTile->selectedCount;
                 KGEOMAP_ASSERT(myTile->selectedCount <= myTile->markerIndices.count());
 
                 if (myTile->childrenEmpty())
@@ -236,11 +237,11 @@ void ItemMarkerTiler::slotSelectionChanged(const QItemSelection& selected, const
         }
     }
 
-    for (int i=0; i<deselected.count(); ++i)
+    for (int i = 0; i < deselected.count(); ++i)
     {
         const QItemSelectionRange selectionRange = deselected.at(i);
 
-        for (int row = selectionRange.top(); row<=selectionRange.bottom(); ++row)
+        for (int row = selectionRange.top(); row <= selectionRange.bottom(); ++row)
         {
             // get the coordinates of the item
             GeoCoordinates coordinates;
@@ -248,7 +249,7 @@ void ItemMarkerTiler::slotSelectionChanged(const QItemSelection& selected, const
             if (!d->modelHelper->itemCoordinates(d->markerModel->index(row, 0, selectionRange.parent()), &coordinates))
                 continue;
 
-            for (int l=0; l<=TileIndex::MaxLevel; ++l)
+            for (int l = 0; l <= TileIndex::MaxLevel; ++l)
             {
                 const TileIndex tileIndex = TileIndex::fromCoordinates(coordinates, l);
                 MyTile* const myTile      = static_cast<MyTile*>(getTile(tileIndex, true));
@@ -270,7 +271,7 @@ void ItemMarkerTiler::slotSelectionChanged(const QItemSelection& selected, const
 
 void ItemMarkerTiler::slotSourceModelDataChanged(const QModelIndex& topLeft, const QModelIndex& bottomRight)
 {
-    kDebug()<<topLeft<<bottomRight;
+    kDebug() << topLeft << bottomRight;
     setDirty();
 
     if (d->activeState)
@@ -288,7 +289,7 @@ void ItemMarkerTiler::slotSourceModelRowsInserted(const QModelIndex& parentIndex
     }
 
     // sort the new items into our tiles:
-    for (int i=start; i<=end; ++i)
+    for (int i = start; i <= end; ++i)
     {
         addMarkerIndexToGrid(QPersistentModelIndex(d->markerModel->index(i, 0, parentIndex)));
     }
@@ -311,7 +312,7 @@ void ItemMarkerTiler::slotSourceModelRowsAboutToBeRemoved(const QModelIndex& par
     }
 
     // remove the items from their tiles:
-    for (int i=start; i<=end; ++i)
+    for (int i = start; i <= end; ++i)
     {
         const QModelIndex itemIndex = d->markerModel->index(start, 0, parentIndex);
 
@@ -369,7 +370,7 @@ void ItemMarkerTiler::removeMarkerIndexFromGrid(const QModelIndex& markerIndex, 
 
     // here l functions as the number of indices that we actually use, therefore we have to go one more up
     // in this case, l==0 returns the root tile
-    for (int l=0; l<=TileIndex::MaxLevel+1; ++l)
+    for (int l = 0; l <= TileIndex::MaxLevel+1; ++l)
     {
         MyTile* const currentTile = static_cast<MyTile*>(getTile(tileIndex.mid(0, l), true));
 
@@ -387,7 +388,7 @@ void ItemMarkerTiler::removeMarkerIndexFromGrid(const QModelIndex& markerIndex, 
     }
 
     // delete the tiles which are now empty!
-    for (int l = tiles.count()-1; l>0; --l)
+    for (int l = tiles.count()-1; l > 0; --l)
     {
         MyTile* const currentTile = tiles.at(l);
 
@@ -455,7 +456,7 @@ KGeoMapGroupState ItemMarkerTiler::getTileGroupState(const TileIndex& tileIndex)
 
     const int selectedCount = myTile->selectedCount;
 
-    if (selectedCount==0)
+    if (selectedCount == 0)
     {
         return KGeoMapSelectedNone;
     }
@@ -489,7 +490,7 @@ AbstractMarkerTiler::Tile* ItemMarkerTiler::getTile(const TileIndex& tileIndex, 
             // we have to sort them into the child tiles:
             if (!tile->markerIndices.isEmpty())
             {
-                for (int i=0; i<tile->markerIndices.count(); ++i)
+                for (int i = 0; i < tile->markerIndices.count(); ++i)
                 {
                     const QPersistentModelIndex currentMarkerIndex = tile->markerIndices.at(i);
                     KGEOMAP_ASSERT(currentMarkerIndex.isValid());
@@ -505,7 +506,7 @@ AbstractMarkerTiler::Tile* ItemMarkerTiler::getTile(const TileIndex& tileIndex, 
 
                     MyTile* newTile = static_cast<MyTile*>(tile->getChild(newTileIndex));
 
-                    if (newTile==0)
+                    if (newTile == 0)
                     {
                         newTile = static_cast<MyTile*>(tileNew());
                         tile->addChild(newTileIndex, newTile);
@@ -526,7 +527,7 @@ AbstractMarkerTiler::Tile* ItemMarkerTiler::getTile(const TileIndex& tileIndex, 
 
         childTile = static_cast<MyTile*>(tile->getChild(currentIndex));
 
-        if (childTile==0)
+        if (childTile == 0)
         {
             if (stopIfEmpty)
             {
@@ -590,9 +591,10 @@ void ItemMarkerTiler::addMarkerIndexToGrid(const QPersistentModelIndex& markerIn
     // add the marker to all existing tiles:
     MyTile* currentTile = static_cast<MyTile*>(rootTile());
 
-    for (int l = 0; l<=TileIndex::MaxLevel; ++l)
+    for (int l = 0; l <= TileIndex::MaxLevel; ++l)
     {
         currentTile->markerIndices<<markerIndex;
+
         if (markerIsSelected)
         {
             currentTile->selectedCount++;
@@ -614,7 +616,7 @@ void ItemMarkerTiler::addMarkerIndexToGrid(const QPersistentModelIndex& markerIn
         }
 
         // if this is the last loop iteration, populate the next tile now:
-        if (l==TileIndex::MaxLevel)
+        if (l == TileIndex::MaxLevel)
         {
             nextTile->markerIndices<<markerIndex;
 
@@ -641,7 +643,7 @@ void ItemMarkerTiler::regenerateTiles()
         return;
 
     // read out all existing markers into tiles:
-    for (int row=0; row<d->markerModel->rowCount(); ++row)
+    for (int row = 0; row < d->markerModel->rowCount(); ++row)
     {
         const QModelIndex modelIndex = d->markerModel->index(row, 0);
         addMarkerIndexToGrid(QPersistentModelIndex(modelIndex));
@@ -657,7 +659,7 @@ void ItemMarkerTiler::onIndicesClicked(const ClickInfo& clickInfo)
 {
     QList<QPersistentModelIndex> clickedMarkers;
 
-    for (int i=0; i<clickInfo.tileIndicesList.count(); ++i)
+    for (int i = 0; i < clickInfo.tileIndicesList.count(); ++i)
     {
         const TileIndex tileIndex = clickInfo.tileIndicesList.at(i);
 
@@ -670,13 +672,13 @@ void ItemMarkerTiler::onIndicesClicked(const ClickInfo& clickInfo)
     {
         const bool doSelect = (clickInfo.groupSelectionState & KGeoMapSelectedMask) != KGeoMapSelectedAll;
 
-        const QItemSelectionModel::SelectionFlags selectionFlags =
-                  (doSelect ? QItemSelectionModel::Select : QItemSelectionModel::Deselect)
-                  | QItemSelectionModel::Rows;
+        const QItemSelectionModel::SelectionFlags selectionFlags = (doSelect ? QItemSelectionModel::Select
+                                                                             : QItemSelectionModel::Deselect) |
+                                                                   QItemSelectionModel::Rows;
 
-        for (int i=0; i<clickedMarkers.count(); ++i)
+        for (int i = 0; i < clickedMarkers.count(); ++i)
         {
-            if (d->selectionModel->isSelected(clickedMarkers.at(i))!=doSelect)
+            if (d->selectionModel->isSelected(clickedMarkers.at(i)) != doSelect)
             {
                 d->selectionModel->select(clickedMarkers.at(i), selectionFlags);
             }
@@ -710,7 +712,7 @@ void ItemMarkerTiler::onIndicesMoved(const TileIndex::List& tileIndicesList, con
         // complicated case: all selected markers were moved
         QModelIndexList selectedIndices = d->selectionModel->selectedIndexes();
 
-        for (int i=0; i<selectedIndices.count(); ++i)
+        for (int i = 0; i < selectedIndices.count(); ++i)
         {
             // TODO: correctly handle items with multiple columns
             QModelIndex movedMarker = selectedIndices.at(i);
@@ -724,7 +726,7 @@ void ItemMarkerTiler::onIndicesMoved(const TileIndex::List& tileIndicesList, con
     else
     {
         // only the tiles in tileIndicesList were moved
-        for (int i=0; i<tileIndicesList.count(); ++i)
+        for (int i = 0; i < tileIndicesList.count(); ++i)
         {
             const TileIndex tileIndex = tileIndicesList.at(i);
 
