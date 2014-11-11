@@ -7,9 +7,9 @@
  * @date   2011-04-30
  * @brief  Class for geonames.org based altitude lookup
  *
- * @author Copyright (C) 2010, 2011 by Michael G. Hansen
+ * @author Copyright (C) 2010-2011 by Michael G. Hansen
  *         <a href="mailto:mike at mghansen dot de">mike at mghansen dot de</a>
- * @author Copyright (C) 2010 by Gilles Caulier
+ * @author Copyright (C) 2010-2014 by Gilles Caulier
  *         <a href="mailto:caulier dot gilles at gmail dot com">caulier dot gilles at gmail dot com</a>
  *
  * This program is free software; you can redistribute it
@@ -41,13 +41,14 @@ namespace KGeoMap
 class MergedRequests
 {
 public:
+
     QList<QPair<GeoCoordinates, QIntList> > groupedRequestIndices;
 
     typedef QList<MergedRequests> List;
 
     bool addRequestIfCoordinatesAreThere(const LookupAltitude::Request& request, const int requestIndex)
     {
-        for (int i=0; i<groupedRequestIndices.size(); ++i)
+        for (int i = 0; i < groupedRequestIndices.size(); ++i)
         {
             if (groupedRequestIndices.at(i).first.sameLonLatAs(request.coordinates))
             {
@@ -60,22 +61,22 @@ public:
     }
 };
 
-class LookupAltitudeGeonames::LookupAltitudeGeonamesPrivate
+class LookupAltitudeGeonames::Private
 {
 public:
 
-    Request::List requests;
+    Request::List        requests;
     MergedRequests::List mergedRequests;
-    Status status;
-    QString errorMessage;
+    Status               status;
+    QString              errorMessage;
 
-    QByteArray data;
-    QPointer<KIO::Job> kioJob;
-    int currentMergedRequestIndex;
+    QByteArray           data;
+    QPointer<KIO::Job>   kioJob;
+    int                  currentMergedRequestIndex;
 };
 
 LookupAltitudeGeonames::LookupAltitudeGeonames(QObject* const parent)
- : LookupAltitude(parent), d(new LookupAltitudeGeonamesPrivate())
+    : LookupAltitude(parent), d(new Private())
 {
 }
 
@@ -112,13 +113,15 @@ LookupAltitude::Request LookupAltitudeGeonames::getRequest(const int index) cons
 void LookupAltitudeGeonames::startLookup()
 {
     MergedRequests currentMergedRequest;
-    for (int i=0; i<d->requests.size(); ++i)
+
+    for (int i = 0; i < d->requests.size(); ++i)
     {
         const Request& currentRequest = d->requests.at(i);
 
         // is there another request with the same coordinates?
         bool requestAdded = currentMergedRequest.addRequestIfCoordinatesAreThere(currentRequest, i);
-        for (int j=0; (!requestAdded) && j<d->mergedRequests.size(); ++j)
+
+        for (int j = 0; (!requestAdded) && j < d->mergedRequests.size(); ++j)
         {
             requestAdded = d->mergedRequests[j].addRequestIfCoordinatesAreThere(currentRequest, i);
         }
@@ -127,7 +130,7 @@ void LookupAltitudeGeonames::startLookup()
         {
             currentMergedRequest.groupedRequestIndices.append(QPair<GeoCoordinates, QIntList>(currentRequest.coordinates, QIntList()<<i));
 
-            if (currentMergedRequest.groupedRequestIndices.size()>=(20-1))
+            if (currentMergedRequest.groupedRequestIndices.size() >= (20-1))
             {
                 d->mergedRequests << currentMergedRequest;
                 currentMergedRequest = MergedRequests();
@@ -149,7 +152,7 @@ void LookupAltitudeGeonames::startNextRequest()
 {
     ++(d->currentMergedRequestIndex);
 
-    if (d->currentMergedRequestIndex>=d->mergedRequests.count())
+    if (d->currentMergedRequestIndex >= d->mergedRequests.count())
     {
         d->status = StatusSuccess;
         emit(signalDone());
@@ -160,18 +163,20 @@ void LookupAltitudeGeonames::startNextRequest()
 
     QString latString;
     QString lonString;
-    for (int i=0; i<currentMergedRequest.groupedRequestIndices.count(); ++i)
+
+    for (int i = 0; i < currentMergedRequest.groupedRequestIndices.count(); ++i)
     {
         const QPair<GeoCoordinates, QIntList>& currentPair = currentMergedRequest.groupedRequestIndices.at(i);
-        const GeoCoordinates requestCoordinates = currentPair.first;
+        const GeoCoordinates requestCoordinates            = currentPair.first;
+
         if (!latString.isEmpty())
         {
-            latString+=QLatin1Char(',');
-            lonString+=QLatin1Char(',');
+            latString += QLatin1Char(',');
+            lonString += QLatin1Char(',');
         }
 
-        latString+=requestCoordinates.latString();
-        lonString+=requestCoordinates.lonString();
+        latString += requestCoordinates.latString();
+        lonString += requestCoordinates.lonString();
     }
 
     KUrl jobUrl("http://ws.geonames.org/srtm3");
@@ -199,31 +204,31 @@ void LookupAltitudeGeonames::slotResult(KJob* kJob)
     if (kJob->error()!=0)
     {
         d->errorMessage = kJob->errorString();
-        d->status = StatusError;
+        d->status       = StatusError;
 
         // after an error, we abort:
         emit(signalDone());
         return;
     }
 
-    const QStringList altitudes = QString::fromAscii(d->data).split(QRegExp(QLatin1String("\\s+")));
-
+    const QStringList altitudes                = QString::fromAscii(d->data).split(QRegExp(QLatin1String("\\s+")));
     const MergedRequests& currentMergedRequest = d->mergedRequests.at(d->currentMergedRequestIndex);
     QIntList readyRequests;
 
-    for (int i=0; i<qMin(altitudes.count(), currentMergedRequest.groupedRequestIndices.count()); ++i)
+    for (int i = 0; i < qMin(altitudes.count(), currentMergedRequest.groupedRequestIndices.count()); ++i)
     {
         const QString& altitudeString = altitudes.at(i);
-        bool haveAltitude = false;
-        const qreal altitude = altitudeString.toFloat(&haveAltitude);
+        bool haveAltitude             = false;
+        const qreal altitude          = altitudeString.toFloat(&haveAltitude);
 
         // -32786 means that geonames.org has no data for these coordinates
-        if (altitude==-32768)
+        if (altitude == -32768)
         {
             haveAltitude = false;
         }
 
         const QIntList& currentRequestIndexes = currentMergedRequest.groupedRequestIndices.at(i).second;
+
         Q_FOREACH(const int requestIndex, currentRequestIndexes)
         {
             if (haveAltitude)
@@ -268,6 +273,7 @@ void LookupAltitudeGeonames::cancel()
     }
 
     d->status = StatusCanceled;
+
     emit(signalDone());
 }
 

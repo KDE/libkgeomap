@@ -9,7 +9,7 @@
  *
  * @author Copyright (C) 2009-2010 by Michael G. Hansen
  *         <a href="mailto:mike at mghansen dot de">mike at mghansen dot de</a>
- * @author Copyright (C) 2010 by Gilles Caulier
+ * @author Copyright (C) 2010-2014 by Gilles Caulier
  *         <a href="mailto:caulier dot gilles at gmail dot com">caulier dot gilles at gmail dot com</a>
  *
  * This program is free software; you can redistribute it
@@ -57,6 +57,7 @@ namespace KGeoMap
 inline void KGeoMap_assert(const char* const condition, const char* const filename, const int lineNumber)
 {
     const QString debugString = QString::fromLatin1( "ASSERT: %1 - %2:%3").arg(QLatin1String( condition )).arg(QLatin1String( filename )).arg(lineNumber);
+
 #ifdef KGEOMAP_HAVE_VALGRIND
     if (RUNNING_ON_VALGRIND>0)
     {
@@ -117,20 +118,20 @@ typedef QPair<int, int> QIntPair;
  */
 enum KGeoMapGroupStateEnum
 {
-    KGeoMapSelectedMask = 0x03 << 0,
-    KGeoMapSelectedNone = 0x00 << 0,
-    KGeoMapSelectedSome = 0x03 << 0,
-    KGeoMapSelectedAll  = 0x02 << 0,
+    KGeoMapSelectedMask         = 0x03 << 0,
+    KGeoMapSelectedNone         = 0x00 << 0,
+    KGeoMapSelectedSome         = 0x03 << 0,
+    KGeoMapSelectedAll          = 0x02 << 0,
 
     KGeoMapFilteredPositiveMask = 0x03 << 2,
     KGeoMapFilteredPositiveNone = 0x00 << 2,
     KGeoMapFilteredPositiveSome = 0x03 << 2,
     KGeoMapFilteredPositiveAll  = 0x02 << 2,
 
-    KGeoMapRegionSelectedMask = 0x03 << 4,
-    KGeoMapRegionSelectedNone = 0x00 << 4,
-    KGeoMapRegionSelectedSome = 0x03 << 4,
-    KGeoMapRegionSelectedAll  = 0x02 << 4
+    KGeoMapRegionSelectedMask   = 0x03 << 4,
+    KGeoMapRegionSelectedNone   = 0x00 << 4,
+    KGeoMapRegionSelectedSome   = 0x03 << 4,
+    KGeoMapRegionSelectedAll    = 0x02 << 4
 };
 
 /// @todo KGeoMapGroupState -> KGeoMapGroupStates?
@@ -149,8 +150,8 @@ public:
     /// @todo Make member functions non-inline?
 
     KGeoMapGroupStateComputer()
-    : m_state(KGeoMapSelectedNone),
-      m_stateMask(KGeoMapSelectedNone)
+        : m_state(KGeoMapSelectedNone),
+          m_stateMask(KGeoMapSelectedNone)
     {
     }
 
@@ -161,7 +162,7 @@ public:
 
     void clear()
     {
-        m_state = KGeoMapSelectedNone;
+        m_state     = KGeoMapSelectedNone;
         m_stateMask = KGeoMapSelectedNone;
     }
 
@@ -176,22 +177,22 @@ public:
     {
         if (!(m_stateMask & KGeoMapSelectedMask))
         {
-            m_state|= state;
-            m_stateMask|= KGeoMapSelectedMask;
+            m_state     |= state;
+            m_stateMask |= KGeoMapSelectedMask;
         }
         else
         {
-            if ((state&KGeoMapSelectedMask)==KGeoMapSelectedAll)
+            if ((state&KGeoMapSelectedMask) == KGeoMapSelectedAll)
             {
-                m_state|=KGeoMapSelectedAll;
+                m_state |= KGeoMapSelectedAll;
             }
-            else if ((m_state&KGeoMapSelectedMask)==KGeoMapSelectedAll)
+            else if ((m_state&KGeoMapSelectedMask) == KGeoMapSelectedAll)
             {
-                m_state|=KGeoMapSelectedSome;
+                m_state |= KGeoMapSelectedSome;
             }
             else
             {
-                m_state|=state;
+                m_state |= state;
             }
         }
     }
@@ -200,22 +201,22 @@ public:
     {
         if (!(m_stateMask & KGeoMapFilteredPositiveMask))
         {
-            m_state|= state;
-            m_stateMask|= KGeoMapFilteredPositiveMask;
+            m_state     |= state;
+            m_stateMask |= KGeoMapFilteredPositiveMask;
         }
         else
         {
-            if ((state&KGeoMapFilteredPositiveMask)==KGeoMapFilteredPositiveAll)
+            if ((state&KGeoMapFilteredPositiveMask) == KGeoMapFilteredPositiveAll)
             {
-                m_state|=KGeoMapFilteredPositiveAll;
+                m_state |= KGeoMapFilteredPositiveAll;
             }
-            else if ((m_state&KGeoMapFilteredPositiveMask)==KGeoMapFilteredPositiveAll)
+            else if ((m_state&KGeoMapFilteredPositiveMask) == KGeoMapFilteredPositiveAll)
             {
-                m_state|=KGeoMapFilteredPositiveSome;
+                m_state |= KGeoMapFilteredPositiveSome;
             }
             else
             {
-                m_state|=state;
+                m_state |= state;
             }
         }
     }
@@ -224,22 +225,22 @@ public:
     {
         if (!(m_stateMask & KGeoMapRegionSelectedMask))
         {
-            m_state|= state;
-            m_stateMask|= KGeoMapRegionSelectedMask;
+            m_state     |= state;
+            m_stateMask |= KGeoMapRegionSelectedMask;
         }
         else
         {
-            if ((state&KGeoMapRegionSelectedMask)==KGeoMapRegionSelectedAll)
+            if ((state&KGeoMapRegionSelectedMask) == KGeoMapRegionSelectedAll)
             {
-                m_state|=KGeoMapRegionSelectedAll;
+                m_state |= KGeoMapRegionSelectedAll;
             }
-            else if ((m_state&KGeoMapRegionSelectedMask)==KGeoMapRegionSelectedAll)
+            else if ((m_state&KGeoMapRegionSelectedMask) == KGeoMapRegionSelectedAll)
             {
-                m_state|=KGeoMapRegionSelectedSome;
+                m_state |= KGeoMapRegionSelectedSome;
             }
             else
             {
-                m_state|=state;
+                m_state |= state;
             }
         }
     }

@@ -7,9 +7,9 @@
  * @date   2011-04-30
  * @brief  Class for geonames.org based altitude lookup
  *
- * @author Copyright (C) 2010, 2011 by Michael G. Hansen
+ * @author Copyright (C) 2010-2011 by Michael G. Hansen
  *         <a href="mailto:mike at mghansen dot de">mike at mghansen dot de</a>
- * @author Copyright (C) 2010 by Gilles Caulier
+ * @author Copyright (C) 2010-2014 by Gilles Caulier
  *         <a href="mailto:caulier dot gilles at gmail dot com">caulier dot gilles at gmail dot com</a>
  *
  * This program is free software; you can redistribute it
@@ -36,6 +36,7 @@ namespace KIO
 {
     class Job;
 }
+
 class KJob;
 /// @endcond
 
@@ -72,8 +73,8 @@ private:
 
     void startNextRequest();
 
-    class LookupAltitudeGeonamesPrivate;
-    LookupAltitudeGeonamesPrivate* const d;
+    class Private;
+    Private* const d;
 };
 
 } /* namespace KGeoMap */
