@@ -43,7 +43,6 @@ private Q_SLOTS:
     void testSaxLoader();
     void testSaxLoaderError();
     void testFileLoading();
-
 };
 
 #endif /* TEST_TRACKS_H */

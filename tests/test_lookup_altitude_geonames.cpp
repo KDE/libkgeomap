@@ -45,15 +45,17 @@ void TestLookupAltitudeGeonames::testSimpleLookup()
 
     LookupAltitude::Request::List requestsList;
     const int nRequests = 30;
+
     // add different requests
-    for (qreal i=0; i<nRequests; ++i)
+    for (qreal i = 0; i < nRequests; ++i)
     {
         LookupAltitude::Request myRequest;
         myRequest.coordinates = GeoCoordinates(52.0, 6.0+i);
         requestsList << myRequest;
     }
+
     // add those same requests again, expecting them to be merged into the existing requests:
-    for (qreal i=0; i<nRequests; ++i)
+    for (qreal i = 0; i < nRequests; ++i)
     {
         LookupAltitude::Request myRequest;
         myRequest.coordinates = GeoCoordinates(52.0, 6.0+i);
@@ -68,6 +70,7 @@ void TestLookupAltitudeGeonames::testSimpleLookup()
     {
         QTest::qWait(100);
     }
+
     QCOMPARE(spyRequestsReady.count(), 2);
 }
 

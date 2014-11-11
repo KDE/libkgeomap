@@ -36,7 +36,6 @@ private Q_SLOTS:
 
     void testNoOp();
     void testSimpleLookup();
-    
 };
 
 #endif /* TEST_LOOKUP_ALTITUDE_GEONAMES_H */

@@ -42,7 +42,7 @@ public:
     MarkerModelHelper(QAbstractItemModel* const itemModel, QItemSelectionModel* const itemSelectionModel);
     ~MarkerModelHelper();
 
-    virtual QAbstractItemModel* model() const;
+    virtual QAbstractItemModel*  model()          const;
     virtual QItemSelectionModel* selectionModel() const;
     virtual bool itemCoordinates(const QModelIndex& index, KGeoMap::GeoCoordinates* const coordinates) const;
 

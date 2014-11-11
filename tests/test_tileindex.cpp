@@ -84,7 +84,8 @@ void TestTileIndex::testIntListInteraction()
         {
             QIntList myList;
             TileIndex i1;
-            for (int i = 0; i<=l; ++i)
+
+            for (int i = 0; i <= l; ++i)
             {
                 i1.appendLinearIndex(i);
                 myList << i;
@@ -106,21 +107,23 @@ void TestTileIndex::testMovable()
 {
     {
         TileIndex i1;
-        for (int i=0; i<=TileIndex::MaxLevel; ++i)
+
+        for (int i = 0; i <= TileIndex::MaxLevel; ++i)
         {
             i1.appendLinearIndex(i);
         }
 
         TileIndex::List l1;
-        for (int i=0; i<10; ++i)
+
+        for (int i = 0; i < 10; ++i)
         {
             l1 << i1;
         }
 
         TileIndex::List l2 = l1;
-        l2[0] = l1.at(0);
+        l2[0]              = l1.at(0);
 
-        for (int i=0; i<l1.count(); ++i)
+        for (int i = 0; i < l1.count(); ++i)
         {
             QVERIFY(TileIndex::indicesEqual(i1, l2.at(i), TileIndex::MaxLevel));
         }
@@ -129,27 +132,28 @@ void TestTileIndex::testMovable()
 //     QBENCHMARK
 //     {
 //         TileIndex i1;
-//         for (int i=0; i<=TileIndex::MaxLevel; ++i)
+//
+//         for (int i = 0; i <= TileIndex::MaxLevel; ++i)
 //         {
 //             i1.appendLinearIndex(i);
 //         }
 // 
 //         TileIndex::List l1;
-//         for (int i=0; i<100000; ++i)
+//
+//         for (int i = 0; i < 100000; ++i)
 //         {
 //             l1 << i1;
 //         }
 //
 // //         QBENCHMARK
 //         {
-//             for (int i = 0; i<100; ++i)
+//             for (int i = 0; i < 100; ++i)
 //             {
 //                 TileIndex::List l2 = l1;
-//                 l2[0] = i1;
+//                 l2[0]              = i1;
 //             }
 //         }
 //     }
 }
 
 QTEST_MAIN(TestTileIndex)
-
