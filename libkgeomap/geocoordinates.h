@@ -9,7 +9,7 @@
  *
  * @author Copyright (C) 2009-2010, 2014 by Michael G. Hansen
  *         <a href="mailto:mike at mghansen dot de">mike at mghansen dot de</a>
- * @author Copyright (C) 2010-2012 by Gilles Caulier
+ * @author Copyright (C) 2010-2014 by Gilles Caulier
  *         <a href="mailto:caulier dot gilles at gmail dot com">caulier dot gilles at gmail dot com</a>
  *
  * This program is free software; you can redistribute it
@@ -108,19 +108,18 @@ public:
 
     void setLatLon(const double inLat, const double inLon)
     {
-        m_lat      = inLat;
-        m_lon      = inLon;
+        m_lat       = inLat;
+        m_lon       = inLon;
         m_hasFlags |= HasCoordinates;
     }
 
-    bool hasAltitude() const { return m_hasFlags.testFlag(HasAltitude); }
-
-    HasFlags hasFlags() const { return m_hasFlags; }
+    bool hasAltitude()  const { return m_hasFlags.testFlag(HasAltitude); }
+    HasFlags hasFlags() const { return m_hasFlags;                       }
 
     void setAlt(const double inAlt)
     {
         m_hasFlags |= HasAltitude;
-        m_alt      = inAlt;
+        m_alt       = inAlt;
     }
 
     void clearAlt()
@@ -156,9 +155,9 @@ public:
 
     bool sameLonLatAs(const GeoCoordinates& other) const
     {
-        return m_hasFlags.testFlag(HasCoordinates) &&
+        return m_hasFlags.testFlag(HasCoordinates)       &&
                other.m_hasFlags.testFlag(HasCoordinates) &&
-               (m_lat==other.m_lat)&&(m_lon==other.m_lon);
+               (m_lat == other.m_lat)&&(m_lon == other.m_lon);
     }
 
     static GeoCoordinates fromGeoUrl(const QString& url, bool* const parsedOkay = 0)
@@ -171,26 +170,28 @@ public:
             // TODO: error
             if (parsedOkay)
                 *parsedOkay = false;
+
             return GeoCoordinates();
         }
 
         const QStringList parts = url.mid(4).split(QLatin1Char( ',' ));
 
         GeoCoordinates position;
-        if ((parts.size()==3)||(parts.size()==2))
-        {
-            bool okay              = true;
-            double ptLongitude     = 0.0;
-            double ptAltitude      = 0.0;
-            const bool hasAltitude = parts.size()==3;
 
+        if ((parts.size() == 3) || (parts.size() == 2))
+        {
+            bool okay               = true;
+            double ptLongitude      = 0.0;
+            double ptAltitude       = 0.0;
+            const bool hasAltitude  = (parts.size() == 3);
             const double ptLatitude = parts[0].toDouble(&okay);
+
             if (okay)
             {
                 ptLongitude = parts[1].toDouble(&okay);
             }
 
-            if (okay&&(hasAltitude))
+            if (okay && (hasAltitude))
             {
                 ptAltitude = parts[2].toDouble(&okay);
             }
@@ -202,6 +203,7 @@ public:
             }
 
             position = GeoCoordinates(ptLatitude, ptLongitude);
+
             if (hasAltitude)
             {
                 position.setAlt(ptAltitude);
@@ -211,11 +213,13 @@ public:
         {
             if (parsedOkay)
                 *parsedOkay = false;
+
             return GeoCoordinates();
         }
 
         if (parsedOkay)
                 *parsedOkay = true;
+
         return position;
     }
 
@@ -223,14 +227,11 @@ public:
     {
         return
             ( hasCoordinates() == other.hasCoordinates() ) &&
-            ( hasCoordinates() ?
-                ( ( lat() == other.lat() ) &&
-                  ( lon() == other.lon() )
-                ) : true
+            ( hasCoordinates() ? ( ( lat() == other.lat() ) && ( lon() == other.lon() ))
+                               : true
             ) &&
             ( hasAltitude() == other.hasAltitude() ) &&
-            ( hasAltitude() ?
-                ( alt() == other.alt() )
+            ( hasAltitude() ? ( alt() == other.alt() )
                             : true );
     }
 

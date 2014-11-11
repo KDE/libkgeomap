@@ -9,7 +9,7 @@
  *
  * @author Copyright (C) 2009-2010, 2014 by Michael G. Hansen
  *         <a href="mailto:mike at mghansen dot de">mike at mghansen dot de</a>
- * @author Copyright (C) 2010-2012 by Gilles Caulier
+ * @author Copyright (C) 2010-2014 by Gilles Caulier
  *         <a href="mailto:caulier dot gilles at gmail dot com">caulier dot gilles at gmail dot com</a>
  *
  * This program is free software; you can redistribute it
@@ -27,6 +27,7 @@
 #include "geocoordinates.h"
 
 // Marble includes
+
 #include <marble/GeoDataCoordinates.h>
 
 namespace KGeoMap
@@ -36,7 +37,8 @@ Marble::GeoDataCoordinates GeoCoordinates::toMarbleCoordinates() const
 {
     Marble::GeoDataCoordinates marbleCoordinates;
     marbleCoordinates.setLongitude(lon(), Marble::GeoDataCoordinates::Degree);
-    marbleCoordinates.setLatitude(lat(), Marble::GeoDataCoordinates::Degree);
+    marbleCoordinates.setLatitude(lat(),  Marble::GeoDataCoordinates::Degree);
+    
     if (hasAltitude())
     {
         marbleCoordinates.setAltitude(alt());
