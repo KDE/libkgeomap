@@ -31,11 +31,11 @@ namespace KGeoMap
 
 typedef QPair<int, int> QIntPair;
 
-class AbstractMarkerTiler::AbstractMarkerTilerPrivate
+class AbstractMarkerTiler::Private
 {
 public:
 
-    AbstractMarkerTilerPrivate()
+    Private()
         : rootTile(0),
           isDirty(true)
     {
@@ -46,7 +46,7 @@ public:
 };
 
 AbstractMarkerTiler::AbstractMarkerTiler(QObject* const parent)
-                   : QObject(parent), d(new AbstractMarkerTilerPrivate())
+    : QObject(parent), d(new Private())
 {
 }
 
@@ -68,11 +68,11 @@ AbstractMarkerTiler::Tile* AbstractMarkerTiler::rootTile()
     return d->rootTile;
 }
 
-class AbstractMarkerTiler::NonEmptyIterator::AbstractMarkerTilerNonEmptyIteratorPrivate
+class AbstractMarkerTiler::NonEmptyIterator::Private
 {
 public:
 
-    AbstractMarkerTilerNonEmptyIteratorPrivate()
+    Private()
         : model(0),
           level(0),
           startIndex(),
@@ -83,17 +83,17 @@ public:
     {
     }
 
-    AbstractMarkerTiler*                                                          model;
-    int                                                                           level;
+    AbstractMarkerTiler*                model;
+    int                                 level;
 
     QList<QPair<TileIndex, TileIndex> > boundsList;
 
-    TileIndex                                                startIndex;
-    TileIndex                                                endIndex;
-    TileIndex                                                currentIndex;
+    TileIndex                           startIndex;
+    TileIndex                           endIndex;
+    TileIndex                           currentIndex;
 
-    bool                                                                          atEnd;
-    bool                                                                          atStartOfLevel;
+    bool                                atEnd;
+    bool                                atStartOfLevel;
 };
 
 AbstractMarkerTiler::NonEmptyIterator::~NonEmptyIterator()
@@ -102,7 +102,7 @@ AbstractMarkerTiler::NonEmptyIterator::~NonEmptyIterator()
 }
 
 AbstractMarkerTiler::NonEmptyIterator::NonEmptyIterator(AbstractMarkerTiler* const model, const int level)
-                   : d(new AbstractMarkerTilerNonEmptyIteratorPrivate())
+    : d(new Private())
 {
     d->model = model;
     KGEOMAP_ASSERT(level <= TileIndex::MaxLevel);
@@ -110,6 +110,7 @@ AbstractMarkerTiler::NonEmptyIterator::NonEmptyIterator(AbstractMarkerTiler* con
 
     TileIndex startIndex;
     TileIndex endIndex;
+
     for (int i=0; i <= level; ++i)
     {
         startIndex.appendLinearIndex(0);
@@ -124,7 +125,7 @@ AbstractMarkerTiler::NonEmptyIterator::NonEmptyIterator(AbstractMarkerTiler* con
 
 AbstractMarkerTiler::NonEmptyIterator::NonEmptyIterator(AbstractMarkerTiler* const model, const int level, 
                                                         const TileIndex& startIndex, const TileIndex& endIndex)
-                                     : d(new AbstractMarkerTilerNonEmptyIteratorPrivate())
+    : d(new Private())
 {
     d->model = model;
     KGEOMAP_ASSERT(level <= TileIndex::MaxLevel);
@@ -139,14 +140,14 @@ AbstractMarkerTiler::NonEmptyIterator::NonEmptyIterator(AbstractMarkerTiler* con
 
 AbstractMarkerTiler::NonEmptyIterator::NonEmptyIterator(AbstractMarkerTiler* const model, const int level, 
                                                         const GeoCoordinates::PairList& normalizedMapBounds)
-                                     : d(new AbstractMarkerTilerNonEmptyIteratorPrivate())
+    : d(new Private())
 {
     d->model = model;
     KGEOMAP_ASSERT(level <= TileIndex::MaxLevel);
     d->level = level;
 
     // store the coordinates of the bounds as indices:
-    for (int i=0; i < normalizedMapBounds.count(); ++i)
+    for (int i = 0; i < normalizedMapBounds.count(); ++i)
     {
         GeoCoordinates::Pair currentBounds = normalizedMapBounds.at(i);
         KGEOMAP_ASSERT(currentBounds.first.lat() < currentBounds.second.lat());
@@ -177,7 +178,7 @@ bool AbstractMarkerTiler::NonEmptyIterator::initializeNextBounds()
     KGEOMAP_ASSERT(d->startIndex.level() == d->level);
     KGEOMAP_ASSERT(d->endIndex.level() == d->level);
 
-    d->currentIndex = d->startIndex.mid(0, 1);
+    d->currentIndex   = d->startIndex.mid(0, 1);
     d->atStartOfLevel = true;
 
     nextIndex();
@@ -214,10 +215,12 @@ TileIndex AbstractMarkerTiler::NonEmptyIterator::nextIndex()
 
             // check limit on the left side:
             bool onLimit = true;
+
             for (int i=0; onLimit && (i <= compareLevel); ++i)
             {
                 onLimit = d->currentIndex.indexLat(i) == d->startIndex.indexLat(i);
             }
+
             if (onLimit)
             {
                 limitLatBL = d->startIndex.indexLat(currentLevel);
@@ -225,10 +228,12 @@ TileIndex AbstractMarkerTiler::NonEmptyIterator::nextIndex()
 
             // check limit on the bottom side:
             onLimit = true;
+
             for (int i=0; onLimit && (i <= compareLevel); ++i)
             {
                 onLimit = d->currentIndex.indexLon(i) == d->startIndex.indexLon(i);
             }
+
             if (onLimit)
             {
                 limitLonBL = d->startIndex.indexLon(currentLevel);
@@ -236,10 +241,12 @@ TileIndex AbstractMarkerTiler::NonEmptyIterator::nextIndex()
 
             // check limit on the right side:
             onLimit = true;
+            
             for (int i=0; onLimit && (i <= compareLevel); ++i)
             {
                 onLimit = d->currentIndex.indexLat(i) == d->endIndex.indexLat(i);
             }
+            
             if (onLimit)
             {
                 limitLatTR = d->endIndex.indexLat(currentLevel);
@@ -247,10 +254,12 @@ TileIndex AbstractMarkerTiler::NonEmptyIterator::nextIndex()
 
             // check limit on the top side:
             onLimit = true;
+            
             for (int i=0; onLimit && (i <= compareLevel); ++i)
             {
                 onLimit = d->currentIndex.indexLon(i) == d->endIndex.indexLon(i);
             }
+            
             if (onLimit)
             {
                 limitLonTR = d->endIndex.indexLon(currentLevel);
@@ -264,10 +273,12 @@ TileIndex AbstractMarkerTiler::NonEmptyIterator::nextIndex()
             int currentLon = d->currentIndex.indexLon(d->currentIndex.level());
 
             currentLon++;
+
             if (currentLon>limitLonTR)
             {
                 currentLon = limitLonBL;
                 currentLat++;
+
                 if (currentLat>limitLatTR)
                 {
                     if (currentLevel == 0)
@@ -315,11 +326,13 @@ TileIndex AbstractMarkerTiler::NonEmptyIterator::nextIndex()
         int limitLonTR = TileIndex::Tiling-1;
 
         // check limit on the left side:
-        bool onLimit = true;
+        bool onLimit   = true;
+
         for (int i=0; onLimit&&(i<=compareLevel); ++i)
         {
             onLimit = d->currentIndex.indexLat(i)==d->startIndex.indexLat(i);
         }
+
         if (onLimit)
         {
             limitLatBL = d->startIndex.indexLat(currentLevel+1);
@@ -327,10 +340,12 @@ TileIndex AbstractMarkerTiler::NonEmptyIterator::nextIndex()
 
         // check limit on the bottom side:
         onLimit = true;
+
         for (int i=0; onLimit && (i <= compareLevel); ++i)
         {
             onLimit = d->currentIndex.indexLon(i)==d->startIndex.indexLon(i);
         }
+
         if (onLimit)
         {
             limitLonBL = d->startIndex.indexLon(currentLevel+1);
@@ -338,10 +353,12 @@ TileIndex AbstractMarkerTiler::NonEmptyIterator::nextIndex()
 
         // check limit on the right side:
         onLimit = true;
+        
         for (int i=0; onLimit && (i <= compareLevel); ++i)
         {
             onLimit = d->currentIndex.indexLat(i) == d->endIndex.indexLat(i);
         }
+        
         if (onLimit)
         {
             limitLatTR = d->endIndex.indexLat(currentLevel+1);
@@ -349,10 +366,12 @@ TileIndex AbstractMarkerTiler::NonEmptyIterator::nextIndex()
 
         // check limit on the top side:
         onLimit = true;
+        
         for (int i=0; onLimit && (i <= compareLevel); ++i)
         {
             onLimit = d->currentIndex.indexLon(i) == d->endIndex.indexLon(i);
         }
+        
         if (onLimit)
         {
             limitLonTR = d->endIndex.indexLon(currentLevel+1);
@@ -430,7 +449,6 @@ AbstractMarkerTiler::Tile* AbstractMarkerTiler::tileNew()
 void AbstractMarkerTiler::tileDelete(AbstractMarkerTiler::Tile* const tile)
 {
     tileDeleteChildren(tile);
-
     tileDeleteInternal(tile);
 }
 
@@ -445,6 +463,7 @@ void AbstractMarkerTiler::tileDeleteChildren(AbstractMarkerTiler::Tile* const ti
         return;
 
     QVector<Tile*> tileChildren = tile->takeChildren();
+
     foreach(Tile* tilec, tileChildren)
     {
         tileDelete(tilec);
@@ -454,10 +473,12 @@ void AbstractMarkerTiler::tileDeleteChildren(AbstractMarkerTiler::Tile* const ti
 void AbstractMarkerTiler::tileDeleteChild(AbstractMarkerTiler::Tile* const parentTile, AbstractMarkerTiler::Tile* const childTile, const int knownLinearIndex)
 {
     int tileIndex = knownLinearIndex;
+
     if (tileIndex < 0)
     {
         tileIndex = parentTile->indexOfChildTile(childTile);
     }
+
     parentTile->clearChild(tileIndex);
 
     tileDelete(childTile);

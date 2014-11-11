@@ -60,10 +60,10 @@ public:
     {
     public:
 
-        TileIndex::List tileIndicesList;
-        QVariant representativeIndex;
+        TileIndex::List   tileIndicesList;
+        QVariant          representativeIndex;
         KGeoMapGroupState groupSelectionState;
-        MouseModes currentMouseMode;
+        MouseModes        currentMouseMode;
     };
 
 public:
@@ -181,10 +181,10 @@ public:
         NonEmptyIterator(AbstractMarkerTiler* const model, const int level, const GeoCoordinates::PairList& normalizedMapBounds);
         ~NonEmptyIterator();
 
-        bool atEnd() const;
-        TileIndex nextIndex();
-        TileIndex currentIndex() const;
-        AbstractMarkerTiler* model() const;
+        bool                 atEnd()        const;
+        TileIndex            nextIndex();
+        TileIndex            currentIndex() const;
+        AbstractMarkerTiler* model()        const;
 
     private:
 
@@ -192,8 +192,8 @@ public:
 
     private:
 
-        class AbstractMarkerTilerNonEmptyIteratorPrivate;
-        AbstractMarkerTilerNonEmptyIteratorPrivate* const d;
+        class Private;
+        Private* const d;
     };
 
 public:
@@ -249,8 +249,8 @@ protected:
 
 private:
 
-    class AbstractMarkerTilerPrivate;
-    AbstractMarkerTilerPrivate* const d;
+    class Private;
+    Private* const d;
 };
 
 } /* namespace KGeoMap */
