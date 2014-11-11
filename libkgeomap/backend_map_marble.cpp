@@ -9,7 +9,7 @@
  *
  * @author Copyright (C) 2009-2011, 2014 by Michael G. Hansen
  *         <a href="mailto:mike at mghansen dot de">mike at mghansen dot de</a>
- * @author Copyright (C) 2010 by Gilles Caulier
+ * @author Copyright (C) 2010-2014 by Gilles Caulier
  *         <a href="mailto:caulier dot gilles at gmail dot com">caulier dot gilles at gmail dot com</a>
  * @author Copyright (C) 2014 by Justus Schwartz
  *         <a href="mailto:justus at gmx dot li">justus at gmx dot li</a>
@@ -69,9 +69,16 @@ class BMInternalWidgetInfo
 {
 public:
 
+    BMInternalWidgetInfo()
+    {
 #ifdef KGEOMAP_MARBLE_ADD_LAYER
-    BMLayer*               bmLayer;
-#endif    
+        bmLayer = 0;
+#endif
+    }
+
+#ifdef KGEOMAP_MARBLE_ADD_LAYER
+    BMLayer* bmLayer;
+#endif
 };
 
 } /* KGeoMap */
@@ -80,11 +87,12 @@ Q_DECLARE_METATYPE(KGeoMap::BMInternalWidgetInfo)
 
 namespace KGeoMap
 {
-    
-class BackendMarble::BackendMarblePrivate
+
+class BackendMarble::Private
 {
 public:
-    BackendMarblePrivate()
+
+    Private()
       : marbleWidget(0),
         actionGroupMapTheme(0),
         actionGroupProjection(0),
@@ -122,51 +130,51 @@ public:
     {
     }
 
-    QPointer<Marble::MarbleWidget> marbleWidget;
+    QPointer<Marble::MarbleWidget>            marbleWidget;
 
-    QActionGroup*          actionGroupMapTheme;
-    QActionGroup*          actionGroupProjection;
-    QActionGroup*          actionGroupFloatItems;
-    KAction*               actionShowCompass;
-    KAction*               actionShowOverviewMap;
-    KAction*               actionShowScaleBar;
+    QActionGroup*                             actionGroupMapTheme;
+    QActionGroup*                             actionGroupProjection;
+    QActionGroup*                             actionGroupFloatItems;
+    KAction*                                  actionShowCompass;
+    KAction*                                  actionShowOverviewMap;
+    KAction*                                  actionShowScaleBar;
 
-    QString                cacheMapTheme;
-    QString                cacheProjection;
-    bool                   cacheShowCompass;
-    bool                   cacheShowScaleBar;
-    bool                   cacheShowOverviewMap;
-    int                    cacheZoom;
-    bool                   havePotentiallyMouseMovingObject;
-    bool                   haveMouseMovingObject;
-    int                    mouseMoveClusterIndex;
-    QPersistentModelIndex  mouseMoveMarkerIndex;
-    GeoCoordinates         mouseMoveObjectCoordinates;
-    QPoint                 mouseMoveCenterOffset;
-    int                    dragDropMarkerCount;
-    QPoint                 dragDropMarkerPos;
-    int                    clustersDirtyCacheProjection;
-    qreal                  clustersDirtyCacheLat;
-    qreal                  clustersDirtyCacheLon;
+    QString                                   cacheMapTheme;
+    QString                                   cacheProjection;
+    bool                                      cacheShowCompass;
+    bool                                      cacheShowScaleBar;
+    bool                                      cacheShowOverviewMap;
+    int                                       cacheZoom;
+    bool                                      havePotentiallyMouseMovingObject;
+    bool                                      haveMouseMovingObject;
+    int                                       mouseMoveClusterIndex;
+    QPersistentModelIndex                     mouseMoveMarkerIndex;
+    GeoCoordinates                            mouseMoveObjectCoordinates;
+    QPoint                                    mouseMoveCenterOffset;
+    int                                       dragDropMarkerCount;
+    QPoint                                    dragDropMarkerPos;
+    int                                       clustersDirtyCacheProjection;
+    qreal                                     clustersDirtyCacheLat;
+    qreal                                     clustersDirtyCacheLon;
 
-    GeoCoordinates::Pair   displayedRectangle;
-    QPoint                 firstSelectionScreenPoint;
-    QPoint                 intermediateSelectionScreenPoint;
-    GeoCoordinates         firstSelectionPoint;
-    GeoCoordinates         intermediateSelectionPoint;
-    bool                   activeState;
-    bool                   widgetIsDocked;
-    bool                   blockingZoomWhileChangingTheme;
+    GeoCoordinates::Pair                      displayedRectangle;
+    QPoint                                    firstSelectionScreenPoint;
+    QPoint                                    intermediateSelectionScreenPoint;
+    GeoCoordinates                            firstSelectionPoint;
+    GeoCoordinates                            intermediateSelectionPoint;
+    bool                                      activeState;
+    bool                                      widgetIsDocked;
+    bool                                      blockingZoomWhileChangingTheme;
 
     QHash<quint64, Marble::GeoDataLineString> trackCache;
 
 #ifdef KGEOMAP_MARBLE_ADD_LAYER
-    BMLayer*               bmLayer;
+    BMLayer*                                  bmLayer;
 #endif
 };
 
 BackendMarble::BackendMarble(const QExplicitlySharedDataPointer<KGeoMapSharedData>& sharedData, QObject* const parent)
-             : MapBackend(sharedData, parent), d(new BackendMarblePrivate())
+    : MapBackend(sharedData, parent), d(new Private())
 {
     createActions();
 }
@@ -214,6 +222,7 @@ QWidget* BackendMarble::mapWidget()
         KGeoMapGlobalObject* const go = KGeoMapGlobalObject::instance();
 
         KGeoMapInternalWidgetInfo info;
+
         if (go->getInternalWidgetFromPool(this, &info))
         {
             d->marbleWidget = qobject_cast<Marble::MarbleWidget*>(info.widget);
@@ -263,6 +272,7 @@ void BackendMarble::releaseWidget(KGeoMapInternalWidgetInfo* const info)
 
 #ifdef KGEOMAP_MARBLE_ADD_LAYER
     BMInternalWidgetInfo intInfo = info->backendData.value<BMInternalWidgetInfo>();
+
     if (intInfo.bmLayer)
     {
         intInfo.bmLayer->setBackend(0);
@@ -273,11 +283,11 @@ void BackendMarble::releaseWidget(KGeoMapInternalWidgetInfo* const info)
                this, SLOT(slotMarbleZoomChanged(int)));
 
     info->currentOwner = 0;
-    info->state = KGeoMapInternalWidgetInfo::InternalWidgetReleased;
+    info->state        = KGeoMapInternalWidgetInfo::InternalWidgetReleased;
 
-    d->marbleWidget = 0;
+    d->marbleWidget    = 0;
 #ifdef KGEOMAP_MARBLE_ADD_LAYER
-    d->bmLayer = 0;
+    d->bmLayer         = 0;
 #endif /* KGEOMAP_MARBLE_ADD_LAYER */
 
     emit(signalBackendReadyChanged(backendName()));
@@ -402,7 +412,8 @@ void BackendMarble::addActionsToConfigurationMenu(QMenu* const configurationMenu
     configurationMenu->addSeparator();
 
     const QList<QAction*> mapThemeActions = d->actionGroupMapTheme->actions();
-    for (int i=0; i<mapThemeActions.count(); ++i)
+
+    for (int i = 0; i < mapThemeActions.count(); ++i)
     {
         configurationMenu->addAction(mapThemeActions.at(i));
     }
@@ -410,18 +421,20 @@ void BackendMarble::addActionsToConfigurationMenu(QMenu* const configurationMenu
     configurationMenu->addSeparator();
 
     // TODO: we need a parent for this guy!
-    QMenu* const projectionSubMenu = new QMenu(i18n("Projection"), configurationMenu);
+    QMenu* const projectionSubMenu          = new QMenu(i18n("Projection"), configurationMenu);
     configurationMenu->addMenu(projectionSubMenu);
     const QList<QAction*> projectionActions = d->actionGroupProjection->actions();
-    for (int i=0; i<projectionActions.count(); ++i)
+
+    for (int i = 0; i < projectionActions.count(); ++i)
     {
         projectionSubMenu->addAction(projectionActions.at(i));
     }
 
-    QMenu* const floatItemsSubMenu = new QMenu(i18n("Float items"), configurationMenu);
+    QMenu* const floatItemsSubMenu     = new QMenu(i18n("Float items"), configurationMenu);
     configurationMenu->addMenu(floatItemsSubMenu);
     const QList<QAction*> floatActions = d->actionGroupFloatItems->actions();
-    for (int i=0; i<floatActions.count(); ++i)
+
+    for (int i = 0; i < floatActions.count(); ++i)
     {
         floatItemsSubMenu->addAction(floatActions.at(i));
     }
@@ -452,7 +465,8 @@ void BackendMarble::setMapTheme(const QString& newMapTheme)
     // Changing the map theme changes the zoom - we want to try to keep the zoom constant
     d->blockingZoomWhileChangingTheme = true;
     // Remember the zoom from the cache. The zoom of the widget may not have been set yet!
-    const int oldMarbleZoom = d->cacheZoom;
+    const int oldMarbleZoom           = d->cacheZoom;
+
     if (newMapTheme == QLatin1String("atlas"))
     {
         d->marbleWidget->setMapThemeId(QLatin1String("earth/srtm/srtm.dgml"));
@@ -469,6 +483,7 @@ void BackendMarble::setMapTheme(const QString& newMapTheme)
 
     // make sure the zoom level is within the allowed range
     int targetZoomLevel = oldMarbleZoom;
+
     if (oldMarbleZoom > d->marbleWidget->maximumZoom())
     {
         targetZoomLevel = d->marbleWidget->maximumZoom();
@@ -484,6 +499,7 @@ void BackendMarble::setMapTheme(const QString& newMapTheme)
         // the signal now to allow the change to propagate
         d->blockingZoomWhileChangingTheme = false;
     }
+
     d->marbleWidget->zoomView(targetZoomLevel);
     d->blockingZoomWhileChangingTheme = false;
 
@@ -492,31 +508,33 @@ void BackendMarble::setMapTheme(const QString& newMapTheme)
 
 void BackendMarble::saveSettingsToGroup(KConfigGroup* const group)
 {
-    KGEOMAP_ASSERT(group!=0);
+    KGEOMAP_ASSERT(group != 0);
+
     if (!group)
     {
         return;
     }
 
-    group->writeEntry("Marble Map Theme", d->cacheMapTheme);
-    group->writeEntry("Marble Projection", d->cacheProjection);
-    group->writeEntry("Marble Show Scale Bar", d->cacheShowScaleBar);
-    group->writeEntry("Marble Show Compass", d->cacheShowCompass);
+    group->writeEntry("Marble Map Theme",         d->cacheMapTheme);
+    group->writeEntry("Marble Projection",        d->cacheProjection);
+    group->writeEntry("Marble Show Scale Bar",    d->cacheShowScaleBar);
+    group->writeEntry("Marble Show Compass",      d->cacheShowCompass);
     group->writeEntry("Marble Show Overview Map", d->cacheShowOverviewMap);
 }
 
 void BackendMarble::readSettingsFromGroup(const KConfigGroup* const group)
 {
-    KGEOMAP_ASSERT(group!=0);
+    KGEOMAP_ASSERT(group != 0);
+
     if (!group)
     {
         return;
     }
 
-    setMapTheme(group->readEntry("Marble Map Theme", d->cacheMapTheme));
-    setProjection(group->readEntry("Marble Projection", d->cacheProjection));
-    setShowScaleBar(group->readEntry("Marble Show Scale Bar", d->cacheShowScaleBar));
-    setShowCompass(group->readEntry("Marble Show Compass", d->cacheShowCompass));
+    setMapTheme(group->readEntry("Marble Map Theme",                d->cacheMapTheme));
+    setProjection(group->readEntry("Marble Projection",             d->cacheProjection));
+    setShowScaleBar(group->readEntry("Marble Show Scale Bar",       d->cacheShowScaleBar));
+    setShowCompass(group->readEntry("Marble Show Compass",          d->cacheShowCompass));
     setShowOverviewMap(group->readEntry("Marble Show Overview Map", d->cacheShowOverviewMap));
 }
 
@@ -545,6 +563,7 @@ bool BackendMarble::screenCoordinates(const GeoCoordinates& coordinates, QPoint*
 
     qreal x, y;
     const bool isVisible = d->marbleWidget->screenCoordinates(coordinates.lon(), coordinates.lat(), x, y);
+
     if (!isVisible)
     {
         return false;
@@ -574,6 +593,7 @@ bool BackendMarble::geoCoordinates(const QPoint& point, GeoCoordinates* const co
 
     qreal lat, lon;
     const bool isVisible = d->marbleWidget->geoCoordinates(point.x(), point.y(), lon, lat, Marble::GeoDataCoordinates::Degree);
+
     if (!isVisible)
     {
         return false;
@@ -601,6 +621,7 @@ void BackendMarble::GeoPainter_drawPixmapAtCoordinates(Marble::GeoPainter* const
 
     // try to convert the coordinates to pixels
     QPoint pointOnScreen;
+
     if (!screenCoordinates(coordinates, &pointOnScreen))
     {
         return;
@@ -609,12 +630,13 @@ void BackendMarble::GeoPainter_drawPixmapAtCoordinates(Marble::GeoPainter* const
     // Marble::GeoPainter::drawPixmap(coordinates, pixmap) draws the pixmap centered on coordinates
     // therefore we calculate the pixel position of the center of the image if its offsetPoint is to be
     // at pointOnScreen:
-    const QSize pixmapSize = pixmap.size();
+    const QSize pixmapSize      = pixmap.size();
     const QPoint pixmapHalfSize = QPoint(pixmapSize.width()/2, pixmapSize.height()/2);
-    const QPoint drawPoint = pointOnScreen + pixmapHalfSize - offsetPoint;
+    const QPoint drawPoint      = pointOnScreen + pixmapHalfSize - offsetPoint;
 
     // now re-calculate the coordinates of the new pixel coordinates:
     GeoCoordinates drawGeoCoordinates;
+
     if (!geoCoordinates(drawPoint, &drawGeoCoordinates))
     {
         return;
@@ -633,13 +655,13 @@ void BackendMarble::marbleCustomPaint(Marble::GeoPainter* painter)
     }
 
     // check whether the parameters of the map changed and we may have to update the clusters:
-    if ( (d->clustersDirtyCacheLat != d->marbleWidget->centerLatitude()) ||
-         (d->clustersDirtyCacheLon != d->marbleWidget->centerLongitude()) ||
+    if ( (d->clustersDirtyCacheLat        != d->marbleWidget->centerLatitude())  ||
+         (d->clustersDirtyCacheLon        != d->marbleWidget->centerLongitude()) ||
          (d->clustersDirtyCacheProjection != d->marbleWidget->projection()) )
     {
 //         kDebug()<<d->marbleWidget->centerLatitude()<<d->marbleWidget->centerLongitude()<<d->marbleWidget->projection();
-        d->clustersDirtyCacheLat = d->marbleWidget->centerLatitude();
-        d->clustersDirtyCacheLon = d->marbleWidget->centerLongitude();
+        d->clustersDirtyCacheLat        = d->marbleWidget->centerLatitude();
+        d->clustersDirtyCacheLon        = d->marbleWidget->centerLongitude();
         d->clustersDirtyCacheProjection = d->marbleWidget->projection();
         s->worldMapWidget->markClustersAsDirty();
     }
