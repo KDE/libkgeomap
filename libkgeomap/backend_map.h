@@ -119,7 +119,6 @@ Q_SIGNALS:
     void signalMarkersMoved(const QIntList& markerIndices);
     void signalZoomChanged(const QString& newZoom);
     void signalSelectionHasBeenMade(const KGeoMap::GeoCoordinates::Pair& coordinates);
-
 };
 
 } /* namespace KGeoMap */
