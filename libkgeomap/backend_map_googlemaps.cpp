@@ -9,7 +9,7 @@
  *
  * @author Copyright (C) 2009-2011, 2014 by Michael G. Hansen
  *         <a href="mailto:mike at mghansen dot de">mike at mghansen dot de</a>
- * @author Copyright (C) 2010 by Gilles Caulier
+ * @author Copyright (C) 2010-2014 by Gilles Caulier
  *         <a href="mailto:caulier dot gilles at gmail dot com">caulier dot gilles at gmail dot com</a>
  * @author Copyright (C) 2014 by Justus Schwartz
  *         <a href="mailto:justus at gmx dot li">justus at gmx dot li</a>
@@ -54,6 +54,12 @@ namespace KGeoMap
 class GMInternalWidgetInfo
 {
 public:
+
+    GMInternalWidgetInfo()
+    {
+        htmlWidget = 0;
+    }
+    
     HTMLWidget* htmlWidget;
 };
 
@@ -64,11 +70,11 @@ Q_DECLARE_METATYPE(KGeoMap::GMInternalWidgetInfo)
 namespace KGeoMap
 {
 
-class BackendGoogleMaps::BackendGoogleMapsPrivate
+class BackendGoogleMaps::Private
 {
 public:
 
-    BackendGoogleMapsPrivate()
+    Private()
     : htmlWidget(0),
       htmlWidgetWrapper(0),
       isReady(false),
@@ -116,7 +122,7 @@ public:
 };
 
 BackendGoogleMaps::BackendGoogleMaps(const QExplicitlySharedDataPointer<KGeoMapSharedData>& sharedData, QObject* const parent)
-                 : MapBackend(sharedData, parent), d(new BackendGoogleMapsPrivate())
+    : MapBackend(sharedData, parent), d(new Private())
 {
     createActions();
 }
@@ -159,7 +165,7 @@ void BackendGoogleMaps::createActions()
         << i18n("Hybrid")
         << i18n("Terrain");
 
-    for (int i = 0; i<mapTypes.count(); ++i)
+    for (int i = 0; i < mapTypes.count(); ++i)
     {
         KAction* const mapTypeAction = new KAction(d->mapTypeActionGroup);
         mapTypeAction->setData(mapTypes.at(i));
@@ -207,12 +213,13 @@ QWidget* BackendGoogleMaps::mapWidget()
         KGeoMapGlobalObject* const go = KGeoMapGlobalObject::instance();
 
         KGeoMapInternalWidgetInfo info;
-        bool foundReusableWidget = go->getInternalWidgetFromPool(this, &info);
+        bool foundReusableWidget      = go->getInternalWidgetFromPool(this, &info);
+
         if (foundReusableWidget)
         {
-            d->htmlWidgetWrapper = info.widget;
+            d->htmlWidgetWrapper               = info.widget;
             const GMInternalWidgetInfo intInfo = info.backendData.value<GMInternalWidgetInfo>();
-            d->htmlWidget = intInfo.htmlWidget;
+            d->htmlWidget                      = intInfo.htmlWidget;
         }
         else
         {
@@ -336,7 +343,8 @@ void BackendGoogleMaps::addActionsToConfigurationMenu(QMenu* const configuration
 
     // map type actions:
     const QList<QAction*> mapTypeActions = d->mapTypeActionGroup->actions();
-    for (int i = 0; i<mapTypeActions.count(); ++i)
+
+    for (int i = 0; i < mapTypeActions.count(); ++i)
     {
         QAction* const mapTypeAction = mapTypeActions.at(i);
         configurationMenu->addAction(mapTypeAction);
@@ -358,6 +366,7 @@ void BackendGoogleMaps::addActionsToConfigurationMenu(QMenu* const configuration
 void BackendGoogleMaps::saveSettingsToGroup(KConfigGroup* const group)
 {
     KGEOMAP_ASSERT(group != 0);
+
     if (!group)
         return;
 
@@ -370,6 +379,7 @@ void BackendGoogleMaps::saveSettingsToGroup(KConfigGroup* const group)
 void BackendGoogleMaps::readSettingsFromGroup(const KConfigGroup* const group)
 {
     KGEOMAP_ASSERT(group != 0);
+
     if (!group)
         return;
 
@@ -383,6 +393,7 @@ void BackendGoogleMaps::readSettingsFromGroup(const KConfigGroup* const group)
 void BackendGoogleMaps::slotUngroupedModelChanged(const int mindex)
 {
     KGEOMAP_ASSERT(isReady());
+
     if (!isReady())
         return;
 
@@ -393,17 +404,18 @@ void BackendGoogleMaps::slotUngroupedModelChanged(const int mindex)
         return;
 
     ModelHelper* const modelHelper = s->ungroupedModels.at(mindex);
+
     if (!modelHelper)
         return;
 
     if (!modelHelper->modelFlags().testFlag(ModelHelper::FlagVisible))
-            return;
+        return;
 
     QAbstractItemModel* const model = modelHelper->model();
 
-    for (int row = 0; row<model->rowCount(); ++row)
+    for (int row = 0; row < model->rowCount(); ++row)
     {
-        const QModelIndex currentIndex = model->index(row, 0);
+        const QModelIndex currentIndex     = model->index(row, 0);
         const ModelHelper::Flags itemFlags = modelHelper->itemFlags(currentIndex);
 
         // TODO: this is untested! We need to make sure the indices stay correct inside the JavaScript part!
@@ -424,10 +436,10 @@ void BackendGoogleMaps::slotUngroupedModelChanged(const int mindex)
                 .arg(itemFlags.testFlag(ModelHelper::FlagSnaps)?QLatin1String("true" ):QLatin1String("false"))
             );
 
-        QPoint markerCenterPoint;
-        QSize markerSize;
-        QPixmap markerPixmap;
-        KUrl markerUrl;
+        QPoint     markerCenterPoint;
+        QSize      markerSize;
+        QPixmap    markerPixmap;
+        KUrl       markerUrl;
         const bool markerHasIcon = modelHelper->itemIcon(currentIndex, &markerCenterPoint,
                                                          &markerSize, &markerPixmap, &markerUrl);
 
@@ -457,59 +469,62 @@ void BackendGoogleMaps::updateMarkers()
 void BackendGoogleMaps::slotHTMLEvents(const QStringList& events)
 {
     // for some events, we just note that they appeared and then process them later on:
-    bool centerProbablyChanged = false;
-    bool mapTypeChanged = false;
-    bool zoomProbablyChanged = false;
+    bool centerProbablyChanged    = false;
+    bool mapTypeChanged           = false;
+    bool zoomProbablyChanged      = false;
     bool mapBoundsProbablyChanged = false;
     QIntList movedClusters;
     QList<QPersistentModelIndex> movedMarkers;
     QIntList clickedClusters;
+
     // TODO: verify that the order of the events is still okay
     //       or that the order does not matter
-    for (QStringList::const_iterator it = events.constBegin(); it!=events.constEnd(); ++it)
+    for (QStringList::const_iterator it = events.constBegin(); it != events.constEnd(); ++it)
     {
-        const QString eventCode = it->left(2);
-        const QString eventParameter = it->mid(2);
+        const QString eventCode           = it->left(2);
+        const QString eventParameter      = it->mid(2);
         const QStringList eventParameters = eventParameter.split(QLatin1Char( '/' ));
 
         if (eventCode == QLatin1String("MT"))
         {
             // map type changed
-            mapTypeChanged = true;
+            mapTypeChanged  = true;
             d->cacheMapType = eventParameter;
         }
         else if (eventCode == QLatin1String("MB"))
         {   // NOTE: event currently disabled in javascript part
             // map bounds changed
-            centerProbablyChanged = true;
-            zoomProbablyChanged = true;
+            centerProbablyChanged    = true;
+            zoomProbablyChanged      = true;
             mapBoundsProbablyChanged = true;
         }
         else if (eventCode == QLatin1String("ZC"))
         {   // NOTE: event currently disabled in javascript part
             // zoom changed
-            zoomProbablyChanged = true;
+            zoomProbablyChanged      = true;
             mapBoundsProbablyChanged = true;
         }
         else if (eventCode == QLatin1String("id"))
         {
             // idle after drastic map changes
-            centerProbablyChanged = true;
-            zoomProbablyChanged = true;
+            centerProbablyChanged    = true;
+            zoomProbablyChanged      = true;
             mapBoundsProbablyChanged = true;
         }
         else if (eventCode == QLatin1String("cm"))
         {
             /// @todo buffer this event type!
             // cluster moved
-            bool okay = false;
+            bool okay              = false;
             const int clusterIndex = eventParameter.toInt(&okay);
             KGEOMAP_ASSERT(okay);
+
             if (!okay)
                 continue;
 
-            KGEOMAP_ASSERT(clusterIndex>=0);
+            KGEOMAP_ASSERT(clusterIndex >= 0);
             KGEOMAP_ASSERT(clusterIndex<s->clusterList.size());
+
             if ((clusterIndex<0)||(clusterIndex>s->clusterList.size()))
                 continue;
 
@@ -521,6 +536,7 @@ void BackendGoogleMaps::slotHTMLEvents(const QStringList& events)
                 );
 
             KGEOMAP_ASSERT(isValid);
+
             if (!isValid)
                 continue;
 
@@ -537,28 +553,33 @@ void BackendGoogleMaps::slotHTMLEvents(const QStringList& events)
             bool okay = false;
             const int clusterIndex = eventParameters.first().toInt(&okay);
             KGEOMAP_ASSERT(okay);
+
             if (!okay)
                 continue;
 
-            KGEOMAP_ASSERT(clusterIndex>=0);
+            KGEOMAP_ASSERT(clusterIndex >= 0);
             KGEOMAP_ASSERT(clusterIndex<s->clusterList.size());
+
             if ((clusterIndex<0)||(clusterIndex>s->clusterList.size()))
                 continue;
 
             // determine to which marker we snapped:
-            okay = false;
+            okay                  = false;
             const int snapModelId = eventParameters.at(1).toInt(&okay);
             KGEOMAP_ASSERT(okay);
+
             if (!okay)
                 continue;
-            okay = false;
+
+            okay                   = false;
             const int snapMarkerId = eventParameters.at(2).toInt(&okay);
             KGEOMAP_ASSERT(okay);
+
             if (!okay)
                 continue;
 
             /// @todo emit signal here or later?
-            ModelHelper* const modelHelper = s->ungroupedModels.at(snapModelId);
+            ModelHelper* const modelHelper  = s->ungroupedModels.at(snapModelId);
             QAbstractItemModel* const model = modelHelper->model();
             QPair<int, QModelIndex> snapTargetIndex(snapModelId, model->index(snapMarkerId, 0));
             emit(signalClustersMoved(QIntList()<<clusterIndex, snapTargetIndex));
@@ -567,14 +588,16 @@ void BackendGoogleMaps::slotHTMLEvents(const QStringList& events)
         {
             /// @todo buffer this event type!
             // cluster clicked
-            bool okay = false;
+            bool okay              = false;
             const int clusterIndex = eventParameter.toInt(&okay);
             KGEOMAP_ASSERT(okay);
+
             if (!okay)
                 continue;
 
             KGEOMAP_ASSERT(clusterIndex>=0);
             KGEOMAP_ASSERT(clusterIndex<s->clusterList.size());
+
             if ((clusterIndex<0)||(clusterIndex>s->clusterList.size()))
                 continue;
 
@@ -584,14 +607,16 @@ void BackendGoogleMaps::slotHTMLEvents(const QStringList& events)
         {
 //             // TODO: buffer this event type!
 //             // marker moved
-//             bool okay = false;
-//             const int markerRow= eventParameter.toInt(&okay);
+//             bool okay           = false;
+//             const int markerRow = eventParameter.toInt(&okay);
 //             KGEOMAP_ASSERT(okay);
+//
 //             if (!okay)
 //                 continue;
 //
-//             KGEOMAP_ASSERT(markerRow>=0);
+//             KGEOMAP_ASSERT(markerRow >= 0);
 //             KGEOMAP_ASSERT(markerRow<s->specialMarkersModel->rowCount());
+//
 //             if ((markerRow<0)||(markerRow>=s->specialMarkersModel->rowCount()))
 //                 continue;
 //
@@ -603,6 +628,7 @@ void BackendGoogleMaps::slotHTMLEvents(const QStringList& events)
 //                 );
 //
 //             KGEOMAP_ASSERT(isValid);
+//
 //             if (!isValid)
 //                 continue;
 //
@@ -642,11 +668,13 @@ void BackendGoogleMaps::slotHTMLEvents(const QStringList& events)
     {
         updateZoomMinMaxCache();
     }
+
     if (zoomProbablyChanged)
     {
         d->cacheZoom = d->htmlWidget->runScript(QLatin1String("kgeomapGetZoom();")).toInt();
         emit(signalZoomChanged(QString::fromLatin1("googlemaps:%1").arg(d->cacheZoom)));
     }
+
     if (centerProbablyChanged)
     {
         // there is nothing we can do if the coordinates are invalid
@@ -654,7 +682,7 @@ void BackendGoogleMaps::slotHTMLEvents(const QStringList& events)
     }
 
     // update the actions if necessary:
-    if (zoomProbablyChanged||mapTypeChanged||centerProbablyChanged)
+    if (zoomProbablyChanged || mapTypeChanged || centerProbablyChanged)
     {
         updateActionAvailability();
     }
@@ -677,6 +705,7 @@ void BackendGoogleMaps::updateClusters()
     kDebug() << "start updateclusters";
     // re-transfer the clusters to the map:
     KGEOMAP_ASSERT(isReady());
+
     if (!isReady())
         return;
 
@@ -686,7 +715,8 @@ void BackendGoogleMaps::updateClusters()
     const bool canMoveItems = s->modificationsAllowed && s->markerModel->tilerFlags().testFlag(AbstractMarkerTiler::FlagMovable) && !s->showThumbnails;
     d->htmlWidget->runScript(QLatin1String("kgeomapClearClusters();"));
     d->htmlWidget->runScript(QString::fromLatin1("kgeomapSetIsInEditMode(%1);").arg(s->showThumbnails?QLatin1String("false" ):QLatin1String("true" )));
-    for (int currentIndex = 0; currentIndex<s->clusterList.size(); ++currentIndex)
+
+    for (int currentIndex = 0; currentIndex < s->clusterList.size(); ++currentIndex)
     {
         const KGeoMapCluster& currentCluster = s->clusterList.at(currentIndex);
 
@@ -749,7 +779,7 @@ bool BackendGoogleMaps::geoCoordinates(const QPoint& point, GeoCoordinates* cons
 
 QSize BackendGoogleMaps::mapSize() const
 {
-    KGEOMAP_ASSERT(d->htmlWidgetWrapper!=0);
+    KGEOMAP_ASSERT(d->htmlWidgetWrapper != 0);
 
     return d->htmlWidgetWrapper->size();
 }
@@ -828,10 +858,10 @@ void BackendGoogleMaps::setZoom(const QString& newZoom)
     const QString myZoomString = s->worldMapWidget->convertZoomToBackendZoom(newZoom, QLatin1String("googlemaps"));
     KGEOMAP_ASSERT(myZoomString.startsWith(QLatin1String("googlemaps:")));
 
-    const int myZoom = myZoomString.mid(QString::fromLatin1("googlemaps:").length()).toInt();
+    const int myZoom           = myZoomString.mid(QString::fromLatin1("googlemaps:").length()).toInt();
     kDebug() << myZoom;
 
-    d->cacheZoom = myZoom;
+    d->cacheZoom               = myZoom;
 
     if (isReady())
     {
@@ -847,6 +877,7 @@ QString BackendGoogleMaps::getZoom() const
 int BackendGoogleMaps::getMarkerModelLevel()
 {
     KGEOMAP_ASSERT(isReady());
+
     if (!isReady())
     {
         return 0;
@@ -935,9 +966,10 @@ void BackendGoogleMaps::updateActionAvailability()
         return;
     }
 
-    const QString currentMapType = getMapType();
+    const QString currentMapType         = getMapType();
     const QList<QAction*> mapTypeActions = d->mapTypeActionGroup->actions();
-    for (int i=0; i<mapTypeActions.size(); ++i)
+
+    for (int i = 0; i < mapTypeActions.size(); ++i)
     {
         mapTypeActions.at(i)->setChecked(mapTypeActions.at(i)->data().toString()==currentMapType);
     }
@@ -956,20 +988,23 @@ void BackendGoogleMaps::updateZoomMinMaxCache()
 void BackendGoogleMaps::slotThumbnailAvailableForIndex(const QVariant& index, const QPixmap& pixmap)
 {
     kDebug()<<index<<pixmap.size();
+
     if (pixmap.isNull() || !s->showThumbnails)
         return;
 
     // TODO: properly reject pixmaps with the wrong size
     const int expectedThumbnailSize = s->worldMapWidget->getUndecoratedThumbnailSize();
+
     if ((pixmap.size().height()!=expectedThumbnailSize)&&(pixmap.size().width()!=expectedThumbnailSize))
         return;
 
     // find the cluster which is represented by this index:
-    for (int i=0; i<s->clusterList.count(); ++i)
+    for (int i = 0; i < s->clusterList.count(); ++i)
     {
         // TODO: use the right sortkey
         // TODO: let the representativeChooser handle the index comparison
         const QVariant representativeMarker = s->worldMapWidget->getClusterRepresentativeMarker(i, s->sortKey);
+
         if (s->markerModel->indicesEqual(index, representativeMarker))
         {
             QPoint clusterCenterPoint;
@@ -1045,11 +1080,12 @@ void BackendGoogleMaps::setMarkerPixmap(const int modelId, const int markerId,
 
 bool BackendGoogleMaps::eventFilter(QObject* object, QEvent* event)
 {
-    if (object==d->htmlWidgetWrapper)
+    if (object == d->htmlWidgetWrapper)
     {
-        if (event->type()==QEvent::Resize)
+        if (event->type() == QEvent::Resize)
         {
             QResizeEvent* const resizeEvent = dynamic_cast<QResizeEvent*>(event);
+
             if (resizeEvent)
             {
                 // TODO: the map div does not adjust its height properly if height=100%,
@@ -1061,6 +1097,7 @@ bool BackendGoogleMaps::eventFilter(QObject* object, QEvent* event)
             }
         }
     }
+
     return false;
 }
 
@@ -1117,19 +1154,19 @@ void BackendGoogleMaps::centerOn( const Marble::GeoDataLatLonBox& latLonBox, con
 void BackendGoogleMaps::setActive(const bool state)
 {
     const bool oldState = d->activeState;
-    d->activeState = state;
+    d->activeState      = state;
 
-    if (oldState!=state)
+    if (oldState != state)
     {
-        if ((!state)&&d->htmlWidgetWrapper)
+        if ((!state) && d->htmlWidgetWrapper)
         {
             // we should share our widget in the list of widgets in the global object
             KGeoMapInternalWidgetInfo info;
             info.deleteFunction = deleteInfoFunction;
-            info.widget = d->htmlWidgetWrapper.data();
-            info.currentOwner = this;
-            info.backendName = backendName();
-            info.state = d->widgetIsDocked ? KGeoMapInternalWidgetInfo::InternalWidgetStillDocked : KGeoMapInternalWidgetInfo::InternalWidgetUndocked;
+            info.widget         = d->htmlWidgetWrapper.data();
+            info.currentOwner   = this;
+            info.backendName    = backendName();
+            info.state          = d->widgetIsDocked ? KGeoMapInternalWidgetInfo::InternalWidgetStillDocked : KGeoMapInternalWidgetInfo::InternalWidgetUndocked;
 
             GMInternalWidgetInfo intInfo;
             intInfo.htmlWidget = d->htmlWidget.data();
@@ -1139,7 +1176,7 @@ void BackendGoogleMaps::setActive(const bool state)
             go->addMyInternalWidgetToPool(info);
         }
 
-        if (state&&d->htmlWidgetWrapper)
+        if (state && d->htmlWidgetWrapper)
         {
             // we should remove our widget from the list of widgets in the global object
             KGeoMapGlobalObject* const go = KGeoMapGlobalObject::instance();
@@ -1176,13 +1213,12 @@ void BackendGoogleMaps::releaseWidget(KGeoMapInternalWidgetInfo* const info)
     d->htmlWidget->setSharedKGeoMapObject(0);
     d->htmlWidgetWrapper->removeEventFilter(this);
 
-    d->htmlWidget = 0;
+    d->htmlWidget        = 0;
     d->htmlWidgetWrapper = 0;
+    info->currentOwner   = 0;
+    info->state          = KGeoMapInternalWidgetInfo::InternalWidgetReleased;
+    d->isReady           = false;
 
-    info->currentOwner = 0;
-    info->state = KGeoMapInternalWidgetInfo::InternalWidgetReleased;
-
-    d->isReady = false;
     emit(signalBackendReadyChanged(backendName()));
 }
 
@@ -1193,6 +1229,7 @@ void BackendGoogleMaps::mapWidgetDocked(const bool state)
         KGeoMapGlobalObject* const go = KGeoMapGlobalObject::instance();
         go->updatePooledWidgetState(d->htmlWidgetWrapper, state ? KGeoMapInternalWidgetInfo::InternalWidgetStillDocked : KGeoMapInternalWidgetInfo::InternalWidgetUndocked);
     }
+
     d->widgetIsDocked = state;
 }
 
@@ -1204,14 +1241,14 @@ void BackendGoogleMaps::deleteInfoFunction(KGeoMapInternalWidgetInfo* const info
     }
 
     const GMInternalWidgetInfo intInfo = info->backendData.value<GMInternalWidgetInfo>();
-    delete intInfo.htmlWidget;
 
+    delete intInfo.htmlWidget;
     delete info->widget.data();
 }
 
 void BackendGoogleMaps::storeTrackChanges(const TrackManager::TrackChanges trackChanges)
 {
-    for (int i=0; i<d->trackChangeTracker.count(); ++i)
+    for (int i = 0; i < d->trackChangeTracker.count(); ++i)
     {
         if (d->trackChangeTracker.at(i).first==trackChanges.first)
         {
@@ -1238,6 +1275,7 @@ void BackendGoogleMaps::slotTrackManagerChanged()
 
         // store all tracks which are already in the manager as changed
         const TrackManager::Track::List trackList = s->trackManager->getTrackList();
+
         Q_FOREACH(const TrackManager::Track& t, trackList)
         {
             storeTrackChanges(TrackManager::TrackChanges(t.id, TrackManager::ChangeAdd));
@@ -1248,10 +1286,12 @@ void BackendGoogleMaps::slotTrackManagerChanged()
 void BackendGoogleMaps::slotTracksChanged(const QList<TrackManager::TrackChanges> trackChanges)
 {
     bool needToTrackChanges = !d->activeState;
+
     if (s->trackManager)
     {
         needToTrackChanges|=!s->trackManager->getVisibility();
     }
+
     if (needToTrackChanges)
     {
         Q_FOREACH(const TrackManager::TrackChanges& tc, trackChanges)
@@ -1301,8 +1341,9 @@ void BackendGoogleMaps::slotTracksChanged(const QList<TrackManager::TrackChanges
                         .arg(track.color.name()); // QColor::name() returns #ff00ff
             d->htmlWidget->runScript(createTrackScript);
 
-            QDateTime t1 = QDateTime::currentDateTime();
+            QDateTime t1                    = QDateTime::currentDateTime();
             const int numPointsToPassAtOnce = 1000;
+
             for (int coordIdx = 0; coordIdx < track.points.count(); coordIdx += numPointsToPassAtOnce)
             {
                 /// @TODO Even by passing only a few points each time, we can
@@ -1311,6 +1352,7 @@ void BackendGoogleMaps::slotTracksChanged(const QList<TrackManager::TrackChanges
                 ///       to allow processing of other events.
                 addPointsToTrack(track.id, track.points, coordIdx, numPointsToPassAtOnce);
             }
+
             QDateTime t2 = QDateTime::currentDateTime();
             kDebug()<<track.url.fileName()<<t1.msecsTo(t2);
         }
@@ -1323,17 +1365,21 @@ void BackendGoogleMaps::addPointsToTrack(const quint64 trackId, TrackManager::Tr
     QTextStream jsonBuilder(&json);
     jsonBuilder << '[';
     int lastPoint = track.count()-1;
+
     if (nPoints>0)
     {
         lastPoint = qMin(firstPoint + nPoints - 1, track.count()-1);
     }
+
     for (int coordIdx = firstPoint; coordIdx <= lastPoint; ++coordIdx)
     {
         GeoCoordinates const& coordinates = track.at(coordIdx).coordinates;
+
         if (coordIdx > firstPoint)
         {
             jsonBuilder << ',';
         }
+
         // Pass data in plain array format. In KHTML, this is much slower than
         // using JSON. In Firefox, the speed is roughly the same.
 //         jsonBuilder /*<< "{\"lat\":" */<< coordinates.latString() << ","
@@ -1343,6 +1389,7 @@ void BackendGoogleMaps::addPointsToTrack(const quint64 trackId, TrackManager::Tr
         jsonBuilder << "{\"lat\":" << coordinates.latString() << ","
                     << "\"lon\":" << coordinates.lonString() << "}";
     }
+
     jsonBuilder << ']';
     const QString addTrackScript = QString::fromLatin1("kgeomapAddToTrack(%1,'%2');").arg(trackId).arg(json);
     d->htmlWidget->runScript(addTrackScript);
@@ -1357,6 +1404,7 @@ void BackendGoogleMaps::slotTrackVisibilityChanged(const bool newState)
         // store all tracks which are already in the manager as changed
         const TrackManager::Track::List trackList = s->trackManager->getTrackList();
         QList<TrackManager::TrackChanges> trackChanges;
+
         Q_FOREACH(const TrackManager::Track& t, trackList)
         {
             trackChanges << TrackManager::TrackChanges(t.id, TrackManager::ChangeAdd);
