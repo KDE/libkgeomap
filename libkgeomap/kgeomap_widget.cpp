@@ -1554,12 +1554,12 @@ QVariant KGeoMapWidget::getClusterRepresentativeMarker(const int clusterIndex, c
     const KGeoMapCluster cluster           = s->clusterList.at(clusterIndex);
     QMap<int, QVariant>::const_iterator it = cluster.representativeMarkers.find(sortKey);
 
-    if (it!=cluster.representativeMarkers.end())
+    if (it != cluster.representativeMarkers.end())
         return *it;
 
     QList<QVariant> repIndices;
 
-    for (int i=0; i<cluster.tileIndicesList.count(); ++i)
+    for (int i = 0; i < cluster.tileIndicesList.count(); ++i)
     {
         repIndices << s->markerModel->getTileRepresentativeMarker(cluster.tileIndicesList.at(i), sortKey);
     }
@@ -1598,7 +1598,8 @@ void KGeoMapWidget::setSortKey(const int sortKey)
     slotRequestLazyReclustering();
 }
 
-QPixmap KGeoMapWidget::getDecoratedPixmapForCluster(const int clusterId, const KGeoMapGroupState* const selectedStateOverride, const int* const countOverride, QPoint* const centerPoint)
+QPixmap KGeoMapWidget::getDecoratedPixmapForCluster(const int clusterId, const KGeoMapGroupState* const selectedStateOverride,
+                                                    const int* const countOverride, QPoint* const centerPoint)
 {
     KGeoMapCluster& cluster      = s->clusterList[clusterId];
     int markerCount              = cluster.markerCount;
@@ -1619,9 +1620,9 @@ QPixmap KGeoMapWidget::getDecoratedPixmapForCluster(const int clusterId, const K
     QColor       labelColor;
     QString      labelText;
     getColorInfos(clusterId, &fillColor, &strokeColor,
-                        &strokeStyle, &labelText, &labelColor,
-                        &selectedState,
-                        &markerCount);
+                  &strokeStyle, &labelText, &labelColor,
+                  &selectedState,
+                  &markerCount);
 
     // determine whether we should use a pixmap or a placeholder
     if (!s->showThumbnails)
@@ -1692,15 +1693,13 @@ QPixmap KGeoMapWidget::getDecoratedPixmapForCluster(const int clusterId, const K
             KGeoMapGroupState globalState = s->markerModel->getGlobalGroupState();
 
             /// @todo What about partially in the region or positively filtered?
-            const bool clusterIsNotInRegionSelection =
-                   (globalState & KGeoMapRegionSelectedMask)
-                && ( (groupState & KGeoMapRegionSelectedMask) == KGeoMapRegionSelectedNone );
-            const bool clusterIsNotPositivelyFiltered =
-                   (globalState & KGeoMapFilteredPositiveMask)
-                && ( (groupState & KGeoMapFilteredPositiveMask) == KGeoMapFilteredPositiveNone );
+            const bool clusterIsNotInRegionSelection  = (globalState & KGeoMapRegionSelectedMask) &&
+                                                        ((groupState & KGeoMapRegionSelectedMask) == KGeoMapRegionSelectedNone);
+            const bool clusterIsNotPositivelyFiltered = (globalState & KGeoMapFilteredPositiveMask) &&
+                                                        ((groupState & KGeoMapFilteredPositiveMask) == KGeoMapFilteredPositiveNone);
 
-            const bool shouldGrayOut  = clusterIsNotInRegionSelection || clusterIsNotPositivelyFiltered;
-            const bool shouldCrossOut = clusterIsNotInRegionSelection;
+            const bool shouldGrayOut                  = clusterIsNotInRegionSelection || clusterIsNotPositivelyFiltered;
+            const bool shouldCrossOut                 = clusterIsNotInRegionSelection;
 
             if (shouldGrayOut)
             {
@@ -1732,25 +1731,23 @@ QPixmap KGeoMapWidget::getDecoratedPixmapForCluster(const int clusterId, const K
                 painter.drawLine(width-1, 0, 0, height-1);
             }
 
-            if (strokeStyle!=Qt::SolidLine)
+            if (strokeStyle != Qt::SolidLine)
             {
                 // paint a white border around the image
                 borderPen.setColor(Qt::white);
                 painter.setPen(borderPen);
-                painter.drawRect(
-                        borderWidth-1, borderWidth-1,
-                        resultPixmap.size().width()-borderWidth, resultPixmap.size().height()-borderWidth
-                    );
+                painter.drawRect(borderWidth-1, borderWidth-1,
+                                 resultPixmap.size().width()-borderWidth,
+                                 resultPixmap.size().height()-borderWidth);
             }
 
             // now draw the selection border
             borderPen.setColor(strokeColor);
             borderPen.setStyle(strokeStyle);
             painter.setPen(borderPen);
-            painter.drawRect(
-                    borderWidth-1, borderWidth-1,
-                    resultPixmap.size().width()-borderWidth, resultPixmap.size().height()-borderWidth
-                );
+            painter.drawRect(borderWidth-1, borderWidth-1,
+                             resultPixmap.size().width()-borderWidth,
+                             resultPixmap.size().height()-borderWidth);
 
             if (s->showNumbersOnItems)
             {
@@ -1770,14 +1767,13 @@ QPixmap KGeoMapWidget::getDecoratedPixmapForCluster(const int clusterId, const K
                 // draw the text:
                 painter.setPen(labelPen);
                 painter.setBrush(Qt::NoBrush);
-                painter.drawText(textRect,
-                            Qt::AlignHCenter|Qt::AlignVCenter, labelText);
+                painter.drawText(textRect, Qt::AlignHCenter|Qt::AlignVCenter, labelText);
             }
 
             // update the display information stored in the cluster:
-            cluster.pixmapType = KGeoMapCluster::PixmapImage;
+            cluster.pixmapType   = KGeoMapCluster::PixmapImage;
             cluster.pixmapOffset = QPoint(resultPixmap.width()/2, resultPixmap.height()/2);
-            cluster.pixmapSize = resultPixmap.size();
+            cluster.pixmapSize   = resultPixmap.size();
 
             if (centerPoint)
             {
@@ -1929,7 +1925,7 @@ void KGeoMapWidget::clearRegionSelection()
 void KGeoMapWidget::slotNewSelectionFromMap(const KGeoMap::GeoCoordinates::Pair& sel)
 {
     /// @todo Should the backend update s on its own?
-    s->selectionRectangle      = sel;
+    s->selectionRectangle = sel;
 
     slotUpdateActionsEnabled();
     emit(signalRegionSelectionChanged());
@@ -1952,7 +1948,7 @@ void KGeoMapWidget::slotUngroupedModelChanged()
 
     if (senderModel)
     {
-        for (int i=0; i<s->ungroupedModels.count(); ++i)
+        for (int i = 0; i < s->ungroupedModels.count(); ++i)
         {
             if (s->ungroupedModels.at(i)->model() == senderModel)
             {
@@ -1968,7 +1964,7 @@ void KGeoMapWidget::slotUngroupedModelChanged()
 
     if (senderHelper)
     {
-        for (int i=0; i<s->ungroupedModels.count(); ++i)
+        for (int i = 0; i < s->ungroupedModels.count(); ++i)
         {
             if (s->ungroupedModels.at(i)==senderHelper)
             {
@@ -1983,7 +1979,7 @@ void KGeoMapWidget::slotUngroupedModelChanged()
 
     if (senderSelectionModel)
     {
-        for (int i=0; i<s->ungroupedModels.count(); ++i)
+        for (int i = 0; i < s->ungroupedModels.count(); ++i)
         {
             if (s->ungroupedModels.at(i)->selectionModel()==senderSelectionModel)
             {
@@ -2041,7 +2037,7 @@ void KGeoMapWidget::setActive(const bool state)
     if (state)
     {
         // do we have a map widget shown?
-        if ( (d->stackedLayout->count()==1) && d->currentBackend )
+        if ( (d->stackedLayout->count() == 1) && d->currentBackend )
         {
             setMapWidgetInFrame(d->currentBackend->mapWidget());
 
@@ -2075,7 +2071,6 @@ void KGeoMapWidget::setVisibleMouseModes(const MouseModes mouseModes)
     if (d->mouseModesHolder)
     {
         d->mouseModesHolder->setVisible(s->visibleMouseModes);
-
         d->setSelectionModeButton->setVisible(s->visibleMouseModes.testFlag(MouseModeRegionSelection));
         d->removeCurrentSelectionButton->setVisible(s->visibleMouseModes.testFlag(MouseModeRegionSelection));
         d->setPanModeButton->setVisible(s->visibleMouseModes.testFlag(MouseModePan));
@@ -2158,7 +2153,7 @@ void KGeoMapWidget::adjustBoundariesToGroupedMarkers(const bool useSaneZoomLevel
     {
         const TileIndex tileIndex = tileIterator.currentIndex();
 
-        for(int corner=1; corner<=4; corner++)
+        for(int corner = 1; corner <= 4; corner++)
         {
             const GeoCoordinates currentTileCoordinate = tileIndex.toCoordinates(TileIndex::CornerPosition(corner));
 
@@ -2205,7 +2200,7 @@ void KGeoMapWidget::setMapWidgetInFrame(QWidget* const widgetForFrame)
     if (d->stackedLayout->count()>1)
     {
         // widget 0 is the status widget, widget 1 is the map widget
-        if (d->stackedLayout->widget(1)==widgetForFrame)
+        if (d->stackedLayout->widget(1) == widgetForFrame)
         {
             return;
         }
@@ -2234,7 +2229,7 @@ void KGeoMapWidget::slotMouseModeChanged(QAction* triggeredAction)
     const QVariant triggeredActionData = triggeredAction->data();
     const MouseModes newMouseMode      = triggeredActionData.value<KGeoMap::MouseModes>();
 
-    if (newMouseMode==s->currentMouseMode)
+    if (newMouseMode == s->currentMouseMode)
     {
         return;
     }
