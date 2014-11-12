@@ -32,10 +32,10 @@
 namespace KGeoMap
 {
 
-class TileGrouper::TileGrouperPrivate
+class TileGrouper::Private
 {
 public:
-    TileGrouperPrivate()
+    Private()
         : clustersDirty(true),
           currentBackend(0)
     {
@@ -47,7 +47,7 @@ public:
 };
 
 TileGrouper::TileGrouper(const QExplicitlySharedDataPointer<KGeoMapSharedData>& sharedData, QObject* const parent)
-    : QObject(parent), d(new TileGrouperPrivate()), s(sharedData)
+    : QObject(parent), d(new Private()), s(sharedData)
 {
 }
 
@@ -103,6 +103,7 @@ void TileGrouper::updateClusters()
     {
        return;
     }
+
     d->clustersDirty = false;
 
     // constants for clusters
@@ -115,14 +116,14 @@ void TileGrouper::updateClusters()
 
     s->clusterList.clear();
 
-    const int markerLevel = d->currentBackend->getMarkerModelLevel();
+    const int markerLevel                                   = d->currentBackend->getMarkerModelLevel();
     QList<QPair<GeoCoordinates, GeoCoordinates> > mapBounds = d->currentBackend->getNormalizedBounds();
 
 //     // debug output for tile level diagnostics:
 //     QIntList tile1;
 //     tile1<<520;
 //     QIntList tile2 = tile1;
-//     for (int i=1; i<=s->markerModel->maxLevel()-1; ++i)
+//     for (int i = 1; i <= s->markerModel->maxLevel()-1; ++i)
 //     {
 //         tile2 = tile1;
 //         tile2<<0;
@@ -135,7 +136,7 @@ void TileGrouper::updateClusters()
 //         kDebug()<<i<<tile1Point<<tile2Point<<(tile1Point-tile2Point);
 //     }
 
-    const int gridSize = ClusterGridSizeScreen;
+    const int gridSize   = ClusterGridSizeScreen;
     const QSize mapSize  = d->currentBackend->mapSize();
     const int gridWidth  = mapSize.width();
     const int gridHeight = mapSize.height();
@@ -145,7 +146,7 @@ void TileGrouper::updateClusters()
 
     /// @todo Iterate only over the visible part of the map
     int debugCountNonEmptyTiles = 0;
-    int debugTilesSearched = 0;
+    int debugTilesSearched      = 0;
 
     /// @todo Review this
     for(int i = 0; i < mapBounds.count(); ++i)
@@ -161,13 +162,14 @@ void TileGrouper::updateClusters()
         const GeoCoordinates tileCoordinate = tileIndex.toCoordinates();
         debugTilesSearched++;
         QPoint tilePoint;
+
         if (!d->currentBackend->screenCoordinates(tileCoordinate, &tilePoint))
         {
             continue;
         }
 
         // make sure we are in the grid (in case there are rounding errors somewhere in the backend
-        if ((tilePoint.x()<0)||(tilePoint.y()<0)||(tilePoint.x()>=gridWidth)||(tilePoint.y()>=gridHeight))
+        if ((tilePoint.x() < 0) || (tilePoint.y() < 0) || (tilePoint.x() >= gridWidth) || (tilePoint.y() >= gridHeight))
             continue;
 
         debugCountNonEmptyTiles++;
@@ -181,7 +183,7 @@ void TileGrouper::updateClusters()
     /// @todo Cleanup this list every ... iterations in the next loop, too
     QIntList nonEmptyPixelIndices;
 
-    for (int i=0; i<gridWidth*gridHeight; ++i)
+    for (int i = 0; i < gridWidth*gridHeight; ++i)
     {
         if (pixelCountGrid.at(i)>0)
             nonEmptyPixelIndices << i;
@@ -192,25 +194,26 @@ void TileGrouper::updateClusters()
     Q_FOREVER
     {
         // here we store candidates for clusters:
-        int markerMax = 0;
-        int markerX = 0;
-        int markerY = 0;
+        int markerMax             = 0;
+        int markerX               = 0;
+        int markerY               = 0;
         int pixelGridMetaIndexMax = 0;
 
-        for (int pixelGridMetaIndex = 0; pixelGridMetaIndex<nonEmptyPixelIndices.size(); ++pixelGridMetaIndex)
+        for (int pixelGridMetaIndex = 0; pixelGridMetaIndex < nonEmptyPixelIndices.size(); ++pixelGridMetaIndex)
         {
             const int index = nonEmptyPixelIndices.at(pixelGridMetaIndex);
+
             if (index<0)
                 continue;
 
-            if (pixelCountGrid.at(index)==0)
+            if (pixelCountGrid.at(index) == 0)
             {
                 /// @todo Also remove this entry from the list to speed up the loop!
                 nonEmptyPixelIndices[pixelGridMetaIndex] = -1;
                 continue;
             }
 
-            if (pixelCountGrid.at(index)>markerMax)
+            if (pixelCountGrid.at(index) > markerMax)
             {
                 // calculate x,y from the linear index:
                 const int x = index % gridWidth;

@@ -33,7 +33,7 @@ namespace KGeoMap
 
 LookupAltitude* LookupFactory::getAltitudeLookup(const QString& backendName, QObject* const parent)
 {
-    if (backendName==QLatin1String("geonames"))
+    if (backendName == QLatin1String("geonames"))
     {
         return new LookupAltitudeGeonames(parent);
     }

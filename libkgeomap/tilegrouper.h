@@ -52,11 +52,12 @@ private:
 
     bool currentBackendReady();
 
-    class TileGrouperPrivate;
-    TileGrouperPrivate* const d;
+private:
+
+    class Private;
+    Private* const d;
 
     const QExplicitlySharedDataPointer<KGeoMapSharedData> s;
-
 };
 
 } /* KGeoMap */

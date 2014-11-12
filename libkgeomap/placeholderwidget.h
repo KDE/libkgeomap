@@ -37,6 +37,7 @@ class PlaceholderWidget : public QFrame
     Q_OBJECT
 
 public:
+
     explicit PlaceholderWidget(QWidget* const parent = 0);
     ~PlaceholderWidget();
 
