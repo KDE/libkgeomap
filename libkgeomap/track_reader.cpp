@@ -39,6 +39,21 @@
 namespace KGeoMap
 {
 
+TrackReader::TrackReader(TrackReadResult* const dataTarget)
+    : QXmlDefaultHandler(),
+      fileData(dataTarget),
+      currentElementPath(),
+      currentElements(),
+      currentText(),
+      currentDataPoint(),
+      verifyFoundGPXElement(false)
+{
+}
+
+TrackReader::~TrackReader()
+{
+}
+
 QDateTime TrackReader::ParseTime(QString timeString)
 {
     if (timeString.isEmpty())
@@ -85,17 +100,6 @@ QDateTime TrackReader::ParseTime(QString timeString)
     theTime           = theTime.addSecs(-timeZoneOffsetSeconds);
 
     return theTime;
-}
-
-TrackReader::TrackReader(TrackReadResult* const dataTarget)
-    : QXmlDefaultHandler(),
-      fileData(dataTarget),
-      currentElementPath(),
-      currentElements(),
-      currentText(),
-      currentDataPoint(),
-      verifyFoundGPXElement(false)
-{
 }
 
 /**
@@ -151,7 +155,7 @@ bool TrackReader::endElement(const QString& namespaceURI, const QString& localNa
         bool okay       = false;
         int nSatellites = eText.toInt(&okay);
 
-        if (okay&&(nSatellites>=0))
+        if (okay && (nSatellites >= 0))
             currentDataPoint.nSatellites = nSatellites;
     }
     else if (ePath == "gpx:gpx/gpx:trk/gpx:trkseg/gpx:trkpt/gpx:hdop")

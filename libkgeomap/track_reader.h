@@ -65,6 +65,7 @@ public:
     };
 
     explicit TrackReader(TrackReadResult* const dataTarget);
+    virtual ~TrackReader();
 
     virtual bool characters(const QString& ch);
     virtual bool endElement(const QString& namespaceURI, const QString& localName, const QString& qName);
@@ -81,12 +82,12 @@ private:
 
 private:
 
-    TrackReadResult* const            fileData;
-    QString                           currentElementPath;
-    QStringList                       currentElements;
-    QString                           currentText;
-    TrackManager::TrackPoint          currentDataPoint;
-    bool                              verifyFoundGPXElement;
+    TrackReadResult* const   fileData;
+    QString                  currentElementPath;
+    QStringList              currentElements;
+    QString                  currentText;
+    TrackManager::TrackPoint currentDataPoint;
+    bool                     verifyFoundGPXElement;
 
     friend class ::TestTracks;
 };
