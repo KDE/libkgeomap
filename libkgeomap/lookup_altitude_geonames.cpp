@@ -278,4 +278,3 @@ void LookupAltitudeGeonames::cancel()
 }
 
 } /* namespace KGeoMap */
-

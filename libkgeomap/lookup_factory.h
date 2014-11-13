@@ -39,7 +39,6 @@ class KGEOMAP_EXPORT LookupFactory
 public:
 
     static LookupAltitude* getAltitudeLookup(const QString& backendName, QObject* const parent);
-
 };
 
 } /* namespace KGeoMap */

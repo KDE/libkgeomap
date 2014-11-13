@@ -7,9 +7,9 @@
  * @date   2006-09-19
  * @brief  Track file reader
  *
- * @author Copyright (C) 2006-2013 by Gilles Caulier
+ * @author Copyright (C) 2006-2014 by Gilles Caulier
  *         <a href="mailto:caulier dot gilles at gmail dot com">caulier dot gilles at gmail dot com</a>
- * @author Copyright (C) 2010, 2014 by Michael G. Hansen
+ * @author Copyright (C) 2010-2014 by Michael G. Hansen
  *         <a href="mailto:mike at mghansen dot de">mike at mghansen dot de</a>
  *
  * This program is free software; you can redistribute it
@@ -23,7 +23,6 @@
  * GNU General Public License for more details.
  *
  * ============================================================ */
-
 
 #ifndef TRACK_READER_H
 #define TRACK_READER_H
@@ -50,17 +49,17 @@ public:
     class TrackReadResult
     {
     public:
+
         TrackReadResult()
           : track(),
             isValid(false),
             loadError()
         {
-
         }
 
-        TrackManager::Track track;
-        bool isValid;
-        QString loadError;
+        TrackManager::Track            track;
+        bool                           isValid;
+        QString                        loadError;
 
         typedef QList<TrackReadResult> List;
     };
@@ -92,6 +91,6 @@ private:
     friend class ::TestTracks;
 };
 
-} /* KGeoMap */
+} /* namespace KGeoMap */
 
 #endif /* TRACK_READER_H */

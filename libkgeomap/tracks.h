@@ -57,13 +57,13 @@ public:
     public:
 
         TrackPoint()
-        : dateTime(),
-          coordinates(),
-          nSatellites(-1),
-          hDop(-1),
-          pDop(-1),
-          fixType(-1),
-          speed(-1)
+          : dateTime(),
+            coordinates(),
+            nSatellites(-1),
+            hDop(-1),
+            pDop(-1),
+            fixType(-1),
+            speed(-1)
         {
         }
 
@@ -71,13 +71,13 @@ public:
 
     public:
 
-        QDateTime                   dateTime;
-        GeoCoordinates              coordinates;
-        int                         nSatellites;
-        qreal                       hDop;
-        qreal                       pDop;
-        int                         fixType;
-        qreal                       speed;
+        QDateTime                 dateTime;
+        GeoCoordinates            coordinates;
+        int                       nSatellites;
+        qreal                     hDop;
+        qreal                     pDop;
+        int                       fixType;
+        qreal                     speed;
 
         typedef QList<TrackPoint> List;
     };
@@ -90,12 +90,15 @@ public:
     class Track
     {
     public:
+
         enum Flags
         {
             FlagVisible = 1,
 
             FlagDefault = FlagVisible
         };
+
+    public:
 
         Track()
           : url(),
@@ -106,12 +109,12 @@ public:
         {
         }
 
-        KUrl              url;
-        QList<TrackPoint> points;
+        KUrl                 url;
+        QList<TrackPoint>    points;
         /// 0 means no track id assigned yet
-        Id                id;
-        QColor            color;
-        Flags             flags;
+        Id                   id;
+        QColor               color;
+        Flags                flags;
 
         typedef QList<Track> List;
     };
@@ -135,12 +138,15 @@ public:
     void loadTrackFiles(const KUrl::List& urls);
     QList<QPair<KUrl, QString> > readLoadErrors();
     void clear();
+
     const Track& getTrack(const int index) const;
     Track::List getTrackList() const;
     int trackCount() const;
+
     quint64 getNextFreeTrackId();
-    Track getTrackById(const quint64 trackId) const;
-    QColor getNextFreeTrackColor();
+    Track   getTrackById(const quint64 trackId) const;
+    QColor  getNextFreeTrackColor();
+
     void setVisibility(const bool value);
     bool getVisibility() const;
 

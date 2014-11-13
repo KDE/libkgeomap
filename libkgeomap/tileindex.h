@@ -9,7 +9,7 @@
  *
  * @author Copyright (C) 2009-2011 by Michael G. Hansen
  *         <a href="mailto:mike at mghansen dot de">mike at mghansen dot de</a>
- * @author Copyright (C) 2010-2011 by Gilles Caulier
+ * @author Copyright (C) 2010-2014 by Gilles Caulier
  *         <a href="mailto:caulier dot gilles at gmail dot com">caulier dot gilles at gmail dot com</a>
  *
  * This program is free software; you can redistribute it
@@ -61,10 +61,12 @@ public:
         CornerSE = 4
     };
 
+public:
+
     inline TileIndex()
         : m_indicesCount(0)
     {
-         for (int i=0; i < MaxIndexCount; ++i)
+         for (int i = 0; i < MaxIndexCount; ++i)
          {
              m_indices[i] = 0;
          }
@@ -142,23 +144,25 @@ public:
     inline QIntList toIntList() const
     {
         QIntList result;
-        for (int i=0; i < m_indicesCount; ++i)
+
+        for (int i = 0; i < m_indicesCount; ++i)
         {
             result << m_indices[i];
         }
+
         return result;
     }
 
     static TileIndex fromCoordinates(const KGeoMap::GeoCoordinates& coordinate, const int getLevel);
 
-    GeoCoordinates toCoordinates() const;
-
+    GeoCoordinates toCoordinates()                              const;
     GeoCoordinates toCoordinates(const CornerPosition ofCorner) const;
 
     inline static TileIndex fromIntList(const QIntList& intList)
     {
         TileIndex result;
-        for (int i=0; i < intList.count(); ++i)
+
+        for (int i = 0; i < intList.count(); ++i)
         {
             result.appendLinearIndex(intList.at(i));
         }
@@ -171,7 +175,7 @@ public:
         KGEOMAP_ASSERT(a.level() >= upToLevel);
         KGEOMAP_ASSERT(b.level() >= upToLevel);
 
-        for (int i=0; i <= upToLevel; ++i)
+        for (int i = 0; i <= upToLevel; ++i)
         {
             if (a.linearIndex(i)!=b.linearIndex(i))
             {
@@ -186,6 +190,7 @@ public:
     {
         KGEOMAP_ASSERT(first+(len-1) <= m_indicesCount);
         TileIndex result;
+
         for (int i = first; i < first+len; ++i)
         {
             result.appendLinearIndex(m_indices[i]);
@@ -203,10 +208,12 @@ public:
     inline static QList<QIntList> listToIntListList(const QList<TileIndex>& tileIndexList)
     {
         QList<QIntList> result;
-        for (int i=0; i < tileIndexList.count(); ++i)
+
+        for (int i = 0; i < tileIndexList.count(); ++i)
         {
             result << tileIndexList.at(i).toIntList();
         }
+
         return result;
     }
 

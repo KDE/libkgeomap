@@ -9,7 +9,7 @@
  *
  * @author Copyright (C) 2009-2011 by Michael G. Hansen
  *         <a href="mailto:mike at mghansen dot de">mike at mghansen dot de</a>
- * @author Copyright (C) 2010 by Gilles Caulier
+ * @author Copyright (C) 2010-2014 by Gilles Caulier
  *         <a href="mailto:caulier dot gilles at gmail dot com">caulier dot gilles at gmail dot com</a>
  *
  * This program is free software; you can redistribute it
@@ -56,26 +56,31 @@ TileIndex TileIndex::fromCoordinates(const KGeoMap::GeoCoordinates& coordinate, 
 
         // protect against invalid indices due to rounding errors
         bool haveRoundingErrors = false;
-        if (latIndex<0)
+
+        if (latIndex < 0)
         {
             haveRoundingErrors = true;
-            latIndex = 0;
+            latIndex           = 0;
         }
-        if (lonIndex<0)
+
+        if (lonIndex < 0)
         {
             haveRoundingErrors = true;
-            lonIndex = 0;
+            lonIndex           = 0;
         }
-        if (latIndex>=latDivisor)
+
+        if (latIndex >= latDivisor)
         {
             haveRoundingErrors = true;
-            latIndex = latDivisor-1;
+            latIndex           = latDivisor-1;
         }
-        if (lonIndex>=lonDivisor)
+
+        if (lonIndex >= lonDivisor)
         {
             haveRoundingErrors = true;
-            lonIndex = lonDivisor-1;
+            lonIndex           = lonDivisor-1;
         }
+
         if (haveRoundingErrors)
         {
 //             kDebug() << QString::fromLatin1("Rounding errors at level %1!").arg(l);
@@ -115,10 +120,10 @@ GeoCoordinates TileIndex::toCoordinates() const
         const int lonIndex     = indexLon(l);
 
         // update the start position for the next tile:
-        tileLatBL     += latIndex*dLat;
-        tileLonBL     += lonIndex*dLon;
-        tileLatHeight /= latDivisor;
-        tileLonWidth  /= lonDivisor;
+        tileLatBL             += latIndex*dLat;
+        tileLonBL             += lonIndex*dLon;
+        tileLatHeight         /= latDivisor;
+        tileLonWidth          /= lonDivisor;
     }
 
     return GeoCoordinates(tileLatBL, tileLonBL);
@@ -183,4 +188,4 @@ GeoCoordinates TileIndex::toCoordinates(const CornerPosition ofCorner) const
     return GeoCoordinates(tileLatBL, tileLonBL);
 }
 
-} /* KGeoMap */
+} /* namespace KGeoMap */

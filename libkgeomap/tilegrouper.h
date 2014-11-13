@@ -60,6 +60,6 @@ private:
     const QExplicitlySharedDataPointer<KGeoMapSharedData> s;
 };
 
-} /* KGeoMap */
+} /* namespace KGeoMap */
 
 #endif /* TILEGROUPER_H */

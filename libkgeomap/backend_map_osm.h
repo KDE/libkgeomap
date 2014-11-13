@@ -93,6 +93,6 @@ private:
     Private* const d;
 };
 
-} /* KGeoMap */
+} /* namespace KGeoMap */
 
 #endif /* BACKEND_MAP_OSM_H */

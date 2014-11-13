@@ -7,9 +7,9 @@
  * @date   2006-09-19
  * @brief  Track file reader
  *
- * @author Copyright (C) 2006-2013 by Gilles Caulier
+ * @author Copyright (C) 2006-2014 by Gilles Caulier
  *         <a href="mailto:caulier dot gilles at gmail dot com">caulier dot gilles at gmail dot com</a>
- * @author Copyright (C) 2010, 2014 by Michael G. Hansen
+ * @author Copyright (C) 2010-2014 by Michael G. Hansen
  *         <a href="mailto:mike at mghansen dot de">mike at mghansen dot de</a>
  *
  * This program is free software; you can redistribute it
@@ -59,20 +59,20 @@ QDateTime TrackReader::ParseTime(QString timeString)
     const int timeZonePlusPosition  = timeString.lastIndexOf("+");
     const int timeZoneMinusPosition = timeString.lastIndexOf("-");
 
-    if ( (timeZonePlusPosition == timeZoneSignPosition)||(timeZoneMinusPosition == timeZoneSignPosition) )
+    if ( (timeZonePlusPosition == timeZoneSignPosition) || (timeZoneMinusPosition == timeZoneSignPosition) )
     {
-        const int timeZoneSign = (timeZonePlusPosition == timeZoneSignPosition) ? +1 : -1;
+        const int timeZoneSign       = (timeZonePlusPosition == timeZoneSignPosition) ? +1 : -1;
 
         // cut off the last digits:
         const QString timeZoneString = timeString.right(6);
         timeString.chop(6);
-        timeString+='Z';
+        timeString                  += 'Z';
 
         // determine the time zone offset:
-        bool okayHour          = false;
-        bool okayMinute        = false;
-        const int hourOffset   = timeZoneString.mid(1, 2).toInt(&okayHour);
-        const int minuteOffset = timeZoneString.mid(4, 2).toInt(&okayMinute);
+        bool okayHour                = false;
+        bool okayMinute              = false;
+        const int hourOffset         = timeZoneString.mid(1, 2).toInt(&okayHour);
+        const int minuteOffset       = timeZoneString.mid(4, 2).toInt(&okayMinute);
 
         if (okayHour&&okayMinute)
         {
@@ -88,15 +88,14 @@ QDateTime TrackReader::ParseTime(QString timeString)
 }
 
 TrackReader::TrackReader(TrackReadResult* const dataTarget)
-  : QXmlDefaultHandler(),
-    fileData(dataTarget),
-    currentElementPath(),
-    currentElements(),
-    currentText(),
-    currentDataPoint(),
-    verifyFoundGPXElement(false)
+    : QXmlDefaultHandler(),
+      fileData(dataTarget),
+      currentElementPath(),
+      currentElements(),
+      currentText(),
+      currentDataPoint(),
+      verifyFoundGPXElement(false)
 {
-
 }
 
 /**
@@ -104,7 +103,7 @@ TrackReader::TrackReader(TrackReadResult* const dataTarget)
  */
 bool TrackReader::characters(const QString& ch)
 {
-    currentText+= ch;
+    currentText += ch;
     return true;
 }
 
@@ -113,8 +112,8 @@ static QString GPX11("http://www.topografix.com/GPX/1/1");
 
 QString TrackReader::myQName(const QString& namespaceURI, const QString& localName)
 {
-    if ( (namespaceURI==GPX10)  ||
-         (namespaceURI==GPX11) )
+    if ( (namespaceURI == GPX10)  ||
+         (namespaceURI == GPX11) )
     {
         return "gpx:"+localName;
     }
@@ -136,7 +135,7 @@ bool TrackReader::endElement(const QString& namespaceURI, const QString& localNa
 
     if (ePath == "gpx:gpx/gpx:trk/gpx:trkseg/gpx:trkpt")
     {
-        if (currentDataPoint.dateTime.isValid()&&currentDataPoint.coordinates.hasCoordinates())
+        if (currentDataPoint.dateTime.isValid() && currentDataPoint.coordinates.hasCoordinates())
         {
             fileData->track.points << currentDataPoint;
         }
@@ -229,7 +228,7 @@ bool TrackReader::startElement(const QString& namespaceURI, const QString& local
         bool haveLat = false;
         bool haveLon = false;
 
-        for (int i=0; i<atts.count(); ++i)
+        for (int i = 0; i < atts.count(); ++i)
         {
             const QString attName  = myQName(atts.uri(i), atts.localName(i));
             const QString attValue = atts.value(i);
@@ -267,7 +266,7 @@ TrackReader::TrackReadResult TrackReader::loadTrackFile(const KUrl& url)
     // TODO: store some kind of error message
     TrackReadResult parsedData;
     parsedData.track.url = url;
-    parsedData.isValid = false;
+    parsedData.isValid   = false;
 
     QFile file(url.toLocalFile());
 
@@ -277,7 +276,7 @@ TrackReader::TrackReadResult TrackReader::loadTrackFile(const KUrl& url)
         return parsedData;
     }
 
-    if (file.size()==0)
+    if (file.size() == 0)
     {
         parsedData.loadError = i18n("File is empty.");
         return parsedData;
@@ -322,4 +321,3 @@ TrackReader::TrackReadResult TrackReader::loadTrackFile(const KUrl& url)
 }
 
 } // namespace KGeoMap
-
