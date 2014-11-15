@@ -66,7 +66,6 @@ TrackReader::TrackReader(TrackReadResult* const dataTarget)
 
 TrackReader::~TrackReader()
 {
-    delete d;
 }
 
 QDateTime TrackReader::ParseTime(QString timeString)

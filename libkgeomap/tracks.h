@@ -29,8 +29,8 @@
 
 // Qt includes
 
-#include <QColor>
-#include <QDateTime>
+#include <QtGui/QColor>
+#include <QtCore/QDateTime>
 
 // KDE includes
 

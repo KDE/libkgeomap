@@ -56,6 +56,8 @@ public:
 
     Q_DECLARE_FLAGS(Flags, Flag)
 
+public:
+
     class ClickInfo
     {
     public:

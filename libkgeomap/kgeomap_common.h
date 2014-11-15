@@ -31,11 +31,11 @@
 
 // Qt includes
 
-#include <QPixmap>
-#include <QPoint>
-#include <QPointer>
-#include <QSharedData>
-#include <QSize>
+#include <QtGui/QPixmap>
+#include <QtCore/QPoint>
+#include <QtCore/QPointer>
+#include <QtCore/QSharedData>
+#include <QtCore/QSize>
 
 // KDE includes
 
@@ -195,7 +195,7 @@ const int KGeoMapMinThumbnailSize           = KGeoMapMinThumbnailGroupingRadius 
  */
 inline int QPointSquareDistance(const QPoint& a, const QPoint& b)
 {
-    return (a.x()-b.x())*(a.x()-b.x()) + (a.y()-b.y())*(a.y()-b.y());
+    return (a.x() - b.x()) * (a.x() - b.x()) + (a.y() - b.y()) * (a.y() - b.y());
 }
 
 class KGeoMapSharedData : public QSharedData
@@ -226,7 +226,6 @@ public:
           activeState(false)
     {
     }
-
 
     /// @todo De-inline?
     bool hasRegionSelection() const

@@ -58,6 +58,8 @@ public:
         typedef QList<Request> List;
     };
 
+public:
+
     enum StatusEnum
     {
         StatusInProgress = 0,
@@ -66,6 +68,8 @@ public:
         StatusError      = 3
     };
     Q_DECLARE_FLAGS(Status, StatusEnum)
+
+public:
 
     explicit LookupAltitude(QObject* const parent);
     virtual ~LookupAltitude();

@@ -73,8 +73,10 @@ private:
 
     void startNextRequest();
 
+private:
+
     class Private;
-    Private* const d;
+    const QScopedPointer<Private> d;
 };
 
 } /* namespace KGeoMap */

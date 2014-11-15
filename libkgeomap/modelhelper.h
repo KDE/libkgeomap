@@ -29,10 +29,10 @@
 
 // Qt includes
 
-#include <QtCore/QAbstractItemModel>
 #include <QtGui/QItemSelectionModel>
-#include <QtCore/QPersistentModelIndex>
 #include <QtGui/QPixmap>
+#include <QtCore/QAbstractItemModel>
+#include <QtCore/QPersistentModelIndex>
 #include <QtCore/QPoint>
 #include <QtCore/QString>
 

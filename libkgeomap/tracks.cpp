@@ -81,7 +81,8 @@ public:
 };
 
 TrackManager::TrackManager(QObject* const parent)
-    : QObject(parent), d(new Private())
+    : QObject(parent),
+      d(new Private)
 {
 }
 

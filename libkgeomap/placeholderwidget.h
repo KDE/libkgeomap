@@ -27,7 +27,7 @@
 
 // Qt includes
 
-#include <QFrame>
+#include <QtGui/QFrame>
 
 namespace KGeoMap
 {
@@ -48,7 +48,7 @@ private:
     Q_DISABLE_COPY(PlaceholderWidget)
 
     class Private;
-    Private* const d;
+    const QScopedPointer<Private> d;
 };
 
 } /* namespace KGeoMap */

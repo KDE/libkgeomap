@@ -48,13 +48,14 @@ public:
 };
 
 TileGrouper::TileGrouper(const QExplicitlySharedDataPointer<KGeoMapSharedData>& sharedData, QObject* const parent)
-    : QObject(parent), d(new Private()), s(sharedData)
+    : QObject(parent),
+      d(new Private),
+      s(sharedData)
 {
 }
 
 TileGrouper::~TileGrouper()
 {
-    delete d;
 }
 
 void TileGrouper::setClustersDirty()

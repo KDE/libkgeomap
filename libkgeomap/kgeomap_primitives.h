@@ -59,7 +59,7 @@ inline void KGeoMap_assert(const char* const condition, const char* const filena
     const QString debugString = QString::fromLatin1( "ASSERT: %1 - %2:%3").arg(QLatin1String( condition )).arg(QLatin1String( filename )).arg(lineNumber);
 
 #ifdef KGEOMAP_HAVE_VALGRIND
-    if (RUNNING_ON_VALGRIND>0)
+    if (RUNNING_ON_VALGRIND > 0)
     {
         // TODO: which encoding?
         const QByteArray dummyArray = debugString.toUtf8();
@@ -67,10 +67,10 @@ inline void KGeoMap_assert(const char* const condition, const char* const filena
     }
     else
     {
-        kDebug(51006)<<debugString;
+        kDebug() << debugString;
     }
 #else
-    kDebug(51006)<<debugString;
+    kDebug() << debugString;
 #endif /* KGEOMAP_HAVE_VALGRIND */
 }
 

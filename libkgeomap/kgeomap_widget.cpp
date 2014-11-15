@@ -225,7 +225,9 @@ public:
 };
 
 KGeoMapWidget::KGeoMapWidget(QWidget* const parent)
-    : QWidget(parent), s(new KGeoMapSharedData), d(new Private)
+    : QWidget(parent),
+      s(new KGeoMapSharedData),
+      d(new Private)
 {
     createActions();
 

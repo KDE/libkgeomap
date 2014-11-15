@@ -29,7 +29,7 @@
 
 // Qt includes
 
-#include <QPointer>
+#include <QtCore/QPointer>
 
 // KDE includes
 

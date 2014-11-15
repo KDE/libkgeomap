@@ -76,13 +76,13 @@ public:
 };
 
 LookupAltitudeGeonames::LookupAltitudeGeonames(QObject* const parent)
-    : LookupAltitude(parent), d(new Private())
+    : LookupAltitude(parent),
+      d(new Private)
 {
 }
 
 LookupAltitudeGeonames::~LookupAltitudeGeonames()
 {
-    delete d;
 }
 
 QString LookupAltitudeGeonames::backendName() const

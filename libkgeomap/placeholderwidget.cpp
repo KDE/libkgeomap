@@ -49,7 +49,8 @@ public:
 };
 
 PlaceholderWidget::PlaceholderWidget(QWidget* const parent)
-    : QFrame(parent), d(new Private())
+    : QFrame(parent),
+      d(new Private)
 {
     QVBoxLayout* const vboxlayout = new QVBoxLayout();
     setLayout(vboxlayout);
@@ -59,7 +60,6 @@ PlaceholderWidget::PlaceholderWidget(QWidget* const parent)
 
 PlaceholderWidget::~PlaceholderWidget()
 {
-    delete d;
 }
 
 void PlaceholderWidget::setMessage(const QString& message)

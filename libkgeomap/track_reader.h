@@ -27,11 +27,9 @@
 #ifndef TRACK_READER_H
 #define TRACK_READER_H
 
-#include "track_reader.h"
-
 // Qt includes
 
-#include <QXmlDefaultHandler>
+#include <QtXml/QXmlDefaultHandler>
 
 // local includes
 
@@ -83,7 +81,7 @@ private:
 private:
 
     class Private;
-    Private* const d;
+    const QScopedPointer<Private> d;
 
     friend class ::TestTracks;
 };

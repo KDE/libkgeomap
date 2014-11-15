@@ -31,8 +31,8 @@
 
 // Qt includes
 
-#include <QModelIndex>
-#include <QWidget>
+#include <QtCore/QModelIndex>
+#include <QtGui/QWidget>
 
 // local includes
 

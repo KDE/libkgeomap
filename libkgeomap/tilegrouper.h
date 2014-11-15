@@ -55,7 +55,7 @@ private:
 private:
 
     class Private;
-    Private* const d;
+    const QScopedPointer<Private> d;
 
     const QExplicitlySharedDataPointer<KGeoMapSharedData> s;
 };
