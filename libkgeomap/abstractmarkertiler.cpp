@@ -68,6 +68,102 @@ AbstractMarkerTiler::Tile* AbstractMarkerTiler::rootTile()
     return d->rootTile;
 }
 
+bool AbstractMarkerTiler::isDirty() const
+{
+    return d->isDirty;
+}
+
+void AbstractMarkerTiler::setDirty(const bool state)
+{
+    if (state && !d->isDirty)
+    {
+        d->isDirty = true;
+        emit(signalTilesOrSelectionChanged());
+    }
+    else
+    {
+        d->isDirty = state;
+    }
+}
+
+AbstractMarkerTiler::Tile* AbstractMarkerTiler::resetRootTile()
+{
+    tileDelete(d->rootTile);
+    d->rootTile = tileNew();
+
+    return d->rootTile;
+}
+
+void AbstractMarkerTiler::onIndicesClicked(const ClickInfo& clickInfo)
+{
+    Q_UNUSED(clickInfo)
+}
+
+void AbstractMarkerTiler::onIndicesMoved(const TileIndex::List& tileIndicesList,
+                                         const GeoCoordinates& targetCoordinates,
+                                         const QPersistentModelIndex& targetSnapIndex)
+{
+    Q_UNUSED(tileIndicesList);
+    Q_UNUSED(targetCoordinates);
+    Q_UNUSED(targetSnapIndex);
+}
+
+AbstractMarkerTiler::Tile* AbstractMarkerTiler::tileNew()
+{
+    return new Tile();
+}
+
+void AbstractMarkerTiler::tileDelete(AbstractMarkerTiler::Tile* const tile)
+{
+    tileDeleteChildren(tile);
+    tileDeleteInternal(tile);
+}
+
+void AbstractMarkerTiler::tileDeleteInternal(AbstractMarkerTiler::Tile* const tile)
+{
+    delete tile;
+}
+
+void AbstractMarkerTiler::tileDeleteChildren(AbstractMarkerTiler::Tile* const tile)
+{
+    if (!tile)
+        return;
+
+    QVector<Tile*> tileChildren = tile->takeChildren();
+
+    foreach(Tile* tilec, tileChildren)
+    {
+        tileDelete(tilec);
+    }
+}
+
+void AbstractMarkerTiler::tileDeleteChild(AbstractMarkerTiler::Tile* const parentTile, AbstractMarkerTiler::Tile* const childTile, const int knownLinearIndex)
+{
+    int tileIndex = knownLinearIndex;
+
+    if (tileIndex < 0)
+    {
+        tileIndex = parentTile->indexOfChildTile(childTile);
+    }
+
+    parentTile->clearChild(tileIndex);
+
+    tileDelete(childTile);
+}
+
+AbstractMarkerTiler::Flags AbstractMarkerTiler::tilerFlags() const
+{
+    return FlagNull;
+}
+
+void AbstractMarkerTiler::clear()
+{
+    tileDelete(d->rootTile);
+    d->rootTile = 0;
+}
+
+// -------------------------------------------------------------------------
+
 class AbstractMarkerTiler::NonEmptyIterator::Private
 {
 public:
@@ -401,98 +497,6 @@ AbstractMarkerTiler* AbstractMarkerTiler::NonEmptyIterator::model() const
     return d->model;
 }
 
-bool AbstractMarkerTiler::isDirty() const
-{
-    return d->isDirty;
-}
-
-void AbstractMarkerTiler::setDirty(const bool state)
-{
-    if (state && !d->isDirty)
-    {
-        d->isDirty = true;
-        emit(signalTilesOrSelectionChanged());
-    }
-    else
-    {
-        d->isDirty = state;
-    }
-}
-
-AbstractMarkerTiler::Tile* AbstractMarkerTiler::resetRootTile()
-{
-    tileDelete(d->rootTile);
-    d->rootTile = tileNew();
-
-    return d->rootTile;
-}
-
-void AbstractMarkerTiler::onIndicesClicked(const ClickInfo& clickInfo)
-{
-    Q_UNUSED(clickInfo)
-}
-
-void AbstractMarkerTiler::onIndicesMoved(const TileIndex::List& tileIndicesList,
-                                         const GeoCoordinates& targetCoordinates,
-                                         const QPersistentModelIndex& targetSnapIndex)
-{
-    Q_UNUSED(tileIndicesList);
-    Q_UNUSED(targetCoordinates);
-    Q_UNUSED(targetSnapIndex);
-}
-
-AbstractMarkerTiler::Tile* AbstractMarkerTiler::tileNew()
-{
-    return new Tile();
-}
-
-void AbstractMarkerTiler::tileDelete(AbstractMarkerTiler::Tile* const tile)
-{
-    tileDeleteChildren(tile);
-    tileDeleteInternal(tile);
-}
-
-void AbstractMarkerTiler::tileDeleteInternal(AbstractMarkerTiler::Tile* const tile)
-{
-    delete tile;
-}
-
-void AbstractMarkerTiler::tileDeleteChildren(AbstractMarkerTiler::Tile* const tile)
-{
-    if (!tile)
-        return;
-
-    QVector<Tile*> tileChildren = tile->takeChildren();
-
-    foreach(Tile* tilec, tileChildren)
-    {
-        tileDelete(tilec);
-    }
-}
-
-void AbstractMarkerTiler::tileDeleteChild(AbstractMarkerTiler::Tile* const parentTile, AbstractMarkerTiler::Tile* const childTile, const int knownLinearIndex)
-{
-    int tileIndex = knownLinearIndex;
-
-    if (tileIndex < 0)
-    {
-        tileIndex = parentTile->indexOfChildTile(childTile);
-    }
-
-    parentTile->clearChild(tileIndex);
-
-    tileDelete(childTile);
-}
-
-AbstractMarkerTiler::Flags AbstractMarkerTiler::tilerFlags() const
-{
-    return FlagNull;
-}
-
-void AbstractMarkerTiler::clear()
-{
-    tileDelete(d->rootTile);
-    d->rootTile = 0;
-}
+// -------------------------------------------------------------------------
 
 } /* namespace KGeoMap */
