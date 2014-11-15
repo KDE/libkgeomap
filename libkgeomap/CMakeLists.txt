@@ -23,6 +23,7 @@ set(widget_sources
     itemmarkertiler.cpp
     kgeomap_widget.cpp
     kgeomap_common.cpp
+    kgeomap_primitives.cpp
     lookup_altitude.cpp
     lookup_altitude_geonames.cpp
     lookup_factory.cpp

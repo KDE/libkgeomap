@@ -66,7 +66,6 @@ public:
         nextTrackColor(0),
         visibility(true)
     {
-
     }
 
     QFutureWatcher<TrackReader::TrackReadResult>* trackLoadFutureWatcher;

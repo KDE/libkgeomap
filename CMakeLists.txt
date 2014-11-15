@@ -42,10 +42,11 @@ add_definitions(-DKDE_DEFAULT_DEBUG_AREA=${LIBKGEOMAP_AREA_CODE_GENERAL})
 # 0.1.0 => 0.1.0     (During digiKam GoSC2010)
 # 2.0.0 => 1.0.0     (Included into digiKam 2.0.0 Software Collection)
 # 3.0.0 => 2.0.0     (Including track manager, see bug #333622)
+# 3.1.0 => 2.1.0     (Clean up API to reduce broken binary compatibility. Prepare code for KF5 port) 
 
 # Library API version
 set(KGEOMAP_LIB_MAJOR_VERSION "3")
-set(KGEOMAP_LIB_MINOR_VERSION "0")
+set(KGEOMAP_LIB_MINOR_VERSION "1")
 set(KGEOMAP_LIB_PATCH_VERSION "0")
 
 # Suffix to add at end of version string. Usual values are:
@@ -60,7 +61,7 @@ set(KGEOMAP_LIB_SUFFIX_VERSION "")
 # Library ABI version used by linker.
 # For details : http://www.gnu.org/software/libtool/manual/libtool.html#Updating-version-info
 set(KGEOMAP_LIB_SO_CUR_VERSION "2")
-set(KGEOMAP_LIB_SO_REV_VERSION "0")
+set(KGEOMAP_LIB_SO_REV_VERSION "1")
 set(KGEOMAP_LIB_SO_AGE_VERSION "0")
 
 # =======================================================
