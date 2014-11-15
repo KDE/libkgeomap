@@ -64,159 +64,39 @@ public:
 
 public:
 
-    inline TileIndex()
-        : m_indicesCount(0)
-    {
-         for (int i = 0; i < MaxIndexCount; ++i)
-         {
-             m_indices[i] = 0;
-         }
-    }
+    TileIndex();
+    virtual ~TileIndex();
 
-    inline int indexCount() const
-    {
-        return m_indicesCount;
-    }
+    int indexCount()                    const;
+    int level()                         const;
+    int linearIndex(const int getLevel) const;
+    int at(const int getLevel)          const;
+    int lastIndex()                     const;
+    int indexLat(const int getLevel)    const;
+    int indexLon(const int getLevel)    const;
 
-    inline int level() const
-    {
-        return m_indicesCount > 0 ? m_indicesCount - 1 : 0;
-    }
+    void clear();
+    void appendLinearIndex(const int newIndex);
+    
+    QPoint latLonIndex(const int getLevel) const;
 
-    inline void clear()
-    {
-        m_indicesCount = 0;
-    }
+    void latLonIndex(const int getLevel, int* const latIndex, int* const lonIndex) const;
+    void appendLatLonIndex(const int latIndex, const int lonIndex);
 
-    inline void appendLinearIndex(const int newIndex)
-    {
-        KGEOMAP_ASSERT(m_indicesCount+1<=MaxIndexCount);
-        m_indices[m_indicesCount] = newIndex;
-        m_indicesCount++;
-    }
-
-    inline int linearIndex(const int getLevel) const
-    {
-        KGEOMAP_ASSERT(getLevel<=level());
-        return m_indices[getLevel];
-    }
-
-    inline int at(const int getLevel) const
-    {
-        KGEOMAP_ASSERT(getLevel<=level());
-        return m_indices[getLevel];
-    }
-
-    inline int lastIndex() const
-    {
-        KGEOMAP_ASSERT(m_indicesCount>0);
-        return m_indices[m_indicesCount-1];
-    }
-
-    inline int indexLat(const int getLevel) const
-    {
-        return linearIndex(getLevel) / Tiling;
-    }
-
-    inline int indexLon(const int getLevel) const
-    {
-        return linearIndex(getLevel) % Tiling;
-    }
-
-    inline QPoint latLonIndex(const int getLevel) const
-    {
-        return QPoint(indexLon(getLevel), indexLat(getLevel));
-    }
-
-    inline void latLonIndex(const int getLevel, int* const latIndex, int* const lonIndex) const
-    {
-        KGEOMAP_ASSERT(getLevel <= level());
-        *latIndex = indexLat(getLevel);
-        *lonIndex = indexLon(getLevel);
-        KGEOMAP_ASSERT(*latIndex < Tiling);
-        KGEOMAP_ASSERT(*lonIndex < Tiling);
-    }
-
-    inline void appendLatLonIndex(const int latIndex, const int lonIndex)
-    {
-        appendLinearIndex(latIndex*Tiling + lonIndex);
-    }
-
-    inline QIntList toIntList() const
-    {
-        QIntList result;
-
-        for (int i = 0; i < m_indicesCount; ++i)
-        {
-            result << m_indices[i];
-        }
-
-        return result;
-    }
-
-    static TileIndex fromCoordinates(const KGeoMap::GeoCoordinates& coordinate, const int getLevel);
+    QIntList toIntList() const;
 
     GeoCoordinates toCoordinates()                              const;
     GeoCoordinates toCoordinates(const CornerPosition ofCorner) const;
 
-    inline static TileIndex fromIntList(const QIntList& intList)
-    {
-        TileIndex result;
+    TileIndex mid(const int first, const int len) const;
+    void oneUp();
 
-        for (int i = 0; i < intList.count(); ++i)
-        {
-            result.appendLinearIndex(intList.at(i));
-        }
+    static TileIndex fromCoordinates(const KGeoMap::GeoCoordinates& coordinate, const int getLevel);
+    static TileIndex fromIntList(const QIntList& intList);
+    static bool indicesEqual(const TileIndex& a, const TileIndex& b, const int upToLevel);
+    static QList<QIntList> listToIntListList(const QList<TileIndex>& tileIndexList);
 
-        return result;
-    }
-
-    inline static bool indicesEqual(const TileIndex& a, const TileIndex& b, const int upToLevel)
-    {
-        KGEOMAP_ASSERT(a.level() >= upToLevel);
-        KGEOMAP_ASSERT(b.level() >= upToLevel);
-
-        for (int i = 0; i <= upToLevel; ++i)
-        {
-            if (a.linearIndex(i)!=b.linearIndex(i))
-            {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    inline TileIndex mid(const int first, const int len) const
-    {
-        KGEOMAP_ASSERT(first+(len-1) <= m_indicesCount);
-        TileIndex result;
-
-        for (int i = first; i < first+len; ++i)
-        {
-            result.appendLinearIndex(m_indices[i]);
-        }
-
-        return result;
-    }
-
-    inline void oneUp()
-    {
-        KGEOMAP_ASSERT(m_indicesCount>0);
-        m_indicesCount--;
-    }
-
-    inline static QList<QIntList> listToIntListList(const QList<TileIndex>& tileIndexList)
-    {
-        QList<QIntList> result;
-
-        for (int i = 0; i < tileIndexList.count(); ++i)
-        {
-            result << tileIndexList.at(i).toIntList();
-        }
-
-        return result;
-    }
+public:
 
     typedef QList<TileIndex> List;
 

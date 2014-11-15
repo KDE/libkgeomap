@@ -29,6 +29,159 @@
 namespace KGeoMap
 {
     
+TileIndex::TileIndex()
+    : m_indicesCount(0)
+{
+    for (int i = 0; i < MaxIndexCount; ++i)
+    {
+        m_indices[i] = 0;
+    }
+}
+
+TileIndex::~TileIndex()
+{
+}
+    
+int TileIndex::indexCount() const
+{
+    return m_indicesCount;
+}
+
+int TileIndex::level() const
+{
+    return m_indicesCount > 0 ? m_indicesCount - 1 : 0;
+}
+
+void TileIndex::clear()
+{
+    m_indicesCount = 0;
+}
+
+void TileIndex::appendLinearIndex(const int newIndex)
+{
+    KGEOMAP_ASSERT(m_indicesCount+1<=MaxIndexCount);
+    m_indices[m_indicesCount] = newIndex;
+    m_indicesCount++;
+}
+
+int TileIndex::linearIndex(const int getLevel) const
+{
+    KGEOMAP_ASSERT(getLevel<=level());
+    return m_indices[getLevel];
+}
+
+int TileIndex::at(const int getLevel) const
+{
+    KGEOMAP_ASSERT(getLevel<=level());
+    return m_indices[getLevel];
+}
+
+int TileIndex::lastIndex() const
+{
+    KGEOMAP_ASSERT(m_indicesCount>0);
+    return m_indices[m_indicesCount-1];
+}
+
+int TileIndex::indexLat(const int getLevel) const
+{
+    return linearIndex(getLevel) / Tiling;
+}
+
+int TileIndex::indexLon(const int getLevel) const
+{
+    return linearIndex(getLevel) % Tiling;
+}
+
+QPoint TileIndex::latLonIndex(const int getLevel) const
+{
+    return QPoint(indexLon(getLevel), indexLat(getLevel));
+}
+
+void TileIndex::latLonIndex(const int getLevel, int* const latIndex, int* const lonIndex) const
+{
+    KGEOMAP_ASSERT(getLevel <= level());
+    *latIndex = indexLat(getLevel);
+    *lonIndex = indexLon(getLevel);
+    KGEOMAP_ASSERT(*latIndex < Tiling);
+    KGEOMAP_ASSERT(*lonIndex < Tiling);
+}
+
+void TileIndex::appendLatLonIndex(const int latIndex, const int lonIndex)
+{
+    appendLinearIndex(latIndex*Tiling + lonIndex);
+}
+
+QIntList TileIndex::toIntList() const
+{
+    QIntList result;
+
+    for (int i = 0; i < m_indicesCount; ++i)
+    {
+        result << m_indices[i];
+    }
+
+    return result;
+}
+
+TileIndex TileIndex::fromIntList(const QIntList& intList)
+{
+    TileIndex result;
+
+    for (int i = 0; i < intList.count(); ++i)
+    {
+        result.appendLinearIndex(intList.at(i));
+    }
+
+    return result;
+}
+
+bool TileIndex::indicesEqual(const TileIndex& a, const TileIndex& b, const int upToLevel)
+{
+    KGEOMAP_ASSERT(a.level() >= upToLevel);
+    KGEOMAP_ASSERT(b.level() >= upToLevel);
+
+    for (int i = 0; i <= upToLevel; ++i)
+    {
+        if (a.linearIndex(i)!=b.linearIndex(i))
+        {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+TileIndex TileIndex::mid(const int first, const int len) const
+{
+    KGEOMAP_ASSERT(first+(len-1) <= m_indicesCount);
+    TileIndex result;
+
+    for (int i = first; i < first+len; ++i)
+    {
+        result.appendLinearIndex(m_indices[i]);
+    }
+
+    return result;
+}
+
+void TileIndex::oneUp()
+{
+    KGEOMAP_ASSERT(m_indicesCount>0);
+    m_indicesCount--;
+}
+
+QList<QIntList> TileIndex::listToIntListList(const QList<TileIndex>& tileIndexList)
+{
+    QList<QIntList> result;
+
+    for (int i = 0; i < tileIndexList.count(); ++i)
+    {
+        result << tileIndexList.at(i).toIntList();
+    }
+
+    return result;
+}
+
 TileIndex TileIndex::fromCoordinates(const KGeoMap::GeoCoordinates& coordinate, const int getLevel)
 {
     KGEOMAP_ASSERT(getLevel<=MaxLevel);
