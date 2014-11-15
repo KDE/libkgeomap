@@ -499,4 +499,77 @@ AbstractMarkerTiler* AbstractMarkerTiler::NonEmptyIterator::model() const
 
 // -------------------------------------------------------------------------
 
+AbstractMarkerTiler::Tile::Tile()
+    : children()
+{
+}
+
+AbstractMarkerTiler::Tile::~Tile()
+{
+}
+
+int AbstractMarkerTiler::Tile::maxChildCount()
+{
+    return TileIndex::Tiling * TileIndex::Tiling;
+}
+
+AbstractMarkerTiler::Tile* AbstractMarkerTiler::Tile::getChild(const int linearIndex)
+{
+    if (children.isEmpty())
+    {
+        return 0;
+    }
+
+    return children.at(linearIndex);
+}
+
+void AbstractMarkerTiler::Tile::addChild(const int linearIndex, Tile* const tilePointer)
+{
+    if ( (tilePointer==0) && children.isEmpty() )
+    {
+        return;
+    }
+
+    prepareForChildren();
+
+    children[linearIndex] = tilePointer;
+}
+
+void AbstractMarkerTiler::Tile::clearChild(const int linearIndex)
+{
+    if (children.isEmpty())
+    {
+        return;
+    }
+
+    children[linearIndex] = 0;
+}
+
+int AbstractMarkerTiler::Tile::indexOfChildTile(Tile* const tile)
+{
+    return children.indexOf(tile);
+}
+
+bool AbstractMarkerTiler::Tile::childrenEmpty() const
+{
+    return children.isEmpty();
+}
+
+QVector<AbstractMarkerTiler::Tile*> AbstractMarkerTiler::Tile::takeChildren()
+{
+    QVector<Tile*> childrenCopy = children;
+    children.clear();
+    return childrenCopy;
+}
+
+void AbstractMarkerTiler::Tile::prepareForChildren()
+{
+    if (!children.isEmpty())
+    {
+        return;
+    }
+
+    children = QVector<Tile*>(maxChildCount(), 0);
+}
+
 } /* namespace KGeoMap */

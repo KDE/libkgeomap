@@ -74,72 +74,30 @@ public:
     {
     public:
 
-        Tile()
-            : children()
-        {
-        }
+        Tile();
 
         /**
-         * Note: Tile is only deleted by AbstractMarkerTiler::tileDelete.
+         * NOTE: Tile is only deleted by AbstractMarkerTiler::tileDelete.
          * All subclasses of AbstractMarkerTiler have to reimplement tileDelete
          * to delete their Tile subclasses.
          * This was done in order not to have any virtual functions
          * in Tile and its subclasses in order to save memory, since there
          * can be a lot of tiles in a MarkerTiler.
          */
-        ~Tile()
-        {
-        }
+        ~Tile();
 
-        static int maxChildCount()
-        {
-            return TileIndex::Tiling * TileIndex::Tiling;
-        }
+        Tile* getChild(const int linearIndex);
 
-        Tile* getChild(const int linearIndex)
-        {
-            if (children.isEmpty())
-            {
-                return 0;
-            }
-
-            return children.at(linearIndex);
-        }
-
-        void addChild(const int linearIndex, Tile* const tilePointer)
-        {
-            if ( (tilePointer==0) && children.isEmpty() )
-            {
-                return;
-            }
-
-            prepareForChildren();
-
-            children[linearIndex] = tilePointer;
-        }
+        void addChild(const int linearIndex, Tile* const tilePointer);
 
         /**
          * @brief Sets the pointer to a child tile to zero, but you have to delete the tile by yourself!
          */
-        void clearChild(const int linearIndex)
-        {
-            if (children.isEmpty())
-            {
-                return;
-            }
+        void clearChild(const int linearIndex);
 
-            children[linearIndex] = 0;
-        }
+        int indexOfChildTile(Tile* const tile);
 
-        int indexOfChildTile(Tile* const tile)
-        {
-            return children.indexOf(tile);
-        }
-
-        bool childrenEmpty() const
-        {
-            return children.isEmpty();
-        }
+        bool childrenEmpty() const;
 
         /**
          * @brief Take away the list of children, only to be used for deleting them.
@@ -147,24 +105,13 @@ public:
          * @todo Make this function protected.
          *
          */
-        QVector<Tile*> takeChildren()
-        {
-            QVector<Tile*> childrenCopy = children;
-            children.clear();
-            return childrenCopy;
-        }
+        QVector<Tile*> takeChildren();
+
+        static int maxChildCount();
 
     private:
 
-        void prepareForChildren()
-        {
-            if (!children.isEmpty())
-            {
-                return;
-            }
-
-            children = QVector<Tile*>(maxChildCount(), 0);
-        }
+        void prepareForChildren();
 
     private:
 
