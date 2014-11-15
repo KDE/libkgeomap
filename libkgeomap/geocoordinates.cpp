@@ -58,3 +58,9 @@ GeoCoordinates GeoCoordinates::fromMarbleCoordinates(const Marble::GeoDataCoordi
 }
 
 } /* namespace KGeoMap */
+
+QDebug operator<<(QDebug debugOut, const KGeoMap::GeoCoordinates& coordinate)
+{
+    debugOut << coordinate.geoUrl();
+    return debugOut;
+}

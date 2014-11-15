@@ -50,6 +50,7 @@
 #include "libkgeomap/abstractmarkertiler.h"
 #include "libkgeomap/itemmarkertiler.h"
 #include "libkgeomap/kgeomap_widget.h"
+#include "libkgeomap/geocoordinates.h"
 #include "libkgeomap/version.h"
 
 const int CoordinatesRole = Qt::UserRole + 1;
@@ -57,6 +58,7 @@ const int CoordinatesRole = Qt::UserRole + 1;
 class CalibratorModelHelper::Private
 {
 public:
+
     Private()
      : model(0)
     {
@@ -247,7 +249,7 @@ void Calibrator::updateGroupingMode()
 
 void Calibrator::addMarkerAt(const KGeoMap::GeoCoordinates& coordinates)
 {
-    kDebug()<<coordinates;
+    kDebug() << coordinates;
     QStandardItem* const item = new QStandardItem(coordinates.geoUrl());
     item->setData(QVariant::fromValue(coordinates), CoordinatesRole);
 

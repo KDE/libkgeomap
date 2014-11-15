@@ -28,7 +28,7 @@
 
 namespace KGeoMap
 {
-
+    
 TileIndex TileIndex::fromCoordinates(const KGeoMap::GeoCoordinates& coordinate, const int getLevel)
 {
     KGEOMAP_ASSERT(getLevel<=MaxLevel);
@@ -42,6 +42,7 @@ TileIndex TileIndex::fromCoordinates(const KGeoMap::GeoCoordinates& coordinate, 
     qreal tileLonWidth  = 360.0;
 
     TileIndex resultIndex;
+
     for (int l = 0; l <= getLevel; ++l)
     {
         // how many tiles at this level?
@@ -151,7 +152,7 @@ GeoCoordinates TileIndex::toCoordinates(const CornerPosition ofCorner) const
         const int lonIndex     = indexLon(l);
 
         // update the start position for the next tile:
-        if (l+1 >= m_indicesCount)
+        if ((l+1) >= m_indicesCount)
         {
             if (ofCorner == CornerNW)
             {
@@ -177,8 +178,8 @@ GeoCoordinates TileIndex::toCoordinates(const CornerPosition ofCorner) const
         else
         {
             // update the start position for the next tile:
-            tileLatBL     += latIndex*dLat;
-            tileLonBL     += lonIndex*dLon;
+            tileLatBL += latIndex*dLat;
+            tileLonBL += lonIndex*dLon;
         }
 
         tileLatHeight /= latDivisor;
@@ -186,6 +187,12 @@ GeoCoordinates TileIndex::toCoordinates(const CornerPosition ofCorner) const
     }
 
     return GeoCoordinates(tileLatBL, tileLonBL);
+}
+
+QDebug operator<<(QDebug debugOut, const KGeoMap::TileIndex& tileIndex)
+{
+    debugOut << tileIndex.toIntList();
+    return debugOut;
 }
 
 } /* namespace KGeoMap */

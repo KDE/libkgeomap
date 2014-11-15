@@ -32,6 +32,7 @@
 #include <QtCore/QBitArray>
 #include <QtCore/QObject>
 #include <QtCore/QPoint>
+#include <QtCore/QDebug>
 
 // local includes
 
@@ -227,11 +228,7 @@ private:
 
 } /* namespace KGeoMap */
 
-inline QDebug operator<<(QDebug debugOut, const KGeoMap::TileIndex& tileIndex)
-{
-    debugOut << tileIndex.toIntList();
-    return debugOut;
-}
+KGEOMAP_EXPORT QDebug operator<<(QDebug debugOut, const KGeoMap::TileIndex& tileIndex);
 
 Q_DECLARE_TYPEINFO(KGeoMap::TileIndex, Q_MOVABLE_TYPE);
 

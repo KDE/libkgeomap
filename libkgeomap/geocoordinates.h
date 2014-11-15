@@ -31,10 +31,10 @@
 
 #include <QtCore/QString>
 #include <QtCore/QStringList>
+#include <QtCore/QDebug>
 
 // Kde includes
 
-#include <kdebug.h>
 #include <kurl.h>
 
 // local includes
@@ -250,11 +250,7 @@ private:
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(KGeoMap::GeoCoordinates::HasFlags)
 
-inline QDebug operator<<(QDebug debugOut, const KGeoMap::GeoCoordinates& coordinate)
-{
-    debugOut << coordinate.geoUrl();
-    return debugOut;
-}
+KGEOMAP_EXPORT QDebug operator<<(QDebug debugOut, const KGeoMap::GeoCoordinates& coordinate);
 
 Q_DECLARE_TYPEINFO(KGeoMap::GeoCoordinates, Q_MOVABLE_TYPE);
 Q_DECLARE_METATYPE(KGeoMap::GeoCoordinates)
