@@ -35,6 +35,7 @@ namespace KGeoMap
 class TileGrouper::Private
 {
 public:
+
     Private()
         : clustersDirty(true),
           currentBackend(0)

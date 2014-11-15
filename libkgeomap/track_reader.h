@@ -82,12 +82,8 @@ private:
 
 private:
 
-    TrackReadResult* const   fileData;
-    QString                  currentElementPath;
-    QStringList              currentElements;
-    QString                  currentText;
-    TrackManager::TrackPoint currentDataPoint;
-    bool                     verifyFoundGPXElement;
+    class Private;
+    Private* const d;
 
     friend class ::TestTracks;
 };
