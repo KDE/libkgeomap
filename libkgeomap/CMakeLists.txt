@@ -54,17 +54,17 @@ set(backend_map_osm_sources
     #backend_map_osm.cpp
    )
 
-KDE4_ADD_LIBRARY(kgeomap SHARED ${widget_sources} 
+add_library(kgeomap SHARED ${widget_sources} 
                              ${backend_map_marble_sources}
                              ${backend_map_googlemaps_sources}
                              ${backend_map_osm_sources}
                 )
 
-target_link_libraries(kgeomap ${QT_QTGUI_LIBRARY}
-                           ${KDE4_KDECORE_LIBS}
+target_link_libraries(kgeomap Qt5::Gui
+                           KF5::KDELibs4Support
                            ${KDE4_UI_LIBS}
-                           ${KDE4_KPARTS_LIBS}
-                           ${KDE4_KHTML_LIBS}
+                           KF5::Parts
+                           KF5::KHtml
                            ${MARBLE_LIBRARIES}
                            )
 
