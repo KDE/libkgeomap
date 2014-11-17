@@ -10,7 +10,22 @@ cmake_minimum_required(VERSION 2.8.12)
 
 # ECM setup
 find_package(ECM 1.3.0 CONFIG REQUIRED)
-set(CMAKE_MODULE_PATH ${libkexiv2_SOURCE_DIR}/cmake/modules ${ECM_MODULE_PATH})
+set(CMAKE_MODULE_PATH ${libkgeomap_SOURCE_DIR}/cmake/modules ${ECM_MODULE_PATH})
+
+include(GenerateExportHeader)
+include(ECMGenerateHeaders)
+include(ECMGeneratePriFile)
+include(ECMPackageConfigHelpers)
+include(ECMSetupVersion)
+include(FeatureSummary)
+include(KDEInstallDirs)
+include(KDECMakeSettings)
+include(KDEFrameworkCompilerSettings)
+
+set(KF5_VERSION "5.3.0")
+
+############## Find Packages ##############
+set(REQUIRED_QT_VERSION "5.2.0")
 
 
 if (false)
