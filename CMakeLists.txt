@@ -6,6 +6,15 @@
 
 project(libkgeomap)
 
+cmake_minimum_required(VERSION 2.8.12)
+
+# ECM setup
+find_package(ECM 1.3.0 CONFIG REQUIRED)
+set(CMAKE_MODULE_PATH ${libkexiv2_SOURCE_DIR}/cmake/modules ${ECM_MODULE_PATH})
+
+
+if (false)
+
 message(STATUS "----------------------------------------------------------------------------------")
 message(STATUS "Starting CMake configuration for: libkgeomap")
 
@@ -92,3 +101,4 @@ endif()
 
 install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules/FindKGeoMap.cmake
         DESTINATION ${DATA_INSTALL_DIR}/cmake/modules)
+endif()
