@@ -74,7 +74,7 @@ set_target_properties(kgeomap PROPERTIES VERSION ${KGEOMAP_LIB_SO_VERSION_STRING
 install(TARGETS kgeomap ${INSTALL_TARGETS_DEFAULT_ARGS})
 
 # Check if compilation is done through digiKam SC or not. If yes, do not install header files.
-if(NOT DIGIKAMSC_USE_PRIVATE_SHAREDLIBS)
+if(NOT DIGIKAMSC_COMPILE_LIBKGEOMAP)
 
     install(FILES libkgeomap_export.h
                   abstractmarkertiler.h
