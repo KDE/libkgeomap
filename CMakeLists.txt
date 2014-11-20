@@ -97,10 +97,10 @@ set(KGEOMAP_LIB_SO_VERSION_STRING "${KGEOMAP_LIB_SO_CUR_VERSION}.${KGEOMAP_LIB_S
 
 # =======================================================
 
-subdirs(libkgeomap)
-subdirs(data)
+add_subdirectory(libkgeomap)
+add_subdirectory(data)
 
-if(KDE4_BUILD_TESTS)
+if(BUILD_TESTING)
     MACRO_OPTIONAL_ADD_SUBDIRECTORY(tests)
     MACRO_OPTIONAL_ADD_SUBDIRECTORY(calibrator)
     MACRO_OPTIONAL_ADD_SUBDIRECTORY(demo)
