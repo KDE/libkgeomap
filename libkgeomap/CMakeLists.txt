@@ -93,4 +93,15 @@ if(NOT DIGIKAMSC_COMPILE_LIBKGEOMAP)
             DESTINATION ${INCLUDE_INSTALL_DIR}/libkgeomap COMPONENT Devel
            )
 
+    if(NOT WIN32)
+        configure_file(${CMAKE_CURRENT_SOURCE_DIR}/cmake/templates/libkgeomap.pc.cmake.in ${CMAKE_CURRENT_BINARY_DIR}/libkgeomap.pc)
+        configure_file(${CMAKE_CURRENT_SOURCE_DIR}/cmake/templates/libkgeomap.lsm.cmake.in ${CMAKE_CURRENT_BINARY_DIR}/libkgeomap.lsm)
+        install(FILES ${CMAKE_CURRENT_BINARY_DIR}/libkgeomap.pc DESTINATION ${LIB_INSTALL_DIR}/pkgconfig )
+    endif()
+
+    # Install find cmake script to the system for client applications.
+
+    install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules/FindKGeoMap.cmake
+            DESTINATION ${DATA_INSTALL_DIR}/cmake/modules)
+
 endif()
