@@ -30,6 +30,7 @@ set(widget_LIB_SRCS abstractmarkertiler.cpp
                     tileindex.cpp
                     tracks.cpp
                     track_reader.cpp
+                    libkgeomap_debug.cpp
 )
 
 set(backend_map_marble_LIB_SRCS
