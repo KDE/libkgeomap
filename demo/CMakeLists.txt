@@ -26,12 +26,12 @@ if(KF5KExiv2_FOUND)
     add_executable(libkgeomap_demo ${demo_sources})
 
     target_link_libraries(libkgeomap_demo
-                          KF5::KGeomap
-                          ${KEXIV2_LIBRARIES}
                           Qt5::Gui
                           KF5::KDELibs4Support
                           KF5::Parts
                           KF5::KHtml
+                          KF5::KGeomap
+                          KF5::KExiv2
                          )
 
     install(TARGETS libkgeomap_demo ${INSTALL_TARGETS_DEFAULT_ARGS})
