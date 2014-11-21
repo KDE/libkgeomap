@@ -33,14 +33,11 @@ set(widget_LIB_SRCS abstractmarkertiler.cpp
                     tracks.cpp
 )
 
-set(backend_map_marble_LIB_SRCS
-    backend_map_marble.cpp
+set(backend_map_marble_LIB_SRCS backend_map_marble.cpp
+                                backend_map_marble_layer.cpp
 )
 
 add_definitions(-DKGEOMAP_MARBLE_ADD_LAYER)
-set(backend_map_marble_LIB_SRCS ${backend_map_marble_sources}
-                                backend_map_marble_layer.cpp
-)
 
 #obsolete with KF5
 #    set(backend_map_marble_LIB_SRCS ${backend_map_marble_sources} backend_map_marble_subwidget.cpp)
@@ -72,8 +69,8 @@ ecm_generate_headers(kgeomap_CamelCase_HEADERS
                      REQUIRED_HEADERS kgeomap_HEADERS
 )
 
-add_library(KF5KGeomap SHARED ${widget_LIB_SRCS} 
-                              ${backend_map_marble__LIB_SRCS}
+add_library(KF5KGeomap SHARED ${widget_LIB_SRCS}
+                              ${backend_map_marble_LIB_SRCS}
                               ${backend_map_googlemaps_LIB_SRCS}
                               ${backend_map_osm_LIB_SRCS}
 )
