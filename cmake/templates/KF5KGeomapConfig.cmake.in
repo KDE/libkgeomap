@@ -1,0 +1,19 @@
+# KGeomapConfig.cmake provides information about the installed KGeomap library.
+# It can be used directly from CMake via find_package(KGeomap NO_MODULE)
+#
+# The following CMake variables are provided:
+#   KGeomap_VERSION_MAJOR - the major version number of KGeomap
+#   KGeomap_VERSION_MINOR - the minor version number of KGeomap
+#   KGeomap_VERSION_PATCH - the patch version number of KGeomap
+#   KGeomap_INCLUDE_DIRS  - the include directories to use
+#
+# Additionally, the following imported library targets are created, which may be used directly
+# with target_link_libraries():
+#   KF5::KGeomap - the kgeomap library
+
+@PACKAGE_INIT@
+
+find_dependency(Qt5Core Qt5Widgets Qt5Gui Qt5Xml @REQUIRED_QT_VERSION@)
+find_dependency(KF5KDELibs4Support)
+
+include("${CMAKE_CURRENT_LIST_DIR}/KF5KGeomapTargets.cmake")
