@@ -28,7 +28,7 @@
 
 // Qt includes
 
-#include <qtconcurrentmap.h>
+#include <QtConcurrentMap>
 #include <QFuture>
 #include <QFutureWatcher>
 
@@ -48,7 +48,7 @@ namespace KGeoMap
 
 bool TrackManager::TrackPoint::EarlierThan(const TrackPoint& a, const TrackPoint& b)
 {
-    return a.dateTime < b.dateTime;
+    return (a.dateTime < b.dateTime);
 }
 
 // TrackManager ---------------------------------------------------------------

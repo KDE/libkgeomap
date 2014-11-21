@@ -64,6 +64,7 @@ find_package(Qt5 ${REQUIRED_QT_VERSION} REQUIRED NO_MODULE COMPONENTS
              Widgets
              Gui
              Xml
+             Concurrent
 )
 
 find_package(KF5 ${KF5_VERSION} REQUIRED COMPONENTS

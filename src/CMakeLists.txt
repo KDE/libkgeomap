@@ -21,6 +21,7 @@ set(widget_LIB_SRCS abstractmarkertiler.cpp
                     kgeomap_widget.cpp
                     kgeomap_common.cpp
                     kgeomap_primitives.cpp
+                    libkgeomap_debug.cpp
                     lookup_altitude.cpp
                     lookup_altitude_geonames.cpp
                     lookup_factory.cpp
@@ -28,9 +29,8 @@ set(widget_LIB_SRCS abstractmarkertiler.cpp
                     placeholderwidget.cpp
                     tilegrouper.cpp
                     tileindex.cpp
-                    tracks.cpp
                     track_reader.cpp
-                    libkgeomap_debug.cpp
+                    tracks.cpp
 )
 
 set(backend_map_marble_LIB_SRCS
