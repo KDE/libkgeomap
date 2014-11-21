@@ -35,8 +35,8 @@
 // local includes
 
 #include "test_tracks.h"
-#include "../libkgeomap/tracks.h"
-#include "../libkgeomap/track_reader.h"
+#include "../src/tracks.h"
+#include "../src/track_reader.h"
 
 using namespace KGeoMap;
 
