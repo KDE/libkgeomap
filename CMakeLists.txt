@@ -125,7 +125,7 @@ install(FILES
 install(EXPORT      KF5KGeomapTargets
         DESTINATION "${CMAKECONFIG_INSTALL_DIR}"
         FILE        KF5KGeomapTargets.cmake
-        NAMESPACE   KGeomap::
+        NAMESPACE   KF5::
 )
 
 feature_summary(WHAT ALL FATAL_ON_MISSING_REQUIRED_PACKAGES)
