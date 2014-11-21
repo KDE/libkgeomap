@@ -21,7 +21,7 @@
  *
  * ============================================================ */
 
-#include "test_primitives.moc"
+#include "test_primitives.h"
 
 // local includes
 

@@ -34,7 +34,7 @@
 
 // local includes
 
-#include "test_tracks.moc"
+#include "test_tracks.h"
 #include "../libkgeomap/tracks.h"
 #include "../libkgeomap/track_reader.h"
 

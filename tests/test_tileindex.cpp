@@ -21,7 +21,7 @@
  *
  * ============================================================ */
 
-#include "test_tileindex.moc"
+#include "test_tileindex.h"
 
 // local includes
 

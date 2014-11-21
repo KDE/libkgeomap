@@ -21,7 +21,7 @@
  *
  * ============================================================ */
 
-#include "test_geocoordinates.moc"
+#include "test_geocoordinates.h"
 
 // local includes
 
