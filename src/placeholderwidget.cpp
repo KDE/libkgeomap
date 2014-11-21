@@ -22,7 +22,7 @@
  *
  * ============================================================ */
 
-#include "placeholderwidget.moc"
+#include "placeholderwidget.h"
 
 // Qt includes
 

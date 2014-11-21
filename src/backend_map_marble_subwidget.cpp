@@ -24,7 +24,7 @@
  *
  * ============================================================ */
 
-#include "backend_map_marble_subwidget.moc"
+#include "backend_map_marble_subwidget.h"
 
 // local includes
 

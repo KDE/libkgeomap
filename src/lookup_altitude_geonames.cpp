@@ -24,7 +24,7 @@
  *
  * ============================================================ */
 
-#include "lookup_altitude_geonames.moc"
+#include "lookup_altitude_geonames.h"
 
 // Qt includes
 

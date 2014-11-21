@@ -24,7 +24,7 @@
  *
  * ============================================================ */
 
-#include "backend_map.moc"
+#include "backend_map.h"
 
 namespace KGeoMap
 {

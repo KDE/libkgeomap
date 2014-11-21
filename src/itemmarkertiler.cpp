@@ -24,7 +24,7 @@
  *
  * ============================================================ */
 
-#include "itemmarkertiler.moc"
+#include "itemmarkertiler.h"
 
 // local includes
 

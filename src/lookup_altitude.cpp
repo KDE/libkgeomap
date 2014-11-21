@@ -24,7 +24,7 @@
  *
  * ============================================================ */
 
-#include "lookup_altitude.moc"
+#include "lookup_altitude.h"
 
 namespace KGeoMap
 {

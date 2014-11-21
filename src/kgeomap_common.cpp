@@ -25,7 +25,7 @@
  *
  * ============================================================ */
 
-#include "kgeomap_common.moc"
+#include "kgeomap_common.h"
 
 // KDE includes
 

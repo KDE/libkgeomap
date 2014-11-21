@@ -26,7 +26,7 @@
  *
  * ============================================================ */
 
-#include "kgeomap_widget.moc"
+#include "kgeomap_widget.h"
 
 // C++ includes
 

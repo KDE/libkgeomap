@@ -24,7 +24,7 @@
  *
  * ============================================================ */
 
-#include "modelhelper.moc"
+#include "modelhelper.h"
 
 namespace KGeoMap
 {

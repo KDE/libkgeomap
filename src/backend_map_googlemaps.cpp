@@ -26,7 +26,7 @@
  *
  * ============================================================ */
 
-#include "backend_map_googlemaps.moc"
+#include "backend_map_googlemaps.h"
 
 // Qt includes
 

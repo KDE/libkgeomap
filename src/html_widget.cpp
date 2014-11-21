@@ -24,7 +24,7 @@
  *
  * ============================================================ */
 
-#include "html_widget.moc"
+#include "html_widget.h"
 
 // Qt includes
 

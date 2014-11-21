@@ -22,7 +22,7 @@
  *
  * ============================================================ */
 
-#include "tilegrouper.moc"
+#include "tilegrouper.h"
 
 // local includes
 

@@ -24,7 +24,11 @@
  *
  * ============================================================ */
 
-#include "abstractmarkertiler.moc"
+#include "abstractmarkertiler.h"
+
+// Qt includes
+
+#include <QPair>
 
 namespace KGeoMap
 {

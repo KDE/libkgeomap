@@ -24,7 +24,7 @@
  *
  * ============================================================ */
 
-#include "tracks.moc"
+#include "tracks.h"
 
 // Qt includes
 
