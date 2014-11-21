@@ -53,6 +53,7 @@
 #include <khbox.h>
 #include <klocale.h>
 #include <kseparator.h>
+#include <kiconloader.h>
 
 // Marbel Widget includes
 
@@ -77,7 +78,7 @@
 #include "tracks.h"
 #include "placeholderwidget.h"
 #include "tilegrouper.h"
-#include "version.h"
+#include "libkgeomap_version.h"
 
 namespace KGeoMap
 {
@@ -2018,7 +2019,7 @@ QString KGeoMapWidget::MarbleWidgetVersion()
 
 QString KGeoMapWidget::version()
 {
-    return QString::fromLatin1(kgeomap_version);
+    return QString::fromLatin1(KGEOMAP_VERSION_STRING);
 }
 
 void KGeoMapWidget::setActive(const bool state)

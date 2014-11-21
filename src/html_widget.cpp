@@ -29,6 +29,7 @@
 // Qt includes
 
 #include <QTimer>
+#include <QResizeEvent>
 
 // KDE includes
 
