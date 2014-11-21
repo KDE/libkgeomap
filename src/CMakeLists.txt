@@ -116,6 +116,7 @@ target_link_libraries(KF5KGeomap
                       KF5::Parts
                       KF5::KHtml
                       Qt5::Gui
+                      Qt5::Widgets
                       Qt5::Core
                       Qt5::Concurrent
 )
