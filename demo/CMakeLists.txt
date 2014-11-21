@@ -4,7 +4,7 @@
 # Redistribution and use is allowed according to the terms of the BSD license.
 # For details see the accompanying COPYING-CMAKE-SCRIPTS file.
 
-FIND_PACKAGE(Kexiv2)
+find_package(KF5KExiv2)
 
 if(KEXIV2_FOUND)
 
