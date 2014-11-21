@@ -68,6 +68,7 @@ find_package(Qt5 ${REQUIRED_QT_VERSION} REQUIRED NO_MODULE COMPONENTS
 
 find_package(KF5 ${KF5_VERSION} REQUIRED COMPONENTS
              KDELibs4Support
+             KHtml
 )
 
 # Special handling for Marble: support both FindMarbleWidget and FindMarble,
