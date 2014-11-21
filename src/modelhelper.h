@@ -29,7 +29,7 @@
 
 // Qt includes
 
-#include <QtGui/QItemSelectionModel>
+#include <QtCore/QItemSelectionModel>
 #include <QtGui/QPixmap>
 #include <QtCore/QAbstractItemModel>
 #include <QtCore/QPersistentModelIndex>

@@ -27,7 +27,7 @@
 
 // Qt includes
 
-#include <QtGui/QFrame>
+#include <QtWidgets/QFrame>
 
 namespace KGeoMap
 {

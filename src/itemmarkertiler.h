@@ -30,7 +30,7 @@
 
 // Qt includes
 
-#include <QtGui/QItemSelection>
+#include <QtCore/QItemSelection>
 
 // local includes
 

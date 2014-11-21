@@ -32,7 +32,7 @@
 // Qt includes
 
 #include <QtCore/QModelIndex>
-#include <QtGui/QWidget>
+#include <QtWidgets/QWidget>
 
 // local includes
 
