@@ -100,6 +100,7 @@ endif()
 target_include_directories(KF5KGeomap INTERFACE
                            "$<INSTALL_INTERFACE:${KF5_INCLUDE_INSTALL_DIR}/KGEOMAP;${KF5_INCLUDE_INSTALL_DIR}/KGEOMAP/kgeomap>"
 )
+target_include_directories(KF5KGeomap PUBLIC "$<BUILD_INTERFACE:${libkgeomap_SOURCE_DIR}/src;${libkgeomap_BINARY_DIR}/src>")
 
 target_link_libraries(KF5KGeomap
                       PRIVATE

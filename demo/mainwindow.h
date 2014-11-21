@@ -37,9 +37,9 @@
 
 // libkgeomap includes
 
-#include "libkgeomap/kgeomap_primitives.h"
-#include "libkgeomap/modelhelper.h"
-#include "libkgeomap/tracks.h"
+#include "kgeomap_primitives.h"
+#include "modelhelper.h"
+#include "tracks.h"
 
 class KCmdLineArgs;
 

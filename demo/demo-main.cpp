@@ -24,14 +24,14 @@
 // KDE includes
 
 #include <kapplication.h>
-#include <kaboutdata.h>
+#include <K4AboutData>
 #include <kcmdlineargs.h>
 #include <kdebug.h>
 #include <kicon.h>
 
 // libkgeomap includes
 
-#include "libkgeomap/version.h"
+//#include "version.h"
 
 // local includes
 
@@ -39,12 +39,13 @@
 
 int main(int argc, char* argv[])
 {
-    KAboutData aboutData("demo-kgeomap",
+    K4AboutData aboutData("demo-kgeomap",
                          0,
                          ki18n("KGeoMap demo application"),
-                         kgeomap_version,                                   // version
+                         //PORT TO QT5
+                         "kgeomap_version",                                   // version
                          ki18n("Presents the World Map Widget Interface"),
-                         KAboutData::License_GPL,
+                         K4AboutData::License_GPL,
                          ki18n("(c) 2009-2010 Michael G. Hansen"),
                          ki18n(""),                                         // optional text
                          "http://www.digikam.org/sharedlibs",               // URI of homepage

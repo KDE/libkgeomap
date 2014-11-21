@@ -22,7 +22,7 @@
  *
  * ============================================================ */
 
-#include "calibrator.moc"
+#include "calibrator.h"
 
 // Qt includes
 
@@ -41,17 +41,17 @@
 // KDE includes
 
 #include <kapplication.h>
-#include <kaboutdata.h>
+#include <K4AboutData>
 #include <kcmdlineargs.h>
 #include <klineedit.h>
 
 // local includes
 
-#include "libkgeomap/abstractmarkertiler.h"
-#include "libkgeomap/itemmarkertiler.h"
-#include "libkgeomap/kgeomap_widget.h"
-#include "libkgeomap/geocoordinates.h"
-#include "libkgeomap/version.h"
+#include "abstractmarkertiler.h"
+#include "itemmarkertiler.h"
+#include "kgeomap_widget.h"
+#include "geocoordinates.h"
+//#include "version.h"
 
 const int CoordinatesRole = Qt::UserRole + 1;
 
@@ -406,12 +406,13 @@ void Calibrator::slotActivateMapActionTriggered(bool state)
 
 int main(int argc, char* argv[])
 {
-    KAboutData aboutData("calibrator-kgeomap",
+    K4AboutData aboutData("calibrator-kgeomap",
                          0,
                          ki18n("KGeoMap calibration tool"),
-                         kgeomap_version,                                     // version
+                         //PORT TO QT5
+                         "kgeomap_version",                                     // version 
                          ki18n("Used to calibrate the KGeoMap library tiling level"),
-                         KAboutData::License_GPL,
+                         K4AboutData::License_GPL,
                          ki18n("(c) 2010 Michael G. Hansen"),
                          ki18n(""),                                           // optional text
                          "http://www.digikam.org/sharedlibs",                 // URI of homepage

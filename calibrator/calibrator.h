@@ -31,7 +31,7 @@
 
 // local includes
 
-#include "libkgeomap/modelhelper.h"
+#include "modelhelper.h"
 
 class QStandardItemModel;
 
