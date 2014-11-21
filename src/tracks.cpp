@@ -28,7 +28,7 @@
 
 // Qt includes
 
-#include <QtConcurrentMap>
+#include <QtConcurrent/QtConcurrentMap>
 #include <QFuture>
 #include <QFutureWatcher>
 
