@@ -6,9 +6,9 @@
 
 find_package(KF5KExiv2)
 
-if(KEXIV2_FOUND)
+if(KExiv2_FOUND)
 
-    message(STATUS "kexiv2 found, the demo application will be compiled.")
+    message(STATUS "KExiv2 found, the demo application will be compiled.")
 
     include_directories(BEFORE ${CMAKE_CURRENT_SOURCE_DIR}/../ ${CMAKE_CURRENT_BINARY_DIR}/../)
     include_directories(${KEXIV2_INCLUDE_DIR})
@@ -38,6 +38,6 @@ if(KEXIV2_FOUND)
 
 else()
 
-     message(STATUS "kexiv2 NOT found, the demo application will NOT be compiled.")
+     message(STATUS "KExiv2 NOT found, the demo application will NOT be compiled.")
 
 endif()
