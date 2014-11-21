@@ -39,9 +39,6 @@ set(backend_map_marble_LIB_SRCS backend_map_marble.cpp
 
 add_definitions(-DKGEOMAP_MARBLE_ADD_LAYER)
 
-#obsolete with KF5
-#    set(backend_map_marble_LIB_SRCS ${backend_map_marble_sources} backend_map_marble_subwidget.cpp)
-
 set(backend_map_googlemaps_LIB_SRCS
     backend_map_googlemaps.cpp
 )
@@ -60,10 +57,6 @@ ecm_generate_headers(kgeomap_CamelCase_HEADERS
                      ModelHelper
                      TileIndex
                      Tracks
-#                     KGeoMapWidget
-#                     LookupAltitude
-#                     LookupFactory
-#                     TrackReader
 
                      PREFIX           KGEOMAP
                      REQUIRED_HEADERS kgeomap_HEADERS
