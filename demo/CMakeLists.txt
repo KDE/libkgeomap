@@ -11,16 +11,16 @@ if(KF5KExiv2_FOUND)
     message(STATUS "KExiv2 found, the demo application will be compiled.")
 
     include_directories(BEFORE ${CMAKE_CURRENT_SOURCE_DIR}/../ ${CMAKE_CURRENT_BINARY_DIR}/../)
-    include_directories(${KEXIV2_INCLUDE_DIR})
+    include_directories(${KF5KExiv2_INCLUDE_DIRS})
 
-    add_definitions(${KEXIV2_DEFINITIONS})
+    #add_definitions(${KEXIV2_DEFINITIONS})
 
     set(demo_sources
         demo-main.cpp
-        mainwindow.cpp
         myimageitem.cpp
         mytreewidget.cpp
         dragdrophandler.cpp
+        mainwindow.cpp
     )
 
     add_executable(libkgeomap_demo ${demo_sources})

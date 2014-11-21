@@ -31,7 +31,7 @@
 
 // libkgeomap includes
 
-#include "libkgeomap/kgeomap_primitives.h"
+#include "src/kgeomap_primitives.h"
 
 const int RoleMyData      = Qt::UserRole+0;
 const int RoleCoordinates = Qt::UserRole+1;

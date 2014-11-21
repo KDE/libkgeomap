@@ -21,7 +21,7 @@
  *
  * ============================================================ */
 
-#include "dragdrophandler.moc"
+#include "dragdrophandler.h"
 
 // Qt includes
 

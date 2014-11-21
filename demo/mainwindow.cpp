@@ -24,7 +24,7 @@
  *
  * ============================================================ */
 
-#include "mainwindow.moc"
+#include "mainwindow.h"
 
 // Qt includes
 
@@ -41,7 +41,7 @@
 #include <QTimer>
 #include <QTreeWidget>
 #include <QVBoxLayout>
-#include <qtconcurrentmap.h>
+#include <QtConcurrentMap>
 
 // KDE includes
 
@@ -59,15 +59,15 @@
 
 // LibKExiv2 includes
 
-#include <libkexiv2/version.h>
-#include <libkexiv2/kexiv2.h>
+#include <libkexiv2_version.h>
+#include <KEXIV2/kexiv2/kexiv2.h>
 
 // libkgeomap includes
 
-#include "libkgeomap/lookup_altitude.h"
-#include "libkgeomap/lookup_factory.h"
-#include "libkgeomap/kgeomap_widget.h"
-#include "libkgeomap/itemmarkertiler.h"
+#include "src/lookup_altitude.h"
+#include "src/lookup_factory.h"
+#include "src/kgeomap_widget.h"
+#include "src/itemmarkertiler.h"
 
 // local includes
 

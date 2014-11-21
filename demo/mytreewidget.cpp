@@ -21,16 +21,17 @@
  *
  * ============================================================ */
 
-#include "mytreewidget.moc"
+#include "mytreewidget.h"
 
 // Qt includes
 
 #include <QApplication>
 #include <QMouseEvent>
+#include <QDrag>
 
 // libkgeomap includes
 
-#include "libkgeomap/kgeomap_primitives.h"
+#include "src/kgeomap_primitives.h"
 
 // local includes
 

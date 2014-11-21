@@ -32,7 +32,7 @@
 
 // libkgeomap includes
 
-#include "libkgeomap/dragdrophandler.h"
+#include "src/dragdrophandler.h"
 
 class MyDragData : public QMimeData
 {
