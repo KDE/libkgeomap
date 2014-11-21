@@ -6,7 +6,7 @@
 
 find_package(KF5KExiv2)
 
-if(KExiv2_FOUND)
+if(KF5KExiv2_FOUND)
 
     message(STATUS "KExiv2 found, the demo application will be compiled.")
 
