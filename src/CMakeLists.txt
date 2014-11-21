@@ -60,14 +60,13 @@ ecm_generate_headers(kgeomap_CamelCase_HEADERS
                      DragDropHandler
                      GeoCoordinates
                      ItemMarkerTiler
-                     KgeomapPrimitives
-                     KgeomapWidget
-                     LookupAltitude
-                     LookupFactory
                      ModelHelper
                      TileIndex
                      Tracks
-                     TrackReader
+#                     KGeoMapWidget
+#                     LookupAltitude
+#                     LookupFactory
+#                     TrackReader
 
                      PREFIX           KGEOMAP
                      REQUIRED_HEADERS kgeomap_HEADERS
@@ -76,7 +75,9 @@ ecm_generate_headers(kgeomap_CamelCase_HEADERS
 add_library(KF5KGeomap SHARED ${widget_LIB_SRCS} 
                               ${backend_map_marble__LIB_SRCS}
                               ${backend_map_googlemaps_LIB_SRCS}
-                              ${backend_map_osm_LIB_SRCS})
+                              ${backend_map_osm_LIB_SRCS}
+)
+
 add_library(KF5::KGeomap ALIAS KF5KGeomap)
 
 generate_export_header(KF5KGeomap BASE_NAME libkgeomap EXPORT_MACRO_NAME LIBKGEOMAP_EXPORT)

@@ -98,9 +98,9 @@ add_subdirectory(data)
 add_subdirectory(src)
 
 if (BUILD_TESTING)
-    MACRO_OPTIONAL_ADD_SUBDIRECTORY(tests)
-    MACRO_OPTIONAL_ADD_SUBDIRECTORY(calibrator)
-    MACRO_OPTIONAL_ADD_SUBDIRECTORY(demo)
+    add_subdirectory(tests)
+    add_subdirectory(calibrator)
+    add_subdirectory(demo)
 endif()
 
 ############## CMake Config Files ##############
@@ -109,7 +109,7 @@ message("${CMAKECONFIG_INSTALL_DIR}")
 set(CMAKECONFIG_INSTALL_DIR "${CMAKECONFIG_INSTALL_PREFIX}/KF5Kgeomap")
 
 ecm_configure_package_config_file(
-    "${CMAKE_CURRENT_SOURCE_DIR}/cmake/templates/KF5KGeomap2Config.cmake.in"
+    "${CMAKE_CURRENT_SOURCE_DIR}/cmake/templates/KF5KGeomapConfig.cmake.in"
     "${CMAKE_CURRENT_BINARY_DIR}/KF5KGeomapConfig.cmake"
     INSTALL_DESTINATION ${CMAKECONFIG_INSTALL_DIR}
 )
