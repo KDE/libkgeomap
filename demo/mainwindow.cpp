@@ -59,9 +59,7 @@
 
 // LibKExiv2 includes
 
-// FIXME: header path sound bad here
-#include <libkexiv2_version.h>
-#include <KEXIV2/kexiv2/kexiv2.h>
+#include <KExiv2/KExiv2>
 
 // libkgeomap includes
 

@@ -58,7 +58,7 @@ ecm_generate_headers(kgeomap_CamelCase_HEADERS
                      TileIndex
                      Tracks
 
-                     PREFIX           KGEOMAP
+                     PREFIX           kgeomap
                      REQUIRED_HEADERS kgeomap_HEADERS
 )
 
@@ -76,17 +76,17 @@ generate_export_header(KF5KGeomap BASE_NAME libkgeomap EXPORT_MACRO_NAME LIBKGEO
 if (NOT DIGIKAMSC_COMPILE_LIBKGEOMAP)
 
     install(FILES       ${kgeomap_CamelCase_HEADERS}
-            DESTINATION ${KF5_INCLUDE_INSTALL_DIR}/KGEOMAP/KGEOMAP
+            DESTINATION ${KF5_INCLUDE_INSTALL_DIR}/KGeomap/KGeomap
             COMPONENT   Devel
     )
 
     install(FILES       ${kgeomap_HEADERS}
-            DESTINATION ${KF5_INCLUDE_INSTALL_DIR}/KGEOMAP/kgeomap
+            DESTINATION ${KF5_INCLUDE_INSTALL_DIR}/KGeomap/kgeomap
             COMPONENT   Devel
     )
 
     install(FILES       ${CMAKE_CURRENT_BINARY_DIR}/libkgeomap_export.h
-            DESTINATION ${KF5_INCLUDE_INSTALL_DIR}/KGEOMAP/kgeomap
+            DESTINATION ${KF5_INCLUDE_INSTALL_DIR}/KGeomap/kgeomap
             COMPONENT   Devel
     )
 
@@ -98,7 +98,7 @@ if (NOT DIGIKAMSC_COMPILE_LIBKGEOMAP)
 endif()
 
 target_include_directories(KF5KGeomap INTERFACE
-                           "$<INSTALL_INTERFACE:${KF5_INCLUDE_INSTALL_DIR}/KGEOMAP;${KF5_INCLUDE_INSTALL_DIR}/KGEOMAP/kgeomap>"
+                           "$<INSTALL_INTERFACE:${KF5_INCLUDE_INSTALL_DIR}/KGeomap>"
 )
 target_include_directories(KF5KGeomap PUBLIC "$<BUILD_INTERFACE:${libkgeomap_SOURCE_DIR}/src;${libkgeomap_BINARY_DIR}/src>")
 
