@@ -61,7 +61,7 @@ ecm_generate_headers(kgeomap_CamelCase_HEADERS
                      TileIndex
                      Tracks
 
-                     PREFIX           kgeomap
+                     PREFIX           KGeomap
                      REQUIRED_HEADERS kgeomap_HEADERS
 )
 
