@@ -46,8 +46,9 @@ QTEST_KDEMAIN_CORE(TestTracks)
  */
 QUrl GetTestDataDirectory()
 {
-    const QUrl thisCPPFile(__FILE__);
-    const QUrl testDataDir = thisCPPFile.resolved(QUrl("../data/"));
+    const QUrl thisCPPFile = QUrl::fromLocalFile(__FILE__);
+    const QUrl testDataDir = thisCPPFile.resolved(QUrl("data/"));
+
     return testDataDir;
 }
 
@@ -175,7 +176,8 @@ void TestTracks::testSaxLoader()
 {
     const QUrl testDataDir = GetTestDataDirectory();
 
-    TrackReader::TrackReadResult fileData = TrackReader::loadTrackFile(testDataDir.resolved(QUrl("gpxfile-1.gpx")));
+    const QUrl trackFile = testDataDir.resolved(QUrl("gpxfile-1.gpx"));
+    TrackReader::TrackReadResult fileData = TrackReader::loadTrackFile(trackFile);
     QVERIFY(fileData.isValid);
     QVERIFY(fileData.loadError.isEmpty());
 
