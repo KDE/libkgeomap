@@ -93,10 +93,11 @@ if (NOT DIGIKAMSC_COMPILE_LIBKGEOMAP)
             COMPONENT   Devel
     )
 
-    install(FILES       "${CMAKE_CURRENT_BINARY_DIR}/libkgeomap_version.h"
-            DESTINATION "${KF5_INCLUDE_INSTALL_DIR}"
-            COMPONENT   Devel
-    )
+# TODO remove this, if it's ok to be installed from the main CMakeLists
+#    install(FILES       "${CMAKE_CURRENT_BINARY_DIR}/libkgeomap_version.h"
+#            DESTINATION "${KF5_INCLUDE_INSTALL_DIR}"
+#            COMPONENT   Devel
+#    )
 
 endif()
 
