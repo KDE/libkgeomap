@@ -133,7 +133,9 @@ QPixmap KGeoMapGlobalObject::getStandardMarkerPixmap()
 
 QUrl KGeoMapGlobalObject::locateDataFile(const QString filename)
 {
-    return QUrl(QStandardPaths::locate(QStandardPaths::GenericDataLocation, QLatin1String("libkgeomap/") + filename));
+    const QUrl dataFile = QUrl::fromLocalFile(QStandardPaths::locate(QStandardPaths::GenericDataLocation, QLatin1String("libkgeomap/") + filename));
+    kDebug() << "located data: " << dataFile;
+    return dataFile;
 }
 
 /**
