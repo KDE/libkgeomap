@@ -347,7 +347,7 @@ void MainWindow::readSettings()
     d->mapWidget->readSettingsFromGroup(&groupWidgetConfig);
 
     KConfigGroup groupMainWindowConfig = config.group(QLatin1String("MainWindowConfig"));
-    d->lastImageOpenDir                = groupMainWindowConfig.readEntry("Last Image Open Directory", KUrl());
+    d->lastImageOpenDir                = groupMainWindowConfig.readEntry("Last Image Open Directory", QUrl());
 
     if (groupMainWindowConfig.hasKey("SplitterState"))
     {
@@ -368,7 +368,7 @@ void MainWindow::saveSettings()
     d->mapWidget->saveSettingsToGroup(&groupWidgetConfig);
 
     KConfigGroup groupMainWindowConfig = config.group(QLatin1String("MainWindowConfig"));
-    groupMainWindowConfig.writeEntry("Last Image Open Directory", d->lastImageOpenDir);
+    groupMainWindowConfig.writeEntry("Last Image Open Directory", d->lastImageOpenDir.toLocalFile());
     groupMainWindowConfig.writeEntry(QLatin1String("SplitterState"), d->splitter->saveState().toBase64());
 }
 
