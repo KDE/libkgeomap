@@ -341,12 +341,12 @@ TileIndex AbstractMarkerTiler::NonEmptyIterator::nextIndex()
 
             // check limit on the right side:
             onLimit = true;
-            
+
             for (int i=0; onLimit && (i <= compareLevel); ++i)
             {
                 onLimit = d->currentIndex.indexLat(i) == d->endIndex.indexLat(i);
             }
-            
+
             if (onLimit)
             {
                 limitLatTR = d->endIndex.indexLat(currentLevel);
@@ -354,12 +354,12 @@ TileIndex AbstractMarkerTiler::NonEmptyIterator::nextIndex()
 
             // check limit on the top side:
             onLimit = true;
-            
+
             for (int i=0; onLimit && (i <= compareLevel); ++i)
             {
                 onLimit = d->currentIndex.indexLon(i) == d->endIndex.indexLon(i);
             }
-            
+
             if (onLimit)
             {
                 limitLonTR = d->endIndex.indexLon(currentLevel);
@@ -453,12 +453,12 @@ TileIndex AbstractMarkerTiler::NonEmptyIterator::nextIndex()
 
         // check limit on the right side:
         onLimit = true;
-        
+
         for (int i=0; onLimit && (i <= compareLevel); ++i)
         {
             onLimit = d->currentIndex.indexLat(i) == d->endIndex.indexLat(i);
         }
-        
+
         if (onLimit)
         {
             limitLatTR = d->endIndex.indexLat(currentLevel+1);
@@ -466,12 +466,12 @@ TileIndex AbstractMarkerTiler::NonEmptyIterator::nextIndex()
 
         // check limit on the top side:
         onLimit = true;
-        
+
         for (int i=0; onLimit && (i <= compareLevel); ++i)
         {
             onLimit = d->currentIndex.indexLon(i) == d->endIndex.indexLon(i);
         }
-        
+
         if (onLimit)
         {
             limitLonTR = d->endIndex.indexLon(currentLevel+1);
