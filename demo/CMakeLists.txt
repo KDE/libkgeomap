@@ -8,14 +8,12 @@ find_package(KF5KExiv2)
 
 if(KF5KExiv2_FOUND)
 
-    message(STATUS "KExiv2 found, the demo application will be compiled.")
+    message(STATUS "KExiv2 shared lib found, the demo application will be compiled.")
 
     include_directories(BEFORE ${CMAKE_CURRENT_SOURCE_DIR}/../ ${CMAKE_CURRENT_BINARY_DIR}/../)
     include_directories(${KF5KExiv2_INCLUDE_DIRS})
 
-    #add_definitions(${KEXIV2_DEFINITIONS})
-
-    set(demo_sources
+    set(demo_SRCS
         demo-main.cpp
         myimageitem.cpp
         mytreewidget.cpp
@@ -23,7 +21,7 @@ if(KF5KExiv2_FOUND)
         mainwindow.cpp
     )
 
-    add_executable(libkgeomap_demo ${demo_sources})
+    add_executable(libkgeomap_demo ${demo_SRCS})
 
     target_link_libraries(libkgeomap_demo
                           Qt5::Gui
@@ -38,6 +36,6 @@ if(KF5KExiv2_FOUND)
 
 else()
 
-     message(STATUS "KExiv2 NOT found, the demo application will NOT be compiled.")
+    message(STATUS "KExiv2 shared lib NOT found, the demo application will NOT be compiled.")
 
 endif()
