@@ -46,7 +46,7 @@
 
 // KDE includes
 
-#include <kaction.h>
+#include <QAction>
 #include <kconfig.h>
 #include <kconfiggroup.h>
 #include <kdeversion.h>
@@ -176,33 +176,33 @@ public:
     // actions for controlling the widget
     QMenu*                  configurationMenu;
     QActionGroup*           actionGroupBackendSelection;
-    KAction*                actionZoomIn;
-    KAction*                actionZoomOut;
-    KAction*                actionShowThumbnails;
+    QAction*                actionZoomIn;
+    QAction*                actionZoomOut;
+    QAction*                actionShowThumbnails;
     QWidget*                mouseModesHolder;
     QPointer<KHBox>         controlWidget;
-    KAction*                actionPreviewSingleItems;
-    KAction*                actionPreviewGroupedItems;
-    KAction*                actionShowNumbersOnItems;
+    QAction*                actionPreviewSingleItems;
+    QAction*                actionPreviewGroupedItems;
+    QAction*                actionShowNumbersOnItems;
 
     bool                    lazyReclusteringRequested;
 
     DragDropHandler*        dragDropHandler;
 
     QMenu*                  sortMenu;
-    KAction*                actionIncreaseThumbnailSize;
-    KAction*                actionDecreaseThumbnailSize;
+    QAction*                actionIncreaseThumbnailSize;
+    QAction*                actionDecreaseThumbnailSize;
     KHBox*                  hBoxForAdditionalControlWidgetItems;
 
     QActionGroup*           mouseModeActionGroup;
-    KAction*                actionRemoveCurrentRegionSelection;
-    KAction*                actionSetRegionSelectionMode;
-    KAction*                actionSetPanMode;
-    KAction*                actionSetZoomIntoGroupMode;
-    KAction*                actionSetRegionSelectionFromIconMode;
-    KAction*                actionSetFilterMode;
-    KAction*                actionRemoveFilter;
-    KAction*                actionSetSelectThumbnailMode;
+    QAction*                actionRemoveCurrentRegionSelection;
+    QAction*                actionSetRegionSelectionMode;
+    QAction*                actionSetPanMode;
+    QAction*                actionSetZoomIntoGroupMode;
+    QAction*                actionSetRegionSelectionFromIconMode;
+    QAction*                actionSetFilterMode;
+    QAction*                actionRemoveFilter;
+    QAction*                actionSetSelectThumbnailMode;
     QToolButton*            setPanModeButton;
     QToolButton*            setSelectionModeButton;
     QToolButton*            removeCurrentSelectionButton;
@@ -218,7 +218,7 @@ public:
 
     ExtraActions            availableExtraActions;
     ExtraActions            visibleExtraActions;
-    KAction*                actionStickyMode;
+    QAction*                actionStickyMode;
     QToolButton*            buttonStickyMode;
 
     // to be sorted later
@@ -251,21 +251,21 @@ KGeoMapWidget::KGeoMapWidget(QWidget* const parent)
 
 void KGeoMapWidget::createActions()
 {
-    d->actionZoomIn = new KAction(this);
+    d->actionZoomIn = new QAction(this);
     d->actionZoomIn->setIcon(SmallIcon( QLatin1String("zoom-in") ));
     d->actionZoomIn->setToolTip(i18n("Zoom in"));
 
     connect(d->actionZoomIn, SIGNAL(triggered()),
             this, SLOT(slotZoomIn()));
 
-    d->actionZoomOut = new KAction(this);
+    d->actionZoomOut = new QAction(this);
     d->actionZoomOut->setIcon(SmallIcon( QLatin1String("zoom-out") ));
     d->actionZoomOut->setToolTip(i18n("Zoom out"));
 
     connect(d->actionZoomOut, SIGNAL(triggered()),
             this, SLOT(slotZoomOut()));
 
-    d->actionShowThumbnails = new KAction(this);
+    d->actionShowThumbnails = new QAction(this);
     d->actionShowThumbnails->setToolTip(i18n("Switch between markers and thumbnails."));
     d->actionShowThumbnails->setCheckable(true);
 
@@ -282,22 +282,22 @@ void KGeoMapWidget::createActions()
     createActionsForBackendSelection();
 
     d->configurationMenu        = new QMenu(this);
-    d->actionPreviewSingleItems = new KAction(i18n("Preview single items"), this);
+    d->actionPreviewSingleItems = new QAction(i18n("Preview single items"), this);
     d->actionPreviewSingleItems->setCheckable(true);
     d->actionPreviewSingleItems->setChecked(true);
-    d->actionPreviewGroupedItems = new KAction(i18n("Preview grouped items"), this);
+    d->actionPreviewGroupedItems = new QAction(i18n("Preview grouped items"), this);
     d->actionPreviewGroupedItems->setCheckable(true);
     d->actionPreviewGroupedItems->setChecked(true);
-    d->actionShowNumbersOnItems = new KAction(i18n("Show numbers"), this);
+    d->actionShowNumbersOnItems = new QAction(i18n("Show numbers"), this);
     d->actionShowNumbersOnItems->setCheckable(true);
     d->actionShowNumbersOnItems->setChecked(true);
 
-    d->actionIncreaseThumbnailSize = new KAction(i18n("T+"), this);
+    d->actionIncreaseThumbnailSize = new QAction(i18n("T+"), this);
     d->actionIncreaseThumbnailSize->setToolTip(i18n("Increase the thumbnail size on the map"));
-    d->actionDecreaseThumbnailSize = new KAction(i18n("T-"), this);
+    d->actionDecreaseThumbnailSize = new QAction(i18n("T-"), this);
     d->actionDecreaseThumbnailSize->setToolTip(i18n("Decrease the thumbnail size on the map"));
 
-    d->actionRemoveCurrentRegionSelection = new KAction(this);
+    d->actionRemoveCurrentRegionSelection = new QAction(this);
     //d->actionRemoveCurrentRegionSelection->setEnabled(false);
     d->actionRemoveCurrentRegionSelection->setIcon(SmallIcon( QLatin1String("edit-clear") ));
     d->actionRemoveCurrentRegionSelection->setToolTip(i18n("Remove the current region selection"));
@@ -305,48 +305,48 @@ void KGeoMapWidget::createActions()
     d->mouseModeActionGroup = new QActionGroup(this);
     d->mouseModeActionGroup->setExclusive(true);
 
-    d->actionSetRegionSelectionMode = new KAction(d->mouseModeActionGroup);
+    d->actionSetRegionSelectionMode = new QAction(d->mouseModeActionGroup);
     d->actionSetRegionSelectionMode->setCheckable(true);
     d->actionSetRegionSelectionMode->setIcon(SmallIcon( QLatin1String("select-rectangular") ));
     d->actionSetRegionSelectionMode->setToolTip(i18n("Select images by drawing a rectangle"));
     d->actionSetRegionSelectionMode->setData(QVariant::fromValue<KGeoMap::MouseModes>(MouseModeRegionSelection));
 
-    d->actionSetPanMode = new KAction(d->mouseModeActionGroup);
+    d->actionSetPanMode = new QAction(d->mouseModeActionGroup);
     d->actionSetPanMode->setCheckable(true);
     d->actionSetPanMode->setToolTip(i18n("Pan mode"));
     d->actionSetPanMode->setIcon(SmallIcon( QLatin1String("transform-move") ));
     d->actionSetPanMode->setChecked(true);
     d->actionSetPanMode->setData(QVariant::fromValue<KGeoMap::MouseModes>(MouseModePan));
 
-    d->actionSetZoomIntoGroupMode = new KAction(d->mouseModeActionGroup);
+    d->actionSetZoomIntoGroupMode = new QAction(d->mouseModeActionGroup);
     d->actionSetZoomIntoGroupMode->setCheckable(true);
     d->actionSetZoomIntoGroupMode->setToolTip(i18n("Zoom into a group"));
     d->actionSetZoomIntoGroupMode->setIcon(SmallIcon( QLatin1String("page-zoom") ));
     d->actionSetZoomIntoGroupMode->setData(QVariant::fromValue<KGeoMap::MouseModes>(MouseModeZoomIntoGroup));
 
-    d->actionSetRegionSelectionFromIconMode = new KAction(d->mouseModeActionGroup);
+    d->actionSetRegionSelectionFromIconMode = new QAction(d->mouseModeActionGroup);
     d->actionSetRegionSelectionFromIconMode->setCheckable(true);
     d->actionSetRegionSelectionFromIconMode->setToolTip(i18n("Create a region selection from a thumbnail"));
     d->actionSetRegionSelectionFromIconMode->setIcon(SmallIcon( QLatin1String("edit-node") ));
     d->actionSetRegionSelectionFromIconMode->setData(QVariant::fromValue<KGeoMap::MouseModes>(MouseModeRegionSelectionFromIcon));
 
-    d->actionSetFilterMode = new KAction(d->mouseModeActionGroup);
+    d->actionSetFilterMode = new QAction(d->mouseModeActionGroup);
     d->actionSetFilterMode->setCheckable(true);
     d->actionSetFilterMode->setToolTip(i18n("Filter images"));
     d->actionSetFilterMode->setIcon(SmallIcon( QLatin1String("view-filter") ));
     d->actionSetFilterMode->setData(QVariant::fromValue<KGeoMap::MouseModes>(MouseModeFilter));
 
-    d->actionRemoveFilter = new KAction(this);
+    d->actionRemoveFilter = new QAction(this);
     d->actionRemoveFilter->setToolTip(i18n("Remove the current filter"));
     d->actionRemoveFilter->setIcon(SmallIcon( QLatin1String("window-close") ));
 
-    d->actionSetSelectThumbnailMode = new KAction(d->mouseModeActionGroup);
+    d->actionSetSelectThumbnailMode = new QAction(d->mouseModeActionGroup);
     d->actionSetSelectThumbnailMode->setCheckable(true);
     d->actionSetSelectThumbnailMode->setToolTip(i18n("Select images"));
     d->actionSetSelectThumbnailMode->setIcon(SmallIcon( QLatin1String("edit-select") ));
     d->actionSetSelectThumbnailMode->setData(QVariant::fromValue<KGeoMap::MouseModes>(MouseModeSelectThumbnail));
 
-    d->actionStickyMode = new KAction(this);
+    d->actionStickyMode = new QAction(this);
     d->actionStickyMode->setCheckable(true);
     d->actionStickyMode->setToolTip(i18n("Lock the map position"));
 
@@ -387,7 +387,7 @@ void KGeoMapWidget::createActionsForBackendSelection()
     for (int i = 0; i<d->loadedBackends.size(); ++i)
     {
         const QString backendName    = d->loadedBackends.at(i)->backendName();
-        KAction* const backendAction = new KAction(d->actionGroupBackendSelection);
+        QAction* const backendAction = new QAction(d->actionGroupBackendSelection);
         backendAction->setData(backendName);
         backendAction->setText(d->loadedBackends.at(i)->backendHumanName());
         backendAction->setCheckable(true);
@@ -737,7 +737,7 @@ void KGeoMapWidget::rebuildConfigurationMenu()
     slotUpdateActionsEnabled();
 }
 
-KAction* KGeoMapWidget::getControlAction(const QString& actionName)
+QAction* KGeoMapWidget::getControlAction(const QString& actionName)
 {
     if (actionName == QLatin1String("zoomin"))
     {

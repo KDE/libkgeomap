@@ -39,7 +39,7 @@
 #include "kgeomap_primitives.h"
 #include "libkgeomap_export.h"
 
-class KAction;
+class QAction;
 class KConfigGroup;
 class QDragEnterEvent;
 class QDropEvent;
@@ -77,7 +77,7 @@ public:
 
     /// @name UI setup
     //@{
-    KAction* getControlAction(const QString& actionName);
+    QAction* getControlAction(const QString& actionName);
     QWidget* getControlWidget();
     void addWidgetToControlWidget(QWidget* const newWidget);
     void setSortOptionsMenu(QMenu* const sortMenu);

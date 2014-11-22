@@ -36,7 +36,7 @@
 
 // KDE includes
 
-#include <kaction.h>
+#include <QAction>
 #include <kconfiggroup.h>
 #include <klocale.h>
 
@@ -135,9 +135,9 @@ public:
     QActionGroup*                             actionGroupMapTheme;
     QActionGroup*                             actionGroupProjection;
     QActionGroup*                             actionGroupFloatItems;
-    KAction*                                  actionShowCompass;
-    KAction*                                  actionShowOverviewMap;
-    KAction*                                  actionShowScaleBar;
+    QAction*                                  actionShowCompass;
+    QAction*                                  actionShowOverviewMap;
+    QAction*                                  actionShowScaleBar;
 
     QString                                   cacheMapTheme;
     QString                                   cacheProjection;
@@ -350,12 +350,12 @@ void BackendMarble::createActions()
     connect(d->actionGroupMapTheme, SIGNAL(triggered(QAction*)),
             this, SLOT(slotMapThemeActionTriggered(QAction*)));
 
-    KAction* const actionAtlas = new KAction(d->actionGroupMapTheme);
+    QAction* const actionAtlas = new QAction(d->actionGroupMapTheme);
     actionAtlas->setCheckable(true);
     actionAtlas->setText(i18n("Atlas map"));
     actionAtlas->setData(QLatin1String("atlas"));
 
-    KAction* const actionOpenStreetmap = new KAction(d->actionGroupMapTheme);
+    QAction* const actionOpenStreetmap = new QAction(d->actionGroupMapTheme);
     actionOpenStreetmap->setCheckable(true);
     actionOpenStreetmap->setText(i18n("OpenStreetMap"));
     actionOpenStreetmap->setData(QLatin1String("openstreetmap"));
@@ -367,17 +367,17 @@ void BackendMarble::createActions()
     connect(d->actionGroupProjection, SIGNAL(triggered(QAction*)),
             this, SLOT(slotProjectionActionTriggered(QAction*)));
 
-    KAction* const actionSpherical = new KAction(d->actionGroupProjection);
+    QAction* const actionSpherical = new QAction(d->actionGroupProjection);
     actionSpherical->setCheckable(true);
     actionSpherical->setText(i18nc("Spherical projection", "Spherical"));
     actionSpherical->setData(QLatin1String("spherical"));
 
-    KAction* const actionMercator = new KAction(d->actionGroupProjection);
+    QAction* const actionMercator = new QAction(d->actionGroupProjection);
     actionMercator->setCheckable(true);
     actionMercator->setText(i18n("Mercator"));
     actionMercator->setData(QLatin1String("mercator"));
 
-    KAction* const actionEquirectangular = new KAction(d->actionGroupProjection);
+    QAction* const actionEquirectangular = new QAction(d->actionGroupProjection);
     actionEquirectangular->setCheckable(true);
     actionEquirectangular->setText(i18n("Equirectangular"));
     actionEquirectangular->setData(QLatin1String("equirectangular"));
@@ -389,17 +389,17 @@ void BackendMarble::createActions()
     connect(d->actionGroupFloatItems, SIGNAL(triggered(QAction*)),
             this, SLOT(slotFloatSettingsTriggered(QAction*)));
 
-    d->actionShowCompass = new KAction(i18n("Show compass"), d->actionGroupFloatItems);
+    d->actionShowCompass = new QAction(i18n("Show compass"), d->actionGroupFloatItems);
     d->actionShowCompass->setData(QLatin1String("showcompass"));
     d->actionShowCompass->setCheckable(true);
     d->actionGroupFloatItems->addAction(d->actionShowCompass);
 
-    d->actionShowOverviewMap = new KAction(i18n("Show overview map"), d->actionGroupFloatItems);
+    d->actionShowOverviewMap = new QAction(i18n("Show overview map"), d->actionGroupFloatItems);
     d->actionShowOverviewMap->setData(QLatin1String("showoverviewmap"));
     d->actionShowOverviewMap->setCheckable(true);
     d->actionGroupFloatItems->addAction(d->actionShowOverviewMap);
 
-    d->actionShowScaleBar = new KAction(i18n("Show scale bar"), d->actionGroupFloatItems);
+    d->actionShowScaleBar = new QAction(i18n("Show scale bar"), d->actionGroupFloatItems);
     d->actionShowScaleBar->setData(QLatin1String("showscalebar"));
     d->actionShowScaleBar->setCheckable(true);
     d->actionGroupFloatItems->addAction(d->actionShowScaleBar);

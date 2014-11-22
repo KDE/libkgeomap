@@ -45,7 +45,7 @@
 
 // KDE includes
 
-#include <kaction.h>
+#include <QAction>
 #include <kcmdlineargs.h>
 #include <kconfig.h>
 #include <kconfiggroup.h>
@@ -601,7 +601,7 @@ void MainWindow::slotAddImages()
 void MainWindow::createMenus()
 {
     QMenu* const fileMenu         = menuBar()->addMenu(i18n("File"));
-    KAction* const addFilesAction = new KAction(i18n("Add images..."), fileMenu);
+    QAction* const addFilesAction = new QAction(i18n("Add images..."), fileMenu);
     fileMenu->addAction(addFilesAction);
 
     connect(addFilesAction, SIGNAL(triggered()),

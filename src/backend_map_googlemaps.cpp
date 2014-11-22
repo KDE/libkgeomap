@@ -38,7 +38,7 @@
 
 // KDE includes
 
-#include <kaction.h>
+#include <QAction>
 #include <kconfiggroup.h>
 #include <khtml_part.h>
 
@@ -104,9 +104,9 @@ public:
     bool                                      isReady;
     QActionGroup*                             mapTypeActionGroup;
     QActionGroup*                             floatItemsActionGroup;
-    KAction*                                  showMapTypeControlAction;
-    KAction*                                  showNavigationControlAction;
-    KAction*                                  showScaleControlAction;
+    QAction*                                  showMapTypeControlAction;
+    QAction*                                  showNavigationControlAction;
+    QAction*                                  showScaleControlAction;
 
     QString                                   cacheMapType;
     bool                                      cacheShowMapTypeControl;
@@ -168,7 +168,7 @@ void BackendGoogleMaps::createActions()
 
     for (int i = 0; i < mapTypes.count(); ++i)
     {
-        KAction* const mapTypeAction = new KAction(d->mapTypeActionGroup);
+        QAction* const mapTypeAction = new QAction(d->mapTypeActionGroup);
         mapTypeAction->setData(mapTypes.at(i));
         mapTypeAction->setText(mapTypesHumanNames.at(i));
         mapTypeAction->setCheckable(true);
@@ -181,17 +181,17 @@ void BackendGoogleMaps::createActions()
     connect(d->floatItemsActionGroup, SIGNAL(triggered(QAction*)),
             this, SLOT(slotFloatSettingsTriggered(QAction*)));
 
-    d->showMapTypeControlAction = new KAction(i18n("Show Map Type Control"), d->floatItemsActionGroup);
+    d->showMapTypeControlAction = new QAction(i18n("Show Map Type Control"), d->floatItemsActionGroup);
     d->showMapTypeControlAction->setCheckable(true);
     d->showMapTypeControlAction->setChecked(d->cacheShowMapTypeControl);
     d->showMapTypeControlAction->setData(QLatin1String("showmaptypecontrol"));
 
-    d->showNavigationControlAction = new KAction(i18n("Show Navigation Control"), d->floatItemsActionGroup);
+    d->showNavigationControlAction = new QAction(i18n("Show Navigation Control"), d->floatItemsActionGroup);
     d->showNavigationControlAction->setCheckable(true);
     d->showNavigationControlAction->setChecked(d->cacheShowNavigationControl);
     d->showNavigationControlAction->setData(QLatin1String("shownavigationcontrol"));
 
-    d->showScaleControlAction = new KAction(i18n("Show Scale Control"), d->floatItemsActionGroup);
+    d->showScaleControlAction = new QAction(i18n("Show Scale Control"), d->floatItemsActionGroup);
     d->showScaleControlAction->setCheckable(true);
     d->showScaleControlAction->setChecked(d->cacheShowScaleControl);
     d->showScaleControlAction->setData(QLatin1String("showscalecontrol"));
