@@ -94,6 +94,7 @@ ecm_setup_version(${LIBKGEOMAP_LIB_VERSION}
 
 add_definitions(-DTRANSLATION_DOMAIN=\"libkgeomap\")
 add_definitions(-DQT_USE_FAST_CONCATENATION -DQT_USE_FAST_OPERATOR_PLUS)
+add_definitions(-DQT_NO_URL_CAST_FROM_STRING) # for porting
 
 include_directories(${CMAKE_SOURCE_DIR} ${CMAKE_BINARY_DIR})
 

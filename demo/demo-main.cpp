@@ -72,11 +72,11 @@ int main(int argc, char* argv[])
     KCmdLineArgs* const args = KCmdLineArgs::parsedArgs();
 
     // get the list of images to load on startup:
-    KUrl::List imagesList;
+    QList<QUrl> imagesList;
 
     for (int i=0; i < args->count(); ++i)
     {
-        const KUrl argUrl = args->url(i);
+        const QUrl argUrl = args->url(i);
 //         kDebug()<<argUrl;
         imagesList << argUrl;
     }

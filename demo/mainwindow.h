@@ -33,7 +33,6 @@
 // KDE includes
 
 #include <kmainwindow.h>
-#include <kurl.h>
 
 // libkgeomap includes
 
@@ -107,7 +106,7 @@ public:
 
 public Q_SLOTS:
 
-    void slotScheduleImagesForLoading(const KUrl::List imagesToSchedule);
+    void slotScheduleImagesForLoading(const QList<QUrl> imagesToSchedule);
 
 protected:
 

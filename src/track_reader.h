@@ -69,7 +69,7 @@ public:
     virtual bool endElement(const QString& namespaceURI, const QString& localName, const QString& qName);
     virtual bool startElement(const QString& namespaceURI, const QString& localName, const QString& qName, const QXmlAttributes& atts);
 
-    static TrackReadResult loadTrackFile(const KUrl& url);
+    static TrackReadResult loadTrackFile(const QUrl& url);
     static QDateTime ParseTime(QString timeString);
 
 private:

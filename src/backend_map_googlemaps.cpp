@@ -249,7 +249,7 @@ QWidget* BackendGoogleMaps::mapWidget()
         }
         else
         {
-            const KUrl htmlUrl = KGeoMapGlobalObject::instance()->locateDataFile(QLatin1String("backend-googlemaps.html"));
+            const QUrl htmlUrl = KGeoMapGlobalObject::instance()->locateDataFile(QLatin1String("backend-googlemaps.html"));
 
             d->htmlWidget->openUrl(htmlUrl);
         }
@@ -440,7 +440,7 @@ void BackendGoogleMaps::slotUngroupedModelChanged(const int mindex)
         QPoint     markerCenterPoint;
         QSize      markerSize;
         QPixmap    markerPixmap;
-        KUrl       markerUrl;
+        QUrl       markerUrl;
         const bool markerHasIcon = modelHelper->itemIcon(currentIndex, &markerCenterPoint,
                                                          &markerSize, &markerPixmap, &markerUrl);
 
@@ -1064,7 +1064,7 @@ void BackendGoogleMaps::setMarkerPixmap(const int modelId, const int markerId,
 
 void BackendGoogleMaps::setMarkerPixmap(const int modelId, const int markerId,
                                         const QPoint& centerPoint, const QSize& iconSize,
-                                        const KUrl& iconUrl
+                                        const QUrl& iconUrl
                                        )
 {
     /// @todo Sort the parameters

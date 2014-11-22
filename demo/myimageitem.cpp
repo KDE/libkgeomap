@@ -23,7 +23,7 @@
 
 #include "myimageitem.h"
 
-MyImageItem::MyImageItem(const KUrl& url, const KGeoMap::GeoCoordinates& itemCoordinates)
+MyImageItem::MyImageItem(const QUrl& url, const KGeoMap::GeoCoordinates& itemCoordinates)
     : QTreeWidgetItem(), coordinates(itemCoordinates), imageUrl(url)
 {
 }

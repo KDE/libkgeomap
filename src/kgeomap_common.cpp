@@ -27,6 +27,10 @@
 
 #include "kgeomap_common.h"
 
+// Qt includes
+
+#include <QStandardPaths>
+
 // KDE includes
 
 #include <klibloader.h>
@@ -87,12 +91,12 @@ public:
             for (QStringList::const_iterator sit = stateNames.constBegin(); sit != stateNames.constEnd(); ++sit)
             {
                 const QString pixmapName  = *it + *sit;
-                const KUrl markerUrl      = KGeoMapGlobalObject::instance()->locateDataFile(QString::fromLatin1( "marker-%1.png").arg(pixmapName));
+                const QUrl markerUrl      = KGeoMapGlobalObject::instance()->locateDataFile(QString::fromLatin1( "marker-%1.png").arg(pixmapName));
                 markerPixmaps[pixmapName] = QPixmap(markerUrl.toLocalFile());
             }
         }
 
-        const KUrl markerIconUrl                            = KGeoMapGlobalObject::instance()->locateDataFile(QLatin1String( "marker-icon-16x16.png" ));
+        const QUrl markerIconUrl                            = KGeoMapGlobalObject::instance()->locateDataFile(QLatin1String( "marker-icon-16x16.png" ));
         markerPixmaps[QLatin1String( "marker-icon-16x16" )] = QPixmap(markerIconUrl.toLocalFile());
     }
 };
@@ -127,9 +131,9 @@ QPixmap KGeoMapGlobalObject::getStandardMarkerPixmap()
     return getMarkerPixmap(QLatin1String("00ff00"));
 }
 
-KUrl KGeoMapGlobalObject::locateDataFile(const QString filename)
+QUrl KGeoMapGlobalObject::locateDataFile(const QString filename)
 {
-    return KStandardDirs::locate("data", QLatin1String("libkgeomap/") + filename);
+    return QUrl(QStandardPaths::locate(QStandardPaths::GenericDataLocation, QLatin1String("libkgeomap/") + filename));
 }
 
 /**

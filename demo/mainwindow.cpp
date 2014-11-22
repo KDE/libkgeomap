@@ -129,7 +129,7 @@ class MyImageData
 public:
 
     GeoCoordinates coordinates;
-    KUrl           url;
+    QUrl           url;
 };
 
 // ----------------------------------------------------------------------
@@ -216,7 +216,7 @@ public:
     QList<MyImageData>                  imageLoadingBuncher;
     QTimer*                             imageLoadingBunchTimer;
     KCmdLineArgs*                       cmdLineArgs;
-    KUrl                                lastImageOpenDir;
+    QUrl                                lastImageOpenDir;
 
     QAbstractItemModel*                 displayMarkersModel;
     QItemSelectionModel*                selectionModel;
@@ -379,7 +379,7 @@ void MainWindow::closeEvent(QCloseEvent* e)
     e->accept();
 }
 
-MyImageData LoadImageData(const KUrl& urlToLoad)
+MyImageData LoadImageData(const QUrl& urlToLoad)
 {
     MyImageData imageData;
     imageData.url = urlToLoad;
@@ -461,7 +461,7 @@ void MainWindow::slotFutureResultsReadyAt(int startIndex, int endIndex)
     }
 }
 
-void MainWindow::slotScheduleImagesForLoading(const KUrl::List imagesToSchedule)
+void MainWindow::slotScheduleImagesForLoading(const QList<QUrl> imagesToSchedule)
 {
     if (imagesToSchedule.isEmpty())
         return;
@@ -588,12 +588,12 @@ void MainWindow::slotAltitudeLookupDone()
 
 void MainWindow::slotAddImages()
 {
-    const KUrl::List fileNames = KFileDialog::getOpenUrls(d->lastImageOpenDir, QLatin1String("*.jpg|*.jpeg|*.png"), this, i18n("Add image files"));
+    const QList<QUrl> fileNames = KFileDialog::getOpenUrls(d->lastImageOpenDir, QLatin1String("*.jpg|*.jpeg|*.png"), this, i18n("Add image files"));
 
     if (fileNames.isEmpty())
         return;
 
-    d->lastImageOpenDir        = fileNames.first().upUrl();
+    d->lastImageOpenDir        = fileNames.first().resolved(QUrl("../"));
 
     slotScheduleImagesForLoading(fileNames);
 }

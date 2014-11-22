@@ -39,8 +39,6 @@
 
 // KDE includes
 
-#include <kstandarddirs.h>
-
 // libkgeomap includes
 
 #include "kgeomap_primitives.h"
@@ -113,7 +111,7 @@ public:
     //@{
     QPixmap getMarkerPixmap(const QString pixmapId);
     QPixmap getStandardMarkerPixmap();
-    KUrl    locateDataFile(const QString filename);
+    QUrl    locateDataFile(const QString filename);
     //@}
 
     /// @name Shared internal map widgets

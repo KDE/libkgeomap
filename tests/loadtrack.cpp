@@ -31,7 +31,6 @@
 
 #include <qtest_kde.h>
 #include <kdebug.h>
-#include <kurl.h>
 
 // local includes
 
@@ -49,12 +48,10 @@ namespace
 /**
  * @brief Return the path of the directory containing the test data
  */
-KUrl GetTestDataDirectory()
+QUrl GetTestDataDirectory()
 {
-    // any better ideas on how to get the path?
-    const KUrl thisCPPFile(__FILE__);
-    KUrl testDataDir = thisCPPFile.upUrl();
-    testDataDir.addPath("data/");
+    const QUrl thisCPPFile(__FILE__);
+    const QUrl testDataDir = thisCPPFile.resolved(QUrl("../data/"));
     return testDataDir;
 }
 
@@ -63,9 +60,9 @@ KUrl GetTestDataDirectory()
  */
 bool testSaxLoader(const QString& filename)
 {
-    const KUrl testDataDir = GetTestDataDirectory();
+    const QUrl testDataDir = GetTestDataDirectory();
 
-    TrackReader::TrackReadResult fileData = TrackReader::loadTrackFile(KUrl(filename));
+    TrackReader::TrackReadResult fileData = TrackReader::loadTrackFile(QUrl(filename));
 
     return fileData.isValid;
 }

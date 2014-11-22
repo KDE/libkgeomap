@@ -72,7 +72,7 @@ public:
     QFuture<TrackReader::TrackReadResult>         trackLoadFuture;
     TrackManager::Track::List                     trackPendingList;
     TrackManager::Track::List                     trackList;
-    QList<QPair<KUrl, QString> >                  loadErrorFiles;
+    QList<QPair<QUrl, QString> >                  loadErrorFiles;
 
     Id                                            nextTrackId;
     int                                           nextTrackColor;
@@ -116,7 +116,7 @@ const TrackManager::Track& TrackManager::getTrack(const int index) const
     return d->trackList.at(index);
 }
 
-void TrackManager::loadTrackFiles(const KUrl::List& urls)
+void TrackManager::loadTrackFiles(const QList<QUrl>& urls)
 {
     d->trackLoadFutureWatcher = new QFutureWatcher<TrackReader::TrackReadResult>(this);
 
@@ -150,7 +150,7 @@ void TrackManager::slotTrackFilesReadyAt(int beginIndex, int endIndex)
         }
         else
         {
-            d->loadErrorFiles << QPair<KUrl, QString>(nextFile.track.url, nextFile.loadError);
+            d->loadErrorFiles << QPair<QUrl, QString>(nextFile.track.url, nextFile.loadError);
         }
     }
 }
@@ -183,9 +183,9 @@ int TrackManager::trackCount() const
     return d->trackList.count();
 }
 
-QList<QPair<KUrl, QString> > TrackManager::readLoadErrors()
+QList<QPair<QUrl, QString> > TrackManager::readLoadErrors()
 {
-    const QList<QPair<KUrl, QString> > result = d->loadErrorFiles;
+    const QList<QPair<QUrl, QString> > result = d->loadErrorFiles;
     d->loadErrorFiles.clear();
 
     return result;

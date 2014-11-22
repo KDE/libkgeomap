@@ -279,7 +279,7 @@ void TrackReader::rebuildElementPath()
     d->currentElementPath = d->currentElements.join("/");
 }
 
-TrackReader::TrackReadResult TrackReader::loadTrackFile(const KUrl& url)
+TrackReader::TrackReadResult TrackReader::loadTrackFile(const QUrl& url)
 {
     // TODO: store some kind of error message
     TrackReadResult parsedData;

@@ -88,7 +88,7 @@ BackendOSM::BackendOSM(const QExplicitlySharedDataPointer<KGeoMapSharedData>& sh
 
 void BackendOSM::loadInitialHTML()
 {
-    const KUrl htmlUrl = KGeoMapGlobalObject::instance()->locateDataFile("backend-osm.html");
+    const QUrl htmlUrl = KGeoMapGlobalObject::instance()->locateDataFile("backend-osm.html");
 
     d->htmlWidget->openUrl(htmlUrl);
 }

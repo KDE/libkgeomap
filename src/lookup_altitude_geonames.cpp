@@ -179,7 +179,7 @@ void LookupAltitudeGeonames::startNextRequest()
         lonString += requestCoordinates.lonString();
     }
 
-    KUrl jobUrl("http://ws.geonames.org/srtm3");
+    QUrl jobUrl("http://ws.geonames.org/srtm3");
     jobUrl.addQueryItem(QLatin1String("lats"), latString);
     jobUrl.addQueryItem(QLatin1String("lngs"), lonString);
 

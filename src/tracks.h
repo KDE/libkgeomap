@@ -31,10 +31,10 @@
 
 #include <QtGui/QColor>
 #include <QtCore/QDateTime>
+#include <QUrl>
 
 // KDE includes
 
-#include <kurl.h>
 
 // local includes
 
@@ -109,7 +109,7 @@ public:
         {
         }
 
-        KUrl                 url;
+        QUrl                 url;
         QList<TrackPoint>    points;
         /// 0 means no track id assigned yet
         Id                   id;
@@ -135,8 +135,8 @@ public:
     explicit TrackManager(QObject* const parent = 0);
     virtual ~TrackManager();
 
-    void loadTrackFiles(const KUrl::List& urls);
-    QList<QPair<KUrl, QString> > readLoadErrors();
+    void loadTrackFiles(const QList<QUrl>& urls);
+    QList<QPair<QUrl, QString> > readLoadErrors();
     void clear();
 
     const Track& getTrack(const int index) const;

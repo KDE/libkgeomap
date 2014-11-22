@@ -38,9 +38,6 @@
 
 // Kde includes
 
-#include <kdebug.h>
-#include <kurl.h>
-
 // local includes
 
 #include "libkgeomap_export.h"
@@ -80,7 +77,7 @@ public:
     virtual Flags modelFlags() const;
 
     // these are necessary for ungrouped models
-    virtual bool itemIcon(const QModelIndex& index, QPoint* const offset, QSize* const size, QPixmap* const pixmap, KUrl* const url) const;
+    virtual bool itemIcon(const QModelIndex& index, QPoint* const offset, QSize* const size, QPixmap* const pixmap, QUrl* const url) const;
     virtual Flags itemFlags(const QModelIndex& index) const;
     virtual void snapItemsTo(const QModelIndex& targetIndex, const QList<QModelIndex>& snappedIndices);
 

@@ -99,7 +99,7 @@ QPersistentModelIndex ModelHelper::bestRepresentativeIndexFromList(const QList<Q
  * @param url URL of the icon if available.
  */
 bool ModelHelper::itemIcon(const QModelIndex& index, QPoint* const offset,
-                           QSize* const size, QPixmap* const pixmap, KUrl* const url) const
+                           QSize* const size, QPixmap* const pixmap, QUrl* const url) const
 {
     Q_UNUSED(index)
     Q_UNUSED(offset)
