@@ -101,7 +101,7 @@ if(NOT DIGIKAMSC_COMPILE_LIBKGEOMAP)
 
     # Install find cmake script to the system for client applications.
 
-    install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules/FindKGeoMap.cmake
+    install(FILES ${CMAKE_SOURCE_DIR}/cmake/modules/FindKGeoMap.cmake
             DESTINATION ${DATA_INSTALL_DIR}/cmake/modules)
 
 endif()
