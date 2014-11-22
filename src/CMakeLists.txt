@@ -6,6 +6,9 @@
 
 include_directories(${MARBLE_INCLUDE_DIR})
 
+# HACK how to do this properly?
+include_directories(${CMAKE_CURRENT_BINARY_DIR}/.. ${CMAKE_CURRENT_BINARY_DIR})
+
 include(CheckIncludeFile)
 CHECK_INCLUDE_FILE("valgrind/valgrind.h" HAVE_VALGRIND)
 if(${HAVE_VALGRIND})
@@ -90,7 +93,7 @@ if (NOT DIGIKAMSC_COMPILE_LIBKGEOMAP)
             COMPONENT   Devel
     )
 
-    install(FILES       "${CMAKE_BINARY_DIR}/libkgeomap_version.h"
+    install(FILES       "${CMAKE_CURRENT_BINARY_DIR}/libkgeomap_version.h"
             DESTINATION "${KF5_INCLUDE_INSTALL_DIR}"
             COMPONENT   Devel
     )
