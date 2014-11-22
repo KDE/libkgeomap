@@ -21,7 +21,8 @@ The library documentation is available in the header and cpp files in doxygen st
 -- DEPENDENCIES -------------------------------------------------------
 
 CMake           >= 2.8.12                   http://www.cmake.org
-libqt           >= 5.2.0                    http://www.qtsoftware.com
+ECM             >= 1.1.0                    https://projects.kde.org/projects/kdesupport/extra-cmake-modules
+libqt           >= 5.2.0                    http://qt-project.org
 libkde          >= 5.0.0                    http://www.kde.org
 libboostgraph   >= 1.43.0                   http://www.boost.org/doc/libs
 libmarblewidget >= 0.19.20                  http://edu.kde.org/marble
