@@ -30,7 +30,7 @@ add_test(kgeomap_test_geocoordinates ${EXECUTABLE_OUTPUT_PATH}/kgeomap_test_geoc
 
 set(test_tileindex_sources test_tileindex.cpp)
 add_executable(kgeomap_test_tileindex ${test_tileindex_sources})
-target_link_libraries(kgeomap_test_tileindex KF5KGeomap Qt5::Test ${KDE4_KDECORE_LIBS})
+target_link_libraries(kgeomap_test_tileindex KF5KGeomap Qt5::Test)
 add_test(kgeomap_test_tileindex ${EXECUTABLE_OUTPUT_PATH}/kgeomap_test_tileindex)
 
 # test the LookupAltitudeGeonames class
@@ -54,11 +54,11 @@ endif()
 
 set(test_tracks_sources test_tracks.cpp)
 add_executable(kgeomap_test_tracks ${test_tracks_sources})
-target_link_libraries(kgeomap_test_tracks KF5KGeomap Qt5::Core Qt5::Test ${KDE4_KDECORE_LIBS})
+target_link_libraries(kgeomap_test_tracks KF5KGeomap Qt5::Core Qt5::Test)
 add_test(kgeomap_test_tracks ${EXECUTABLE_OUTPUT_PATH}/kgeomap_test_tracks)
 
 # track loading application for timing tests
 
 set(loadtrack_sources loadtrack.cpp)
 add_executable(loadtrack ${loadtrack_sources})
-target_link_libraries(loadtrack KF5KGeomap Qt5::Core Qt5::Test ${KDE4_KDECORE_LIBS})
+target_link_libraries(loadtrack KF5KGeomap Qt5::Core Qt5::Test)
