@@ -29,6 +29,7 @@
 // Qt includes
 
 #include <QPointer>
+#include <QUrlQuery>
 
 // KDE includes
 
@@ -179,9 +180,12 @@ void LookupAltitudeGeonames::startNextRequest()
         lonString += requestCoordinates.lonString();
     }
 
-    QUrl jobUrl("http://ws.geonames.org/srtm3");
-    jobUrl.addQueryItem(QLatin1String("lats"), latString);
-    jobUrl.addQueryItem(QLatin1String("lngs"), lonString);
+    QUrl jobUrl(QLatin1String("http://ws.geonames.org/srtm3"));
+    QUrlQuery jobQuery;
+    jobQuery.addQueryItem(QLatin1String("lats"), latString);
+    jobQuery.addQueryItem(QLatin1String("lngs"), lonString);
+
+    jobUrl.setQuery(jobQuery);
 
     d->kioJob = KIO::get(jobUrl, KIO::NoReload, KIO::HideProgressInfo);
 
@@ -211,7 +215,7 @@ void LookupAltitudeGeonames::slotResult(KJob* kJob)
         return;
     }
 
-    const QStringList altitudes                = QString::fromAscii(d->data).split(QRegExp(QLatin1String("\\s+")));
+    const QStringList altitudes                = QString::fromLatin1(d->data).split(QRegExp(QLatin1String("\\s+")));
     const MergedRequests& currentMergedRequest = d->mergedRequests.at(d->currentMergedRequestIndex);
     QIntList readyRequests;
 
