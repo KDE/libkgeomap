@@ -16,28 +16,28 @@ find_package(Qt5Test REQUIRED)
 
 set(test_primitives_sources test_primitives.cpp)
 add_executable(kgeomap_test_primitives ${test_primitives_sources})
-target_link_libraries(kgeomap_test_primitives KF5KGeomap Qt5::Core Qt5::Test)
+target_link_libraries(kgeomap_test_primitives KF5KGeoMap Qt5::Core Qt5::Test)
 add_test(kgeomap_test_primitives ${EXECUTABLE_OUTPUT_PATH}/kgeomap_test_primitives)
 
 # test the GeoCoordinates class
 
 set(test_geocoordinates_sources test_geocoordinates.cpp)
 add_executable(kgeomap_test_geocoordinates ${test_geocoordinates_sources})
-target_link_libraries(kgeomap_test_geocoordinates KF5KGeomap Qt5::Core Qt5::Test)
+target_link_libraries(kgeomap_test_geocoordinates KF5KGeoMap Qt5::Core Qt5::Test)
 add_test(kgeomap_test_geocoordinates ${EXECUTABLE_OUTPUT_PATH}/kgeomap_test_geocoordinates)
 
 # test the TileIndex class
 
 set(test_tileindex_sources test_tileindex.cpp)
 add_executable(kgeomap_test_tileindex ${test_tileindex_sources})
-target_link_libraries(kgeomap_test_tileindex KF5KGeomap Qt5::Test)
+target_link_libraries(kgeomap_test_tileindex KF5KGeoMap Qt5::Test)
 add_test(kgeomap_test_tileindex ${EXECUTABLE_OUTPUT_PATH}/kgeomap_test_tileindex)
 
 # test the LookupAltitudeGeonames class
 
 set(test_lookup_altitude_geonames_sources test_lookup_altitude_geonames.cpp)
 add_executable(kgeomap_test_lookup_altitude_geonames ${test_lookup_altitude_geonames_sources})
-target_link_libraries(kgeomap_test_lookup_altitude_geonames KF5KGeomap Qt5::Core Qt5::Test)
+target_link_libraries(kgeomap_test_lookup_altitude_geonames KF5KGeoMap Qt5::Core Qt5::Test)
 # do not add this as a test because it only works if there is an internet connection
 # add_test(kgeomap_test_lookup_altitude_geonames ${EXECUTABLE_OUTPUT_PATH}/kgeomap_test_lookup_altitude_geonames)
 
@@ -46,7 +46,7 @@ target_link_libraries(kgeomap_test_lookup_altitude_geonames KF5KGeomap Qt5::Core
 if(NOT WIN32)
     set(test_itemmarkertiler_sources test_itemmarkertiler.cpp)
     add_executable(kgeomap_test_itemmarkertiler ${test_itemmarkertiler_sources})
-    target_link_libraries(kgeomap_test_itemmarkertiler KF5KGeomap Qt5::Core Qt5::Test KF5::WidgetsAddons)
+    target_link_libraries(kgeomap_test_itemmarkertiler KF5KGeoMap Qt5::Core Qt5::Test KF5::WidgetsAddons)
     add_test(kgeomap_test_itemmarkertiler ${EXECUTABLE_OUTPUT_PATH}/kgeomap_test_itemmarkertiler)
 endif()
 
@@ -54,11 +54,11 @@ endif()
 
 set(test_tracks_sources test_tracks.cpp)
 add_executable(kgeomap_test_tracks ${test_tracks_sources})
-target_link_libraries(kgeomap_test_tracks KF5KGeomap Qt5::Core Qt5::Test)
+target_link_libraries(kgeomap_test_tracks KF5KGeoMap Qt5::Core Qt5::Test)
 add_test(kgeomap_test_tracks ${EXECUTABLE_OUTPUT_PATH}/kgeomap_test_tracks)
 
 # track loading application for timing tests
 
 set(loadtrack_sources loadtrack.cpp)
 add_executable(loadtrack ${loadtrack_sources})
-target_link_libraries(loadtrack KF5KGeomap Qt5::Core Qt5::Test)
+target_link_libraries(loadtrack KF5KGeoMap Qt5::Core Qt5::Test)

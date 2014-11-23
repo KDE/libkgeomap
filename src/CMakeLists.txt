@@ -64,35 +64,35 @@ ecm_generate_headers(kgeomap_CamelCase_HEADERS
                      TileIndex
                      Tracks
 
-                     PREFIX           KGeomap
+                     PREFIX           KGeoMap
                      REQUIRED_HEADERS kgeomap_HEADERS
 )
 
-add_library(KF5KGeomap SHARED ${widget_LIB_SRCS}
+add_library(KF5KGeoMap SHARED ${widget_LIB_SRCS}
                               ${backend_map_marble_LIB_SRCS}
                               ${backend_map_googlemaps_LIB_SRCS}
                               ${backend_map_osm_LIB_SRCS}
 )
 
-add_library(KF5::KGeomap ALIAS KF5KGeomap)
+add_library(KF5::KGeoMap ALIAS KF5KGeoMap)
 
-generate_export_header(KF5KGeomap BASE_NAME libkgeomap EXPORT_MACRO_NAME LIBKGEOMAP_EXPORT)
+generate_export_header(KF5KGeoMap BASE_NAME libkgeomap EXPORT_MACRO_NAME LIBKGEOMAP_EXPORT)
 
 # Check if compilation is done through digiKam SC or not. If yes, do not install header files.
 if (NOT DIGIKAMSC_COMPILE_LIBKGEOMAP)
 
     install(FILES       ${kgeomap_CamelCase_HEADERS}
-            DESTINATION ${KF5_INCLUDE_INSTALL_DIR}/KGeomap/KGeomap
+            DESTINATION ${KF5_INCLUDE_INSTALL_DIR}/KGeoMap/KGeoMap
             COMPONENT   Devel
     )
 
     install(FILES       ${kgeomap_HEADERS}
-            DESTINATION ${KF5_INCLUDE_INSTALL_DIR}/KGeomap/kgeomap
+            DESTINATION ${KF5_INCLUDE_INSTALL_DIR}/KGeoMap/kgeomap
             COMPONENT   Devel
     )
 
     install(FILES       ${CMAKE_CURRENT_BINARY_DIR}/libkgeomap_export.h
-            DESTINATION ${KF5_INCLUDE_INSTALL_DIR}/KGeomap/kgeomap
+            DESTINATION ${KF5_INCLUDE_INSTALL_DIR}/KGeoMap/kgeomap
             COMPONENT   Devel
     )
 
@@ -104,12 +104,12 @@ if (NOT DIGIKAMSC_COMPILE_LIBKGEOMAP)
 
 endif()
 
-target_include_directories(KF5KGeomap INTERFACE
-                           "$<INSTALL_INTERFACE:${KF5_INCLUDE_INSTALL_DIR}/KGeomap>"
+target_include_directories(KF5KGeoMap INTERFACE
+                           "$<INSTALL_INTERFACE:${KF5_INCLUDE_INSTALL_DIR}/KGeoMap>"
 )
-target_include_directories(KF5KGeomap PUBLIC "$<BUILD_INTERFACE:${libkgeomap_SOURCE_DIR}/src;${libkgeomap_BINARY_DIR}/src>")
+target_include_directories(KF5KGeoMap PUBLIC "$<BUILD_INTERFACE:${libkgeomap_SOURCE_DIR}/src;${libkgeomap_BINARY_DIR}/src>")
 
-target_link_libraries(KF5KGeomap
+target_link_libraries(KF5KGeoMap
                       PRIVATE
                       ${MARBLE_LIBRARIES}
                       PUBLIC
@@ -122,12 +122,12 @@ target_link_libraries(KF5KGeomap
                       Qt5::Concurrent
 )
 
-install(TARGETS KF5KGeomap
-        EXPORT  KF5KGeomapTargets ${KF5_INSTALL_TARGETS_DEFAULT_ARGS}
+install(TARGETS KF5KGeoMap
+        EXPORT  KF5KGeoMapTargets ${KF5_INSTALL_TARGETS_DEFAULT_ARGS}
 )
 
-set_target_properties(KF5KGeomap  PROPERTIES
+set_target_properties(KF5KGeoMap  PROPERTIES
                       VERSION     ${KGEOMAP_VERSION_STRING}
                       SOVERSION   ${KGEOMAP_SOVERSION}
-                      EXPORT_NAME KGeomap
+                      EXPORT_NAME KGeoMap
 )

@@ -86,7 +86,7 @@ endif()
 ecm_setup_version(${LIBKGEOMAP_LIB_VERSION}
                   VARIABLE_PREFIX      KGEOMAP
                   VERSION_HEADER       "${CMAKE_CURRENT_BINARY_DIR}/libkgeomap_version.h"
-                  PACKAGE_VERSION_FILE "${CMAKE_CURRENT_BINARY_DIR}/KF5KGeomapConfigVersion.cmake"
+                  PACKAGE_VERSION_FILE "${CMAKE_CURRENT_BINARY_DIR}/KF5KGeoMapConfigVersion.cmake"
                   SOVERSION            ${LIBKGEOMAP_SO_VERSION}
 )
 
@@ -113,21 +113,21 @@ message("${CMAKECONFIG_INSTALL_DIR}")
 set(CMAKECONFIG_INSTALL_DIR "${CMAKECONFIG_INSTALL_PREFIX}/KF5Kgeomap")
 
 ecm_configure_package_config_file(
-    "${CMAKE_CURRENT_SOURCE_DIR}/cmake/templates/KF5KGeomapConfig.cmake.in"
-    "${CMAKE_CURRENT_BINARY_DIR}/KF5KGeomapConfig.cmake"
+    "${CMAKE_CURRENT_SOURCE_DIR}/cmake/templates/KF5KGeoMapConfig.cmake.in"
+    "${CMAKE_CURRENT_BINARY_DIR}/KF5KGeoMapConfig.cmake"
     INSTALL_DESTINATION ${CMAKECONFIG_INSTALL_DIR}
 )
 
 install(FILES
-        "${CMAKE_CURRENT_BINARY_DIR}/KF5KGeomapConfig.cmake"
-        "${CMAKE_CURRENT_BINARY_DIR}/KF5KGeomapConfigVersion.cmake"
+        "${CMAKE_CURRENT_BINARY_DIR}/KF5KGeoMapConfig.cmake"
+        "${CMAKE_CURRENT_BINARY_DIR}/KF5KGeoMapConfigVersion.cmake"
         DESTINATION "${CMAKECONFIG_INSTALL_DIR}"
         COMPONENT   Devel
 )
 
-install(EXPORT      KF5KGeomapTargets
+install(EXPORT      KF5KGeoMapTargets
         DESTINATION "${CMAKECONFIG_INSTALL_DIR}"
-        FILE        KF5KGeomapTargets.cmake
+        FILE        KF5KGeoMapTargets.cmake
         NAMESPACE   KF5::
 )
 

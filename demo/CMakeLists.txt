@@ -28,7 +28,7 @@ if(KF5KExiv2_FOUND)
                           KF5::KDELibs4Support
                           KF5::Parts
                           KF5::KHtml
-                          KF5::KGeomap
+                          KF5::KGeoMap
                           KF5::KExiv2
                          )
 
