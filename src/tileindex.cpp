@@ -237,7 +237,7 @@ TileIndex TileIndex::fromCoordinates(const KGeoMap::GeoCoordinates& coordinate, 
 
         if (haveRoundingErrors)
         {
-//             kDebug() << QString::fromLatin1("Rounding errors at level %1!").arg(l);
+//             qDebug() << QString::fromLatin1("Rounding errors at level %1!").arg(l);
         }
 
         resultIndex.appendLatLonIndex(latIndex, lonIndex);

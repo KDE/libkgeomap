@@ -26,6 +26,7 @@
 // Qt includes
 
 #include <QStandardItemModel>
+#include <QDebug>
 
 using namespace KGeoMap;
 
@@ -96,7 +97,7 @@ int CountMarkersInIterator(ItemMarkerTiler::NonEmptyIterator* const it)
         const TileIndex currentIndex = it->currentIndex();
         markerCount                 += it->model()->getTileMarkerCount(currentIndex);
         it->nextIndex();
-//         kDebug()<<currentIndex;
+//         qDebug()<<currentIndex;
     }
 
     return markerCount;

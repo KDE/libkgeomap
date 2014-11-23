@@ -35,7 +35,7 @@
 
 // KDE includes
 
-#include <kdebug.h>
+#include <QDebug>
 #include <kurl.h>
 
 // Local includes

@@ -114,7 +114,7 @@ void TileGrouper::updateClusters()
     const int ClusterGridSizeScreen  = 4*ClusterRadius;
 //    const QSize ClusterMaxPixmapSize = QSize(ClusterGridSizeScreen, ClusterGridSizeScreen);
 
-//     kDebug()<<"updateClusters starting...";
+//     qDebug()<<"updateClusters starting...";
 
     s->clusterList.clear();
 
@@ -135,7 +135,7 @@ void TileGrouper::updateClusters()
 //         QPoint tile1Point, tile2Point;
 //         d->currentBackend->screenCoordinates(tile1Coordinate, &tile1Point);
 //         d->currentBackend->screenCoordinates(tile2Coordinate, &tile2Point);
-//         kDebug()<<i<<tile1Point<<tile2Point<<(tile1Point-tile2Point);
+//         qDebug()<<i<<tile1Point<<tile2Point<<(tile1Point-tile2Point);
 //     }
 
     const int gridSize   = ClusterGridSizeScreen;
@@ -179,7 +179,7 @@ void TileGrouper::updateClusters()
         pixelNonEmptyTileIndexGrid[linearIndex] << tileIndex;
         pixelCountGrid[linearIndex]+= s->markerModel->getTileMarkerCount(tileIndex);
 
-//         kDebug()<<QString::fromLatin1("pixel at: %1, %2 (%3): %4 markers").arg(tilePoint.x()).arg(tilePoint.y()).arg(linearIndex).arg(pixelCountGrid[linearIndex]);
+//         qDebug()<<QString::fromLatin1("pixel at: %1, %2 (%3): %4 markers").arg(tilePoint.x()).arg(tilePoint.y()).arg(linearIndex).arg(pixelCountGrid[linearIndex]);
     }
 
     /// @todo Cleanup this list every ... iterations in the next loop, too
@@ -297,7 +297,7 @@ void TileGrouper::updateClusters()
             }
         }
 
-        kDebug()<<QString::fromLatin1("created cluster %1: %2 tiles").arg(s->clusterList.size()).arg(cluster.tileIndicesList.count());
+        qDebug()<<QString::fromLatin1("created cluster %1: %2 tiles").arg(s->clusterList.size()).arg(cluster.tileIndicesList.count());
 
         s->clusterList << cluster;
     }
@@ -349,8 +349,8 @@ void TileGrouper::updateClusters()
         cluster.groupState          = clusterStateComputer.getState();
     }
 
-//     kDebug()<<s->clusterList.size();
-    kDebug()<<QString::fromLatin1("level %1: %2 non empty tiles sorted into %3 clusters (%4 searched)").arg(markerLevel).arg(debugCountNonEmptyTiles).arg(s->clusterList.count()).arg(debugTilesSearched);
+//     qDebug()<<s->clusterList.size();
+    qDebug()<<QString::fromLatin1("level %1: %2 non empty tiles sorted into %3 clusters (%4 searched)").arg(markerLevel).arg(debugCountNonEmptyTiles).arg(s->clusterList.count()).arg(debugTilesSearched);
 
     d->currentBackend->updateClusters();
 }

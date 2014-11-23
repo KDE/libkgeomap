@@ -26,6 +26,7 @@
 // Qt includes
 
 #include <QDropEvent>
+#include <QDebug>
 
 // local includes
 
@@ -52,7 +53,7 @@ bool DemoDragDropHandler::dropEvent(const QDropEvent* e, const KGeoMap::GeoCoord
     if (!mimeData)
         return false;
 
-    kDebug() << mimeData->draggedIndices.count();
+    qDebug() << mimeData->draggedIndices.count();
 
     for (int i = 0; i < mimeData->draggedIndices.count(); ++i)
     {

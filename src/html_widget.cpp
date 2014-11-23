@@ -35,6 +35,7 @@
 
 #include <khtmlview.h>
 #include <khtml_events.h>
+#include <QDebug>
 
 // local includes
 
@@ -102,7 +103,7 @@ HTMLWidget::~HTMLWidget()
 
 void HTMLWidget::loadInitialHTML(const QString& initialHTML)
 {
-//     kDebug() << initialHTML;
+//     qDebug() << initialHTML;
     begin();
     write(initialHTML);
     end();
@@ -205,7 +206,7 @@ void HTMLWidget::khtmlMouseMoveEvent(khtml::MouseMoveEvent *e)
 
         d->intermediateSelectionScreenPoint = QPoint(e->x(), e->y());
 
-        kDebug() << d->firstSelectionScreenPoint << QLatin1String(" ") << d->intermediateSelectionScreenPoint;
+        qDebug() << d->firstSelectionScreenPoint << QLatin1String(" ") << d->intermediateSelectionScreenPoint;
 
         qreal lonWest, latNorth, lonEast, latSouth;
 
@@ -249,7 +250,7 @@ void HTMLWidget::slotScanForJSMessages()
     if (status!=QLatin1String("(event)" ))
         return;
 
-    kDebug() << status;
+    qDebug() << status;
 
     const QString eventBufferString = runScript(QLatin1String("kgeomapReadEventStrings();")).toString();
 
@@ -271,7 +272,7 @@ QVariant HTMLWidget::runScript(const QString& scriptCode)
     if (!d->isReady)
         return QVariant();
 
-//     kDebug() << scriptCode;
+//     qDebug() << scriptCode;
     return executeScript(scriptCode);
 }
 
@@ -344,7 +345,7 @@ void HTMLWidget::mouseModeChanged(const MouseModes mouseMode)
 
 void HTMLWidget::centerOn(const qreal west, const qreal north, const qreal east, const qreal south, const bool useSaneZoomLevel)
 {
-//    kDebug() << "West:" << west << " North:" << north << " East:" << east << " South:" << south;
+//    qDebug() << "West:" << west << " North:" << north << " East:" << east << " South:" << south;
     runScript(QString::fromLatin1("kgeomapSetMapBoundaries(%1, %2, %3, %4, %5);")
               .arg(west)
               .arg(north)

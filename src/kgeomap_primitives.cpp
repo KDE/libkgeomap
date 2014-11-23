@@ -29,6 +29,7 @@
 
 #ifdef KGEOMAP_HAVE_VALGRIND
 #include <valgrind/valgrind.h>
+#include <QDebug>
 #endif
 
 namespace KGeoMap
@@ -47,10 +48,10 @@ void KGeoMap_assert(const char* const condition, const char* const filename, con
     }
     else
     {
-        kDebug() << debugString;
+        qDebug() << debugString;
     }
 #else
-    kDebug() << debugString;
+    qDebug() << debugString;
 #endif /* KGEOMAP_HAVE_VALGRIND */
 }
 

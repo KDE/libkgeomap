@@ -30,7 +30,7 @@
 // KDE includes
 
 #include <qtest_kde.h>
-#include <kdebug.h>
+#include <QDebug>
 
 // local includes
 

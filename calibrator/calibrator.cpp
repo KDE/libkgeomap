@@ -47,6 +47,7 @@
 #include <QApplication>
 #include <KLocalizedString>
 #include <QCommandLineParser>
+#include <QDebug>
 
 // local includes
 
@@ -252,7 +253,7 @@ void Calibrator::updateGroupingMode()
 
 void Calibrator::addMarkerAt(const KGeoMap::GeoCoordinates& coordinates)
 {
-    kDebug() << coordinates;
+    qDebug() << coordinates;
     QStandardItem* const item = new QStandardItem(coordinates.geoUrl());
     item->setData(QVariant::fromValue(coordinates), CoordinatesRole);
 
@@ -337,7 +338,7 @@ void Calibrator::updateMarkers()
         }
     }
 
-    kDebug()<<d->model->rowCount();
+    qDebug()<<d->model->rowCount();
 }
 
 void Calibrator::updateZoomView()

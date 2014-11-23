@@ -60,6 +60,7 @@
 // LibKExiv2 includes
 
 #include <KExiv2/KExiv2>
+#include <QDebug>
 
 // libkgeomap includes
 
@@ -402,7 +403,7 @@ MyImageData LoadImageData(const QUrl& urlToLoad)
 
 void MainWindow::slotFutureResultsReadyAt(int startIndex, int endIndex)
 {
-//     kDebug()<<"future"<<startIndex<<endIndex;
+//     //qDebug()<<"future"<<startIndex<<endIndex;
 
     // determine the sender:
     QFutureWatcher<MyImageData>* const futureSender = reinterpret_cast<QFutureWatcher<MyImageData>*>(sender());
@@ -433,7 +434,7 @@ void MainWindow::slotFutureResultsReadyAt(int startIndex, int endIndex)
     for (int index = startIndex; index < endIndex; ++index)
     {
         MyImageData newData = d->imageLoadingRunningFutures.at(futureIndex).resultAt(index);
-//         kDebug()<<"future"<<newData.url<<newData.coordinates.geoUrl();
+//         //qDebug()<<"future"<<newData.url<<newData.coordinates.geoUrl();
 
         d->imageLoadingBuncher << newData;
     }
@@ -491,7 +492,7 @@ void MainWindow::slotScheduleImagesForLoading(const QList<QUrl> imagesToSchedule
 
 void MainWindow::slotImageLoadingBunchReady()
 {
-    kDebug()<<"slotImageLoadingBunchReady";
+    qDebug()<<"slotImageLoadingBunchReady";
 
     for (int i = 0; i < d->imageLoadingBuncher.count(); ++i)
     {
@@ -545,13 +546,13 @@ void MainWindow::slotMarkersMoved(const QList<QPersistentModelIndex>& markerIndi
 
         /// @todo Check the return value?
         myAltitudeLookup->startLookup();
-        kDebug()<<"Starting lookup for "<<altitudeQueries.count()<<" items!";
+        qDebug()<<"Starting lookup for "<<altitudeQueries.count()<<" items!";
     }
 }
 
 void MainWindow::slotAltitudeRequestsReady(const QList<int>& readyRequests)
 {
-    kDebug()<<readyRequests.count() << " items ready!";
+    qDebug()<<readyRequests.count() << " items ready!";
     LookupAltitude* const myAltitudeLookup = qobject_cast<LookupAltitude*>(sender());
 
     if (!myAltitudeLookup)

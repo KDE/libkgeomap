@@ -36,6 +36,7 @@
 #include <QAction>
 #include <kconfiggroup.h>
 #include <khtml_part.h>
+#include <QDebug>
 
 // local includes
 
@@ -123,7 +124,7 @@ GeoCoordinates BackendOSM::getCenter() const
 
 void BackendOSM::setCenter(const GeoCoordinates& coordinate)
 {
-    kDebug() << isReady() << coordinate.geoUrl();
+    qDebug() << isReady() << coordinate.geoUrl();
     d->cacheCenter = coordinate;
 
     if (isReady())
@@ -140,7 +141,7 @@ bool BackendOSM::isReady() const
 
 void BackendOSM::slotHTMLInitialized()
 {
-    kDebug() << 1;
+    qDebug() << 1;
 
     d->isReady = true;
     d->htmlWidget->runScript(QLatin1String("document.getElementById(\"map_canvas\").style.height=\"%1px\"")
@@ -317,19 +318,19 @@ void BackendOSM::slotHTMLEvents(const QStringList& events)
         else if (eventCode == "do")
         {
             // debug output:
-            kDebug()<<QString::fromLatin1("javascript:%1").arg(eventParameter);
+            qDebug()<<QString::fromLatin1("javascript:%1").arg(eventParameter);
         }
     }
 
     if (!movedClusters.isEmpty())
     {
-        kDebug() << movedClusters;
+        qDebug() << movedClusters;
         emit(signalClustersMoved(movedClusters));
     }
 
     if (!movedMarkers.isEmpty())
     {
-        kDebug() << movedMarkers;
+        qDebug() << movedMarkers;
         emit(signalSpecialMarkersMoved(movedMarkers));
     }
 
@@ -366,7 +367,7 @@ void BackendOSM::slotHTMLEvents(const QStringList& events)
 
 void BackendOSM::updateClusters()
 {
-    kDebug() << "start updateclusters";
+    qDebug() << "start updateclusters";
     // re-transfer the clusters to the map:
     KGEOMAP_ASSERT(isReady());
 
@@ -403,7 +404,7 @@ void BackendOSM::updateClusters()
             );
     }
 
-    kDebug() << "end updateclusters";
+    qDebug() << "end updateclusters";
 }
 
 bool BackendOSM::screenCoordinates(const GeoCoordinates& coordinates, QPoint* const point)
@@ -455,7 +456,7 @@ void BackendOSM::setZoom(const QString& newZoom)
     KGEOMAP_ASSERT(myZoomString.startsWith(QLatin1String("googlemaps:")));
 
     const int myZoom = myZoomString.mid(QLatin1String("googlemaps:").length()).toInt();
-    kDebug() << myZoom;
+    qDebug() << myZoom;
 
     d->cacheZoom = myZoom;
 

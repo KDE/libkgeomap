@@ -34,6 +34,7 @@
 // KDE includes
 
 #include <klibloader.h>
+#include <QDebug>
 
 // local includes
 
@@ -129,7 +130,7 @@ QPixmap KGeoMapGlobalObject::getStandardMarkerPixmap()
 QUrl KGeoMapGlobalObject::locateDataFile(const QString filename)
 {
     const QUrl dataFile = QUrl::fromLocalFile(QStandardPaths::locate(QStandardPaths::GenericDataLocation, QLatin1String("libkgeomap/") + filename));
-    kDebug() << "located data: " << dataFile;
+    qDebug() << "located data: " << dataFile;
     return dataFile;
 }
 
@@ -278,7 +279,7 @@ GeoCoordinates::PairList KGeoMapHelperNormalizeBounds(const GeoCoordinates::Pair
     const qreal bEast  = boundsPair.second.lon();
     const qreal bNorth = boundsPair.second.lat();
     const qreal bSouth = boundsPair.first.lat();
-//     kDebug() << bWest << bEast << bNorth << bSouth;
+//     qDebug() << bWest << bEast << bNorth << bSouth;
 
     if (bEast<bWest)
     {
@@ -290,7 +291,7 @@ GeoCoordinates::PairList KGeoMapHelperNormalizeBounds(const GeoCoordinates::Pair
         boundsList << GeoCoordinates::makePair(bSouth, bWest, bNorth, bEast);
     }
 
-//     kDebug() << boundsList;
+//     qDebug() << boundsList;
     return boundsList;
 }
 
@@ -396,7 +397,7 @@ void KGeoMapGlobalObject::clearWidgetPool()
     while (!d->internalMapWidgetsPool.isEmpty())
     {
         KGeoMapInternalWidgetInfo info = d->internalMapWidgetsPool.takeLast();
-        kDebug() << info.backendName << info.deleteFunction;
+        qDebug() << info.backendName << info.deleteFunction;
 
         if (info.deleteFunction)
         {

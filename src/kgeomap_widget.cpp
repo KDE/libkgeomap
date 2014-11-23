@@ -63,6 +63,7 @@
 #else
 // This file was deprecated in 4.9
 #include <marble/global.h>
+#include <QDebug>
 #endif
 
 // local includes
@@ -470,7 +471,7 @@ bool KGeoMapWidget::setBackend(const QString& backendName)
     {
         if (backend->backendName() == backendName)
         {
-            kDebug() << QString::fromLatin1("setting backend %1").arg(backendName);
+            qDebug() << QString::fromLatin1("setting backend %1").arg(backendName);
             d->currentBackend     = backend;
             d->currentBackendName = backendName;
 
@@ -535,7 +536,7 @@ void KGeoMapWidget::applyCacheToBackend()
 
     setCenter(d->cacheCenterCoordinate);
     /// @todo Only do this if the zoom was changed!
-    kDebug() << d->cacheZoom;
+    qDebug() << d->cacheZoom;
     setZoom(d->cacheZoom);
     d->currentBackend->mouseModeChanged();
     d->currentBackend->regionSelectionChanged();
@@ -576,7 +577,7 @@ void KGeoMapWidget::setCenter(const GeoCoordinates& coordinate)
 
 void KGeoMapWidget::slotBackendReadyChanged(const QString& backendName)
 {
-    kDebug() << QString::fromLatin1("backend %1 is ready!").arg(backendName);
+    qDebug() << QString::fromLatin1("backend %1 is ready!").arg(backendName);
 
     if (backendName != d->currentBackendName)
     {
@@ -1223,7 +1224,7 @@ GeoCoordinates::Pair KGeoMapWidget::getRegionSelection()
 
 void KGeoMapWidget::slotClustersMoved(const QIntList& clusterIndices, const QPair<int, QModelIndex>& snapTarget)
 {
-    kDebug() << clusterIndices;
+    qDebug() << clusterIndices;
 
     /// @todo We actually expect only one clusterindex
     int             clusterIndex      = clusterIndices.first();
@@ -1391,7 +1392,7 @@ void KGeoMapWidget::slotLazyReclusteringRequestCallBack()
  */
 void KGeoMapWidget::slotClustersClicked(const QIntList& clusterIndices)
 {
-    kDebug()<<clusterIndices;
+    qDebug()<<clusterIndices;
 
     if ((s->currentMouseMode == MouseModeZoomIntoGroup) ||
         (s->currentMouseMode == MouseModeRegionSelectionFromIcon) )

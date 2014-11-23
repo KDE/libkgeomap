@@ -198,7 +198,7 @@ QVariant ItemMarkerTiler::bestRepresentativeIndexFromList(const QList<QVariant>&
 
 void ItemMarkerTiler::slotSelectionChanged(const QItemSelection& selected, const QItemSelection& deselected)
 {
-//     kDebug()<<selected<<deselected;
+//     qDebug()<<selected<<deselected;
     if (isDirty())
     {
         return;
@@ -228,7 +228,7 @@ void ItemMarkerTiler::slotSelectionChanged(const QItemSelection& selected, const
                     break;
 
                 myTile->selectedCount++;
-//                 kDebug() << l << tileIndex << myTile->selectedCount;
+//              qDebug() << l << tileIndex << myTile->selectedCount;
                 KGEOMAP_ASSERT(myTile->selectedCount <= myTile->markerIndices.count());
 
                 if (myTile->childrenEmpty())
@@ -271,7 +271,7 @@ void ItemMarkerTiler::slotSelectionChanged(const QItemSelection& selected, const
 
 void ItemMarkerTiler::slotSourceModelDataChanged(const QModelIndex& topLeft, const QModelIndex& bottomRight)
 {
-    kDebug() << topLeft << bottomRight;
+    qDebug() << topLeft << bottomRight;
     setDirty();
 
     if (d->activeState)
@@ -330,7 +330,7 @@ void ItemMarkerTiler::slotThumbnailAvailableForIndex(const QPersistentModelIndex
 
 void ItemMarkerTiler::slotSourceModelReset()
 {
-    kDebug() << "----";
+    qDebug() << "----";
     setDirty();
 }
 

@@ -26,7 +26,7 @@
 
 #include <KAboutData>
 
-#include <kdebug.h>
+#include <QDebug>
 #include <kicon.h>
 #include <QApplication>
 #include <KLocalizedString>
@@ -79,7 +79,7 @@ int main(int argc, char* argv[])
     Q_FOREACH(const QString& file, parser.positionalArguments())
     {
         const QUrl argUrl = QUrl::fromLocalFile(file);
-        kDebug()<<argUrl;
+        qDebug()<<argUrl;
         imagesList << argUrl;
     }
 

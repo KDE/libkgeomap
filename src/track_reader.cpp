@@ -33,7 +33,7 @@
 
 // KDE includes
 
-#include <kdebug.h>
+#include <QDebug>
 #include <klocale.h>
 
 namespace KGeoMap

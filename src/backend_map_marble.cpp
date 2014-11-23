@@ -48,6 +48,7 @@
 #include <marble/MarbleModel.h>
 #include <marble/MarbleWidget.h>
 #include <marble/ViewportParams.h>
+#include <QDebug>
 
 // local includes
 
@@ -659,7 +660,7 @@ void BackendMarble::marbleCustomPaint(Marble::GeoPainter* painter)
          (d->clustersDirtyCacheLon        != d->marbleWidget->centerLongitude()) ||
          (d->clustersDirtyCacheProjection != d->marbleWidget->projection()) )
     {
-//         kDebug()<<d->marbleWidget->centerLatitude()<<d->marbleWidget->centerLongitude()<<d->marbleWidget->projection();
+//         qDebug()<<d->marbleWidget->centerLatitude()<<d->marbleWidget->centerLongitude()<<d->marbleWidget->projection();
         d->clustersDirtyCacheLat        = d->marbleWidget->centerLatitude();
         d->clustersDirtyCacheLon        = d->marbleWidget->centerLongitude();
         d->clustersDirtyCacheProjection = d->marbleWidget->projection();
@@ -1116,7 +1117,7 @@ GeoCoordinates::PairList BackendMarble::getNormalizedBounds()
 #else
     const Marble::GeoDataLatLonAltBox marbleBounds = d->marbleWidget->viewport()->viewLatLonAltBox();
 #endif
-//     kDebug()<<marbleBounds.toString(GeoDataCoordinates::Degree);
+//     qDebug()<<marbleBounds.toString(GeoDataCoordinates::Degree);
 
     const GeoCoordinates::Pair boundsPair = GeoCoordinates::makePair(
             marbleBounds.south(Marble::GeoDataCoordinates::Degree),
@@ -1125,8 +1126,8 @@ GeoCoordinates::PairList BackendMarble::getNormalizedBounds()
             marbleBounds.east(Marble::GeoDataCoordinates::Degree)
         );
 
-//     kDebug()<<boundsPair.first<<boundsPair.second;
-//     kDebug()<<KGeoMapHelperNormalizeBounds(boundsPair);
+//     qDebug()<<boundsPair.first<<boundsPair.second;
+//     qDebug()<<KGeoMapHelperNormalizeBounds(boundsPair);
 
     return KGeoMapHelperNormalizeBounds(boundsPair);
 }
@@ -1174,7 +1175,7 @@ bool BackendMarble::eventFilter(QObject *object, QEvent *event)
                 geoCoordinates(mouseEvent->pos(), &d->intermediateSelectionPoint);
                 d->intermediateSelectionScreenPoint = mouseEvent->pos();
 
-                kDebug() << d->firstSelectionScreenPoint << QLatin1String(" ") << d->intermediateSelectionScreenPoint;
+                qDebug() << d->firstSelectionScreenPoint << QLatin1String(" ") << d->intermediateSelectionScreenPoint;
 
                 qreal lonWest, latNorth, lonEast, latSouth;
 
@@ -1491,7 +1492,7 @@ void BackendMarble::updateActionAvailability()
         return;
     }
 
-    kDebug() << d->cacheZoom << d->marbleWidget->maximumZoom() << d->marbleWidget->minimumZoom();
+    qDebug() << d->cacheZoom << d->marbleWidget->maximumZoom() << d->marbleWidget->minimumZoom();
     s->worldMapWidget->getControlAction(QLatin1String("zoomin"))->setEnabled(d->cacheZoom<d->marbleWidget->maximumZoom());
     s->worldMapWidget->getControlAction(QLatin1String("zoomout"))->setEnabled(d->cacheZoom>d->marbleWidget->minimumZoom());
     const QList<QAction*> mapThemeActions = d->actionGroupMapTheme->actions();
@@ -1520,7 +1521,7 @@ void BackendMarble::slotThumbnailAvailableForIndex(const QVariant& index, const 
         return;
     }
 
-    kDebug() << index << pixmap.size();
+    qDebug() << index << pixmap.size();
 
     if (pixmap.isNull() || !s->showThumbnails)
     {

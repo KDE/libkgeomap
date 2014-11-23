@@ -29,7 +29,7 @@
 // KDE includes
 
 #include <qtest_kde.h>
-#include <kdebug.h>
+#include <QDebug>
 
 // local includes
 
@@ -199,20 +199,20 @@ void TestTracks::testSaxLoaderError()
         TrackReader::TrackReadResult fileData = TrackReader::loadTrackFile(testDataDir.resolved(QUrl("gpx-invalid-empty.gpx")));
         QVERIFY(!fileData.isValid);
         QVERIFY(!fileData.loadError.isEmpty());
-        kDebug()<<fileData.loadError;
+        qDebug()<<fileData.loadError;
     }
 
     {
         TrackReader::TrackReadResult fileData = TrackReader::loadTrackFile(testDataDir.resolved(QUrl("gpx-invalid-xml-error.gpx")));
         QVERIFY(!fileData.isValid);
         QVERIFY(!fileData.loadError.isEmpty());
-        kDebug()<<fileData.loadError;
+        qDebug()<<fileData.loadError;
     }
 
     {
         TrackReader::TrackReadResult fileData = TrackReader::loadTrackFile(testDataDir.resolved(QUrl("gpx-invalid-no-points.gpx")));
         QVERIFY(!fileData.isValid);
         QVERIFY(!fileData.loadError.isEmpty());
-        kDebug()<<fileData.loadError;
+        qDebug()<<fileData.loadError;
     }
 }
