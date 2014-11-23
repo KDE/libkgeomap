@@ -33,9 +33,9 @@ using namespace KGeoMap;
 const int CoordinatesRole = Qt::UserRole + 0;
 
 MarkerModelHelper::MarkerModelHelper(QAbstractItemModel* const itemModel, QItemSelectionModel* const itemSelectionModel)
- : ModelHelper(itemModel),
-   m_itemModel(itemModel),
-   m_itemSelectionModel(itemSelectionModel)
+    : ModelHelper(itemModel),
+      m_itemModel(itemModel),
+      m_itemSelectionModel(itemSelectionModel)
 {
     connect(itemModel, SIGNAL(dataChanged(QModelIndex,QModelIndex)),
             this, SLOT(slotDataChanged(QModelIndex,QModelIndex)));
@@ -246,7 +246,7 @@ void TestItemMarkerTiler::testMoveMarkers2()
     const QModelIndex markerIndex1 = itemModel->indexFromItem(item1);
     QStandardItem* const item2     = MakeItemAt(coord_1_2);
     itemModel->appendRow(item2);
-    const QModelIndex markerIndex2 = itemModel->indexFromItem(item2);
+//    const QModelIndex markerIndex2 = itemModel->indexFromItem(item2);
 
     for (int l = 1; l <= fillLevel; ++l)
     {
@@ -259,8 +259,8 @@ void TestItemMarkerTiler::testMoveMarkers2()
 
     QStandardItem* const item3     = MakeItemAt(coord_50_60);
     itemModel->appendRow(item3);
-    const QModelIndex markerIndex3 = itemModel->indexFromItem(item3);
- 
+//    const QModelIndex markerIndex3 = itemModel->indexFromItem(item3);
+
     for (int l = 1; l <= fillLevel; ++l)
     {
         const TileIndex tileIndex           = TileIndex::fromCoordinates(coord_50_60, l);
