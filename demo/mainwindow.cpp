@@ -45,12 +45,12 @@
 #include <QtConcurrentMap>
 #include <QCommandLineParser>
 #include <QMenuBar>
+#include <QFileDialog>
 
 // KDE includes
 
 #include <kconfig.h>
 #include <kconfiggroup.h>
-#include <kfiledialog.h>
 #include <klineedit.h>
 #include <klocale.h>
 #include <kmenu.h>
@@ -591,7 +591,7 @@ void MainWindow::slotAltitudeLookupDone()
 
 void MainWindow::slotAddImages()
 {
-    const QList<QUrl> fileNames = KFileDialog::getOpenUrls(d->lastImageOpenDir, QLatin1String("*.jpg|*.jpeg|*.png"), this, i18n("Add image files"));
+    const QList<QUrl> fileNames = QFileDialog::getOpenFileUrls(this, i18n("Add image files"), d->lastImageOpenDir, i18n("Images (*.jpg *.jpeg *.png)"));
 
     if (fileNames.isEmpty())
         return;
