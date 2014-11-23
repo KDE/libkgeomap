@@ -50,7 +50,7 @@
 #include <kconfig.h>
 #include <kconfiggroup.h>
 #include <kdeversion.h>
-#include <khbox.h>
+#include <QHBoxLayout>
 #include <klocale.h>
 #include <kseparator.h>
 #include <kiconloader.h>
@@ -180,7 +180,7 @@ public:
     QAction*                actionZoomOut;
     QAction*                actionShowThumbnails;
     QWidget*                mouseModesHolder;
-    QPointer<KHBox>         controlWidget;
+    QPointer<QWidget>       controlWidget;
     QAction*                actionPreviewSingleItems;
     QAction*                actionPreviewGroupedItems;
     QAction*                actionShowNumbersOnItems;
@@ -192,7 +192,7 @@ public:
     QMenu*                  sortMenu;
     QAction*                actionIncreaseThumbnailSize;
     QAction*                actionDecreaseThumbnailSize;
-    KHBox*                  hBoxForAdditionalControlWidgetItems;
+    QWidget*                hBoxForAdditionalControlWidgetItems;
 
     QActionGroup*           mouseModeActionGroup;
     QAction*                actionRemoveCurrentRegionSelection;
@@ -774,65 +774,88 @@ QWidget* KGeoMapWidget::getControlWidget()
 {
     if (!d->controlWidget)
     {
-        d->controlWidget = new KHBox(this);
+        d->controlWidget = new QWidget(this);
+        QHBoxLayout *controlWidgetHBoxLayout = new QHBoxLayout(d->controlWidget);
+        controlWidgetHBoxLayout->setMargin(0);
 
         QToolButton* const configurationButton = new QToolButton(d->controlWidget);
+        controlWidgetHBoxLayout->addWidget(configurationButton);
         configurationButton->setToolTip(i18n("Map settings"));
         configurationButton->setIcon(SmallIcon( QLatin1String("applications-internet") ));
         configurationButton->setMenu(d->configurationMenu);
         configurationButton->setPopupMode(QToolButton::InstantPopup);
 
         QToolButton* const zoomInButton = new QToolButton(d->controlWidget);
+        controlWidgetHBoxLayout->addWidget(zoomInButton);
         zoomInButton->setDefaultAction(d->actionZoomIn);
 
         QToolButton* const zoomOutButton = new QToolButton(d->controlWidget);
+        controlWidgetHBoxLayout->addWidget(zoomOutButton);
         zoomOutButton->setDefaultAction(d->actionZoomOut);
 
         QToolButton* const showThumbnailsButton = new QToolButton(d->controlWidget);
+        controlWidgetHBoxLayout->addWidget(showThumbnailsButton);
         showThumbnailsButton->setDefaultAction(d->actionShowThumbnails);
 
         new KSeparator(Qt::Vertical, d->controlWidget);
 
         QToolButton* const increaseThumbnailSizeButton = new QToolButton(d->controlWidget);
+        controlWidgetHBoxLayout->addWidget(increaseThumbnailSizeButton);
         increaseThumbnailSizeButton->setDefaultAction(d->actionIncreaseThumbnailSize);
 
         QToolButton* const decreaseThumbnailSizeButton = new QToolButton(d->controlWidget);
+        controlWidgetHBoxLayout->addWidget(decreaseThumbnailSizeButton);
         decreaseThumbnailSizeButton->setDefaultAction(d->actionDecreaseThumbnailSize);
 
         /* --- --- --- */
 
-        d->mouseModesHolder = new KHBox(d->controlWidget);
+        d->mouseModesHolder = new QWidget(d->controlWidget);
+        QHBoxLayout *mouseModesHolderHBoxLayout = new QHBoxLayout(d->mouseModesHolder);
+        mouseModesHolderHBoxLayout->setMargin(0);
+        controlWidgetHBoxLayout->addWidget(d->mouseModesHolder);
 
         new KSeparator(Qt::Vertical, d->mouseModesHolder);
 
         d->setPanModeButton = new QToolButton(d->mouseModesHolder);
+        mouseModesHolderHBoxLayout->addWidget(d->setPanModeButton);
         d->setPanModeButton->setDefaultAction(d->actionSetPanMode);
 
         d->setSelectionModeButton = new QToolButton(d->mouseModesHolder);
+        mouseModesHolderHBoxLayout->addWidget(d->setSelectionModeButton);
         d->setSelectionModeButton->setDefaultAction(d->actionSetRegionSelectionMode);
 
         d->setRegionSelectionFromIconModeButton = new QToolButton(d->mouseModesHolder);
+        mouseModesHolderHBoxLayout->addWidget(d->setRegionSelectionFromIconModeButton);
         d->setRegionSelectionFromIconModeButton->setDefaultAction(d->actionSetRegionSelectionFromIconMode);
 
         d->removeCurrentSelectionButton = new QToolButton(d->mouseModesHolder);
+        mouseModesHolderHBoxLayout->addWidget(d->removeCurrentSelectionButton);
         d->removeCurrentSelectionButton->setDefaultAction(d->actionRemoveCurrentRegionSelection);
 
         d->setZoomModeButton = new QToolButton(d->mouseModesHolder);
+        mouseModesHolderHBoxLayout->addWidget(d->setZoomModeButton);
         d->setZoomModeButton->setDefaultAction(d->actionSetZoomIntoGroupMode);
 
         d->setFilterModeButton = new QToolButton(d->mouseModesHolder);
+        mouseModesHolderHBoxLayout->addWidget(d->setFilterModeButton);
         d->setFilterModeButton->setDefaultAction(d->actionSetFilterMode);
 
         d->removeFilterModeButton = new QToolButton(d->mouseModesHolder);
+        mouseModesHolderHBoxLayout->addWidget(d->removeFilterModeButton);
         d->removeFilterModeButton->setDefaultAction(d->actionRemoveFilter);
 
         d->setSelectThumbnailMode = new QToolButton(d->mouseModesHolder);
+        mouseModesHolderHBoxLayout->addWidget(d->setSelectThumbnailMode);
         d->setSelectThumbnailMode->setDefaultAction(d->actionSetSelectThumbnailMode);
 
         d->buttonStickyMode = new QToolButton(d->controlWidget);
+        controlWidgetHBoxLayout->addWidget(d->buttonStickyMode);
         d->buttonStickyMode->setDefaultAction(d->actionStickyMode);
 
-        d->hBoxForAdditionalControlWidgetItems = new KHBox(d->controlWidget);
+        d->hBoxForAdditionalControlWidgetItems = new QWidget(d->controlWidget);
+        QHBoxLayout *hBoxForAdditionalControlWidgetItemsHBoxLayout = new QHBoxLayout(d->hBoxForAdditionalControlWidgetItems);
+        hBoxForAdditionalControlWidgetItemsHBoxLayout->setMargin(0);
+        controlWidgetHBoxLayout->addWidget(d->hBoxForAdditionalControlWidgetItems);
 
         setVisibleMouseModes(s->visibleMouseModes);
         setVisibleExtraActions(d->visibleExtraActions);
