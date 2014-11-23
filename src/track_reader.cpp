@@ -34,7 +34,7 @@
 // KDE includes
 
 #include <QDebug>
-#include <klocale.h>
+#include <KLocalizedString>
 
 namespace KGeoMap
 {

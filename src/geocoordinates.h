@@ -35,8 +35,6 @@
 
 // Kde includes
 
-#include <kurl.h>
-
 // local includes
 
 #include "libkgeomap_export.h"

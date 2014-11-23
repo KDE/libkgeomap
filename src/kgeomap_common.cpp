@@ -30,11 +30,12 @@
 // Qt includes
 
 #include <QStandardPaths>
+#include <QUrl>
+#include <QDebug>
 
 // KDE includes
 
 #include <klibloader.h>
-#include <QDebug>
 
 // local includes
 

@@ -38,7 +38,7 @@
 
 #include <QAction>
 #include <kconfiggroup.h>
-#include <klocale.h>
+#include <KLocalizedString>
 
 // Marble widget includes
 

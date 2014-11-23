@@ -28,6 +28,7 @@
 
 #include <QTreeWidgetItem>
 #include <QPersistentModelIndex>
+#include <QUrl>
 
 // libkgeomap includes
 

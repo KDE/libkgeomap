@@ -32,11 +32,10 @@
 #include <QtCore/QPersistentModelIndex>
 #include <QtCore/QString>
 #include <QtCore/QVariant>
+#include <QDebug>
 
 // KDE includes
 
-#include <QDebug>
-#include <kurl.h>
 
 // Local includes
 

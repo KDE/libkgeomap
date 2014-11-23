@@ -27,7 +27,6 @@
 #include <KAboutData>
 
 #include <QDebug>
-#include <kicon.h>
 #include <QApplication>
 #include <KLocalizedString>
 #include <QCommandLineParser>

@@ -46,16 +46,15 @@
 #include <QCommandLineParser>
 #include <QMenuBar>
 #include <QFileDialog>
+#include <QStatusBar>
 
 // KDE includes
 
 #include <kconfig.h>
 #include <kconfiggroup.h>
 #include <klineedit.h>
-#include <klocale.h>
-#include <kmenu.h>
-#include <kstatusbar.h>
 #include <KHelpMenu>
+#include <KLocalizedString>
 
 // LibKExiv2 includes
 
