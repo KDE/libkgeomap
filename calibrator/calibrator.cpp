@@ -40,10 +40,13 @@
 
 // KDE includes
 
-#include <kapplication.h>
-#include <K4AboutData>
-#include <kcmdlineargs.h>
+
+#include <KAboutData>
+
 #include <klineedit.h>
+#include <QApplication>
+#include <KLocalizedString>
+#include <QCommandLineParser>
 
 // local includes
 
@@ -406,27 +409,27 @@ void Calibrator::slotActivateMapActionTriggered(bool state)
 
 int main(int argc, char* argv[])
 {
-    K4AboutData aboutData("calibrator-kgeomap",
-                         0,
-                         ki18n("KGeoMap calibration tool"),
-                         //PORT TO QT5
-                         "kgeomap_version",                                     // version 
-                         ki18n("Used to calibrate the KGeoMap library tiling level"),
-                         K4AboutData::License_GPL,
-                         ki18n("(c) 2010 Michael G. Hansen"),
-                         ki18n(""),                                           // optional text
-                         "http://www.digikam.org/sharedlibs",                 // URI of homepage
-                         ""                                                   // bugs e-mail address
-                        );
+    KAboutData aboutData("calibrator-kgeomap", i18n("KGeoMap calibration tool"),  "kgeomap_version"); // TODO fix version
+    aboutData.setShortDescription(i18n("Used to calibrate the KGeoMap library tiling level"));
+    aboutData.setLicense(KAboutLicense::GPL);
+    aboutData.setCopyrightStatement(i18n("(c) 2010 Michael G. Hansen"));
+    aboutData.setHomepage("http://www.digikam.org/sharedlibs");
 
-    aboutData.addAuthor(ki18n("Michael G. Hansen"),
-                        ki18n("KGeoMap library"),
+    aboutData.addAuthor(i18n("Michael G. Hansen"),
+                        i18n("KGeoMap library"),
                         "mike@mghansen.de",
                         "http://www.mghansen.de");
 
-    KCmdLineArgs::init(argc, argv, &aboutData);
+    QApplication app(argc, argv);
+    QCommandLineParser parser;
+    KAboutData::setApplicationData(aboutData);
+    parser.addVersionOption();
+    parser.addHelpOption();
+    //PORTING SCRIPT: adapt aboutdata variable if necessary
+    aboutData.setupCommandLine(&parser);
+    parser.process(app);
+    aboutData.processCommandLine(&parser);
 
-    KApplication app;
 
     Calibrator* const calibrator = new Calibrator();
     calibrator->show();

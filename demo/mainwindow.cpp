@@ -42,11 +42,11 @@
 #include <QTreeWidget>
 #include <QVBoxLayout>
 #include <QtConcurrentMap>
+#include <QCommandLineParser>
 
 // KDE includes
 
 #include <QAction>
-#include <kcmdlineargs.h>
 #include <kconfig.h>
 #include <kconfiggroup.h>
 #include <kfiledialog.h>
@@ -215,7 +215,7 @@ public:
     int                                 imageLoadingCurrentCount;
     QList<MyImageData>                  imageLoadingBuncher;
     QTimer*                             imageLoadingBunchTimer;
-    KCmdLineArgs*                       cmdLineArgs;
+    QCommandLineParser*                 cmdLineArgs;
     QUrl                                lastImageOpenDir;
 
     QAbstractItemModel*                 displayMarkersModel;
@@ -224,7 +224,7 @@ public:
     MyTrackModelHelper*                 trackModelHelper;
 };
 
-MainWindow::MainWindow(KCmdLineArgs* const cmdLineArgs, QWidget* const parent)
+MainWindow::MainWindow(QCommandLineParser* const cmdLineArgs, QWidget* const parent)
     : KMainWindow(parent), d(new Private())
 {
     // initialize kexiv2 before doing any multitasking

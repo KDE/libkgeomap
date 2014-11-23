@@ -40,7 +40,7 @@
 #include "modelhelper.h"
 #include "tracks.h"
 
-class KCmdLineArgs;
+class QCommandLineParser;
 
 class MarkerModelHelper : public KGeoMap::ModelHelper
 {
@@ -101,7 +101,7 @@ class MainWindow : public KMainWindow
 
 public:
 
-    explicit MainWindow(KCmdLineArgs* const cmdLineArgs, QWidget* const parent = 0);
+    explicit MainWindow(QCommandLineParser* const cmdLineArgs, QWidget* const parent = 0);
     ~MainWindow();
 
 public Q_SLOTS:

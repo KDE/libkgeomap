@@ -23,11 +23,15 @@
 
 // KDE includes
 
-#include <kapplication.h>
-#include <K4AboutData>
-#include <kcmdlineargs.h>
+
+#include <KAboutData>
+
 #include <kdebug.h>
 #include <kicon.h>
+#include <QApplication>
+#include <KLocalizedString>
+#include <QCommandLineParser>
+#include <QCommandLineOption>
 
 // libkgeomap includes
 
@@ -39,51 +43,48 @@
 
 int main(int argc, char* argv[])
 {
-    K4AboutData aboutData("demo-kgeomap",
-                         0,
-                         ki18n("KGeoMap demo application"),
-                         //PORT TO QT5
-                         "kgeomap_version",                                   // version
-                         ki18n("Presents the World Map Widget Interface"),
-                         K4AboutData::License_GPL,
-                         ki18n("(c) 2009-2010 Michael G. Hansen"),
-                         ki18n(""),                                         // optional text
-                         "http://www.digikam.org/sharedlibs",               // URI of homepage
-                         ""                                                 // bugs e-mail address
-                        );
+    KAboutData aboutData("demo-kgeomap", i18n("KGeoMap demo application"), "kgeomap_version"); // TODO fix version
+    aboutData.setShortDescription(i18n("Presents the World Map Widget Interface"));
+    aboutData.setLicense(KAboutLicense::GPL);
+    aboutData.setCopyrightStatement(i18n("(c) 2009-2010 Michael G. Hansen"));
+    aboutData.setHomepage("http://www.digikam.org/sharedlibs");
 
-    aboutData.addAuthor(ki18n("Michael G. Hansen"),
-                        ki18n("KGeoMap library"),
+    aboutData.addAuthor(i18n("Michael G. Hansen"),
+                        i18n("KGeoMap library"),
                         "mike@mghansen.de",
                         "http://www.mghansen.de");
 
-    aboutData.addCredit(ki18n("Justus Schwartz"),
-                        ki18n("Patch for displaying tracks on the map."),
+    aboutData.addCredit(i18n("Justus Schwartz"),
+                        i18n("Patch for displaying tracks on the map."),
                               "justus at gmx dot li");
 
-    KCmdLineArgs::init(argc, argv, &aboutData);
-    KCmdLineOptions options;
-    options.add( "demopoints_single", ki18n("Add built-in demo points as single markers"));
-    options.add( "demopoints_group", ki18n("Add built-in demo points as groupable markers"));
-    options.add( "single", ki18n("Do not group the displayed images"));
-    options.add( "+[images]", ki18n("List of images") );
-    KCmdLineArgs::addCmdLineOptions( options );
+    QApplication app(argc, argv);
+    QCommandLineParser parser;
+    KAboutData::setApplicationData(aboutData);
+    parser.addVersionOption();
+    parser.addHelpOption();
+    //PORTING SCRIPT: adapt aboutdata variable if necessary
+    parser.addOption(QCommandLineOption(QStringList() <<  QLatin1String("demopoints_single"), i18n("Add built-in demo points as single markers")));
+    parser.addOption(QCommandLineOption(QStringList() <<  QLatin1String("demopoints_group"), i18n("Add built-in demo points as groupable markers")));
+    parser.addOption(QCommandLineOption(QStringList() <<  QLatin1String("single"), i18n("Do not group the displayed images")));
+    parser.addPositionalArgument("images", i18n("List of images"), "[images...]");
 
-    KCmdLineArgs* const args = KCmdLineArgs::parsedArgs();
+    aboutData.setupCommandLine(&parser);
+    parser.process(app);
+    aboutData.processCommandLine(&parser);
 
     // get the list of images to load on startup:
     QList<QUrl> imagesList;
 
-    for (int i=0; i < args->count(); ++i)
+    Q_FOREACH(const QString& file, parser.positionalArguments())
     {
-        const QUrl argUrl = args->url(i);
-//         kDebug()<<argUrl;
+        const QUrl argUrl = QUrl::fromLocalFile(file);
+        kDebug()<<argUrl;
         imagesList << argUrl;
     }
 
-    KApplication app;
 
-    MainWindow* const myMainWindow = new MainWindow(args);
+    MainWindow* const myMainWindow = new MainWindow(&parser);
     myMainWindow->show();
     myMainWindow->slotScheduleImagesForLoading(imagesList);
 
