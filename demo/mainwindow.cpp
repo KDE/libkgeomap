@@ -28,6 +28,7 @@
 
 // Qt includes
 
+#include <QAction>
 #include <QStandardItemModel>
 #include <QCloseEvent>
 #include <QComboBox>
@@ -43,10 +44,10 @@
 #include <QVBoxLayout>
 #include <QtConcurrentMap>
 #include <QCommandLineParser>
+#include <QMenuBar>
 
 // KDE includes
 
-#include <QAction>
 #include <kconfig.h>
 #include <kconfiggroup.h>
 #include <kfiledialog.h>
@@ -54,8 +55,8 @@
 #include <klineedit.h>
 #include <klocale.h>
 #include <kmenu.h>
-#include <kmenubar.h>
 #include <kstatusbar.h>
+#include <KHelpMenu>
 
 // LibKExiv2 includes
 
@@ -200,7 +201,8 @@ public:
         displayMarkersModel(0),
         selectionModel(0),
         markerModelHelper(0),
-        trackModelHelper(0)
+        trackModelHelper(0),
+        helpMenu(0)
     {
     }
 
@@ -222,6 +224,7 @@ public:
     QItemSelectionModel*                selectionModel;
     MarkerModelHelper*                  markerModelHelper;
     MyTrackModelHelper*                 trackModelHelper;
+    KHelpMenu*                          helpMenu;
 };
 
 MainWindow::MainWindow(QCommandLineParser* const cmdLineArgs, QWidget* const parent)
@@ -607,7 +610,8 @@ void MainWindow::createMenus()
     connect(addFilesAction, SIGNAL(triggered()),
             this, SLOT(slotAddImages()));
 
-    menuBar()->addMenu(helpMenu());
+    d->helpMenu = new KHelpMenu(this);
+    menuBar()->addMenu(d->helpMenu->menu());
 }
 
 KGeoMap::ModelHelper::Flags MarkerModelHelper::modelFlags() const
