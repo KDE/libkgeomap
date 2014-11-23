@@ -51,7 +51,6 @@
 #include <kconfig.h>
 #include <kconfiggroup.h>
 #include <kfiledialog.h>
-#include <kiconloader.h>
 #include <klineedit.h>
 #include <klocale.h>
 #include <kmenu.h>
@@ -246,7 +245,7 @@ MainWindow::MainWindow(QCommandLineParser* const cmdLineArgs, QWidget* const par
 
     resize(512, 512);
     setWindowTitle(i18n("LibKGeoMap demo"));
-    setWindowIcon(SmallIcon( QLatin1String("applications-internet" )));
+    setWindowIcon(QIcon::fromTheme("applications-internet"));
     setObjectName(QLatin1String("Demo-KGeoMap" ));
 
     d->cmdLineArgs = cmdLineArgs;

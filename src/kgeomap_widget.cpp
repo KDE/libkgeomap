@@ -53,7 +53,6 @@
 #include <QHBoxLayout>
 #include <klocale.h>
 #include <kseparator.h>
-#include <kiconloader.h>
 
 // Marbel Widget includes
 
@@ -252,14 +251,14 @@ KGeoMapWidget::KGeoMapWidget(QWidget* const parent)
 void KGeoMapWidget::createActions()
 {
     d->actionZoomIn = new QAction(this);
-    d->actionZoomIn->setIcon(SmallIcon( QLatin1String("zoom-in") ));
+    d->actionZoomIn->setIcon(QIcon::fromTheme( QLatin1String("zoom-in") ));
     d->actionZoomIn->setToolTip(i18n("Zoom in"));
 
     connect(d->actionZoomIn, SIGNAL(triggered()),
             this, SLOT(slotZoomIn()));
 
     d->actionZoomOut = new QAction(this);
-    d->actionZoomOut->setIcon(SmallIcon( QLatin1String("zoom-out") ));
+    d->actionZoomOut->setIcon(QIcon::fromTheme( QLatin1String("zoom-out") ));
     d->actionZoomOut->setToolTip(i18n("Zoom out"));
 
     connect(d->actionZoomOut, SIGNAL(triggered()),
@@ -299,7 +298,7 @@ void KGeoMapWidget::createActions()
 
     d->actionRemoveCurrentRegionSelection = new QAction(this);
     //d->actionRemoveCurrentRegionSelection->setEnabled(false);
-    d->actionRemoveCurrentRegionSelection->setIcon(SmallIcon( QLatin1String("edit-clear") ));
+    d->actionRemoveCurrentRegionSelection->setIcon(QIcon::fromTheme( QLatin1String("edit-clear") ));
     d->actionRemoveCurrentRegionSelection->setToolTip(i18n("Remove the current region selection"));
 
     d->mouseModeActionGroup = new QActionGroup(this);
@@ -307,43 +306,43 @@ void KGeoMapWidget::createActions()
 
     d->actionSetRegionSelectionMode = new QAction(d->mouseModeActionGroup);
     d->actionSetRegionSelectionMode->setCheckable(true);
-    d->actionSetRegionSelectionMode->setIcon(SmallIcon( QLatin1String("select-rectangular") ));
+    d->actionSetRegionSelectionMode->setIcon(QIcon::fromTheme( QLatin1String("select-rectangular") ));
     d->actionSetRegionSelectionMode->setToolTip(i18n("Select images by drawing a rectangle"));
     d->actionSetRegionSelectionMode->setData(QVariant::fromValue<KGeoMap::MouseModes>(MouseModeRegionSelection));
 
     d->actionSetPanMode = new QAction(d->mouseModeActionGroup);
     d->actionSetPanMode->setCheckable(true);
     d->actionSetPanMode->setToolTip(i18n("Pan mode"));
-    d->actionSetPanMode->setIcon(SmallIcon( QLatin1String("transform-move") ));
+    d->actionSetPanMode->setIcon(QIcon::fromTheme( QLatin1String("transform-move") ));
     d->actionSetPanMode->setChecked(true);
     d->actionSetPanMode->setData(QVariant::fromValue<KGeoMap::MouseModes>(MouseModePan));
 
     d->actionSetZoomIntoGroupMode = new QAction(d->mouseModeActionGroup);
     d->actionSetZoomIntoGroupMode->setCheckable(true);
     d->actionSetZoomIntoGroupMode->setToolTip(i18n("Zoom into a group"));
-    d->actionSetZoomIntoGroupMode->setIcon(SmallIcon( QLatin1String("page-zoom") ));
+    d->actionSetZoomIntoGroupMode->setIcon(QIcon::fromTheme( QLatin1String("page-zoom") ));
     d->actionSetZoomIntoGroupMode->setData(QVariant::fromValue<KGeoMap::MouseModes>(MouseModeZoomIntoGroup));
 
     d->actionSetRegionSelectionFromIconMode = new QAction(d->mouseModeActionGroup);
     d->actionSetRegionSelectionFromIconMode->setCheckable(true);
     d->actionSetRegionSelectionFromIconMode->setToolTip(i18n("Create a region selection from a thumbnail"));
-    d->actionSetRegionSelectionFromIconMode->setIcon(SmallIcon( QLatin1String("edit-node") ));
+    d->actionSetRegionSelectionFromIconMode->setIcon(QIcon::fromTheme( QLatin1String("edit-node") ));
     d->actionSetRegionSelectionFromIconMode->setData(QVariant::fromValue<KGeoMap::MouseModes>(MouseModeRegionSelectionFromIcon));
 
     d->actionSetFilterMode = new QAction(d->mouseModeActionGroup);
     d->actionSetFilterMode->setCheckable(true);
     d->actionSetFilterMode->setToolTip(i18n("Filter images"));
-    d->actionSetFilterMode->setIcon(SmallIcon( QLatin1String("view-filter") ));
+    d->actionSetFilterMode->setIcon(QIcon::fromTheme( QLatin1String("view-filter") ));
     d->actionSetFilterMode->setData(QVariant::fromValue<KGeoMap::MouseModes>(MouseModeFilter));
 
     d->actionRemoveFilter = new QAction(this);
     d->actionRemoveFilter->setToolTip(i18n("Remove the current filter"));
-    d->actionRemoveFilter->setIcon(SmallIcon( QLatin1String("window-close") ));
+    d->actionRemoveFilter->setIcon(QIcon::fromTheme( QLatin1String("window-close") ));
 
     d->actionSetSelectThumbnailMode = new QAction(d->mouseModeActionGroup);
     d->actionSetSelectThumbnailMode->setCheckable(true);
     d->actionSetSelectThumbnailMode->setToolTip(i18n("Select images"));
-    d->actionSetSelectThumbnailMode->setIcon(SmallIcon( QLatin1String("edit-select") ));
+    d->actionSetSelectThumbnailMode->setIcon(QIcon::fromTheme( QLatin1String("edit-select") ));
     d->actionSetSelectThumbnailMode->setData(QVariant::fromValue<KGeoMap::MouseModes>(MouseModeSelectThumbnail));
 
     d->actionStickyMode = new QAction(this);
@@ -781,7 +780,7 @@ QWidget* KGeoMapWidget::getControlWidget()
         QToolButton* const configurationButton = new QToolButton(d->controlWidget);
         controlWidgetHBoxLayout->addWidget(configurationButton);
         configurationButton->setToolTip(i18n("Map settings"));
-        configurationButton->setIcon(SmallIcon( QLatin1String("applications-internet") ));
+        configurationButton->setIcon(QIcon::fromTheme( QLatin1String("applications-internet") ));
         configurationButton->setMenu(d->configurationMenu);
         configurationButton->setPopupMode(QToolButton::InstantPopup);
 
@@ -932,8 +931,8 @@ void KGeoMapWidget::slotUpdateActionsEnabled()
     d->actionStickyMode->setEnabled(d->availableExtraActions.testFlag(ExtraActionSticky));
 
     /// @todo Only set the icons if they have to be changed!
-    d->actionStickyMode->setIcon(SmallIcon( QLatin1String( d->actionStickyMode->isChecked()?"object-locked":"object-unlocked" )));
-    d->actionShowThumbnails->setIcon(d->actionShowThumbnails->isChecked()?SmallIcon( QLatin1String("folder-image") ):KGeoMapGlobalObject::instance()->getMarkerPixmap(QLatin1String("marker-icon-16x16" )));
+    d->actionStickyMode->setIcon(QIcon::fromTheme( QLatin1String( d->actionStickyMode->isChecked()?"object-locked":"object-unlocked" )));
+    d->actionShowThumbnails->setIcon(d->actionShowThumbnails->isChecked()?QIcon::fromTheme( QLatin1String("folder-image") ):KGeoMapGlobalObject::instance()->getMarkerPixmap(QLatin1String("marker-icon-16x16" )));
 
     // make sure the action for the current mouse mode is checked
     const QList<QAction*> mouseModeActions = d->mouseModeActionGroup->actions();
@@ -1732,7 +1731,7 @@ QPixmap KGeoMapWidget::getDecoratedPixmapForCluster(const int clusterId, const K
                 /// @todo Cache the alphaPixmap!
                 QPixmap alphaPixmap(clusterPixmap.size());
                 alphaPixmap.fill(QColor::fromRgb(0x80, 0x80, 0x80));
-                clusterPixmap.setAlphaChannel(alphaPixmap);
+//                clusterPixmap.setAlphaChannel(alphaPixmap); // TODO PORT QT5
             }
 
             painter.drawPixmap(QPoint(1,1), clusterPixmap);
