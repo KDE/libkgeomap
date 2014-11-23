@@ -137,32 +137,25 @@ void ItemMarkerTiler::setMarkerModelHelper(ModelHelper* const modelHelper)
     if (d->markerModel != 0)
     {
         // TODO: disconnect the old model if there was one
-        connect(d->markerModel, SIGNAL(rowsInserted(QModelIndex,int,int)),
-                this, SLOT(slotSourceModelRowsInserted(QModelIndex,int,int)));
+        connect(d->markerModel, &QAbstractItemModel::rowsInserted, this, &ItemMarkerTiler::slotSourceModelRowsInserted);
 
-        connect(d->markerModel, SIGNAL(rowsAboutToBeRemoved(QModelIndex,int,int)),
-                this, SLOT(slotSourceModelRowsAboutToBeRemoved(QModelIndex,int,int)));
+        connect(d->markerModel, &QAbstractItemModel::rowsAboutToBeRemoved, this, &ItemMarkerTiler::slotSourceModelRowsAboutToBeRemoved);
 
         // TODO: this signal now has to be monitored in the model helper
 //         connect(d->markerModel, SIGNAL(dataChanged(QModelIndex,QModelIndex)),
 //                 this, SLOT(slotSourceModelDataChanged(QModelIndex,QModelIndex)));
 
-        connect(d->modelHelper, SIGNAL(signalModelChangedDrastically()),
-                this, SLOT(slotSourceModelReset()));
+        connect(d->modelHelper, &ModelHelper::signalModelChangedDrastically, this, &ItemMarkerTiler::slotSourceModelReset);
 
-        connect(d->markerModel, SIGNAL(modelReset()),
-                this, SLOT(slotSourceModelReset()));
+        connect(d->markerModel, &QAbstractItemModel::modelReset, this, &ItemMarkerTiler::slotSourceModelReset);
 
-        connect(d->markerModel, SIGNAL(layoutChanged()),
-                this, SLOT(slotSourceModelLayoutChanged()));
+        connect(d->markerModel, &QAbstractItemModel::layoutChanged, this, &ItemMarkerTiler::slotSourceModelLayoutChanged);
 
-        connect(d->modelHelper, SIGNAL(signalThumbnailAvailableForIndex(QPersistentModelIndex,QPixmap)),
-                this, SLOT(slotThumbnailAvailableForIndex(QPersistentModelIndex,QPixmap)));
+        connect(d->modelHelper, &ModelHelper::signalThumbnailAvailableForIndex, this, &ItemMarkerTiler::slotThumbnailAvailableForIndex);
 
         if (d->selectionModel)
         {
-            connect(d->selectionModel, SIGNAL(selectionChanged(QItemSelection,QItemSelection)),
-                    this, SLOT(slotSelectionChanged(QItemSelection,QItemSelection)));
+            connect(d->selectionModel, &QItemSelectionModel::selectionChanged, this, &ItemMarkerTiler::slotSelectionChanged);
         }
     }
 

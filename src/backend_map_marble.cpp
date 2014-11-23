@@ -348,8 +348,7 @@ void BackendMarble::createActions()
     d->actionGroupMapTheme = new QActionGroup(this);
     d->actionGroupMapTheme->setExclusive(true);
 
-    connect(d->actionGroupMapTheme, SIGNAL(triggered(QAction*)),
-            this, SLOT(slotMapThemeActionTriggered(QAction*)));
+    connect(d->actionGroupMapTheme, &QActionGroup::triggered, this, &BackendMarble::slotMapThemeActionTriggered);
 
     QAction* const actionAtlas = new QAction(d->actionGroupMapTheme);
     actionAtlas->setCheckable(true);
@@ -365,8 +364,7 @@ void BackendMarble::createActions()
     d->actionGroupProjection = new QActionGroup(this);
     d->actionGroupProjection->setExclusive(true);
 
-    connect(d->actionGroupProjection, SIGNAL(triggered(QAction*)),
-            this, SLOT(slotProjectionActionTriggered(QAction*)));
+    connect(d->actionGroupProjection, &QActionGroup::triggered, this, &BackendMarble::slotProjectionActionTriggered);
 
     QAction* const actionSpherical = new QAction(d->actionGroupProjection);
     actionSpherical->setCheckable(true);
@@ -387,8 +385,7 @@ void BackendMarble::createActions()
     d->actionGroupFloatItems = new QActionGroup(this);
     d->actionGroupFloatItems->setExclusive(false);
 
-    connect(d->actionGroupFloatItems, SIGNAL(triggered(QAction*)),
-            this, SLOT(slotFloatSettingsTriggered(QAction*)));
+    connect(d->actionGroupFloatItems, &QActionGroup::triggered, this, &BackendMarble::slotFloatSettingsTriggered);
 
     d->actionShowCompass = new QAction(i18n("Show compass"), d->actionGroupFloatItems);
     d->actionShowCompass->setData(QLatin1String("showcompass"));

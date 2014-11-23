@@ -248,29 +248,25 @@ void KGeoMapWidget::createActions()
     d->actionZoomIn->setIcon(QIcon::fromTheme( QLatin1String("zoom-in") ));
     d->actionZoomIn->setToolTip(i18n("Zoom in"));
 
-    connect(d->actionZoomIn, SIGNAL(triggered()),
-            this, SLOT(slotZoomIn()));
+    connect(d->actionZoomIn, &QAction::triggered, this, &KGeoMapWidget::slotZoomIn);
 
     d->actionZoomOut = new QAction(this);
     d->actionZoomOut->setIcon(QIcon::fromTheme( QLatin1String("zoom-out") ));
     d->actionZoomOut->setToolTip(i18n("Zoom out"));
 
-    connect(d->actionZoomOut, SIGNAL(triggered()),
-            this, SLOT(slotZoomOut()));
+    connect(d->actionZoomOut, &QAction::triggered, this, &KGeoMapWidget::slotZoomOut);
 
     d->actionShowThumbnails = new QAction(this);
     d->actionShowThumbnails->setToolTip(i18n("Switch between markers and thumbnails."));
     d->actionShowThumbnails->setCheckable(true);
 
-    connect(d->actionShowThumbnails, SIGNAL(triggered(bool)),
-            this, SLOT(slotShowThumbnailsChanged()));
+    connect(d->actionShowThumbnails, &QAction::triggered, this, &KGeoMapWidget::slotShowThumbnailsChanged);
 
     // create backend selection entries:
     d->actionGroupBackendSelection = new QActionGroup(this);
     d->actionGroupBackendSelection->setExclusive(true);
 
-    connect(d->actionGroupBackendSelection, SIGNAL(triggered(QAction*)),
-            this, SLOT(slotChangeBackend(QAction*)));
+    connect(d->actionGroupBackendSelection, &QActionGroup::triggered, this, &KGeoMapWidget::slotChangeBackend);
 
     createActionsForBackendSelection();
 
@@ -343,32 +339,23 @@ void KGeoMapWidget::createActions()
     d->actionStickyMode->setCheckable(true);
     d->actionStickyMode->setToolTip(i18n("Lock the map position"));
 
-    connect(d->actionStickyMode, SIGNAL(triggered(bool)),
-            this, SLOT(slotStickyModeChanged()));
+    connect(d->actionStickyMode, &QAction::triggered, this, &KGeoMapWidget::slotStickyModeChanged);
 
-    connect(d->actionIncreaseThumbnailSize, SIGNAL(triggered(bool)),
-            this, SLOT(slotIncreaseThumbnailSize()));
+    connect(d->actionIncreaseThumbnailSize, &QAction::triggered, this, &KGeoMapWidget::slotIncreaseThumbnailSize);
 
-    connect(d->actionDecreaseThumbnailSize, SIGNAL(triggered(bool)),
-            this, SLOT(slotDecreaseThumbnailSize()));
+    connect(d->actionDecreaseThumbnailSize, &QAction::triggered, this, &KGeoMapWidget::slotDecreaseThumbnailSize);
 
-    connect(d->actionPreviewSingleItems, SIGNAL(changed()),
-            this, SLOT(slotItemDisplaySettingsChanged()));
+    connect(d->actionPreviewSingleItems, &QAction::changed, this, &KGeoMapWidget::slotItemDisplaySettingsChanged);
 
-    connect(d->actionPreviewGroupedItems, SIGNAL(changed()),
-            this, SLOT(slotItemDisplaySettingsChanged()));
+    connect(d->actionPreviewGroupedItems, &QAction::changed, this, &KGeoMapWidget::slotItemDisplaySettingsChanged);
 
-    connect(d->actionShowNumbersOnItems, SIGNAL(changed()),
-            this, SLOT(slotItemDisplaySettingsChanged()));
+    connect(d->actionShowNumbersOnItems, &QAction::changed, this, &KGeoMapWidget::slotItemDisplaySettingsChanged);
 
-    connect(d->mouseModeActionGroup, SIGNAL(triggered(QAction*)),
-            this, SLOT(slotMouseModeChanged(QAction*)));
+    connect(d->mouseModeActionGroup, &QActionGroup::triggered, this, &KGeoMapWidget::slotMouseModeChanged);
 
-    connect(d->actionRemoveFilter, SIGNAL(triggered()),
-            this, SIGNAL(signalRemoveCurrentFilter()));
+    connect(d->actionRemoveFilter, &QAction::triggered, this, &KGeoMapWidget::signalRemoveCurrentFilter);
 
-    connect(d->actionRemoveCurrentRegionSelection, SIGNAL(triggered()),
-            this, SLOT(slotRemoveCurrentRegionSelection()));
+    connect(d->actionRemoveCurrentRegionSelection, &QAction::triggered, this, &KGeoMapWidget::slotRemoveCurrentRegionSelection);
 }
 
 void KGeoMapWidget::createActionsForBackendSelection()
@@ -468,17 +455,13 @@ bool KGeoMapWidget::setBackend(const QString& backendName)
             d->currentBackend     = backend;
             d->currentBackendName = backendName;
 
-            connect(d->currentBackend, SIGNAL(signalBackendReadyChanged(QString)),
-                    this, SLOT(slotBackendReadyChanged(QString)));
+            connect(d->currentBackend, &MapBackend::signalBackendReadyChanged, this, &KGeoMapWidget::slotBackendReadyChanged);
 
-            connect(d->currentBackend, SIGNAL(signalZoomChanged(QString)),
-                    this, SLOT(slotBackendZoomChanged(QString)));
+            connect(d->currentBackend, &MapBackend::signalZoomChanged, this, &KGeoMapWidget::slotBackendZoomChanged);
 
-            connect(d->currentBackend, SIGNAL(signalClustersMoved(QIntList,QPair<int,QModelIndex>)),
-                    this, SLOT(slotClustersMoved(QIntList,QPair<int,QModelIndex>)));
+            connect(d->currentBackend, &MapBackend::signalClustersMoved, this, &KGeoMapWidget::slotClustersMoved);
 
-            connect(d->currentBackend, SIGNAL(signalClustersClicked(QIntList)),
-                    this, SLOT(slotClustersClicked(QIntList)));
+            connect(d->currentBackend, &MapBackend::signalClustersClicked, this, &KGeoMapWidget::slotClustersClicked);
 
             /**
              * @todo This connection is queued because otherwise QAbstractItemModel::itemSelected does not
@@ -493,8 +476,7 @@ bool KGeoMapWidget::setBackend(const QString& backendName)
                         d->currentBackend, SLOT(slotThumbnailAvailableForIndex(QVariant,QPixmap)));
             }
 
-            connect(d->currentBackend, SIGNAL(signalSelectionHasBeenMade(KGeoMap::GeoCoordinates::Pair)),
-                    this, SLOT(slotNewSelectionFromMap(KGeoMap::GeoCoordinates::Pair)));
+            connect(d->currentBackend, &MapBackend::signalSelectionHasBeenMade, this, &KGeoMapWidget::slotNewSelectionFromMap);
 
             if (s->activeState)
             {
@@ -591,8 +573,7 @@ void KGeoMapWidget::slotBackendReadyChanged(const QString& backendName)
         d->thumbnailTimer      = new QTimer(this);
         d->thumbnailTimerCount = 0;
 
-        connect(d->thumbnailTimer, SIGNAL(timeout()),
-                this, SLOT(stopThumbnailTimer()));
+        connect(d->thumbnailTimer, &QTimer::timeout, this, &KGeoMapWidget::stopThumbnailTimer);
 
         d->thumbnailTimer->start(2000);
     }
