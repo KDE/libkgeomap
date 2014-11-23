@@ -39,11 +39,6 @@
 
 #include "backend_map.h"
 
-static const KCatalogLoader loader_kgeomap("libkgeomap");
-// We also load the translations for Marble here, because
-// Marble does not load them on its own. BKO#336021
-static const KCatalogLoader loader_marble("marble_qt");
-
 namespace KGeoMap
 {
 

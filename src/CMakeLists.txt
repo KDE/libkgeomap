@@ -4,6 +4,9 @@
 # Redistribution and use is allowed according to the terms of the BSD license.
 # For details see the accompanying COPYING-CMAKE-SCRIPTS file.
 
+add_definitions(-DTRANSLATION_DOMAIN=\"libkgeomap\")
+
+
 include_directories(${MARBLE_INCLUDE_DIR})
 
 # HACK how to do this properly?
