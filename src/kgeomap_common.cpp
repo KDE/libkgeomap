@@ -35,8 +35,6 @@
 
 // KDE includes
 
-#include <klibloader.h>
-
 // local includes
 
 #include "backend_map.h"
@@ -51,7 +49,7 @@ public:
     KGeoMapGlobalObject object;
 };
 
-K_GLOBAL_STATIC(KGeoMapGlobalObjectCreator, kgeomapGlobalObjectCreator)
+Q_GLOBAL_STATIC(KGeoMapGlobalObjectCreator, kgeomapGlobalObjectCreator)
 
 class KGeoMapGlobalObject::Private
 {
