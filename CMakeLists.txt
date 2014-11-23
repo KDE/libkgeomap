@@ -68,7 +68,6 @@ find_package(Qt5 ${REQUIRED_QT_VERSION} REQUIRED NO_MODULE COMPONENTS
 )
 
 find_package(KF5 ${KF5_VERSION} REQUIRED COMPONENTS
-             KDELibs4Support
              KHtml
              Parts
 )
@@ -95,6 +94,7 @@ ecm_setup_version(${LIBKGEOMAP_LIB_VERSION}
 add_definitions(-DTRANSLATION_DOMAIN=\"libkgeomap\")
 add_definitions(-DQT_USE_FAST_CONCATENATION -DQT_USE_FAST_OPERATOR_PLUS)
 add_definitions(-DQT_NO_URL_CAST_FROM_STRING) # for porting
+remove_definitions(-DQT_NO_CAST_FROM_ASCII) # for porting to avoid casting all the strings
 
 include_directories(${CMAKE_SOURCE_DIR} ${CMAKE_BINARY_DIR})
 

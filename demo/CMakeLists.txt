@@ -25,7 +25,6 @@ if(KF5KExiv2_FOUND)
 
     target_link_libraries(libkgeomap_demo
                           Qt5::Gui
-                          KF5::KDELibs4Support
                           KF5::Parts
                           KF5::KHtml
                           KF5::KGeoMap

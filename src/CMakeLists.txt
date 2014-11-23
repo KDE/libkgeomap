@@ -113,7 +113,6 @@ target_link_libraries(KF5KGeoMap
                       PRIVATE
                       ${MARBLE_LIBRARIES}
                       PUBLIC
-                      KF5::KDELibs4Support
                       KF5::Parts
                       KF5::KHtml
                       Qt5::Gui
