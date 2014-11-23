@@ -1031,7 +1031,7 @@ void BackendGoogleMaps::setClusterPixmap(const int clusterId, const QPoint& cent
     clusterPixmap.save(&buffer, "PNG");
 
     // http://www.faqs.org/rfcs/rfc2397.html
-    const QString imageData = QString::fromLatin1("data:image/png;base64,%1").arg(QString::fromAscii(bytes.toBase64()));
+    const QString imageData = QString::fromLatin1("data:image/png;base64,%1").arg(QString::fromLatin1(bytes.toBase64()));
     d->htmlWidget->runScript(QString::fromLatin1("kgeomapSetClusterPixmap(%1,%5,%6,%2,%3,'%4');")
                     .arg(clusterId)
                     .arg(centerPoint.x())
@@ -1051,7 +1051,7 @@ void BackendGoogleMaps::setMarkerPixmap(const int modelId, const int markerId,
     markerPixmap.save(&buffer, "PNG");
 
     // http://www.faqs.org/rfcs/rfc2397.html
-    const QString imageData = QString::fromLatin1("data:image/png;base64,%1").arg(QString::fromAscii(bytes.toBase64()));
+    const QString imageData = QString::fromLatin1("data:image/png;base64,%1").arg(QString::fromLatin1(bytes.toBase64()));
     d->htmlWidget->runScript(QString::fromLatin1("kgeomapSetMarkerPixmap(%7,%1,%5,%6,%2,%3,'%4');")
                     .arg(markerId)
                     .arg(centerPoint.x())
