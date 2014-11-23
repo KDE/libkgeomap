@@ -43,28 +43,21 @@
 #include <QStackedLayout>
 #include <QTimer>
 #include <QToolButton>
+#include <QDebug>
 
 // KDE includes
 
 #include <QAction>
 #include <kconfig.h>
 #include <kconfiggroup.h>
-#include <kdeversion.h>
 #include <QHBoxLayout>
-#include <klocale.h>
+#include <KLocalizedString>
 #include <kseparator.h>
 
 // Marbel Widget includes
 
 #include <marble/GeoDataLineString.h>
-
-#if KDE_IS_VERSION(4,9,0)
 #include <marble/MarbleGlobal.h>
-#else
-// This file was deprecated in 4.9
-#include <marble/global.h>
-#include <QDebug>
-#endif
 
 // local includes
 
