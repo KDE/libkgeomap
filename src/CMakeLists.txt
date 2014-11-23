@@ -76,7 +76,7 @@ add_library(KF5KGeoMap SHARED ${widget_LIB_SRCS}
 
 add_library(KF5::KGeoMap ALIAS KF5KGeoMap)
 
-generate_export_header(KF5KGeoMap BASE_NAME libkgeomap EXPORT_MACRO_NAME LIBKGEOMAP_EXPORT)
+generate_export_header(KF5KGeoMap BASE_NAME libkgeomap EXPORT_MACRO_NAME KGEOMAP_EXPORT)
 
 # Check if compilation is done through digiKam SC or not. If yes, do not install header files.
 if (NOT DIGIKAMSC_COMPILE_LIBKGEOMAP)
