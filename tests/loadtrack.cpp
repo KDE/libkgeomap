@@ -26,11 +26,10 @@
 
 #include <QDateTime>
 #include <QTextStream>
+#include <QDebug>
+#include <QtTest>
 
 // KDE includes
-
-#include <qtest_kde.h>
-#include <QDebug>
 
 // local includes
 

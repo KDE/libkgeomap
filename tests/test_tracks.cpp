@@ -25,11 +25,10 @@
 // Qt includes
 
 #include <QDateTime>
+#include <QtTest>
+#include <QDebug>
 
 // KDE includes
-
-#include <qtest_kde.h>
-#include <QDebug>
 
 // local includes
 
@@ -39,7 +38,7 @@
 
 using namespace KGeoMap;
 
-QTEST_KDEMAIN_CORE(TestTracks)
+QTEST_MAIN(TestTracks)
 
 /**
  * @brief Return the path of the directory containing the test data
