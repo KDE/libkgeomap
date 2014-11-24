@@ -47,19 +47,19 @@
 #include <QMenuBar>
 #include <QFileDialog>
 #include <QStatusBar>
+#include <QDebug>
 
 // KDE includes
 
 #include <kconfig.h>
 #include <kconfiggroup.h>
 #include <klineedit.h>
-#include <KHelpMenu>
-#include <KLocalizedString>
+#include <khelpmenu.h>
+#include <klocalizedstring.h>
 
 // LibKExiv2 includes
 
-#include <KExiv2/KExiv2>
-#include <QDebug>
+#include <kexiv2.h>
 
 // libkgeomap includes
 

@@ -21,20 +21,21 @@
  *
  * ============================================================ */
 
-// KDE includes
-
-
-#include <KAboutData>
+// Qt includes
 
 #include <QDebug>
 #include <QApplication>
-#include <KLocalizedString>
 #include <QCommandLineParser>
 #include <QCommandLineOption>
 
+// KDE includes
+
+#include <kaboutdata.h>
+#include <klocalizedstring.h>
+
 // libkgeomap includes
 
-//#include "version.h"
+#include "libkgeomap_version.h"
 
 // local includes
 
@@ -42,7 +43,7 @@
 
 int main(int argc, char* argv[])
 {
-    KAboutData aboutData("demo-kgeomap", i18n("KGeoMap demo application"), "kgeomap_version"); // TODO fix version
+    KAboutData aboutData("demo-kgeomap", i18n("KGeoMap demo application"), KGEOMAP_VERSION_STRING);
     aboutData.setShortDescription(i18n("Presents the World Map Widget Interface"));
     aboutData.setLicense(KAboutLicense::GPL);
     aboutData.setCopyrightStatement(i18n("(c) 2009-2010 Michael G. Hansen"));
@@ -55,7 +56,7 @@ int main(int argc, char* argv[])
 
     aboutData.addCredit(i18n("Justus Schwartz"),
                         i18n("Patch for displaying tracks on the map."),
-                              "justus at gmx dot li");
+                             "justus at gmx dot li");
 
     QApplication app(argc, argv);
     QCommandLineParser parser;
