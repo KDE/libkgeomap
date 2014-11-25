@@ -11,8 +11,10 @@ macro(DETECT_LIBKEXIV2 MIN_VERSION)
         message(STATUS "libkexiv2 : search system based library")
         find_package(KF5KExiv2 ${MIN_VERSION})
 
-        if(KF5KExiv2_FOUND)
+        if(KF5KExiv2_FOUND AND KF5KExiv2_INCLUDE_DIRS)
             set(KF5KExiv2_LIBRARIES KF5::KExiv2)
+        else()
+            set(KF5KExiv2_FOUND FALSE)
         endif()
 
     else()
@@ -29,6 +31,7 @@ macro(DETECT_LIBKEXIV2 MIN_VERSION)
 
     endif()
 
+    message(STATUS "libkexiv2 found       : ${KF5KExiv2_FOUND}")
     message(STATUS "libkexiv2 include dir : ${KF5KExiv2_INCLUDE_DIRS}")
     message(STATUS "libkexiv2 library     : ${KF5KExiv2_LIBRARIES}")
 
