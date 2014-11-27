@@ -63,10 +63,11 @@ int main(int argc, char* argv[])
     KAboutData::setApplicationData(aboutData);
     parser.addVersionOption();
     parser.addHelpOption();
+
     //PORTING SCRIPT: adapt aboutdata variable if necessary
-    parser.addOption(QCommandLineOption(QStringList() <<  QLatin1String("demopoints_single"), i18n("Add built-in demo points as single markers")));
-    parser.addOption(QCommandLineOption(QStringList() <<  QLatin1String("demopoints_group"), i18n("Add built-in demo points as groupable markers")));
-    parser.addOption(QCommandLineOption(QStringList() <<  QLatin1String("single"), i18n("Do not group the displayed images")));
+    parser.addOption(QCommandLineOption(QStringList() << QLatin1String("demopoints_single"), i18n("Add built-in demo points as single markers")));
+    parser.addOption(QCommandLineOption(QStringList() << QLatin1String("demopoints_group"),  i18n("Add built-in demo points as groupable markers")));
+    parser.addOption(QCommandLineOption(QStringList() << QLatin1String("single"),            i18n("Do not group the displayed images")));
     parser.addPositionalArgument("images", i18n("List of images"), "[images...]");
 
     aboutData.setupCommandLine(&parser);
@@ -79,10 +80,9 @@ int main(int argc, char* argv[])
     Q_FOREACH(const QString& file, parser.positionalArguments())
     {
         const QUrl argUrl = QUrl::fromLocalFile(file);
-        qDebug()<<argUrl;
+        qDebug() << argUrl;
         imagesList << argUrl;
     }
-
 
     MainWindow* const myMainWindow = new MainWindow(&parser);
     myMainWindow->show();
