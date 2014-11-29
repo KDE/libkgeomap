@@ -1706,7 +1706,7 @@ QPixmap KGeoMapWidget::getDecoratedPixmapForCluster(const int clusterId, const K
                 /// @todo Cache the alphaPixmap!
                 QPixmap alphaPixmap(clusterPixmap.size());
                 alphaPixmap.fill(QColor::fromRgb(0x80, 0x80, 0x80));
-#pragma message: PORT QT5
+#pragma message("PORT QT5")
 //                clusterPixmap.setAlphaChannel(alphaPixmap);
             }
 
