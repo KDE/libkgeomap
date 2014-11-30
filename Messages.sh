@@ -1,2 +1,2 @@
 #! /bin/sh
-$XGETTEXT libkgeomap/*.cpp -o $podir/libkgeomap.pot
+$XGETTEXT src/*.cpp -o $podir/libkgeomap.pot
