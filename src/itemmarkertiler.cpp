@@ -29,6 +29,7 @@
 // local includes
 
 #include "modelhelper.h"
+#include "libkgeomap_debug.h"
 
 namespace KGeoMap
 {
@@ -191,7 +192,7 @@ QVariant ItemMarkerTiler::bestRepresentativeIndexFromList(const QList<QVariant>&
 
 void ItemMarkerTiler::slotSelectionChanged(const QItemSelection& selected, const QItemSelection& deselected)
 {
-//     qDebug()<<selected<<deselected;
+//     qCDebug(LIBKGEOMAP_LOG)<<selected<<deselected;
     if (isDirty())
     {
         return;
@@ -221,7 +222,7 @@ void ItemMarkerTiler::slotSelectionChanged(const QItemSelection& selected, const
                     break;
 
                 myTile->selectedCount++;
-//              qDebug() << l << tileIndex << myTile->selectedCount;
+//              qCDebug(LIBKGEOMAP_LOG) << l << tileIndex << myTile->selectedCount;
                 KGEOMAP_ASSERT(myTile->selectedCount <= myTile->markerIndices.count());
 
                 if (myTile->childrenEmpty())
@@ -264,7 +265,7 @@ void ItemMarkerTiler::slotSelectionChanged(const QItemSelection& selected, const
 
 void ItemMarkerTiler::slotSourceModelDataChanged(const QModelIndex& topLeft, const QModelIndex& bottomRight)
 {
-    qDebug() << topLeft << bottomRight;
+    qCDebug(LIBKGEOMAP_LOG) << topLeft << bottomRight;
     setDirty();
 
     if (d->activeState)
@@ -323,7 +324,7 @@ void ItemMarkerTiler::slotThumbnailAvailableForIndex(const QPersistentModelIndex
 
 void ItemMarkerTiler::slotSourceModelReset()
 {
-    qDebug() << "----";
+    qCDebug(LIBKGEOMAP_LOG) << "----";
     setDirty();
 }
 

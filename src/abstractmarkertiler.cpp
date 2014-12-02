@@ -217,7 +217,7 @@ AbstractMarkerTiler::NonEmptyIterator::NonEmptyIterator(AbstractMarkerTiler* con
         startIndex.appendLinearIndex(0);
         endIndex.appendLinearIndex(TileIndex::Tiling*TileIndex::Tiling-1);
     }
-//     qDebug()<<d->startIndexLinear<<d->endIndexLinear;
+//     qCDebug(LIBKGEOMAP_LOG)<<d->startIndexLinear<<d->endIndexLinear;
 
     d->boundsList << QPair<TileIndex, TileIndex>(startIndex, endIndex);
 
@@ -257,7 +257,7 @@ AbstractMarkerTiler::NonEmptyIterator::NonEmptyIterator(AbstractMarkerTiler* con
         const TileIndex startIndex = TileIndex::fromCoordinates(currentBounds.first, d->level);
         const TileIndex endIndex   = TileIndex::fromCoordinates(currentBounds.second, d->level);
 
-//         qDebug()<<currentBounds.first.geoUrl()<<startIndex<<currentBounds.second.geoUrl()<<endIndex;
+//         qCDebug(LIBKGEOMAP_LOG)<<currentBounds.first.geoUrl()<<startIndex<<currentBounds.second.geoUrl()<<endIndex;
         d->boundsList << QPair<TileIndex, TileIndex>(startIndex, endIndex);
     }
 
@@ -297,7 +297,7 @@ TileIndex AbstractMarkerTiler::NonEmptyIterator::nextIndex()
     Q_FOREVER
     {
         const int currentLevel = d->currentIndex.level();
-//         qDebug() << d->level << currentLevel << d->atStartOfLevel << d->currentIndex;
+//         qCDebug(LIBKGEOMAP_LOG) << d->level << currentLevel << d->atStartOfLevel << d->currentIndex;
 
         if (d->atStartOfLevel)
         {
@@ -368,7 +368,7 @@ TileIndex AbstractMarkerTiler::NonEmptyIterator::nextIndex()
 
             KGEOMAP_ASSERT(limitLatBL <= limitLatTR);
             KGEOMAP_ASSERT(limitLonBL <= limitLonTR);
-//             qDebug() << limitLatBL << limitLonBL << limitLatTR << limitLonTR << compareLevel << currentLevel;
+//             qCDebug(LIBKGEOMAP_LOG) << limitLatBL << limitLonBL << limitLatTR << limitLonTR << compareLevel << currentLevel;
 
             int currentLat = d->currentIndex.indexLat(d->currentIndex.level());
             int currentLon = d->currentIndex.indexLon(d->currentIndex.level());

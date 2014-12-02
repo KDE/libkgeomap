@@ -43,15 +43,14 @@
 #include <QStackedLayout>
 #include <QTimer>
 #include <QToolButton>
-#include <QDebug>
+#include <QHBoxLayout>
+#include <QAction>
 
 // KDE includes
 
-#include <QAction>
 #include <kconfig.h>
 #include <kconfiggroup.h>
-#include <QHBoxLayout>
-#include <KLocalizedString>
+#include <klocalizedstring.h>
 #include <kseparator.h>
 
 // Marbel Widget includes
@@ -61,10 +60,6 @@
 
 // local includes
 
-#include "abstractmarkertiler.h"
-#include "backend_map_googlemaps.h"
-#include "backend_map_marble.h"
-// #include "backend_map_osm.h"
 #include "kgeomap_common.h"
 #include "dragdrophandler.h"
 #include "modelhelper.h"
@@ -72,6 +67,11 @@
 #include "placeholderwidget.h"
 #include "tilegrouper.h"
 #include "libkgeomap_version.h"
+#include "libkgeomap_debug.h"
+#include "abstractmarkertiler.h"
+#include "backend_map_googlemaps.h"
+#include "backend_map_marble.h"
+// #include "backend_map_osm.h"
 
 namespace KGeoMap
 {
@@ -451,7 +451,7 @@ bool KGeoMapWidget::setBackend(const QString& backendName)
     {
         if (backend->backendName() == backendName)
         {
-            qDebug() << QString::fromLatin1("setting backend %1").arg(backendName);
+            qCDebug(LIBKGEOMAP_LOG) << QString::fromLatin1("setting backend %1").arg(backendName);
             d->currentBackend     = backend;
             d->currentBackendName = backendName;
 
@@ -511,7 +511,7 @@ void KGeoMapWidget::applyCacheToBackend()
 
     setCenter(d->cacheCenterCoordinate);
     /// @todo Only do this if the zoom was changed!
-    qDebug() << d->cacheZoom;
+    qCDebug(LIBKGEOMAP_LOG) << d->cacheZoom;
     setZoom(d->cacheZoom);
     d->currentBackend->mouseModeChanged();
     d->currentBackend->regionSelectionChanged();
@@ -552,7 +552,7 @@ void KGeoMapWidget::setCenter(const GeoCoordinates& coordinate)
 
 void KGeoMapWidget::slotBackendReadyChanged(const QString& backendName)
 {
-    qDebug() << QString::fromLatin1("backend %1 is ready!").arg(backendName);
+    qCDebug(LIBKGEOMAP_LOG) << QString::fromLatin1("backend %1 is ready!").arg(backendName);
 
     if (backendName != d->currentBackendName)
     {
@@ -1198,7 +1198,7 @@ GeoCoordinates::Pair KGeoMapWidget::getRegionSelection()
 
 void KGeoMapWidget::slotClustersMoved(const QIntList& clusterIndices, const QPair<int, QModelIndex>& snapTarget)
 {
-    qDebug() << clusterIndices;
+    qCDebug(LIBKGEOMAP_LOG) << clusterIndices;
 
     /// @todo We actually expect only one clusterindex
     int             clusterIndex      = clusterIndices.first();
@@ -1366,7 +1366,7 @@ void KGeoMapWidget::slotLazyReclusteringRequestCallBack()
  */
 void KGeoMapWidget::slotClustersClicked(const QIntList& clusterIndices)
 {
-    qDebug()<<clusterIndices;
+    qCDebug(LIBKGEOMAP_LOG)<<clusterIndices;
 
     if ((s->currentMouseMode == MouseModeZoomIntoGroup) ||
         (s->currentMouseMode == MouseModeRegionSelectionFromIcon) )

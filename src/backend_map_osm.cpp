@@ -124,7 +124,7 @@ GeoCoordinates BackendOSM::getCenter() const
 
 void BackendOSM::setCenter(const GeoCoordinates& coordinate)
 {
-    qDebug() << isReady() << coordinate.geoUrl();
+    qCDebug(LIBKGEOMAP_LOG) << isReady() << coordinate.geoUrl();
     d->cacheCenter = coordinate;
 
     if (isReady())
@@ -141,7 +141,7 @@ bool BackendOSM::isReady() const
 
 void BackendOSM::slotHTMLInitialized()
 {
-    qDebug() << 1;
+    qCDebug(LIBKGEOMAP_LOG) << 1;
 
     d->isReady = true;
     d->htmlWidget->runScript(QLatin1String("document.getElementById(\"map_canvas\").style.height=\"%1px\"")
@@ -318,19 +318,19 @@ void BackendOSM::slotHTMLEvents(const QStringList& events)
         else if (eventCode == "do")
         {
             // debug output:
-            qDebug()<<QString::fromLatin1("javascript:%1").arg(eventParameter);
+            qCDebug(LIBKGEOMAP_LOG)<<QString::fromLatin1("javascript:%1").arg(eventParameter);
         }
     }
 
     if (!movedClusters.isEmpty())
     {
-        qDebug() << movedClusters;
+        qCDebug(LIBKGEOMAP_LOG) << movedClusters;
         emit(signalClustersMoved(movedClusters));
     }
 
     if (!movedMarkers.isEmpty())
     {
-        qDebug() << movedMarkers;
+        qCDebug(LIBKGEOMAP_LOG) << movedMarkers;
         emit(signalSpecialMarkersMoved(movedMarkers));
     }
 
@@ -367,7 +367,7 @@ void BackendOSM::slotHTMLEvents(const QStringList& events)
 
 void BackendOSM::updateClusters()
 {
-    qDebug() << "start updateclusters";
+    qCDebug(LIBKGEOMAP_LOG) << "start updateclusters";
     // re-transfer the clusters to the map:
     KGEOMAP_ASSERT(isReady());
 
@@ -404,7 +404,7 @@ void BackendOSM::updateClusters()
             );
     }
 
-    qDebug() << "end updateclusters";
+    qCDebug(LIBKGEOMAP_LOG) << "end updateclusters";
 }
 
 bool BackendOSM::screenCoordinates(const GeoCoordinates& coordinates, QPoint* const point)
@@ -456,7 +456,7 @@ void BackendOSM::setZoom(const QString& newZoom)
     KGEOMAP_ASSERT(myZoomString.startsWith(QLatin1String("googlemaps:")));
 
     const int myZoom = myZoomString.mid(QLatin1String("googlemaps:").length()).toInt();
-    qDebug() << myZoom;
+    qCDebug(LIBKGEOMAP_LOG) << myZoom;
 
     d->cacheZoom = myZoom;
 

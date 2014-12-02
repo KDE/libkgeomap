@@ -24,13 +24,18 @@
  *
  * ============================================================ */
 
+// Local includes
+
 #include "kgeomap_primitives.h"
-#include "geocoordinates.h"
 
 #ifdef KGEOMAP_HAVE_VALGRIND
 #include <valgrind/valgrind.h>
-#include <QDebug>
 #endif
+
+// Local includes
+
+#include "geocoordinates.h"
+#include "libkgeomap_debug.h"
 
 namespace KGeoMap
 {
@@ -48,10 +53,10 @@ void KGeoMap_assert(const char* const condition, const char* const filename, con
     }
     else
     {
-        qDebug() << debugString;
+        qCDebug(LIBKGEOMAP_LOG) << debugString;
     }
 #else
-    qDebug() << debugString;
+    qCDebug(LIBKGEOMAP_LOG) << debugString;
 #endif /* KGEOMAP_HAVE_VALGRIND */
 }
 

@@ -35,13 +35,11 @@
 #include <QMenu>
 #include <QPointer>
 #include <QResizeEvent>
+#include <QAction>
 
 // KDE includes
 
-#include <QAction>
 #include <kconfiggroup.h>
-#include <khtml_part.h>
-#include <QDebug>
 
 // local includes
 
@@ -49,6 +47,7 @@
 #include "kgeomap_widget.h"
 #include "abstractmarkertiler.h"
 #include "modelhelper.h"
+#include "libkgeomap_debug.h"
 
 namespace KGeoMap
 {
@@ -318,7 +317,7 @@ QString BackendGoogleMaps::getMapType() const
 void BackendGoogleMaps::setMapType(const QString& newMapType)
 {
     d->cacheMapType = newMapType;
-    qDebug()<<newMapType;
+    qCDebug(LIBKGEOMAP_LOG) << newMapType;
 
     if (isReady())
     {
@@ -643,25 +642,25 @@ void BackendGoogleMaps::slotHTMLEvents(const QStringList& events)
         else if (eventCode == QLatin1String("do"))
         {
             // debug output:
-            qDebug() << QString::fromLatin1("javascript:%1").arg(eventParameter);
+            qCDebug(LIBKGEOMAP_LOG) << QString::fromLatin1("javascript:%1").arg(eventParameter);
         }
     }
 
     if (!movedClusters.isEmpty())
     {
-        qDebug()<<movedClusters;
+        qCDebug(LIBKGEOMAP_LOG)<<movedClusters;
         emit(signalClustersMoved(movedClusters, QPair<int, QModelIndex>(-1, QModelIndex())));
     }
 
     if (!movedMarkers.isEmpty())
     {
-        qDebug()<<movedMarkers;
+        qCDebug(LIBKGEOMAP_LOG)<<movedMarkers;
 //         emit(signalSpecialMarkersMoved(movedMarkers));
     }
 
     if (!clickedClusters.isEmpty())
     {
-        qDebug()<<clickedClusters;
+        qCDebug(LIBKGEOMAP_LOG)<<clickedClusters;
         emit(signalClustersClicked(clickedClusters));
     }
 
@@ -704,7 +703,7 @@ void BackendGoogleMaps::slotHTMLEvents(const QStringList& events)
 
 void BackendGoogleMaps::updateClusters()
 {
-    qDebug() << "start updateclusters";
+    qCDebug(LIBKGEOMAP_LOG) << "start updateclusters";
     // re-transfer the clusters to the map:
     KGEOMAP_ASSERT(isReady());
 
@@ -743,7 +742,7 @@ void BackendGoogleMaps::updateClusters()
             setClusterPixmap(currentIndex, clusterCenterPoint, clusterPixmap);
         }
     }
-    qDebug()<<"end updateclusters";
+    qCDebug(LIBKGEOMAP_LOG)<<"end updateclusters";
 }
 
 bool BackendGoogleMaps::screenCoordinates(const GeoCoordinates& coordinates, QPoint* const point)
@@ -861,7 +860,7 @@ void BackendGoogleMaps::setZoom(const QString& newZoom)
     KGEOMAP_ASSERT(myZoomString.startsWith(QLatin1String("googlemaps:")));
 
     const int myZoom           = myZoomString.mid(QString::fromLatin1("googlemaps:").length()).toInt();
-    qDebug() << myZoom;
+    qCDebug(LIBKGEOMAP_LOG) << myZoom;
 
     d->cacheZoom               = myZoom;
 
@@ -989,7 +988,7 @@ void BackendGoogleMaps::updateZoomMinMaxCache()
 
 void BackendGoogleMaps::slotThumbnailAvailableForIndex(const QVariant& index, const QPixmap& pixmap)
 {
-    qDebug()<<index<<pixmap.size();
+    qCDebug(LIBKGEOMAP_LOG)<<index<<pixmap.size();
 
     if (pixmap.isNull() || !s->showThumbnails)
         return;
@@ -1150,7 +1149,7 @@ void BackendGoogleMaps::centerOn( const Marble::GeoDataLatLonBox& latLonBox, con
     const qreal boxSouth = latLonBox.south(Marble::GeoDataCoordinates::Degree);
 
     d->htmlWidget->centerOn(boxWest, boxNorth, boxEast, boxSouth, useSaneZoomLevel);
-    qDebug()<<getZoom();
+    qCDebug(LIBKGEOMAP_LOG)<<getZoom();
 }
 
 void BackendGoogleMaps::setActive(const bool state)
@@ -1356,7 +1355,7 @@ void BackendGoogleMaps::slotTracksChanged(const QList<TrackManager::TrackChanges
             }
 
             QDateTime t2 = QDateTime::currentDateTime();
-            qDebug()<<track.url.fileName()<<t1.msecsTo(t2);
+            qCDebug(LIBKGEOMAP_LOG)<<track.url.fileName()<<t1.msecsTo(t2);
         }
     }
 }
