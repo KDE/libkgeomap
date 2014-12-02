@@ -9,7 +9,6 @@ add_definitions(-DTRANSLATION_DOMAIN=\"libkgeomap\")
 
 include_directories(${MARBLE_INCLUDE_DIR})
 
-# HACK how to do this properly?
 include_directories(${CMAKE_CURRENT_BINARY_DIR}/.. ${CMAKE_CURRENT_BINARY_DIR})
 
 include(CheckIncludeFile)
@@ -78,6 +77,34 @@ add_library(KF5::KGeoMap ALIAS KF5KGeoMap)
 
 generate_export_header(KF5KGeoMap BASE_NAME libkgeomap EXPORT_MACRO_NAME KGEOMAP_EXPORT)
 
+target_include_directories(KF5KGeoMap INTERFACE
+                           "$<INSTALL_INTERFACE:${KF5_INCLUDE_INSTALL_DIR}/KGeoMap>"
+)
+
+target_include_directories(KF5KGeoMap PUBLIC "$<BUILD_INTERFACE:${libkgeomap_SOURCE_DIR}/src;${libkgeomap_BINARY_DIR}/src>")
+
+target_link_libraries(KF5KGeoMap
+                      PRIVATE
+                      ${MARBLE_LIBRARIES}
+                      PUBLIC
+                      KF5::Parts
+                      KF5::KHtml
+                      Qt5::Gui
+                      Qt5::Widgets
+                      Qt5::Core
+                      Qt5::Concurrent
+)
+
+set_target_properties(KF5KGeoMap  PROPERTIES
+                      VERSION     ${KGEOMAP_VERSION_STRING}
+                      SOVERSION   ${KGEOMAP_SOVERSION}
+                      EXPORT_NAME KGeoMap
+)
+
+install(TARGETS KF5KGeoMap
+        EXPORT  KF5KGeoMapTargets ${KF5_INSTALL_TARGETS_DEFAULT_ARGS}
+)
+
 # Check if compilation is done through digiKam SC or not. If yes, do not install header files.
 if (NOT DIGIKAMSC_COMPILE_LIBKGEOMAP)
 
@@ -96,37 +123,9 @@ if (NOT DIGIKAMSC_COMPILE_LIBKGEOMAP)
             COMPONENT   Devel
     )
 
-# TODO remove this, if it's ok to be installed from the main CMakeLists
-#    install(FILES       "${CMAKE_CURRENT_BINARY_DIR}/libkgeomap_version.h"
-#            DESTINATION "${KF5_INCLUDE_INSTALL_DIR}"
-#            COMPONENT   Devel
-#    )
+    install(FILES       "${CMAKE_CURRENT_BINARY_DIR}/libkgeomap_version.h"
+            DESTINATION "${KF5_INCLUDE_INSTALL_DIR}"
+            COMPONENT   Devel
+    )
 
 endif()
-
-target_include_directories(KF5KGeoMap INTERFACE
-                           "$<INSTALL_INTERFACE:${KF5_INCLUDE_INSTALL_DIR}/KGeoMap>"
-)
-target_include_directories(KF5KGeoMap PUBLIC "$<BUILD_INTERFACE:${libkgeomap_SOURCE_DIR}/src;${libkgeomap_BINARY_DIR}/src>")
-
-target_link_libraries(KF5KGeoMap
-                      PRIVATE
-                      ${MARBLE_LIBRARIES}
-                      PUBLIC
-                      KF5::Parts
-                      KF5::KHtml
-                      Qt5::Gui
-                      Qt5::Widgets
-                      Qt5::Core
-                      Qt5::Concurrent
-)
-
-install(TARGETS KF5KGeoMap
-        EXPORT  KF5KGeoMapTargets ${KF5_INSTALL_TARGETS_DEFAULT_ARGS}
-)
-
-set_target_properties(KF5KGeoMap  PROPERTIES
-                      VERSION     ${KGEOMAP_VERSION_STRING}
-                      SOVERSION   ${KGEOMAP_SOVERSION}
-                      EXPORT_NAME KGeoMap
-)
