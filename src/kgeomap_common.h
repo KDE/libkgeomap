@@ -37,8 +37,6 @@
 #include <QtCore/QSharedData>
 #include <QtCore/QSize>
 
-// KDE includes
-
 // libkgeomap includes
 
 #include "kgeomap_primitives.h"

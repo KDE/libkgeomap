@@ -29,7 +29,10 @@
 // Qt includes
 
 #include <QPair>
-#include <QDebug>
+
+// Local includes
+
+#include "libkgeomap_debug.h"
 
 namespace KGeoMap
 {

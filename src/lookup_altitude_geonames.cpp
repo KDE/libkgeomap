@@ -34,7 +34,7 @@
 // KDE includes
 
 #include <kio/job.h>
-#include <KLocalizedString>
+#include <klocalizedstring.h>
 
 namespace KGeoMap
 {

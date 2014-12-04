@@ -40,7 +40,7 @@
 #include <kconfiggroup.h>
 #include <klocalizedstring.h>
 
-// Marble widget includes
+// Marble includes
 
 #include <marble/GeoDataLinearRing.h>
 #include <marble/GeoPainter.h>

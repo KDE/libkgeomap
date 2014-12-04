@@ -31,11 +31,10 @@
 #include <QtConcurrent/QtConcurrentMap>
 #include <QFuture>
 #include <QFutureWatcher>
-#include <QDebug>
 
 // KDE includes
 
-#include <KLocalizedString>
+#include <klocalizedstring.h>
 
 // local includes
 

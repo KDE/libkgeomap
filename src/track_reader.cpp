@@ -33,11 +33,13 @@
 
 // KDE includes
 
-#include <QDebug>
-#include <KLocalizedString>
+#include <klocalizedstring.h>
 
 namespace KGeoMap
 {
+
+static QString GPX10("http://www.topografix.com/GPX/1/0");
+static QString GPX11("http://www.topografix.com/GPX/1/1");
 
 class TrackReader::Private
 {
@@ -124,9 +126,6 @@ bool TrackReader::characters(const QString& ch)
     d->currentText += ch;
     return true;
 }
-
-static QString GPX10("http://www.topografix.com/GPX/1/0");
-static QString GPX11("http://www.topografix.com/GPX/1/1");
 
 QString TrackReader::myQName(const QString& namespaceURI, const QString& localName)
 {

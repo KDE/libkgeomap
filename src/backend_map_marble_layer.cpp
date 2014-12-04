@@ -26,7 +26,7 @@
 
 #include "backend_map_marble_layer.h"
 
-// KDE includes
+// Marble includes
 
 #include <marble/GeoPainter.h>
 

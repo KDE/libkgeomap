@@ -26,13 +26,9 @@
 
 #include "dragdrophandler.h"
 
-// Qt includes
-
-
 // local includes
 
 #include "kgeomap_primitives.h"
-#include "libkgeomap_export.h"
 
 namespace KGeoMap
 {

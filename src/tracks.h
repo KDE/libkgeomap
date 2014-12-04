@@ -31,10 +31,7 @@
 
 #include <QtGui/QColor>
 #include <QtCore/QDateTime>
-#include <QUrl>
-
-// KDE includes
-
+#include <QtCore/QUrl>
 
 // local includes
 

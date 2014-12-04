@@ -31,7 +31,7 @@
 
 #include <QtCore/QPointer>
 
-// KDE includes
+// Marble includes
 
 #include <marble/LayerInterface.h>
 

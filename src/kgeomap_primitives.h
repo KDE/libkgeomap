@@ -32,10 +32,6 @@
 #include <QtCore/QPersistentModelIndex>
 #include <QtCore/QString>
 #include <QtCore/QVariant>
-#include <QDebug>
-
-// KDE includes
-
 
 // Local includes
 
@@ -73,6 +69,8 @@ Q_DECLARE_OPERATORS_FOR_FLAGS(ExtraActions)
 
 typedef QList<int>      QIntList;
 typedef QPair<int, int> QIntPair;
+
+// ---------------------------------------------------------------------------------
 
 /**
  * @brief Representation of possible tile or cluster states
@@ -112,6 +110,8 @@ enum KGeoMapGroupStateEnum
 /// @todo KGeoMapGroupState -> KGeoMapGroupStates?
 Q_DECLARE_FLAGS(KGeoMapGroupState, KGeoMapGroupStateEnum)
 Q_DECLARE_OPERATORS_FOR_FLAGS(KGeoMapGroupState)
+
+// ---------------------------------------------------------------------------------
 
 class KGEOMAP_EXPORT KGeoMapGroupStateComputer
 {

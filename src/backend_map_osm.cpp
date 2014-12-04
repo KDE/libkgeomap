@@ -30,19 +30,19 @@
 
 #include <QMenu>
 #include <QPointer>
+#include <QAction>
 
 // KDE includes
 
-#include <QAction>
 #include <kconfiggroup.h>
 #include <khtml_part.h>
-#include <QDebug>
 
 // local includes
 
 #include "html_widget.h"
 #include "kgeomap.h"
 #include "markermodel.h"
+#include "libkgeomap_debug.h"
 
 namespace KGeoMap
 {

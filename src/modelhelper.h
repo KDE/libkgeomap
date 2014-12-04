@@ -36,8 +36,6 @@
 #include <QtCore/QPoint>
 #include <QtCore/QString>
 
-// Kde includes
-
 // local includes
 
 #include "libkgeomap_export.h"

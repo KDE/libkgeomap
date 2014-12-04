@@ -53,7 +53,7 @@
 #include <klocalizedstring.h>
 #include <kseparator.h>
 
-// Marbel Widget includes
+// Marbel includes
 
 #include <marble/GeoDataLineString.h>
 #include <marble/MarbleGlobal.h>

@@ -34,13 +34,13 @@
 #include <QtCore/QModelIndex>
 #include <QtWidgets/QWidget>
 
-// local includes
-
-#include "kgeomap_common.h"
-
 // Marble Widget includes
 
 #include <marble/GeoDataLatLonBox.h>
+
+// local includes
+
+#include "kgeomap_common.h"
 
 class QMenu;
 class KConfigGroup;
