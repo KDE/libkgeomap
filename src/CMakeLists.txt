@@ -87,12 +87,13 @@ target_link_libraries(KF5KGeoMap
                       PRIVATE
                       ${MARBLE_LIBRARIES}
                       PUBLIC
-                      KF5::Parts
-                      KF5::KHtml
                       Qt5::Gui
                       Qt5::Widgets
                       Qt5::Core
                       Qt5::Concurrent
+                      KF5::I18n
+                      KF5::ConfigCore
+                      KF5::KHtml
 )
 
 set_target_properties(KF5KGeoMap  PROPERTIES
