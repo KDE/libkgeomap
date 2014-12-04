@@ -8,7 +8,7 @@ include_directories(BEFORE ${CMAKE_CURRENT_SOURCE_DIR}/../ ${CMAKE_CURRENT_BINAR
 
 set(calibrator_sources
         calibrator.cpp
-   )
+)
 
 add_executable(libkgeomap_calibrator ${calibrator_sources})
 

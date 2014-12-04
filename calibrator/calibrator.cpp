@@ -37,17 +37,15 @@
 #include <QTimer>
 #include <QToolButton>
 #include <QVBoxLayout>
+#include <QApplication>
+#include <QCommandLineParser>
+#include <QDebug>
+#include <QLineEdit>
 
 // KDE includes
 
-
-#include <KAboutData>
-
-#include <klineedit.h>
-#include <QApplication>
-#include <KLocalizedString>
-#include <QCommandLineParser>
-#include <QDebug>
+#include <kaboutdata.h>
+#include <klocalizedstring.h>
 
 // local includes
 
@@ -55,7 +53,7 @@
 #include "itemmarkertiler.h"
 #include "kgeomap_widget.h"
 #include "geocoordinates.h"
-//#include "version.h"
+#include "libkgeomap_version.h"
 
 const int CoordinatesRole = Qt::UserRole + 1;
 
@@ -144,8 +142,7 @@ public:
 
     QButtonGroup*                                    groupingMode;
     QSpinBox*                                        sbLevel;
-    KLineEdit*                                       zoomDisplay;
-
+    QLineEdit*                                       zoomDisplay;
     QTimer*                                          zoomDisplayTimer;
 };
 
@@ -178,7 +175,7 @@ Calibrator::Calibrator()
     QLabel* const labelsbLevel = new QLabel(i18nc("Tile level", "Level:"), this);
     labelsbLevel->setBuddy(d->sbLevel);
 
-    d->zoomDisplay                 = new KLineEdit(this);
+    d->zoomDisplay                 = new QLineEdit(this);
     d->zoomDisplay->setReadOnly(true);
     QLabel* const labelZoomDisplay = new QLabel(i18n("Zoom:"), this);
     labelZoomDisplay->setBuddy(d->zoomDisplay);
