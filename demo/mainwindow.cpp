@@ -47,13 +47,14 @@
 #include <QMenuBar>
 #include <QFileDialog>
 #include <QStatusBar>
+#include <QPointer>
+#include <QProgressBar>
 #include <QDebug>
 
 // KDE includes
 
 #include <kconfig.h>
 #include <kconfiggroup.h>
-#include <klineedit.h>
 #include <khelpmenu.h>
 #include <klocalizedstring.h>
 
