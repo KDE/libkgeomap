@@ -40,4 +40,4 @@ install(FILES backend-osm.html
               marker-ffff00-selected.png
               marker-icon-16x16.png
         DESTINATION ${DATA_INSTALL_DIR}/libkgeomap/
-       )
+)
