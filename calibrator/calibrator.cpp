@@ -407,16 +407,18 @@ void Calibrator::slotActivateMapActionTriggered(bool state)
 
 int main(int argc, char* argv[])
 {
-    KAboutData aboutData("calibrator-kgeomap", i18n("KGeoMap calibration tool"),  "kgeomap_version"); // TODO fix version
+    KAboutData aboutData(QString::fromLatin1("calibrator-kgeomap"),
+                         i18n("KGeoMap calibration tool"),
+                         QString::fromLatin1("kgeomap_version")); // TODO fix version
     aboutData.setShortDescription(i18n("Used to calibrate the KGeoMap library tiling level"));
     aboutData.setLicense(KAboutLicense::GPL);
     aboutData.setCopyrightStatement(i18n("(c) 2010 Michael G. Hansen"));
-    aboutData.setHomepage("http://www.digikam.org/sharedlibs");
+    aboutData.setHomepage(QString::fromLatin1("http://www.digikam.org/sharedlibs"));
 
     aboutData.addAuthor(i18n("Michael G. Hansen"),
                         i18n("KGeoMap library"),
-                        "mike@mghansen.de",
-                        "http://www.mghansen.de");
+                        QString::fromLatin1("mike@mghansen.de"),
+                        QString::fromLatin1("http://www.mghansen.de"));
 
     QApplication app(argc, argv);
     QCommandLineParser parser;

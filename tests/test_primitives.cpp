@@ -96,7 +96,7 @@ void TestPrimitives::testParseXYStringToPoint()
     QVERIFY(KGeoMapHelperParseXYStringToPoint(QLatin1String("  ( -52.5, 6.5 )  "), &point));
     QCOMPARE(point, QPoint(-52,6));
 
-    QVERIFY(KGeoMapHelperParseXYStringToPoint("(204.94641003022224, 68.00444002512285)", &point));
+    QVERIFY(KGeoMapHelperParseXYStringToPoint(QString::fromLatin1("(204.94641003022224, 68.00444002512285)"), &point));
 
     QVERIFY(!KGeoMapHelperParseXYStringToPoint(QLatin1String(""), 0));
     QVERIFY(!KGeoMapHelperParseXYStringToPoint(QLatin1String("()"), 0));
@@ -143,7 +143,7 @@ void TestPrimitives::testParseBoundsString()
     QVERIFY(!KGeoMapHelperParseBoundsString(QLatin1String("((-52.5,-6.5),(52.5 6.5))"), 0));
     QVERIFY(!KGeoMapHelperParseBoundsString(QLatin1String("( -52.5,-6.5),(52.5,6.5))"), 0));
     QVERIFY(!KGeoMapHelperParseBoundsString(QLatin1String("((-52.5,-6.5),(52.5,6.5)a"), 0));
-    QVERIFY(!KGeoMapHelperParseBoundsString(QLatin1String("((-52.5,),(52.5,6.5))"), 0));
+    QVERIFY(!KGeoMapHelperParseBoundsString(QLatin1String("((-52.5,),(52.5,6.5))"),     0));
 }
 
 void TestPrimitives::testNormalizeBounds_data()

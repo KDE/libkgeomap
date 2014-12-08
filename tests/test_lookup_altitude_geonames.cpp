@@ -38,7 +38,7 @@ void TestLookupAltitudeGeonames::testNoOp()
 
 void TestLookupAltitudeGeonames::testSimpleLookup()
 {
-    LookupAltitude* const myLookup = LookupFactory::getAltitudeLookup("geonames", this);
+    LookupAltitude* const myLookup = LookupFactory::getAltitudeLookup(QString::fromLatin1("geonames"), this);
 
     QSignalSpy spyRequestsReady(myLookup, SIGNAL(signalRequestsReady(QList<int>)));
     QSignalSpy spyLookupDone(myLookup, SIGNAL(signalDone()));

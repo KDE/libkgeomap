@@ -45,8 +45,8 @@ QTEST_MAIN(TestTracks)
  */
 QUrl GetTestDataDirectory()
 {
-    const QUrl thisCPPFile = QUrl::fromLocalFile(__FILE__);
-    const QUrl testDataDir = thisCPPFile.resolved(QUrl("data/"));
+    const QUrl thisCPPFile = QUrl::fromLocalFile(QString::fromLatin1(__FILE__));
+    const QUrl testDataDir = thisCPPFile.resolved(QUrl(QString::fromLatin1("data/")));
 
     return testDataDir;
 }
@@ -69,16 +69,16 @@ void TestTracks::testQDateTimeParsing()
 {
     {
         // strings ending with a 'Z' are taken to be in UTC, regardless of milliseconds
-        QDateTime time1 = QDateTime::fromString("2009-03-11T13:39:55.622Z", Qt::ISODate);
+        QDateTime time1 = QDateTime::fromString(QString::fromLatin1("2009-03-11T13:39:55.622Z"), Qt::ISODate);
         QCOMPARE(time1.timeSpec(), Qt::UTC);
-        QDateTime time2 = QDateTime::fromString("2009-03-11T13:39:55Z", Qt::ISODate);
+        QDateTime time2 = QDateTime::fromString(QString::fromLatin1("2009-03-11T13:39:55Z"), Qt::ISODate);
         QCOMPARE(time2.timeSpec(), Qt::UTC);
     }
 
     {
         // eCoach in N900 records GPX files with this kind of date format:
         // 2010-01-14T09:26:02.287+02:00
-        QDateTime time1 = QDateTime::fromString("2010-01-14T09:26:02.287+02:00", Qt::ISODate);
+        QDateTime time1 = QDateTime::fromString(QString::fromLatin1("2010-01-14T09:26:02.287+02:00"), Qt::ISODate);
 
 #if QT_VERSION>=0x040700
         // Qt >= 4.7: both date and time are parsed fine
@@ -93,7 +93,7 @@ void TestTracks::testQDateTimeParsing()
 
         // when we omit the time zone data, parsing succeeds
         // time is interpreted as local time
-        QDateTime time2 = QDateTime::fromString("2010-01-14T09:26:02.287"/*"+02:00"*/, Qt::ISODate);
+        QDateTime time2 = QDateTime::fromString(QString::fromLatin1("2010-01-14T09:26:02.287")/*"+02:00"*/, Qt::ISODate);
         QCOMPARE(time2.date(), QDate(2010, 01, 14));
         QCOMPARE(time2.time(), QTime(9, 26, 2, 287));
         QCOMPARE(time2.timeSpec(), Qt::LocalTime);
@@ -107,7 +107,7 @@ void TestTracks::testCustomDateTimeParsing()
 {
     {
         // this should work as usual:
-        const QDateTime time1 = TrackReader::ParseTime("2009-03-11T13:39:55.622Z");
+        const QDateTime time1 = TrackReader::ParseTime(QString::fromLatin1("2009-03-11T13:39:55.622Z"));
         QCOMPARE(time1.timeSpec(), Qt::UTC);
         QCOMPARE(time1.date(), QDate(2009, 03, 11));
         QCOMPARE(time1.time(), QTime(13, 39, 55, 622));
@@ -115,7 +115,7 @@ void TestTracks::testCustomDateTimeParsing()
 
     {
         // eCoach in N900: 2010-01-14T09:26:02.287+02:00
-        const QDateTime time1 = TrackReader::ParseTime("2010-01-14T09:26:02.287+02:00");
+        const QDateTime time1 = TrackReader::ParseTime(QString::fromLatin1("2010-01-14T09:26:02.287+02:00"));
         QCOMPARE(time1.timeSpec(), Qt::UTC);
         QCOMPARE(time1.date(), QDate(2010, 01, 14));
         QCOMPARE(time1.time(), QTime(7, 26, 02, 287));
@@ -123,7 +123,7 @@ void TestTracks::testCustomDateTimeParsing()
 
     {
         // test negative time zone offset: 2010-01-14T09:26:02.287+02:00
-        const QDateTime time1 = TrackReader::ParseTime("2010-01-14T09:26:02.287-02:00");
+        const QDateTime time1 = TrackReader::ParseTime(QString::fromLatin1("2010-01-14T09:26:02.287-02:00"));
         QCOMPARE(time1.timeSpec(), Qt::UTC);
         QCOMPARE(time1.date(), QDate(2010, 01, 14));
         QCOMPARE(time1.time(), QTime(11, 26, 02, 287));
@@ -131,7 +131,7 @@ void TestTracks::testCustomDateTimeParsing()
 
     {
         // test negative time zone offset with minutes: 2010-01-14T09:26:02.287+03:15
-        const QDateTime time1 = TrackReader::ParseTime("2010-01-14T09:26:02.287-03:15");
+        const QDateTime time1 = TrackReader::ParseTime(QString::fromLatin1("2010-01-14T09:26:02.287-03:15"));
         QCOMPARE(time1.timeSpec(), Qt::UTC);
         QCOMPARE(time1.date(), QDate(2010, 01, 14));
         QCOMPARE(time1.time(), QTime(12, 41, 02, 287));
@@ -146,7 +146,7 @@ void TestTracks::testFileLoading()
     const QUrl testDataDir = GetTestDataDirectory();
 
     QList<QUrl> fileList;
-    fileList << QUrl(testDataDir).resolved(QUrl("gpxfile-1.gpx"));
+    fileList << QUrl(testDataDir).resolved(QUrl(QString::fromLatin1("gpxfile-1.gpx")));
 
     TrackManager myParser;
 
@@ -173,9 +173,8 @@ void TestTracks::testFileLoading()
  */
 void TestTracks::testSaxLoader()
 {
-    const QUrl testDataDir = GetTestDataDirectory();
-
-    const QUrl trackFile = testDataDir.resolved(QUrl("gpxfile-1.gpx"));
+    const QUrl testDataDir                = GetTestDataDirectory();
+    const QUrl trackFile                  = testDataDir.resolved(QUrl(QString::fromLatin1("gpxfile-1.gpx")));
     TrackReader::TrackReadResult fileData = TrackReader::loadTrackFile(trackFile);
     QVERIFY(fileData.isValid);
     QVERIFY(fileData.loadError.isEmpty());
@@ -195,23 +194,23 @@ void TestTracks::testSaxLoaderError()
     const QUrl testDataDir = GetTestDataDirectory();
 
     {
-        TrackReader::TrackReadResult fileData = TrackReader::loadTrackFile(testDataDir.resolved(QUrl("gpx-invalid-empty.gpx")));
+        TrackReader::TrackReadResult fileData = TrackReader::loadTrackFile(testDataDir.resolved(QUrl(QString::fromLatin1("gpx-invalid-empty.gpx"))));
         QVERIFY(!fileData.isValid);
         QVERIFY(!fileData.loadError.isEmpty());
-        qDebug()<<fileData.loadError;
+        qDebug() << fileData.loadError;
     }
 
     {
-        TrackReader::TrackReadResult fileData = TrackReader::loadTrackFile(testDataDir.resolved(QUrl("gpx-invalid-xml-error.gpx")));
+        TrackReader::TrackReadResult fileData = TrackReader::loadTrackFile(testDataDir.resolved(QUrl(QString::fromLatin1("gpx-invalid-xml-error.gpx"))));
         QVERIFY(!fileData.isValid);
         QVERIFY(!fileData.loadError.isEmpty());
-        qDebug()<<fileData.loadError;
+        qDebug() << fileData.loadError;
     }
 
     {
-        TrackReader::TrackReadResult fileData = TrackReader::loadTrackFile(testDataDir.resolved(QUrl("gpx-invalid-no-points.gpx")));
+        TrackReader::TrackReadResult fileData = TrackReader::loadTrackFile(testDataDir.resolved(QUrl(QString::fromLatin1("gpx-invalid-no-points.gpx"))));
         QVERIFY(!fileData.isValid);
         QVERIFY(!fileData.loadError.isEmpty());
-        qDebug()<<fileData.loadError;
+        qDebug() << fileData.loadError;
     }
 }

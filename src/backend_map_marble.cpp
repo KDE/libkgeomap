@@ -45,7 +45,6 @@
 #include <marble/GeoDataLinearRing.h>
 #include <marble/GeoPainter.h>
 #include <marble/MarbleMap.h>
-#include <marble/MarbleModel.h>
 #include <marble/MarbleWidget.h>
 #include <marble/ViewportParams.h>
 

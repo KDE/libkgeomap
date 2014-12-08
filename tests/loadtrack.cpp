@@ -49,8 +49,8 @@ namespace
  */
 QUrl GetTestDataDirectory()
 {
-    const QUrl thisCPPFile(__FILE__);
-    const QUrl testDataDir = thisCPPFile.resolved(QUrl("../data/"));
+    const QUrl thisCPPFile(QString::fromLatin1(__FILE__));
+    const QUrl testDataDir = thisCPPFile.resolved(QUrl(QString::fromLatin1("../data/")));
     return testDataDir;
 }
 
@@ -59,8 +59,7 @@ QUrl GetTestDataDirectory()
  */
 bool testSaxLoader(const QString& filename)
 {
-    const QUrl testDataDir = GetTestDataDirectory();
-
+    const QUrl testDataDir                = GetTestDataDirectory();
     TrackReader::TrackReadResult fileData = TrackReader::loadTrackFile(QUrl(filename));
 
     return fileData.isValid;
@@ -70,14 +69,14 @@ int main(int argc, char* argv[])
 {
     QCoreApplication app(argc, argv);
 
-    if (argc<2)
+    if (argc < 2)
     {
         qerr << QLatin1String("Need a filename as argument to load") << endl;
         return 1;
     }
 
-    const QString filename = argv[1];
-    qerr << QString("Loading file: %1").arg(filename) << endl;
+    const QString filename = QString::fromLatin1(argv[1]);
+    qerr << "Loading file: " << filename << endl;
     const bool success     = testSaxLoader(filename);
 
     if (!success)

@@ -38,8 +38,8 @@
 namespace KGeoMap
 {
 
-static QString GPX10("http://www.topografix.com/GPX/1/0");
-static QString GPX11("http://www.topografix.com/GPX/1/1");
+static QString GPX10(QString::fromLatin1("http://www.topografix.com/GPX/1/0"));
+static QString GPX11(QString::fromLatin1("http://www.topografix.com/GPX/1/1"));
 
 class TrackReader::Private
 {
@@ -87,8 +87,8 @@ QDateTime TrackReader::ParseTime(QString timeString)
 
     // does the string contain a timezone offset?
     int timeZoneOffsetSeconds       = 0;
-    const int timeZonePlusPosition  = timeString.lastIndexOf("+");
-    const int timeZoneMinusPosition = timeString.lastIndexOf("-");
+    const int timeZonePlusPosition  = timeString.lastIndexOf(QString::fromLatin1("+"));
+    const int timeZoneMinusPosition = timeString.lastIndexOf(QString::fromLatin1("-"));
 
     if ( (timeZonePlusPosition == timeZoneSignPosition) || (timeZoneMinusPosition == timeZoneSignPosition) )
     {
@@ -97,7 +97,7 @@ QDateTime TrackReader::ParseTime(QString timeString)
         // cut off the last digits:
         const QString timeZoneString = timeString.right(6);
         timeString.chop(6);
-        timeString                  += 'Z';
+        timeString                  += QChar::fromLatin1('Z');
 
         // determine the time zone offset:
         bool okayHour                = false;
@@ -132,7 +132,7 @@ QString TrackReader::myQName(const QString& namespaceURI, const QString& localNa
     if ( (namespaceURI == GPX10)  ||
          (namespaceURI == GPX11) )
     {
-        return "gpx:"+localName;
+        return QString::fromLatin1("gpx:") + localName;
     }
 
     return namespaceURI+localName;
@@ -150,7 +150,7 @@ bool TrackReader::endElement(const QString& namespaceURI, const QString& localNa
     d->currentText.clear();
     rebuildElementPath();
 
-    if (ePath == "gpx:gpx/gpx:trk/gpx:trkseg/gpx:trkpt")
+    if (ePath == QString::fromLatin1("gpx:gpx/gpx:trk/gpx:trkseg/gpx:trkpt"))
     {
         if (d->currentDataPoint.dateTime.isValid() && d->currentDataPoint.coordinates.hasCoordinates())
         {
@@ -159,11 +159,11 @@ bool TrackReader::endElement(const QString& namespaceURI, const QString& localNa
 
         d->currentDataPoint = TrackManager::TrackPoint();
     }
-    else if (ePath == "gpx:gpx/gpx:trk/gpx:trkseg/gpx:trkpt/gpx:time")
+    else if (ePath == QString::fromLatin1("gpx:gpx/gpx:trk/gpx:trkseg/gpx:trkpt/gpx:time"))
     {
         d->currentDataPoint.dateTime = ParseTime(eText.trimmed());
     }
-    else if (ePath == "gpx:gpx/gpx:trk/gpx:trkseg/gpx:trkpt/gpx:sat")
+    else if (ePath == QString::fromLatin1("gpx:gpx/gpx:trk/gpx:trkseg/gpx:trkpt/gpx:sat"))
     {
         bool okay       = false;
         int nSatellites = eText.toInt(&okay);
@@ -171,7 +171,7 @@ bool TrackReader::endElement(const QString& namespaceURI, const QString& localNa
         if (okay && (nSatellites >= 0))
             d->currentDataPoint.nSatellites = nSatellites;
     }
-    else if (ePath == "gpx:gpx/gpx:trk/gpx:trkseg/gpx:trkpt/gpx:hdop")
+    else if (ePath == QString::fromLatin1("gpx:gpx/gpx:trk/gpx:trkseg/gpx:trkpt/gpx:hdop"))
     {
         bool okay  = false;
         qreal hDop = eText.toDouble(&okay);
@@ -179,7 +179,7 @@ bool TrackReader::endElement(const QString& namespaceURI, const QString& localNa
         if (okay)
             d->currentDataPoint.hDop = hDop;
     }
-    else if (ePath == "gpx:gpx/gpx:trk/gpx:trkseg/gpx:trkpt/gpx:pdop")
+    else if (ePath == QString::fromLatin1("gpx:gpx/gpx:trk/gpx:trkseg/gpx:trkpt/gpx:pdop"))
     {
         bool okay  = false;
         qreal pDop = eText.toDouble(&okay);
@@ -187,15 +187,15 @@ bool TrackReader::endElement(const QString& namespaceURI, const QString& localNa
         if (okay)
             d->currentDataPoint.pDop = pDop;
     }
-    else if (ePath == "gpx:gpx/gpx:trk/gpx:trkseg/gpx:trkpt/gpx:fix")
+    else if (ePath == QString::fromLatin1("gpx:gpx/gpx:trk/gpx:trkseg/gpx:trkpt/gpx:fix"))
     {
         int fixType = -1;
 
-        if (eText=="2d")
+        if (eText == QString::fromLatin1("2d"))
         {
             fixType = 2;
         }
-        else if (eText=="3d")
+        else if (eText == QString::fromLatin1("3d"))
         {
             fixType = 3;
         }
@@ -205,7 +205,7 @@ bool TrackReader::endElement(const QString& namespaceURI, const QString& localNa
             d->currentDataPoint.fixType = fixType;
         }
     }
-    else if (ePath == "gpx:gpx/gpx:trk/gpx:trkseg/gpx:trkpt/gpx:ele")
+    else if (ePath == QString::fromLatin1("gpx:gpx/gpx:trk/gpx:trkseg/gpx:trkpt/gpx:ele"))
     {
         bool haveAltitude = false;
         const qreal alt   = eText.toDouble(&haveAltitude);
@@ -215,7 +215,7 @@ bool TrackReader::endElement(const QString& namespaceURI, const QString& localNa
             d->currentDataPoint.coordinates.setAlt(alt);
         }
     }
-    else if (ePath == "gpx:gpx/gpx:trk/gpx:trkseg/gpx:trkpt/gpx:speed")
+    else if (ePath == QString::fromLatin1("gpx:gpx/gpx:trk/gpx:trkseg/gpx:trkpt/gpx:speed"))
     {
         bool haveSpeed    = false;
         const qreal speed = eText.toDouble(&haveSpeed);
@@ -238,7 +238,7 @@ bool TrackReader::startElement(const QString& namespaceURI, const QString& local
     rebuildElementPath();
     const QString& ePath = d->currentElementPath;
 
-    if (ePath == "gpx:gpx/gpx:trk/gpx:trkseg/gpx:trkpt")
+    if (ePath == QString::fromLatin1("gpx:gpx/gpx:trk/gpx:trkseg/gpx:trkpt"))
     {
         qreal lat    = 0.0;
         qreal lon    = 0.0;
@@ -250,11 +250,11 @@ bool TrackReader::startElement(const QString& namespaceURI, const QString& local
             const QString attName  = myQName(atts.uri(i), atts.localName(i));
             const QString attValue = atts.value(i);
 
-            if (attName == "lat")
+            if (attName == QString::fromLatin1("lat"))
             {
                 lat = attValue.toDouble(&haveLat);
             }
-            else if (attName == "lon")
+            else if (attName == QString::fromLatin1("lon"))
             {
                 lon = attValue.toDouble(&haveLon);
             }
@@ -265,7 +265,7 @@ bool TrackReader::startElement(const QString& namespaceURI, const QString& local
             d->currentDataPoint.coordinates.setLatLon(lat, lon);
         }
     }
-    else if (ePath=="gpx:gpx")
+    else if (ePath == QString::fromLatin1("gpx:gpx"))
     {
         d->verifyFoundGPXElement = true;
     }
@@ -275,7 +275,7 @@ bool TrackReader::startElement(const QString& namespaceURI, const QString& local
 
 void TrackReader::rebuildElementPath()
 {
-    d->currentElementPath = d->currentElements.join("/");
+    d->currentElementPath = d->currentElements.join(QString::fromLatin1("/"));
 }
 
 TrackReader::TrackReadResult TrackReader::loadTrackFile(const QUrl& url)

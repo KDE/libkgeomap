@@ -43,20 +43,22 @@
 
 int main(int argc, char* argv[])
 {
-    KAboutData aboutData("demo-kgeomap", i18n("KGeoMap demo application"), KGEOMAP_VERSION_STRING);
+    KAboutData aboutData(QString::fromLatin1("demo-kgeomap"),
+                         i18n("KGeoMap demo application"),
+                         QString::fromLatin1(KGEOMAP_VERSION_STRING));
     aboutData.setShortDescription(i18n("Presents the World Map Widget Interface"));
     aboutData.setLicense(KAboutLicense::GPL);
     aboutData.setCopyrightStatement(i18n("(c) 2009-2010 Michael G. Hansen"));
-    aboutData.setHomepage("http://www.digikam.org/sharedlibs");
+    aboutData.setHomepage(QString::fromLatin1("http://www.digikam.org/sharedlibs"));
 
     aboutData.addAuthor(i18n("Michael G. Hansen"),
                         i18n("KGeoMap library"),
-                        "mike@mghansen.de",
-                        "http://www.mghansen.de");
+                        QString::fromLatin1("mike@mghansen.de"),
+                        QString::fromLatin1("http://www.mghansen.de"));
 
     aboutData.addCredit(i18n("Justus Schwartz"),
                         i18n("Patch for displaying tracks on the map."),
-                             "justus at gmx dot li");
+                             QString::fromLatin1("justus at gmx dot li"));
 
     QApplication app(argc, argv);
     QCommandLineParser parser;
@@ -68,7 +70,7 @@ int main(int argc, char* argv[])
     parser.addOption(QCommandLineOption(QStringList() << QLatin1String("demopoints_single"), i18n("Add built-in demo points as single markers")));
     parser.addOption(QCommandLineOption(QStringList() << QLatin1String("demopoints_group"),  i18n("Add built-in demo points as groupable markers")));
     parser.addOption(QCommandLineOption(QStringList() << QLatin1String("single"),            i18n("Do not group the displayed images")));
-    parser.addPositionalArgument("images", i18n("List of images"), "[images...]");
+    parser.addPositionalArgument(QString::fromLatin1("images"), i18n("List of images"), QString::fromLatin1("[images...]"));
 
     aboutData.setupCommandLine(&parser);
     parser.process(app);

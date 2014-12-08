@@ -246,7 +246,7 @@ MainWindow::MainWindow(QCommandLineParser* const cmdLineArgs, QWidget* const par
 
     resize(512, 512);
     setWindowTitle(i18n("LibKGeoMap demo"));
-    setWindowIcon(QIcon::fromTheme("applications-internet"));
+    setWindowIcon(QIcon::fromTheme(QString::fromLatin1("applications-internet")));
     setObjectName(QLatin1String("Demo-KGeoMap" ));
 
     d->cmdLineArgs = cmdLineArgs;
@@ -314,7 +314,7 @@ MainWindow::MainWindow(QCommandLineParser* const cmdLineArgs, QWidget* const par
     // Sagrada Familia in Spain
     markerList<<GeoCoordinates::fromGeoUrl(QLatin1String("geo:41.4036480511,2.1743756533,46" ));
 
-    if (cmdLineArgs->isSet("demopoints_single") || cmdLineArgs->isSet("demopoints_group"))
+    if (cmdLineArgs->isSet(QString::fromLatin1("demopoints_single")) || cmdLineArgs->isSet(QString::fromLatin1("demopoints_group")))
     {
         for (int i = 0; i < markerList.count(); ++i)
         {
@@ -532,7 +532,7 @@ void MainWindow::slotMarkersMoved(const QList<QPersistentModelIndex>& markerIndi
 
     if (!altitudeQueries.isEmpty())
     {
-        LookupAltitude* const myAltitudeLookup = LookupFactory::getAltitudeLookup("geonames", this);
+        LookupAltitude* const myAltitudeLookup = LookupFactory::getAltitudeLookup(QString::fromLatin1("geonames"), this);
 
         connect(myAltitudeLookup, SIGNAL(signalRequestsReady(QList<int>)),
                 this, SLOT(slotAltitudeRequestsReady(QList<int>)));
@@ -546,7 +546,7 @@ void MainWindow::slotMarkersMoved(const QList<QPersistentModelIndex>& markerIndi
 
         /// @todo Check the return value?
         myAltitudeLookup->startLookup();
-        qDebug()<<"Starting lookup for "<<altitudeQueries.count()<<" items!";
+        qDebug() << "Starting lookup for " << altitudeQueries.count() << " items!";
     }
 }
 
@@ -596,7 +596,7 @@ void MainWindow::slotAddImages()
     if (fileNames.isEmpty())
         return;
 
-    d->lastImageOpenDir        = fileNames.first().resolved(QUrl("../"));
+    d->lastImageOpenDir        = fileNames.first().resolved(QUrl(QString::fromLatin1("../")));
 
     slotScheduleImagesForLoading(fileNames);
 }
