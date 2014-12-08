@@ -1704,10 +1704,18 @@ QPixmap KGeoMapWidget::getDecoratedPixmapForCluster(const int clusterId, const K
             if (shouldGrayOut)
             {
                 /// @todo Cache the alphaPixmap!
+
                 QPixmap alphaPixmap(clusterPixmap.size());
                 alphaPixmap.fill(QColor::fromRgb(0x80, 0x80, 0x80));
-#pragma message("PORT QT5")
-//                clusterPixmap.setAlphaChannel(alphaPixmap);
+
+                /* NOTE : old Qt4 code ported to Qt5 due to deprecated QPixmap::setAlphaChannel()
+                clusterPixmap.setAlphaChannel(alphaPixmap);
+                */
+                
+                QPainter p(&clusterPixmap);
+                p.setOpacity(0.2);
+                p.drawPixmap(0, 0, alphaPixmap);
+                p.end();
             }
 
             painter.drawPixmap(QPoint(1,1), clusterPixmap);
