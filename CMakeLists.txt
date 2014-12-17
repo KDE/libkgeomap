@@ -109,7 +109,7 @@ endif()
 ############## CMake Config Files ##############
 
 message("${CMAKECONFIG_INSTALL_DIR}")
-set(CMAKECONFIG_INSTALL_DIR "${CMAKECONFIG_INSTALL_PREFIX}/KF5Kgeomap")
+set(CMAKECONFIG_INSTALL_DIR "${CMAKECONFIG_INSTALL_PREFIX}/KF5KGeoMap")
 
 ecm_configure_package_config_file(
     "${CMAKE_CURRENT_SOURCE_DIR}/cmake/templates/KF5KGeoMapConfig.cmake.in"
