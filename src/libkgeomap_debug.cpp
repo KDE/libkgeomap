@@ -19,4 +19,4 @@
 
 #include "libkgeomap_debug.h"
 
-Q_LOGGING_CATEGORY(LIBKGEOMAP_LOG, "log_libkgeomap")
+Q_LOGGING_CATEGORY(LIBKGEOMAP_LOG, "libkgeomap")
