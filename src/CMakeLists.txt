@@ -85,6 +85,7 @@ target_include_directories(KF5KGeoMap PUBLIC "$<BUILD_INTERFACE:${libkgeomap_SOU
 target_link_libraries(KF5KGeoMap
                       PRIVATE
                       ${MARBLE_LIBRARIES}
+                      KF5::KHtml
                       PUBLIC
                       Qt5::Gui
                       Qt5::Widgets
@@ -92,7 +93,6 @@ target_link_libraries(KF5KGeoMap
                       Qt5::Concurrent
                       KF5::I18n
                       KF5::ConfigCore
-                      KF5::KHtml
 )
 
 set_target_properties(KF5KGeoMap  PROPERTIES

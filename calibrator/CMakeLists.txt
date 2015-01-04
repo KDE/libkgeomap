@@ -15,6 +15,5 @@ add_executable(libkgeomap_calibrator ${calibrator_sources})
 target_link_libraries(libkgeomap_calibrator
                        Qt5::Gui
                        KF5::Parts
-                       KF5::KHtml
                        KF5KGeoMap
                      )

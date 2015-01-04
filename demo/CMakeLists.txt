@@ -11,7 +11,7 @@ macro(DETECT_LIBKEXIV2 MIN_VERSION)
         message(STATUS "libkexiv2 : search system based library")
         find_package(KF5KExiv2 ${MIN_VERSION})
 
-        if(KF5KExiv2_FOUND AND KF5KExiv2_INCLUDE_DIRS)
+        if(KF5KExiv2_FOUND)
             set(KF5KExiv2_LIBRARIES KF5::KExiv2)
         else()
             set(KF5KExiv2_FOUND FALSE)
@@ -59,7 +59,6 @@ if(KF5KExiv2_FOUND)
     target_link_libraries(libkgeomap_demo
                           Qt5::Gui
                           KF5::Parts
-                          KF5::KHtml
                           KF5KGeoMap
                           ${KF5KExiv2_LIBRARIES}
                          )
