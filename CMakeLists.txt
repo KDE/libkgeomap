@@ -85,8 +85,8 @@ endif()
 
 ecm_setup_version(${LIBKGEOMAP_LIB_VERSION}
                   VARIABLE_PREFIX      KGEOMAP
-                  VERSION_HEADER       "${CMAKE_CURRENT_BINARY_DIR}/libkgeomap_version.h"
-                  PACKAGE_VERSION_FILE "${CMAKE_CURRENT_BINARY_DIR}/KF5KGeoMapConfigVersion.cmake"
+                  VERSION_HEADER       "libkgeomap_version.h"
+                  PACKAGE_VERSION_FILE "KF5KGeoMapConfigVersion.cmake"
                   SOVERSION            ${LIBKGEOMAP_SO_VERSION}
 )
 

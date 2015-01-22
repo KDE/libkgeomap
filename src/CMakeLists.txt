@@ -78,6 +78,7 @@ generate_export_header(KF5KGeoMap BASE_NAME libkgeomap EXPORT_MACRO_NAME KGEOMAP
 
 target_include_directories(KF5KGeoMap INTERFACE
                            "$<INSTALL_INTERFACE:${KF5_INCLUDE_INSTALL_DIR}/KGeoMap;${KF5_INCLUDE_INSTALL_DIR}/KGeoMap/kgeomap>"
+                           "$<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/..>"
 )
 
 target_include_directories(KF5KGeoMap PUBLIC "$<BUILD_INTERFACE:${libkgeomap_SOURCE_DIR}/src;${libkgeomap_BINARY_DIR}/src>")
