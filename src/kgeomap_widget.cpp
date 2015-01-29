@@ -45,13 +45,13 @@
 #include <QToolButton>
 #include <QHBoxLayout>
 #include <QAction>
+#include <QFrame>
 
 // KDE includes
 
 #include <kconfig.h>
 #include <kconfiggroup.h>
 #include <klocalizedstring.h>
-#include <kseparator.h>
 
 // Marbel includes
 
@@ -771,8 +771,14 @@ QWidget* KGeoMapWidget::getControlWidget()
         controlWidgetHBoxLayout->addWidget(showThumbnailsButton);
         showThumbnailsButton->setDefaultAction(d->actionShowThumbnails);
 
-        new KSeparator(Qt::Vertical, d->controlWidget);
-
+        QFrame* const vline1 = new QFrame(d->controlWidget);
+        vline1->setLineWidth(1);
+        vline1->setMidLineWidth(0);
+        vline1->setFrameShape(QFrame::VLine);
+        vline1->setFrameShadow(QFrame::Sunken);
+        vline1->setMinimumSize(2, 0);
+        vline1->updateGeometry();
+        
         QToolButton* const increaseThumbnailSizeButton = new QToolButton(d->controlWidget);
         controlWidgetHBoxLayout->addWidget(increaseThumbnailSizeButton);
         increaseThumbnailSizeButton->setDefaultAction(d->actionIncreaseThumbnailSize);
@@ -788,7 +794,13 @@ QWidget* KGeoMapWidget::getControlWidget()
         mouseModesHolderHBoxLayout->setMargin(0);
         controlWidgetHBoxLayout->addWidget(d->mouseModesHolder);
 
-        new KSeparator(Qt::Vertical, d->mouseModesHolder);
+        QFrame* const vline2 = new QFrame(d->mouseModesHolder);
+        vline2->setLineWidth(1);
+        vline2->setMidLineWidth(0);
+        vline2->setFrameShape(QFrame::VLine);
+        vline2->setFrameShadow(QFrame::Sunken);
+        vline2->setMinimumSize(2, 0);
+        vline2->updateGeometry();
 
         d->setPanModeButton = new QToolButton(d->mouseModesHolder);
         mouseModesHolderHBoxLayout->addWidget(d->setPanModeButton);
