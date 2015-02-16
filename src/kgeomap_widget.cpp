@@ -748,8 +748,8 @@ QWidget* KGeoMapWidget::getControlWidget()
 {
     if (!d->controlWidget)
     {
-        d->controlWidget = new QWidget(this);
-        QHBoxLayout *controlWidgetHBoxLayout = new QHBoxLayout(d->controlWidget);
+        d->controlWidget                           = new QWidget(this);
+        QHBoxLayout* const controlWidgetHBoxLayout = new QHBoxLayout(d->controlWidget);
         controlWidgetHBoxLayout->setMargin(0);
 
         QToolButton* const configurationButton = new QToolButton(d->controlWidget);
@@ -778,6 +778,7 @@ QWidget* KGeoMapWidget::getControlWidget()
         vline1->setFrameShadow(QFrame::Sunken);
         vline1->setMinimumSize(2, 0);
         vline1->updateGeometry();
+        controlWidgetHBoxLayout->addWidget(vline1);
         
         QToolButton* const increaseThumbnailSizeButton = new QToolButton(d->controlWidget);
         controlWidgetHBoxLayout->addWidget(increaseThumbnailSizeButton);
@@ -789,8 +790,8 @@ QWidget* KGeoMapWidget::getControlWidget()
 
         /* --- --- --- */
 
-        d->mouseModesHolder = new QWidget(d->controlWidget);
-        QHBoxLayout *mouseModesHolderHBoxLayout = new QHBoxLayout(d->mouseModesHolder);
+        d->mouseModesHolder                           = new QWidget(d->controlWidget);
+        QHBoxLayout* const mouseModesHolderHBoxLayout = new QHBoxLayout(d->mouseModesHolder);
         mouseModesHolderHBoxLayout->setMargin(0);
         controlWidgetHBoxLayout->addWidget(d->mouseModesHolder);
 
@@ -801,6 +802,7 @@ QWidget* KGeoMapWidget::getControlWidget()
         vline2->setFrameShadow(QFrame::Sunken);
         vline2->setMinimumSize(2, 0);
         vline2->updateGeometry();
+        mouseModesHolderHBoxLayout->addWidget(vline2);
 
         d->setPanModeButton = new QToolButton(d->mouseModesHolder);
         mouseModesHolderHBoxLayout->addWidget(d->setPanModeButton);
