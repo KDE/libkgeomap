@@ -252,7 +252,8 @@ QWidget* BackendGoogleMaps::mapWidget()
         {
             const QUrl htmlUrl = KGeoMapGlobalObject::instance()->locateDataFile(QLatin1String("backend-googlemaps.html"));
 
-            d->htmlWidget->openUrl(htmlUrl);
+            d->htmlWidget->setUrl(htmlUrl);
+            d->htmlWidget->show();
         }
     }
 

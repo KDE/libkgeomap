@@ -30,6 +30,7 @@
 // KDE includes
 
 #include <khtml_part.h>
+#include <QWebView>
 
 // local includes
 
@@ -41,7 +42,7 @@ namespace KGeoMap
 
 class KGeoMapSharedData;
 
-class KGEOMAP_EXPORT HTMLWidget : public KHTMLPart
+class KGEOMAP_EXPORT HTMLWidget : public QWebView
 {
     Q_OBJECT
 
@@ -61,15 +62,15 @@ public:
 
 protected:
 
-    bool eventFilter(QObject* object, QEvent* event);
-    void khtmlMousePressEvent(khtml::MousePressEvent* e);
-    void khtmlMouseReleaseEvent(khtml::MouseReleaseEvent* e);
-    void khtmlMouseMoveEvent(khtml::MouseMoveEvent *e);
+//    bool eventFilter(QObject* object, QEvent* event);
+//    void khtmlMousePressEvent(khtml::MousePressEvent* e);
+//    void khtmlMouseReleaseEvent(khtml::MouseReleaseEvent* e);
+//    void khtmlMouseMoveEvent(khtml::MouseMoveEvent *e);
 
 protected Q_SLOTS:
 
-    void slotHTMLCompleted();
-    void slotScanForJSMessages();
+//    void slotHTMLCompleted();
+//    void slotScanForJSMessages();
 
 Q_SIGNALS:
 

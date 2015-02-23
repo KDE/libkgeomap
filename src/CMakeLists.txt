@@ -92,6 +92,7 @@ target_link_libraries(KF5KGeoMap
                       Qt5::Widgets
                       Qt5::Core
                       Qt5::Concurrent
+                      Qt5::WebKitWidgets
                       KF5::I18n
                       KF5::ConfigCore
 )
