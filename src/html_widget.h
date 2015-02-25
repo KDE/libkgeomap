@@ -62,15 +62,16 @@ public:
 
 protected:
 
-//    bool eventFilter(QObject* object, QEvent* event);
-//    void khtmlMousePressEvent(khtml::MousePressEvent* e);
-//    void khtmlMouseReleaseEvent(khtml::MouseReleaseEvent* e);
-//    void khtmlMouseMoveEvent(khtml::MouseMoveEvent *e);
+    bool eventFilter(QObject* object, QEvent* event);
+    void mousePressEvent(QMouseEvent* e);
+    void mouseReleaseEvent(QMouseEvent* e);
+    void mouseMoveEvent(QMouseEvent *e);
 
 protected Q_SLOTS:
 
-//    void slotHTMLCompleted();
+    void slotHTMLCompleted(bool ok);
 //    void slotScanForJSMessages();
+    void progress(int progress);
 
 Q_SIGNALS:
 

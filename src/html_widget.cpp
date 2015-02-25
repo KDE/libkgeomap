@@ -82,18 +82,21 @@ HTMLWidget::HTMLWidget(QWidget* const parent)
     page()->setLinkDelegationPolicy(QWebPage::DelegateAllLinks);
     setRenderHint(QPainter::TextAntialiasing);
 
-    //widget()->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    d->parent->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
     // create a timer for monitoring for javascript events, but do not start it yet:
-//    d->javascriptScanTimer = new QTimer(this);
-//    d->javascriptScanTimer->setSingleShot(false);
-//    d->javascriptScanTimer->setInterval(300);
+    d->javascriptScanTimer = new QTimer(this);
+    d->javascriptScanTimer->setSingleShot(false);
+    d->javascriptScanTimer->setInterval(300);
 
 //    connect(d->javascriptScanTimer, SIGNAL(timeout()),
 //            this, SLOT(slotScanForJSMessages()));
 
-//    connect(this, SIGNAL(completed()),
-//            this, SLOT(slotHTMLCompleted()));
+    connect(this, SIGNAL(loadProgress(int)),
+            this, SLOT(progress(int)));
+
+    connect(this, SIGNAL(loadFinished(bool)),
+            this, SLOT(slotHTMLCompleted(bool)));
 
     if (d->parent)
     {
@@ -114,145 +117,151 @@ HTMLWidget::~HTMLWidget()
 //    end();
 //}
 
-//void HTMLWidget::slotHTMLCompleted()
-//{
-//    d->isReady = true;
+void HTMLWidget::progress(int progress)
+{
+    qDebug() << progress;
+}
 
-//    // start monitoring for javascript events using a timer:
-//    d->javascriptScanTimer->start();
+void HTMLWidget::slotHTMLCompleted(bool ok)
+{
+    qDebug() << ok;
+    d->isReady = ok;
 
-//    emit(signalJavaScriptReady());
-//}
+    // start monitoring for javascript events using a timer:
+    d->javascriptScanTimer->start();
 
-//void HTMLWidget::khtmlMousePressEvent(khtml::MousePressEvent* e)
-//{
+    emit(signalJavaScriptReady());
+}
+
+void HTMLWidget::mousePressEvent(QMouseEvent* e)
+{
 //    slotScanForJSMessages();
-//    KHTMLPart::khtmlMousePressEvent(e);
-//}
+    QWebView::mousePressEvent(e);
+}
 
-//void HTMLWidget::khtmlMouseReleaseEvent(khtml::MouseReleaseEvent* e)
-//{
-//    if (s->currentMouseMode == MouseModeRegionSelection)
-//    {
-//        if (!d->firstSelectionPoint.hasCoordinates())
-//        {
-//            runScript2Coordinates(QString::fromLatin1("kgeomapPixelToLatLng(%1, %2);")
-//                                  .arg(e->x())
-//                                  .arg(e->y()),
-//                                  &d->firstSelectionPoint);
+void HTMLWidget::mouseReleaseEvent(QMouseEvent* e)
+{
+    if (s->currentMouseMode == MouseModeRegionSelection)
+    {
+        if (!d->firstSelectionPoint.hasCoordinates())
+        {
+            runScript2Coordinates(QString::fromLatin1("kgeomapPixelToLatLng(%1, %2);")
+                                  .arg(e->x())
+                                  .arg(e->y()),
+                                  &d->firstSelectionPoint);
 
-//            d->firstSelectionScreenPoint = QPoint(e->x(), e->y());
-//        }
-//        else
-//        {
-//            runScript2Coordinates(QString::fromLatin1("kgeomapPixelToLatLng(%1, %2);")
-//                                  .arg(e->x())
-//                                  .arg(e->y()),
-//                                  &d->intermediateSelectionPoint);
+            d->firstSelectionScreenPoint = QPoint(e->x(), e->y());
+        }
+        else
+        {
+            runScript2Coordinates(QString::fromLatin1("kgeomapPixelToLatLng(%1, %2);")
+                                  .arg(e->x())
+                                  .arg(e->y()),
+                                  &d->intermediateSelectionPoint);
 
-//            d->intermediateSelectionScreenPoint = QPoint(e->x(), e->y());
+            d->intermediateSelectionScreenPoint = QPoint(e->x(), e->y());
 
-//            qreal lonWest, latNorth, lonEast, latSouth;
+            qreal lonWest, latNorth, lonEast, latSouth;
 
-//            if (d->firstSelectionScreenPoint.x() < d->intermediateSelectionScreenPoint.x())
-//            {
-//                lonWest  = d->firstSelectionPoint.lon();
-//                lonEast  = d->intermediateSelectionPoint.lon();
-//            }
-//            else
-//            {
-//                lonEast  = d->firstSelectionPoint.lon();
-//                lonWest  = d->intermediateSelectionPoint.lon();
-//            }
+            if (d->firstSelectionScreenPoint.x() < d->intermediateSelectionScreenPoint.x())
+            {
+                lonWest  = d->firstSelectionPoint.lon();
+                lonEast  = d->intermediateSelectionPoint.lon();
+            }
+            else
+            {
+                lonEast  = d->firstSelectionPoint.lon();
+                lonWest  = d->intermediateSelectionPoint.lon();
+            }
 
-//            if (d->firstSelectionScreenPoint.y() < d->intermediateSelectionScreenPoint.y())
-//            {
-//                latNorth = d->firstSelectionPoint.lat();
-//                latSouth = d->intermediateSelectionPoint.lat();
-//            }
-//            else
-//            {
-//                latNorth = d->intermediateSelectionPoint.lat();
-//                latSouth = d->firstSelectionPoint.lat();
-//            }
+            if (d->firstSelectionScreenPoint.y() < d->intermediateSelectionScreenPoint.y())
+            {
+                latNorth = d->firstSelectionPoint.lat();
+                latSouth = d->intermediateSelectionPoint.lat();
+            }
+            else
+            {
+                latNorth = d->intermediateSelectionPoint.lat();
+                latSouth = d->firstSelectionPoint.lat();
+            }
 
-//            runScript(QLatin1String("kgeomapRemoveTemporarySelectionRectangle();"));
-//            runScript(QString::fromLatin1("kgeomapSetSelectionRectangle(%1, %2, %3, %4);")
-//                     .arg(lonWest)
-//                     .arg(latNorth)
-//                     .arg(lonEast)
-//                     .arg(latSouth));
+            runScript(QLatin1String("kgeomapRemoveTemporarySelectionRectangle();"));
+            runScript(QString::fromLatin1("kgeomapSetSelectionRectangle(%1, %2, %3, %4);")
+                     .arg(lonWest)
+                     .arg(latNorth)
+                     .arg(lonEast)
+                     .arg(latSouth));
 
-//            const GeoCoordinates::Pair selectionCoordinates(
-//                    GeoCoordinates(latNorth, lonWest),
-//                    GeoCoordinates(latSouth, lonEast)
-//                );
+            const GeoCoordinates::Pair selectionCoordinates(
+                    GeoCoordinates(latNorth, lonWest),
+                    GeoCoordinates(latSouth, lonEast)
+                );
 
-//            d->firstSelectionPoint.clear();
-//            d->intermediateSelectionPoint.clear();
+            d->firstSelectionPoint.clear();
+            d->intermediateSelectionPoint.clear();
 
-//            emit(selectionHasBeenMade(selectionCoordinates));
-//        }
-//    }
-
-//    slotScanForJSMessages();
-//    KHTMLPart::khtmlMouseReleaseEvent(e);
-//}
-
-//void HTMLWidget::khtmlMouseMoveEvent(khtml::MouseMoveEvent *e)
-//{
-//    if (s->currentMouseMode == MouseModeRegionSelection &&
-//        d->firstSelectionPoint.hasCoordinates())
-//    {
-//        runScript2Coordinates(QString::fromLatin1("kgeomapPixelToLatLng(%1, %2);")
-//                              .arg(e->x())
-//                              .arg(e->y()),
-//                              &d->intermediateSelectionPoint);
-
-//        d->intermediateSelectionScreenPoint = QPoint(e->x(), e->y());
-
-//        qCDebug(LIBKGEOMAP_LOG) << d->firstSelectionScreenPoint << QLatin1String(" ") << d->intermediateSelectionScreenPoint;
-
-//        qreal lonWest, latNorth, lonEast, latSouth;
-
-//        if (d->firstSelectionScreenPoint.x() < d->intermediateSelectionScreenPoint.x())
-//        {
-//            lonWest  = d->firstSelectionPoint.lon();
-//            lonEast  = d->intermediateSelectionPoint.lon();
-//        }
-//        else
-//        {
-//            lonEast  = d->firstSelectionPoint.lon();
-//            lonWest  = d->intermediateSelectionPoint.lon();
-//        }
-
-//        if (d->firstSelectionScreenPoint.y() < d->intermediateSelectionScreenPoint.y())
-//        {
-//            latNorth = d->firstSelectionPoint.lat();
-//            latSouth = d->intermediateSelectionPoint.lat();
-//        }
-//        else
-//        {
-//            latNorth = d->intermediateSelectionPoint.lat();
-//            latSouth = d->firstSelectionPoint.lat();
-//        }
-
-//        runScript(QString::fromLatin1("kgeomapSetTemporarySelectionRectangle(%1, %2, %3, %4);")
-//                  .arg(lonWest)
-//                  .arg(latNorth)
-//                  .arg(lonEast)
-//                  .arg(latSouth));
-//    }
+            emit(selectionHasBeenMade(selectionCoordinates));
+        }
+    }
 
 //    slotScanForJSMessages();
-//    KHTMLPart::khtmlMouseMoveEvent(e);
-//}
+    QWebView::mouseReleaseEvent(e);
+}
+
+void HTMLWidget::mouseMoveEvent(QMouseEvent *e)
+{
+    if (s->currentMouseMode == MouseModeRegionSelection &&
+        d->firstSelectionPoint.hasCoordinates())
+    {
+        runScript2Coordinates(QString::fromLatin1("kgeomapPixelToLatLng(%1, %2);")
+                              .arg(e->x())
+                              .arg(e->y()),
+                              &d->intermediateSelectionPoint);
+
+        d->intermediateSelectionScreenPoint = QPoint(e->x(), e->y());
+
+        qCDebug(LIBKGEOMAP_LOG) << d->firstSelectionScreenPoint << QLatin1String(" ") << d->intermediateSelectionScreenPoint;
+
+        qreal lonWest, latNorth, lonEast, latSouth;
+
+        if (d->firstSelectionScreenPoint.x() < d->intermediateSelectionScreenPoint.x())
+        {
+            lonWest  = d->firstSelectionPoint.lon();
+            lonEast  = d->intermediateSelectionPoint.lon();
+        }
+        else
+        {
+            lonEast  = d->firstSelectionPoint.lon();
+            lonWest  = d->intermediateSelectionPoint.lon();
+        }
+
+        if (d->firstSelectionScreenPoint.y() < d->intermediateSelectionScreenPoint.y())
+        {
+            latNorth = d->firstSelectionPoint.lat();
+            latSouth = d->intermediateSelectionPoint.lat();
+        }
+        else
+        {
+            latNorth = d->intermediateSelectionPoint.lat();
+            latSouth = d->firstSelectionPoint.lat();
+        }
+
+        runScript(QString::fromLatin1("kgeomapSetTemporarySelectionRectangle(%1, %2, %3, %4);")
+                  .arg(lonWest)
+                  .arg(latNorth)
+                  .arg(lonEast)
+                  .arg(latSouth));
+    }
+
+//    slotScanForJSMessages();
+    QWebView::mouseMoveEvent(e);
+}
 
 //void HTMLWidget::slotScanForJSMessages()
 //{
-//    const QString status = jsStatusBarText();
+//    const QString status =  jsStatusBarText();
 
-//    if (status!=QLatin1String("(event)" ))
+//    if (status!=QLatin1String("(event)"))
 //        return;
 
 //    qCDebug(LIBKGEOMAP_LOG) << status;
@@ -291,25 +300,24 @@ bool HTMLWidget::runScript2Coordinates(const QString& scriptCode, GeoCoordinates
     return KGeoMapHelperParseLatLonString(scriptResult.toString(), coordinates);
 }
 
-//bool HTMLWidget::eventFilter(QObject* object, QEvent* event)
-//{
-//    if (d->parent && object==d->parent)
-//    {
+bool HTMLWidget::eventFilter(QObject* object, QEvent* event)
+{
+    if (d->parent && object==d->parent)
+    {
 
-//        if (event->type()==QEvent::Resize)
-//        {
-//            QResizeEvent* const resizeEvent = dynamic_cast<QResizeEvent*>(event);
+        if (event->type()==QEvent::Resize)
+        {
+            QResizeEvent* const resizeEvent = dynamic_cast<QResizeEvent*>(event);
 
-//            if (resizeEvent)
-//            {
-//                //widget()->resize(resizeEvent->size());
-//                //view()->resize(resizeEvent->size());
-//            }
-//        }
-//    }
+            if (resizeEvent)
+            {
+                resize(resizeEvent->size());
+            }
+        }
+    }
 
-//    return false;
-//}
+    return false;
+}
 
 void HTMLWidget::setSelectionRectangle(const GeoCoordinates::Pair& searchCoordinates)
 {
