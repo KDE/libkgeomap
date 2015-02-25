@@ -29,7 +29,6 @@
 
 // KDE includes
 
-#include <khtml_part.h>
 #include <QWebView>
 
 // local includes

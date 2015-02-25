@@ -33,11 +33,6 @@
 #include <QWebView>
 #include <QWebFrame>
 
-// KDE includes
-
-#include <khtmlview.h>
-#include <khtml_events.h>
-
 // local includes
 
 #include "kgeomap_common.h"
