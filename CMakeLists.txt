@@ -72,6 +72,7 @@ find_package(KF5 ${KF5_VERSION} REQUIRED COMPONENTS
              I18n
              Config
              KIO
+             Parts
 )
 
 # Special handling for Marble: support both FindMarbleWidget and FindMarble,
