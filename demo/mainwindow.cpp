@@ -55,7 +55,6 @@
 
 #include <kconfig.h>
 #include <kconfiggroup.h>
-#include <khelpmenu.h>
 #include <klocalizedstring.h>
 
 // LibKExiv2 includes
@@ -201,8 +200,7 @@ public:
         displayMarkersModel(0),
         selectionModel(0),
         markerModelHelper(0),
-        trackModelHelper(0),
-        helpMenu(0)
+        trackModelHelper(0)
     {
     }
 
@@ -224,11 +222,11 @@ public:
     QItemSelectionModel*                selectionModel;
     MarkerModelHelper*                  markerModelHelper;
     MyTrackModelHelper*                 trackModelHelper;
-    KHelpMenu*                          helpMenu;
 };
 
 MainWindow::MainWindow(QCommandLineParser* const cmdLineArgs, QWidget* const parent)
-    : KMainWindow(parent), d(new Private())
+    : QMainWindow(parent),
+      d(new Private())
 {
     // initialize kexiv2 before doing any multitasking
     KExiv2Iface::KExiv2::initializeExiv2();
@@ -552,7 +550,7 @@ void MainWindow::slotMarkersMoved(const QList<QPersistentModelIndex>& markerIndi
 
 void MainWindow::slotAltitudeRequestsReady(const QList<int>& readyRequests)
 {
-    qDebug()<<readyRequests.count() << " items ready!";
+    qDebug() << readyRequests.count() << " items ready!";
     LookupAltitude* const myAltitudeLookup = qobject_cast<LookupAltitude*>(sender());
 
     if (!myAltitudeLookup)
@@ -591,7 +589,7 @@ void MainWindow::slotAltitudeLookupDone()
 
 void MainWindow::slotAddImages()
 {
-    const QList<QUrl> fileNames = QFileDialog::getOpenFileUrls(this, i18n("Add image files"), d->lastImageOpenDir, i18n("Images (*.jpg *.jpeg *.png)"));
+    const QList<QUrl> fileNames = QFileDialog::getOpenFileUrls(this, i18n("Add image files"), d->lastImageOpenDir, i18n("Images (*.jpg *.jpeg *.png *.tif *.tiff)"));
 
     if (fileNames.isEmpty())
         return;
@@ -609,9 +607,6 @@ void MainWindow::createMenus()
 
     connect(addFilesAction, SIGNAL(triggered()),
             this, SLOT(slotAddImages()));
-
-    d->helpMenu = new KHelpMenu(this);
-    menuBar()->addMenu(d->helpMenu->menu());
 }
 
 KGeoMap::ModelHelper::Flags MarkerModelHelper::modelFlags() const

@@ -66,7 +66,6 @@ int main(int argc, char* argv[])
     parser.addVersionOption();
     parser.addHelpOption();
 
-    //PORTING SCRIPT: adapt aboutdata variable if necessary
     parser.addOption(QCommandLineOption(QStringList() << QLatin1String("demopoints_single"), i18n("Add built-in demo points as single markers")));
     parser.addOption(QCommandLineOption(QStringList() << QLatin1String("demopoints_group"),  i18n("Add built-in demo points as groupable markers")));
     parser.addOption(QCommandLineOption(QStringList() << QLatin1String("single"),            i18n("Do not group the displayed images")));

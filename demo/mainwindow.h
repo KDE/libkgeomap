@@ -29,10 +29,7 @@
 // Qt includes
 
 #include <QItemSelection>
-
-// KDE includes
-
-#include <kmainwindow.h>
+#include <QMainWindow>
 
 // libkgeomap includes
 
@@ -95,7 +92,7 @@ private:
 
 // ------------------------------------------------------------------------------------------------
 
-class MainWindow : public KMainWindow
+class MainWindow : public QMainWindow
 {
     Q_OBJECT
 

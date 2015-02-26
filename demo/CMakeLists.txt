@@ -58,7 +58,6 @@ if(KF5KExiv2_FOUND)
 
     target_link_libraries(libkgeomap_demo
                           Qt5::Gui
-                          KF5::Parts
                           KF5KGeoMap
                           ${KF5KExiv2_LIBRARIES}
                          )
