@@ -27,7 +27,7 @@
 
 // KDE includes
 
-#include <kmainwindow.h>
+#include <QMainWindow>
 
 // local includes
 
@@ -49,7 +49,7 @@ public:
     // these are necessary for grouped and ungrouped models
     virtual QAbstractItemModel*  model()          const;
     virtual QItemSelectionModel* selectionModel() const;
-    virtual Flags 		 modelFlags()     const;
+    virtual Flags                modelFlags()     const;
     virtual bool itemCoordinates(const QModelIndex& index, KGeoMap::GeoCoordinates* const coordinates) const;
 
 private:
@@ -62,11 +62,12 @@ private:
 
 // -----------------------------------------------------------------------------------------------------------
 
-class Calibrator : public KMainWindow
+class Calibrator : public QMainWindow
 {
     Q_OBJECT
 
 public:
+
     Calibrator();
     ~Calibrator();
 

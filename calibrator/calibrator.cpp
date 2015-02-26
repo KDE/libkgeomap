@@ -70,7 +70,8 @@ public:
 };
 
 CalibratorModelHelper::CalibratorModelHelper(QStandardItemModel* const model, QObject* const parent)
-    : ModelHelper(parent), d(new Private())
+    : ModelHelper(parent),
+      d(new Private())
 {
     d->model = model;
 }
@@ -122,6 +123,7 @@ KGeoMap::ModelHelper::Flags CalibratorModelHelper::modelFlags() const
 class Calibrator::Private
 {
 public:
+
     Private()
      : hBoxLayout(0),
        model(0),
@@ -147,7 +149,8 @@ public:
 };
 
 Calibrator::Calibrator()
-    : KMainWindow(), d(new Private())
+    : QMainWindow(),
+      d(new Private())
 {
     d->model       = new QStandardItemModel(this);
     d->modelHelper = new CalibratorModelHelper(d->model, this);
@@ -325,10 +328,12 @@ void Calibrator::updateMarkers()
                         KGeoMap::TileIndex newIndex = markerIndex;
                         newIndex.appendLinearIndex(newLinIndex);
                         addMarkerAt(newIndex.toCoordinates());
-//                         for (int corner = 1; corner<=4; ++corner)
-//                         {
-//                             addMarkerAt(newIndex.toCoordinates(KGeoMap::TileIndex::CornerPosition(corner)));
-//                         }
+/*
+                         for (int corner = 1; corner<=4; ++corner)
+                         {
+                             addMarkerAt(newIndex.toCoordinates(KGeoMap::TileIndex::CornerPosition(corner)));
+                         }
+*/
                     }
                 }
             }
@@ -425,11 +430,9 @@ int main(int argc, char* argv[])
     KAboutData::setApplicationData(aboutData);
     parser.addVersionOption();
     parser.addHelpOption();
-    //PORTING SCRIPT: adapt aboutdata variable if necessary
     aboutData.setupCommandLine(&parser);
     parser.process(app);
     aboutData.processCommandLine(&parser);
-
 
     Calibrator* const calibrator = new Calibrator();
     calibrator->show();
