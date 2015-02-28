@@ -49,7 +49,7 @@ public:
     Private()
       : parent(0),
         isReady(false),
-        javascriptScanTimer(0),
+        //javascriptScanTimer(0),
         selectionStatus(false),
         firstSelectionPoint(),
         intermediateSelectionPoint(),
@@ -60,7 +60,7 @@ public:
 
     QWidget*       parent;
     bool           isReady;
-    QTimer*        javascriptScanTimer;
+    //QTimer*        javascriptScanTimer;
 
     bool           selectionStatus;
     GeoCoordinates firstSelectionPoint;
@@ -80,18 +80,18 @@ HTMLWidget::HTMLWidget(QWidget* const parent)
     d->parent->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
     // create a timer for monitoring for javascript events, but do not start it yet:
-    d->javascriptScanTimer = new QTimer(this);
-    d->javascriptScanTimer->setSingleShot(false);
-    d->javascriptScanTimer->setInterval(300);
-
-//    connect(d->javascriptScanTimer, SIGNAL(timeout()),
-//            this, SLOT(slotScanForJSMessages()));
+//    d->javascriptScanTimer = new QTimer(this);
+//    d->javascriptScanTimer->setSingleShot(false);
+//    d->javascriptScanTimer->setInterval(300);
 
     connect(this, SIGNAL(loadProgress(int)),
             this, SLOT(progress(int)));
 
     connect(this, SIGNAL(loadFinished(bool)),
             this, SLOT(slotHTMLCompleted(bool)));
+
+    connect(this, SIGNAL(statusBarMessage(QString)),
+            this, SLOT(slotScanForJSMessages(QString)));
 
     if (d->parent)
     {
@@ -104,6 +104,8 @@ HTMLWidget::~HTMLWidget()
     delete d;
 }
 
+// This method wasn't called ever, before porting to QWebView
+// What does it do?
 //void HTMLWidget::loadInitialHTML(const QString& initialHTML)
 //{
 ////     qCDebug(LIBKGEOMAP_LOG) << initialHTML;
@@ -123,7 +125,7 @@ void HTMLWidget::slotHTMLCompleted(bool ok)
     d->isReady = ok;
 
     // start monitoring for javascript events using a timer:
-    d->javascriptScanTimer->start();
+    // d->javascriptScanTimer->start();
 
     emit(signalJavaScriptReady());
 }
@@ -252,24 +254,22 @@ void HTMLWidget::mouseMoveEvent(QMouseEvent *e)
     QWebView::mouseMoveEvent(e);
 }
 
-//void HTMLWidget::slotScanForJSMessages()
-//{
-//    const QString status =  jsStatusBarText();
+void HTMLWidget::slotScanForJSMessages(QString message)
+{
+    if (message!=QLatin1String("(event)"))
+        return;
 
-//    if (status!=QLatin1String("(event)"))
-//        return;
+    qCDebug(LIBKGEOMAP_LOG) << message;
 
-//    qCDebug(LIBKGEOMAP_LOG) << status;
+    const QString eventBufferString = runScript(QLatin1String("kgeomapReadEventStrings();")).toString();
 
-//    const QString eventBufferString = runScript(QLatin1String("kgeomapReadEventStrings();")).toString();
+    if (eventBufferString.isEmpty())
+        return;
 
-//    if (eventBufferString.isEmpty())
-//        return;
+    const QStringList events = eventBufferString.split(QLatin1Char( '|' ));
 
-//    const QStringList events = eventBufferString.split(QLatin1Char( '|' ));
-
-//    emit(signalHTMLEvents(events));
-//}
+    emit(signalHTMLEvents(events));
+}
 
 /**
  * @brief Wrapper around executeScript to catch more errors

@@ -69,7 +69,7 @@ protected:
 protected Q_SLOTS:
 
     void slotHTMLCompleted(bool ok);
-//    void slotScanForJSMessages();
+    void slotScanForJSMessages(QString message);
     void progress(int progress);
 
 Q_SIGNALS:
