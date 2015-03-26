@@ -1411,7 +1411,7 @@ void BackendGoogleMaps::slotTrackVisibilityChanged(const bool newState)
         }
         slotTracksChanged(trackChanges);
     }
-    else
+    else if (d->htmlWidget)
     {
         const QVariant successClear = d->htmlWidget->runScript(QString::fromLatin1("kgeomapClearTracks();"));
     }
