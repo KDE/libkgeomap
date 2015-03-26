@@ -61,7 +61,7 @@ public:
     {
         htmlWidget = 0;
     }
-    
+
     HTMLWidget* htmlWidget;
 };
 
@@ -124,7 +124,8 @@ public:
 };
 
 BackendGoogleMaps::BackendGoogleMaps(const QExplicitlySharedDataPointer<KGeoMapSharedData>& sharedData, QObject* const parent)
-    : MapBackend(sharedData, parent), d(new Private())
+    : MapBackend(sharedData, parent),
+      d(new Private())
 {
     createActions();
 }
@@ -141,7 +142,7 @@ BackendGoogleMaps::~BackendGoogleMaps()
     {
         delete d->htmlWidgetWrapper;
     }
-    
+
     delete d;
 }
 
@@ -525,9 +526,9 @@ void BackendGoogleMaps::slotHTMLEvents(const QStringList& events)
                 continue;
 
             KGEOMAP_ASSERT(clusterIndex >= 0);
-            KGEOMAP_ASSERT(clusterIndex<s->clusterList.size());
+            KGEOMAP_ASSERT(clusterIndex < s->clusterList.size());
 
-            if ((clusterIndex<0)||(clusterIndex>s->clusterList.size()))
+            if ((clusterIndex<0)||(clusterIndex > s->clusterList.size()))
                 continue;
 
             // re-read the marker position:
@@ -560,7 +561,7 @@ void BackendGoogleMaps::slotHTMLEvents(const QStringList& events)
                 continue;
 
             KGEOMAP_ASSERT(clusterIndex >= 0);
-            KGEOMAP_ASSERT(clusterIndex<s->clusterList.size());
+            KGEOMAP_ASSERT(clusterIndex < s->clusterList.size());
 
             if ((clusterIndex<0)||(clusterIndex>s->clusterList.size()))
                 continue;
@@ -584,7 +585,7 @@ void BackendGoogleMaps::slotHTMLEvents(const QStringList& events)
             ModelHelper* const modelHelper  = s->ungroupedModels.at(snapModelId);
             QAbstractItemModel* const model = modelHelper->model();
             QPair<int, QModelIndex> snapTargetIndex(snapModelId, model->index(snapMarkerId, 0));
-            emit(signalClustersMoved(QIntList()<<clusterIndex, snapTargetIndex));
+            emit(signalClustersMoved(QIntList() << clusterIndex, snapTargetIndex));
         }
         else if (eventCode == QLatin1String("cc"))
         {
@@ -598,9 +599,9 @@ void BackendGoogleMaps::slotHTMLEvents(const QStringList& events)
                 continue;
 
             KGEOMAP_ASSERT(clusterIndex>=0);
-            KGEOMAP_ASSERT(clusterIndex<s->clusterList.size());
+            KGEOMAP_ASSERT(clusterIndex < s->clusterList.size());
 
-            if ((clusterIndex<0)||(clusterIndex>s->clusterList.size()))
+            if ((clusterIndex<0) || (clusterIndex > s->clusterList.size()))
                 continue;
 
             clickedClusters << clusterIndex;
@@ -649,7 +650,7 @@ void BackendGoogleMaps::slotHTMLEvents(const QStringList& events)
 
     if (!movedClusters.isEmpty())
     {
-        qCDebug(LIBKGEOMAP_LOG)<<movedClusters;
+        qCDebug(LIBKGEOMAP_LOG) << movedClusters;
         emit(signalClustersMoved(movedClusters, QPair<int, QModelIndex>(-1, QModelIndex())));
     }
 
@@ -695,7 +696,7 @@ void BackendGoogleMaps::slotHTMLEvents(const QStringList& events)
         KGeoMapHelperParseBoundsString(mapBoundsString, &d->cacheBounds);
     }
 
-    if (mapBoundsProbablyChanged||!movedClusters.isEmpty())
+    if (mapBoundsProbablyChanged || !movedClusters.isEmpty())
     {
         s->worldMapWidget->markClustersAsDirty();
         s->worldMapWidget->updateClusters();
@@ -743,7 +744,7 @@ void BackendGoogleMaps::updateClusters()
             setClusterPixmap(currentIndex, clusterCenterPoint, clusterPixmap);
         }
     }
-    qCDebug(LIBKGEOMAP_LOG)<<"end updateclusters";
+    qCDebug(LIBKGEOMAP_LOG) << "end updateclusters";
 }
 
 bool BackendGoogleMaps::screenCoordinates(const GeoCoordinates& coordinates, QPoint* const point)
@@ -989,7 +990,7 @@ void BackendGoogleMaps::updateZoomMinMaxCache()
 
 void BackendGoogleMaps::slotThumbnailAvailableForIndex(const QVariant& index, const QPixmap& pixmap)
 {
-    qCDebug(LIBKGEOMAP_LOG)<<index<<pixmap.size();
+    qCDebug(LIBKGEOMAP_LOG) << index<<pixmap.size();
 
     if (pixmap.isNull() || !s->showThumbnails)
         return;
@@ -997,7 +998,7 @@ void BackendGoogleMaps::slotThumbnailAvailableForIndex(const QVariant& index, co
     // TODO: properly reject pixmaps with the wrong size
     const int expectedThumbnailSize = s->worldMapWidget->getUndecoratedThumbnailSize();
 
-    if ((pixmap.size().height()!=expectedThumbnailSize)&&(pixmap.size().width()!=expectedThumbnailSize))
+    if ((pixmap.size().height() != expectedThumbnailSize)&&(pixmap.size().width()!=expectedThumbnailSize))
         return;
 
     // find the cluster which is represented by this index:
@@ -1150,7 +1151,7 @@ void BackendGoogleMaps::centerOn( const Marble::GeoDataLatLonBox& latLonBox, con
     const qreal boxSouth = latLonBox.south(Marble::GeoDataCoordinates::Degree);
 
     d->htmlWidget->centerOn(boxWest, boxNorth, boxEast, boxSouth, useSaneZoomLevel);
-    qCDebug(LIBKGEOMAP_LOG)<<getZoom();
+    qCDebug(LIBKGEOMAP_LOG) << getZoom();
 }
 
 void BackendGoogleMaps::setActive(const bool state)
@@ -1226,7 +1227,7 @@ void BackendGoogleMaps::releaseWidget(KGeoMapInternalWidgetInfo* const info)
 
 void BackendGoogleMaps::mapWidgetDocked(const bool state)
 {
-    if (d->widgetIsDocked!=state)
+    if (d->widgetIsDocked != state)
     {
         KGeoMapGlobalObject* const go = KGeoMapGlobalObject::instance();
         go->updatePooledWidgetState(d->htmlWidgetWrapper, state ? KGeoMapInternalWidgetInfo::InternalWidgetStillDocked : KGeoMapInternalWidgetInfo::InternalWidgetUndocked);
@@ -1291,7 +1292,7 @@ void BackendGoogleMaps::slotTracksChanged(const QList<TrackManager::TrackChanges
 
     if (s->trackManager)
     {
-        needToTrackChanges|=!s->trackManager->getVisibility();
+        needToTrackChanges |= !s->trackManager->getVisibility();
     }
 
     if (needToTrackChanges)
