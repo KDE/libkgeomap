@@ -84,8 +84,6 @@ target_include_directories(KF5KGeoMap INTERFACE
 target_include_directories(KF5KGeoMap PUBLIC "$<BUILD_INTERFACE:${libkgeomap_SOURCE_DIR}/src;${libkgeomap_BINARY_DIR}/src>")
 
 target_link_libraries(KF5KGeoMap
-                      PRIVATE
-                          ${MARBLE_LIBRARIES}
                       PUBLIC
                           Qt5::Xml
                           Qt5::Gui
@@ -97,6 +95,10 @@ target_link_libraries(KF5KGeoMap
                           KF5::I18n
                           KF5::ConfigCore
                           KF5::KIOCore
+
+                          #must be decalred as public, else linking in client application will fail
+                          ${MARBLE_LIBRARIES}
+                          ${ASTRO_LIBRARIES}
 )
 
 set_target_properties(KF5KGeoMap  PROPERTIES

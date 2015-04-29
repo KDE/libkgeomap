@@ -75,15 +75,7 @@ find_package(KF5 ${KF5_VERSION} REQUIRED COMPONENTS
              TextWidgets
 )
 
-# Special handling for Marble: support both FindMarbleWidget and FindMarble,
-# assuming FindMarble is the way of the future.
 find_package(Marble)
-
-if(NOT MARBLE_FOUND)
-    find_package(MarbleWidget REQUIRED)
-    set(MARBLE_INCLUDE_DIR ${MARBLEWIDGET_INCLUDE_DIR})
-    set(MARBLE_LIBRARIES   ${LIBMARBLEWIDGET_LIBRARY})
-endif()
 
 ecm_setup_version(${LIBKGEOMAP_LIB_VERSION}
                   VARIABLE_PREFIX      KGEOMAP
