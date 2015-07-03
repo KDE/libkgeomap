@@ -57,8 +57,11 @@ ecm_generate_headers(kgeomap_CamelCase_HEADERS
                      GeoCoordinates
                      ItemMarkerTiler
                      ModelHelper
+                     Lookup_Altitude
+                     Lookup_Factory
                      TileIndex
                      Tracks
+                     Track_Reader
                      KGeoMap_Widget
                      KGeoMap_Primitives
 
