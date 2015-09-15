@@ -36,14 +36,13 @@
 // local includes
 
 #include "kgeomap_primitives.h"
-#include "libkgeomap_export.h"
 
 namespace KGeoMap
 {
 
 class KGeoMapSharedData;
 
-class KGEOMAP_EXPORT HTMLWidget : public QWebView
+class HTMLWidget : public QWebView
 {
     Q_OBJECT
 
