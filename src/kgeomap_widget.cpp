@@ -102,7 +102,7 @@ namespace KGeoMap
  * @li Finally, setActive() has to be called to tell the widget that it should start displaying things.
  */
 
-class KGeoMapWidget::Private
+class Q_DECL_HIDDEN KGeoMapWidget::Private
 {
 public:
 

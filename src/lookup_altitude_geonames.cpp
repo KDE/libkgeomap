@@ -62,7 +62,7 @@ public:
     }
 };
 
-class LookupAltitudeGeonames::Private
+class Q_DECL_HIDDEN LookupAltitudeGeonames::Private
 {
 public:
 

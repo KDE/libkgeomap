@@ -52,7 +52,7 @@ bool TrackManager::TrackPoint::EarlierThan(const TrackPoint& a, const TrackPoint
 
 // TrackManager ---------------------------------------------------------------
 
-class TrackManager::Private
+class Q_DECL_HIDDEN TrackManager::Private
 {
 public:
 

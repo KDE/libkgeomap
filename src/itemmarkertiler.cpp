@@ -95,7 +95,7 @@ void ItemMarkerTiler::MyTile::removeMarkerIndexOrInvalidIndex(const QModelIndex&
 
 // -------------------------------------------------------------------------------------------
 
-class ItemMarkerTiler::Private
+class Q_DECL_HIDDEN ItemMarkerTiler::Private
 {
 public:
 

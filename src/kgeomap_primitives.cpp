@@ -62,7 +62,7 @@ void KGeoMap_assert(const char* const condition, const char* const filename, con
 
 // ---------------------------------------------------
 
-class KGeoMapGroupStateComputer::Private
+class Q_DECL_HIDDEN KGeoMapGroupStateComputer::Private
 {
 public:
 

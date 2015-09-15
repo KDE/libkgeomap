@@ -172,7 +172,7 @@ void AbstractMarkerTiler::clear()
 
 // -------------------------------------------------------------------------
 
-class AbstractMarkerTiler::NonEmptyIterator::Private
+class Q_DECL_HIDDEN AbstractMarkerTiler::NonEmptyIterator::Private
 {
 public:
 

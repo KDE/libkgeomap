@@ -41,7 +41,7 @@ namespace KGeoMap
 static QString GPX10(QString::fromLatin1("http://www.topografix.com/GPX/1/0"));
 static QString GPX11(QString::fromLatin1("http://www.topografix.com/GPX/1/1"));
 
-class TrackReader::Private
+class Q_DECL_HIDDEN TrackReader::Private
 {
 public:
 
