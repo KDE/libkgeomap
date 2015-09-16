@@ -37,8 +37,6 @@
 namespace KGeoMap
 {
 
-typedef QPair<int, int> QIntPair;
-
 class AbstractMarkerTiler::Private
 {
 public:

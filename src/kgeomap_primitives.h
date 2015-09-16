@@ -67,8 +67,7 @@ enum ExtraAction
 Q_DECLARE_FLAGS(ExtraActions, ExtraAction)
 Q_DECLARE_OPERATORS_FOR_FLAGS(ExtraActions)
 
-typedef QList<int>      QIntList;
-typedef QPair<int, int> QIntPair;
+typedef QList<int> QIntList;
 
 // ---------------------------------------------------------------------------------
 
