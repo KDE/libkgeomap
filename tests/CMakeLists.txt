@@ -14,7 +14,12 @@ find_package(Qt5Test REQUIRED)
 
 # test the primitive datatypes and helper functions
 
-set(test_primitives_sources test_primitives.cpp)
+set(test_primitives_sources
+    test_primitives.cpp
+    ../src/kgeomap_common.cpp
+    ../src/libkgeomap_debug.cpp
+    ../src/backend_map.cpp
+)
 add_executable(kgeomap_test_primitives ${test_primitives_sources})
 target_link_libraries(kgeomap_test_primitives KF5KGeoMap Qt5::Core Qt5::Test)
 add_test(kgeomap_test_primitives ${EXECUTABLE_OUTPUT_PATH}/kgeomap_test_primitives)
