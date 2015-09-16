@@ -43,7 +43,7 @@ class KJob;
 namespace KGeoMap
 {
 
-class KGEOMAP_EXPORT LookupAltitudeGeonames : public LookupAltitude
+class LookupAltitudeGeonames : public LookupAltitude
 {
     Q_OBJECT
 
