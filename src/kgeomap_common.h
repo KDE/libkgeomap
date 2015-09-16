@@ -267,10 +267,10 @@ public:
 
 // helper functions:
 
-KGEOMAP_EXPORT bool KGeoMapHelperParseLatLonString(const QString& latLonString, GeoCoordinates* const coordinates);
-KGEOMAP_EXPORT bool KGeoMapHelperParseXYStringToPoint(const QString& xyString, QPoint* const point);
-KGEOMAP_EXPORT bool KGeoMapHelperParseBoundsString(const QString& boundsString, QPair<GeoCoordinates, GeoCoordinates>* const boundsCoordinates);
-KGEOMAP_EXPORT GeoCoordinates::PairList KGeoMapHelperNormalizeBounds(const GeoCoordinates::Pair& boundsPair);
+bool KGeoMapHelperParseLatLonString(const QString& latLonString, GeoCoordinates* const coordinates);
+bool KGeoMapHelperParseXYStringToPoint(const QString& xyString, QPoint* const point);
+bool KGeoMapHelperParseBoundsString(const QString& boundsString, QPair<GeoCoordinates, GeoCoordinates>* const boundsCoordinates);
+GeoCoordinates::PairList KGeoMapHelperNormalizeBounds(const GeoCoordinates::Pair& boundsPair);
 
 } /* namespace KGeoMap */
 
