@@ -4,9 +4,7 @@
 # Redistribution and use is allowed according to the terms of the BSD license.
 # For details see the accompanying COPYING-CMAKE-SCRIPTS file.
 
-include_directories(${MARBLE_INCLUDE_DIR})
-
-include_directories(${CMAKE_CURRENT_BINARY_DIR}/.. ${CMAKE_CURRENT_BINARY_DIR})
+include_directories(${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR})
 
 include(CheckIncludeFile)
 CHECK_INCLUDE_FILE("valgrind/valgrind.h" HAVE_VALGRIND)
@@ -14,11 +12,11 @@ if(${HAVE_VALGRIND})
     add_definitions(-DKGEOMAP_HAVE_VALGRIND)
 endif()
 
+add_subdirectory(backends)
+
 set(widget_LIB_SRCS abstractmarkertiler.cpp
-                    backend_map.cpp
                     dragdrophandler.cpp
                     geocoordinates.cpp
-                    html_widget.cpp
                     itemmarkertiler.cpp
                     kgeomap_widget.cpp
                     kgeomap_common.cpp
@@ -33,20 +31,6 @@ set(widget_LIB_SRCS abstractmarkertiler.cpp
                     tileindex.cpp
                     track_reader.cpp
                     tracks.cpp
-)
-
-set(backend_map_marble_LIB_SRCS backend_map_marble.cpp
-                                backend_map_marble_layer.cpp
-)
-
-add_definitions(-DKGEOMAP_MARBLE_ADD_LAYER)
-
-set(backend_map_googlemaps_LIB_SRCS
-    backend_map_googlemaps.cpp
-)
-
-set(backend_map_osm_LIB_SRCS
-    #backend_map_osm.cpp
 )
 
 ecm_generate_headers(kgeomap_CamelCase_HEADERS
@@ -69,11 +53,7 @@ ecm_generate_headers(kgeomap_CamelCase_HEADERS
                      REQUIRED_HEADERS kgeomap_HEADERS
 )
 
-add_library(KF5KGeoMap SHARED ${widget_LIB_SRCS}
-                              ${backend_map_marble_LIB_SRCS}
-                              ${backend_map_googlemaps_LIB_SRCS}
-                              ${backend_map_osm_LIB_SRCS}
-)
+add_library(KF5KGeoMap SHARED ${widget_LIB_SRCS})
 
 add_library(KF5::KGeoMap ALIAS KF5KGeoMap)
 
@@ -88,19 +68,20 @@ target_include_directories(KF5KGeoMap PUBLIC "$<BUILD_INTERFACE:${libkgeomap_SOU
 
 target_link_libraries(KF5KGeoMap
     PUBLIC
+        ${MARBLE_LIBRARIES}
+
         Qt5::Core
         Qt5::Gui
         Qt5::Xml
         Qt5::Widgets
-
-        ${MARBLE_LIBRARIES}
     PRIVATE
-        Qt5::Concurrent
-        Qt5::WebKitWidgets
+        mapbackends
 
         KF5::I18n
         KF5::ConfigCore
         KF5::KIOCore
+
+        Qt5::Concurrent
 )
 
 set_target_properties(KF5KGeoMap  PROPERTIES

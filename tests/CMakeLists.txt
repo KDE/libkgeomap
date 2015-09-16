@@ -18,7 +18,7 @@ set(test_primitives_sources
     test_primitives.cpp
     ../src/kgeomap_common.cpp
     ../src/libkgeomap_debug.cpp
-    ../src/backend_map.cpp
+    ../src/backends/backend_map.cpp
 )
 add_executable(kgeomap_test_primitives ${test_primitives_sources})
 target_link_libraries(kgeomap_test_primitives KF5KGeoMap Qt5::Core Qt5::Test)

@@ -34,7 +34,7 @@
 
 // local includes
 
-#include "backend_map.h"
+#include "backends/backend_map.h"
 #include "libkgeomap_debug.h"
 
 namespace KGeoMap
