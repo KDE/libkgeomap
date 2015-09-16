@@ -49,7 +49,11 @@ target_link_libraries(kgeomap_test_lookup_altitude_geonames KF5KGeoMap Qt5::Core
 # test the marker model
 
 if(NOT WIN32)
-    set(test_itemmarkertiler_sources test_itemmarkertiler.cpp)
+    set(test_itemmarkertiler_sources
+        test_itemmarkertiler.cpp
+        ../src/kgeomap_common.cpp
+        ../src/libkgeomap_debug.cpp
+    )
     add_executable(kgeomap_test_itemmarkertiler ${test_itemmarkertiler_sources})
     target_link_libraries(kgeomap_test_itemmarkertiler KF5KGeoMap Qt5::Core Qt5::Test KF5::WidgetsAddons)
     add_test(kgeomap_test_itemmarkertiler ${EXECUTABLE_OUTPUT_PATH}/kgeomap_test_itemmarkertiler)

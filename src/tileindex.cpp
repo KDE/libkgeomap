@@ -25,6 +25,7 @@
  * ============================================================ */
 
 #include "tileindex.h"
+#include "kgeomap_common.h"
 
 namespace KGeoMap
 {

@@ -52,6 +52,8 @@ if(KF5KExiv2_FOUND)
         mytreewidget.cpp
         dragdrophandler.cpp
         mainwindow.cpp
+        ../src/kgeomap_common.cpp
+        ../src/libkgeomap_debug.cpp
     )
 
     add_executable(libkgeomap_demo ${demo_SRCS})

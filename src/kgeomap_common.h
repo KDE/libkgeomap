@@ -273,6 +273,10 @@ bool KGeoMapHelperParseXYStringToPoint(const QString& xyString, QPoint* const po
 bool KGeoMapHelperParseBoundsString(const QString& boundsString, QPair<GeoCoordinates, GeoCoordinates>* const boundsCoordinates);
 GeoCoordinates::PairList KGeoMapHelperNormalizeBounds(const GeoCoordinates::Pair& boundsPair);
 
+void KGeoMap_assert(const char* const condition, const char* const filename, const int lineNumber);
+
 } /* namespace KGeoMap */
+
+#define KGEOMAP_ASSERT(cond) ((!(cond)) ? KGeoMap::KGeoMap_assert(#cond,__FILE__,__LINE__) : qt_noop())
 
 #endif /* KGEOMAP_COMMON_H */

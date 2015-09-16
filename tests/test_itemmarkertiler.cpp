@@ -22,6 +22,7 @@
  * ============================================================ */
 
 #include "test_itemmarkertiler.h"
+#include "kgeomap_common.h"
 
 // Qt includes
 

@@ -28,10 +28,6 @@
 
 #include "kgeomap_primitives.h"
 
-#ifdef KGEOMAP_HAVE_VALGRIND
-#include <valgrind/valgrind.h>
-#endif
-
 // Local includes
 
 #include "geocoordinates.h"
@@ -39,28 +35,6 @@
 
 namespace KGeoMap
 {
-
-void KGeoMap_assert(const char* const condition, const char* const filename, const int lineNumber)
-{
-    const QString debugString = QString::fromLatin1( "ASSERT: %1 - %2:%3").arg(QLatin1String( condition )).arg(QLatin1String( filename )).arg(lineNumber);
-
-#ifdef KGEOMAP_HAVE_VALGRIND
-    if (RUNNING_ON_VALGRIND > 0)
-    {
-        // TODO: which encoding?
-        const QByteArray dummyArray = debugString.toUtf8();
-        VALGRIND_PRINTF_BACKTRACE("%s", dummyArray.constData());
-    }
-    else
-    {
-        qCDebug(LIBKGEOMAP_LOG) << debugString;
-    }
-#else
-    qCDebug(LIBKGEOMAP_LOG) << debugString;
-#endif /* KGEOMAP_HAVE_VALGRIND */
-}
-
-// ---------------------------------------------------
 
 class Q_DECL_HIDDEN KGeoMapGroupStateComputer::Private
 {

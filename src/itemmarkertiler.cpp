@@ -30,6 +30,7 @@
 
 #include "modelhelper.h"
 #include "libkgeomap_debug.h"
+#include "kgeomap_common.h"
 
 namespace KGeoMap
 {

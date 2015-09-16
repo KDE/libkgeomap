@@ -43,8 +43,6 @@ Q_DECLARE_METATYPE(QPersistentModelIndex)
 namespace KGeoMap
 {
 
-KGEOMAP_EXPORT void KGeoMap_assert(const char* const condition, const char* const filename, const int lineNumber);
-
 enum MouseMode
 {
     MouseModePan                     = 1,
@@ -135,8 +133,6 @@ private:
 };
 
 } /* namespace KGeoMap */
-
-#define KGEOMAP_ASSERT(cond) ((!(cond)) ? KGeoMap::KGeoMap_assert(#cond,__FILE__,__LINE__) : qt_noop())
 
 Q_DECLARE_METATYPE(KGeoMap::MouseModes)
 

@@ -67,6 +67,7 @@
 #include "src/lookup_factory.h"
 #include "src/kgeomap_widget.h"
 #include "src/itemmarkertiler.h"
+#include "src/kgeomap_common.h"
 
 // local includes
 
