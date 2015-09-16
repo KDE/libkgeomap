@@ -51,7 +51,7 @@
 
 #include "abstractmarkertiler.h"
 #include "itemmarkertiler.h"
-#include "kgeomap_widget.h"
+#include "mapwidget.h"
 #include "geocoordinates.h"
 #include "libkgeomap_version.h"
 
@@ -137,7 +137,7 @@ public:
     }
 
     QHBoxLayout*                                     hBoxLayout;
-    QList<QPair<QWidget*, KGeoMap::KGeoMapWidget*> > extraWidgetHolders;
+    QList<QPair<QWidget*, KGeoMap::MapWidget*> > extraWidgetHolders;
     QStandardItemModel*                              model;
     CalibratorModelHelper*                           modelHelper;
     KGeoMap::ItemMarkerTiler*                        markerTiler;
@@ -236,7 +236,7 @@ void Calibrator::updateGroupingMode()
 
     for (int i = 0; i < d->extraWidgetHolders.count(); ++i)
     {
-        KGeoMap::KGeoMapWidget* const mapWidget = d->extraWidgetHolders.at(i).second;
+        KGeoMap::MapWidget* const mapWidget = d->extraWidgetHolders.at(i).second;
 
         if (shouldBeGrouped)
         {
@@ -350,7 +350,7 @@ void Calibrator::updateZoomView()
         return;
     }
 
-    KGeoMap::KGeoMapWidget* const firstMapWidget = d->extraWidgetHolders.first().second;
+    KGeoMap::MapWidget* const firstMapWidget = d->extraWidgetHolders.first().second;
     const QString newZoom                        = firstMapWidget->getZoom();
 
     if (newZoom!=d->zoomDisplay->text())
@@ -362,7 +362,7 @@ void Calibrator::updateZoomView()
 void Calibrator::slotAddMapWidget()
 {
     QVBoxLayout* const boxLayout            = new QVBoxLayout();
-    KGeoMap::KGeoMapWidget* const mapWidget = new KGeoMap::KGeoMapWidget();
+    KGeoMap::MapWidget* const mapWidget = new KGeoMap::MapWidget();
     boxLayout->addWidget(mapWidget);
     boxLayout->addWidget(mapWidget->getControlWidget());
 
@@ -378,7 +378,7 @@ void Calibrator::slotAddMapWidget()
 
     QWidget* const dummyWidget = new QWidget();
     dummyWidget->setLayout(boxLayout);
-    d->extraWidgetHolders.append(QPair<QWidget*, KGeoMap::KGeoMapWidget*>(dummyWidget, mapWidget));
+    d->extraWidgetHolders.append(QPair<QWidget*, KGeoMap::MapWidget*>(dummyWidget, mapWidget));
 
     d->hBoxLayout->addWidget(dummyWidget);
 
@@ -392,7 +392,7 @@ void Calibrator::slotRemoveMapWidget()
         return;
     }
 
-    QPair<QWidget*, KGeoMap::KGeoMapWidget*> info = d->extraWidgetHolders.takeLast();
+    QPair<QWidget*, KGeoMap::MapWidget*> info = d->extraWidgetHolders.takeLast();
     d->hBoxLayout->removeWidget(info.first);
     delete info.first;
 }
@@ -406,7 +406,7 @@ void Calibrator::slotActivateMapActionTriggered(bool state)
         return;
     }
 
-    KGeoMap::KGeoMapWidget* const mapWidget = static_cast<KGeoMap::KGeoMapWidget*>(senderAction->data().value<void*>());
+    KGeoMap::MapWidget* const mapWidget = static_cast<KGeoMap::MapWidget*>(senderAction->data().value<void*>());
     mapWidget->setActive(state);
 }
 

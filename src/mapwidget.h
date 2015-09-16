@@ -56,14 +56,14 @@ class KGeoMapSharedData;
 class ModelHelper;
 class TrackManager;
 
-class KGEOMAP_EXPORT KGeoMapWidget : public QWidget
+class KGEOMAP_EXPORT MapWidget : public QWidget
 {
   Q_OBJECT
 
 public:
 
-    explicit KGeoMapWidget(QWidget* const parent = 0);
-    ~KGeoMapWidget();
+    explicit MapWidget(QWidget* const parent = 0);
+    ~MapWidget();
 
     void saveSettingsToGroup(KConfigGroup* const group);
     void readSettingsFromGroup(const KConfigGroup* const group);
@@ -231,7 +231,7 @@ private:
     class Private;
     Private* const d;
 
-    Q_DISABLE_COPY(KGeoMapWidget)
+    Q_DISABLE_COPY(MapWidget)
 };
 
 } /* namespace KGeoMap */

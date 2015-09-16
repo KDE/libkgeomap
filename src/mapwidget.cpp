@@ -26,7 +26,7 @@
  *
  * ============================================================ */
 
-#include "kgeomap_widget.h"
+#include "mapwidget.h"
 
 // C++ includes
 
@@ -102,7 +102,7 @@ namespace KGeoMap
  * @li Finally, setActive() has to be called to tell the widget that it should start displaying things.
  */
 
-class Q_DECL_HIDDEN KGeoMapWidget::Private
+class Q_DECL_HIDDEN MapWidget::Private
 {
 public:
 
@@ -218,7 +218,7 @@ public:
     PlaceholderWidget*      placeholderWidget;
 };
 
-KGeoMapWidget::KGeoMapWidget(QWidget* const parent)
+MapWidget::MapWidget(QWidget* const parent)
     : QWidget(parent),
       s(new KGeoMapSharedData),
       d(new Private)
@@ -242,31 +242,31 @@ KGeoMapWidget::KGeoMapWidget(QWidget* const parent)
     setAcceptDrops(true);
 }
 
-void KGeoMapWidget::createActions()
+void MapWidget::createActions()
 {
     d->actionZoomIn = new QAction(this);
     d->actionZoomIn->setIcon(QIcon::fromTheme( QLatin1String("zoom-in") ));
     d->actionZoomIn->setToolTip(i18n("Zoom in"));
 
-    connect(d->actionZoomIn, &QAction::triggered, this, &KGeoMapWidget::slotZoomIn);
+    connect(d->actionZoomIn, &QAction::triggered, this, &MapWidget::slotZoomIn);
 
     d->actionZoomOut = new QAction(this);
     d->actionZoomOut->setIcon(QIcon::fromTheme( QLatin1String("zoom-out") ));
     d->actionZoomOut->setToolTip(i18n("Zoom out"));
 
-    connect(d->actionZoomOut, &QAction::triggered, this, &KGeoMapWidget::slotZoomOut);
+    connect(d->actionZoomOut, &QAction::triggered, this, &MapWidget::slotZoomOut);
 
     d->actionShowThumbnails = new QAction(this);
     d->actionShowThumbnails->setToolTip(i18n("Switch between markers and thumbnails."));
     d->actionShowThumbnails->setCheckable(true);
 
-    connect(d->actionShowThumbnails, &QAction::triggered, this, &KGeoMapWidget::slotShowThumbnailsChanged);
+    connect(d->actionShowThumbnails, &QAction::triggered, this, &MapWidget::slotShowThumbnailsChanged);
 
     // create backend selection entries:
     d->actionGroupBackendSelection = new QActionGroup(this);
     d->actionGroupBackendSelection->setExclusive(true);
 
-    connect(d->actionGroupBackendSelection, &QActionGroup::triggered, this, &KGeoMapWidget::slotChangeBackend);
+    connect(d->actionGroupBackendSelection, &QActionGroup::triggered, this, &MapWidget::slotChangeBackend);
 
     createActionsForBackendSelection();
 
@@ -339,26 +339,26 @@ void KGeoMapWidget::createActions()
     d->actionStickyMode->setCheckable(true);
     d->actionStickyMode->setToolTip(i18n("Lock the map position"));
 
-    connect(d->actionStickyMode, &QAction::triggered, this, &KGeoMapWidget::slotStickyModeChanged);
+    connect(d->actionStickyMode, &QAction::triggered, this, &MapWidget::slotStickyModeChanged);
 
-    connect(d->actionIncreaseThumbnailSize, &QAction::triggered, this, &KGeoMapWidget::slotIncreaseThumbnailSize);
+    connect(d->actionIncreaseThumbnailSize, &QAction::triggered, this, &MapWidget::slotIncreaseThumbnailSize);
 
-    connect(d->actionDecreaseThumbnailSize, &QAction::triggered, this, &KGeoMapWidget::slotDecreaseThumbnailSize);
+    connect(d->actionDecreaseThumbnailSize, &QAction::triggered, this, &MapWidget::slotDecreaseThumbnailSize);
 
-    connect(d->actionPreviewSingleItems, &QAction::changed, this, &KGeoMapWidget::slotItemDisplaySettingsChanged);
+    connect(d->actionPreviewSingleItems, &QAction::changed, this, &MapWidget::slotItemDisplaySettingsChanged);
 
-    connect(d->actionPreviewGroupedItems, &QAction::changed, this, &KGeoMapWidget::slotItemDisplaySettingsChanged);
+    connect(d->actionPreviewGroupedItems, &QAction::changed, this, &MapWidget::slotItemDisplaySettingsChanged);
 
-    connect(d->actionShowNumbersOnItems, &QAction::changed, this, &KGeoMapWidget::slotItemDisplaySettingsChanged);
+    connect(d->actionShowNumbersOnItems, &QAction::changed, this, &MapWidget::slotItemDisplaySettingsChanged);
 
-    connect(d->mouseModeActionGroup, &QActionGroup::triggered, this, &KGeoMapWidget::slotMouseModeChanged);
+    connect(d->mouseModeActionGroup, &QActionGroup::triggered, this, &MapWidget::slotMouseModeChanged);
 
-    connect(d->actionRemoveFilter, &QAction::triggered, this, &KGeoMapWidget::signalRemoveCurrentFilter);
+    connect(d->actionRemoveFilter, &QAction::triggered, this, &MapWidget::signalRemoveCurrentFilter);
 
-    connect(d->actionRemoveCurrentRegionSelection, &QAction::triggered, this, &KGeoMapWidget::slotRemoveCurrentRegionSelection);
+    connect(d->actionRemoveCurrentRegionSelection, &QAction::triggered, this, &MapWidget::slotRemoveCurrentRegionSelection);
 }
 
-void KGeoMapWidget::createActionsForBackendSelection()
+void MapWidget::createActionsForBackendSelection()
 {
     // delete the existing actions:
     qDeleteAll(d->actionGroupBackendSelection->actions());
@@ -374,7 +374,7 @@ void KGeoMapWidget::createActionsForBackendSelection()
     }
 }
 
-KGeoMapWidget::~KGeoMapWidget()
+MapWidget::~MapWidget()
 {
     // release all widgets:
     for (int i = 0; i < d->stackedLayout->count(); ++i)
@@ -388,7 +388,7 @@ KGeoMapWidget::~KGeoMapWidget()
     /// @todo delete s, but make sure it is not accessed by any other objects any more!
 }
 
-QStringList KGeoMapWidget::availableBackends() const
+QStringList MapWidget::availableBackends() const
 {
     QStringList result;
     MapBackend* backend = 0;
@@ -401,7 +401,7 @@ QStringList KGeoMapWidget::availableBackends() const
     return result;
 }
 
-bool KGeoMapWidget::setBackend(const QString& backendName)
+bool MapWidget::setBackend(const QString& backendName)
 {
     if (backendName == d->currentBackendName)
     {
@@ -455,13 +455,13 @@ bool KGeoMapWidget::setBackend(const QString& backendName)
             d->currentBackend     = backend;
             d->currentBackendName = backendName;
 
-            connect(d->currentBackend, &MapBackend::signalBackendReadyChanged, this, &KGeoMapWidget::slotBackendReadyChanged);
+            connect(d->currentBackend, &MapBackend::signalBackendReadyChanged, this, &MapWidget::slotBackendReadyChanged);
 
-            connect(d->currentBackend, &MapBackend::signalZoomChanged, this, &KGeoMapWidget::slotBackendZoomChanged);
+            connect(d->currentBackend, &MapBackend::signalZoomChanged, this, &MapWidget::slotBackendZoomChanged);
 
-            connect(d->currentBackend, &MapBackend::signalClustersMoved, this, &KGeoMapWidget::slotClustersMoved);
+            connect(d->currentBackend, &MapBackend::signalClustersMoved, this, &MapWidget::slotClustersMoved);
 
-            connect(d->currentBackend, &MapBackend::signalClustersClicked, this, &KGeoMapWidget::slotClustersClicked);
+            connect(d->currentBackend, &MapBackend::signalClustersClicked, this, &MapWidget::slotClustersClicked);
 
             /**
              * @todo This connection is queued because otherwise QAbstractItemModel::itemSelected does not
@@ -476,7 +476,7 @@ bool KGeoMapWidget::setBackend(const QString& backendName)
                         d->currentBackend, SLOT(slotThumbnailAvailableForIndex(QVariant,QPixmap)));
             }
 
-            connect(d->currentBackend, &MapBackend::signalSelectionHasBeenMade, this, &KGeoMapWidget::slotNewSelectionFromMap);
+            connect(d->currentBackend, &MapBackend::signalSelectionHasBeenMade, this, &MapWidget::slotNewSelectionFromMap);
 
             if (s->activeState)
             {
@@ -502,7 +502,7 @@ bool KGeoMapWidget::setBackend(const QString& backendName)
     return false;
 }
 
-void KGeoMapWidget::applyCacheToBackend()
+void MapWidget::applyCacheToBackend()
 {
     if ( (!currentBackendReady()) || (!s->activeState) )
     {
@@ -517,7 +517,7 @@ void KGeoMapWidget::applyCacheToBackend()
     d->currentBackend->regionSelectionChanged();
 }
 
-void KGeoMapWidget::saveBackendToCache()
+void MapWidget::saveBackendToCache()
 {
     if (!currentBackendReady())
     {
@@ -528,7 +528,7 @@ void KGeoMapWidget::saveBackendToCache()
     d->cacheZoom             = getZoom();
 }
 
-GeoCoordinates KGeoMapWidget::getCenter() const
+GeoCoordinates MapWidget::getCenter() const
 {
     if (!currentBackendReady())
     {
@@ -538,7 +538,7 @@ GeoCoordinates KGeoMapWidget::getCenter() const
     return d->currentBackend->getCenter();
 }
 
-void KGeoMapWidget::setCenter(const GeoCoordinates& coordinate)
+void MapWidget::setCenter(const GeoCoordinates& coordinate)
 {
     d->cacheCenterCoordinate = coordinate;
 
@@ -550,7 +550,7 @@ void KGeoMapWidget::setCenter(const GeoCoordinates& coordinate)
     d->currentBackend->setCenter(coordinate);
 }
 
-void KGeoMapWidget::slotBackendReadyChanged(const QString& backendName)
+void MapWidget::slotBackendReadyChanged(const QString& backendName)
 {
     qCDebug(LIBKGEOMAP_LOG) << QString::fromLatin1("backend %1 is ready!").arg(backendName);
 
@@ -573,7 +573,7 @@ void KGeoMapWidget::slotBackendReadyChanged(const QString& backendName)
         d->thumbnailTimer      = new QTimer(this);
         d->thumbnailTimerCount = 0;
 
-        connect(d->thumbnailTimer, &QTimer::timeout, this, &KGeoMapWidget::stopThumbnailTimer);
+        connect(d->thumbnailTimer, &QTimer::timeout, this, &MapWidget::stopThumbnailTimer);
 
         d->thumbnailTimer->start(2000);
     }
@@ -583,7 +583,7 @@ void KGeoMapWidget::slotBackendReadyChanged(const QString& backendName)
     rebuildConfigurationMenu();
 }
 
-void KGeoMapWidget::stopThumbnailTimer()
+void MapWidget::stopThumbnailTimer()
 {
     d->currentBackend->updateMarkers();
     d->thumbnailTimerCount++;
@@ -595,7 +595,7 @@ void KGeoMapWidget::stopThumbnailTimer()
     }
 }
 
-void KGeoMapWidget::saveSettingsToGroup(KConfigGroup* const group)
+void MapWidget::saveSettingsToGroup(KConfigGroup* const group)
 {
     KGEOMAP_ASSERT(group != 0);
 
@@ -629,7 +629,7 @@ void KGeoMapWidget::saveSettingsToGroup(KConfigGroup* const group)
     }
 }
 
-void KGeoMapWidget::readSettingsFromGroup(const KConfigGroup* const group)
+void MapWidget::readSettingsFromGroup(const KConfigGroup* const group)
 {
     KGEOMAP_ASSERT(group != 0);
 
@@ -672,7 +672,7 @@ void KGeoMapWidget::readSettingsFromGroup(const KConfigGroup* const group)
     slotUpdateActionsEnabled();
 }
 
-void KGeoMapWidget::rebuildConfigurationMenu()
+void MapWidget::rebuildConfigurationMenu()
 {
     d->configurationMenu->clear();
     const QList<QAction*> backendSelectionActions = d->actionGroupBackendSelection->actions();
@@ -711,7 +711,7 @@ void KGeoMapWidget::rebuildConfigurationMenu()
     slotUpdateActionsEnabled();
 }
 
-QAction* KGeoMapWidget::getControlAction(const QString& actionName)
+QAction* MapWidget::getControlAction(const QString& actionName)
 {
     if (actionName == QLatin1String("zoomin"))
     {
@@ -744,7 +744,7 @@ QAction* KGeoMapWidget::getControlAction(const QString& actionName)
 /**
  * @brief Returns the control widget.
  */
-QWidget* KGeoMapWidget::getControlWidget()
+QWidget* MapWidget::getControlWidget()
 {
     if (!d->controlWidget)
     {
@@ -863,7 +863,7 @@ QWidget* KGeoMapWidget::getControlWidget()
     return d->controlWidget;
 }
 
-void KGeoMapWidget::slotZoomIn()
+void MapWidget::slotZoomIn()
 {
     if (!currentBackendReady())
         return;
@@ -871,7 +871,7 @@ void KGeoMapWidget::slotZoomIn()
     d->currentBackend->zoomIn();
 }
 
-void KGeoMapWidget::slotZoomOut()
+void MapWidget::slotZoomOut()
 {
     if (!currentBackendReady())
         return;
@@ -879,7 +879,7 @@ void KGeoMapWidget::slotZoomOut()
     d->currentBackend->zoomOut();
 }
 
-void KGeoMapWidget::slotUpdateActionsEnabled()
+void MapWidget::slotUpdateActionsEnabled()
 {
     if (!s->activeState)
     {
@@ -936,7 +936,7 @@ void KGeoMapWidget::slotUpdateActionsEnabled()
     }
 }
 
-void KGeoMapWidget::slotChangeBackend(QAction* action)
+void MapWidget::slotChangeBackend(QAction* action)
 {
     KGEOMAP_ASSERT(action!=0);
 
@@ -947,7 +947,7 @@ void KGeoMapWidget::slotChangeBackend(QAction* action)
     setBackend(newBackendName);
 }
 
-void KGeoMapWidget::updateMarkers()
+void MapWidget::updateMarkers()
 {
     if (!currentBackendReady())
     {
@@ -958,14 +958,14 @@ void KGeoMapWidget::updateMarkers()
     d->currentBackend->updateMarkers();
 }
 
-void KGeoMapWidget::updateClusters()
+void MapWidget::updateClusters()
 {
     /// @todo Find a better way to tell the TileGrouper about the backend
     s->tileGrouper->setCurrentBackend(d->currentBackend);
     s->tileGrouper->updateClusters();
 }
 
-void KGeoMapWidget::slotClustersNeedUpdating()
+void MapWidget::slotClustersNeedUpdating()
 {
     if (currentBackendReady())
     {
@@ -984,7 +984,7 @@ void KGeoMapWidget::slotClustersNeedUpdating()
  * @param overrideSelection Get the colors for a different selection state
  * @param overrideCount Get the colors for a different amount of markers
  */
-void KGeoMapWidget::getColorInfos(const int clusterIndex, QColor* fillColor, QColor* strokeColor,
+void MapWidget::getColorInfos(const int clusterIndex, QColor* fillColor, QColor* strokeColor,
                                     Qt::PenStyle* strokeStyle, QString* labelText, QColor* labelColor,
                                     const GroupState* const overrideSelection,
                                     const int* const overrideCount) const
@@ -1000,7 +1000,7 @@ void KGeoMapWidget::getColorInfos(const int clusterIndex, QColor* fillColor, QCo
                   fillColor, strokeColor, strokeStyle, labelText, labelColor);
 }
 
-void KGeoMapWidget::getColorInfos(const GroupState groupState,
+void MapWidget::getColorInfos(const GroupState groupState,
                        const int nMarkers,
                        QColor* fillColor, QColor* strokeColor,
                        Qt::PenStyle* strokeStyle, QString* labelText, QColor* labelColor) const
@@ -1110,7 +1110,7 @@ void KGeoMapWidget::getColorInfos(const GroupState groupState,
 //     }
 }
 
-QString KGeoMapWidget::convertZoomToBackendZoom(const QString& someZoom, const QString& targetBackend) const
+QString MapWidget::convertZoomToBackendZoom(const QString& someZoom, const QString& targetBackend) const
 {
     const QStringList zoomParts = someZoom.split(QLatin1Char( ':' ));
     KGEOMAP_ASSERT(zoomParts.count() == 2);
@@ -1180,12 +1180,12 @@ QString KGeoMapWidget::convertZoomToBackendZoom(const QString& someZoom, const Q
     return QString::fromLatin1("%1:%2").arg(targetBackend).arg(targetZoom);
 }
 
-void KGeoMapWidget::slotBackendZoomChanged(const QString& newZoom)
+void MapWidget::slotBackendZoomChanged(const QString& newZoom)
 {
     d->cacheZoom = newZoom;
 }
 
-void KGeoMapWidget::setZoom(const QString& newZoom)
+void MapWidget::setZoom(const QString& newZoom)
 {
     d->cacheZoom = newZoom;
 
@@ -1195,7 +1195,7 @@ void KGeoMapWidget::setZoom(const QString& newZoom)
     }
 }
 
-QString KGeoMapWidget::getZoom()
+QString MapWidget::getZoom()
 {
     if (currentBackendReady())
     {
@@ -1205,12 +1205,12 @@ QString KGeoMapWidget::getZoom()
     return d->cacheZoom;
 }
 
-GeoCoordinates::Pair KGeoMapWidget::getRegionSelection()
+GeoCoordinates::Pair MapWidget::getRegionSelection()
 {
     return s->selectionRectangle;
 }
 
-void KGeoMapWidget::slotClustersMoved(const QIntList& clusterIndices, const QPair<int, QModelIndex>& snapTarget)
+void MapWidget::slotClustersMoved(const QIntList& clusterIndices, const QPair<int, QModelIndex>& snapTarget)
 {
     qCDebug(LIBKGEOMAP_LOG) << clusterIndices;
 
@@ -1244,7 +1244,7 @@ void KGeoMapWidget::slotClustersMoved(const QIntList& clusterIndices, const QPai
      */
 }
 
-void KGeoMapWidget::addUngroupedModel(ModelHelper* const modelHelper)
+void MapWidget::addUngroupedModel(ModelHelper* const modelHelper)
 {
     s->ungroupedModels << modelHelper;
 
@@ -1270,7 +1270,7 @@ void KGeoMapWidget::addUngroupedModel(ModelHelper* const modelHelper)
     emit(signalUngroupedModelChanged(s->ungroupedModels.count() - 1));
 }
 
-void KGeoMapWidget::removeUngroupedModel(ModelHelper* const modelHelper)
+void MapWidget::removeUngroupedModel(ModelHelper* const modelHelper)
 {
     if (!modelHelper)
         return;
@@ -1310,7 +1310,7 @@ void KGeoMapWidget::removeUngroupedModel(ModelHelper* const modelHelper)
     }
 }
 
-void KGeoMapWidget::setGroupedModel(AbstractMarkerTiler* const markerModel)
+void MapWidget::setGroupedModel(AbstractMarkerTiler* const markerModel)
 {
     s->markerModel = markerModel;
 
@@ -1332,7 +1332,7 @@ void KGeoMapWidget::setGroupedModel(AbstractMarkerTiler* const markerModel)
     slotRequestLazyReclustering();
 }
 
-void KGeoMapWidget::setShowThumbnails(const bool state)
+void MapWidget::setShowThumbnails(const bool state)
 {
     s->showThumbnails = state;
 
@@ -1341,7 +1341,7 @@ void KGeoMapWidget::setShowThumbnails(const bool state)
     slotRequestLazyReclustering();
 }
 
-void KGeoMapWidget::slotShowThumbnailsChanged()
+void MapWidget::slotShowThumbnailsChanged()
 {
     setShowThumbnails(d->actionShowThumbnails->isChecked());
 }
@@ -1349,7 +1349,7 @@ void KGeoMapWidget::slotShowThumbnailsChanged()
 /**
  * @brief Request reclustering, repeated calls should generate only one actual update of the clusters
  */
-void KGeoMapWidget::slotRequestLazyReclustering()
+void MapWidget::slotRequestLazyReclustering()
 {
     if (d->lazyReclusteringRequested)
         return;
@@ -1366,7 +1366,7 @@ void KGeoMapWidget::slotRequestLazyReclustering()
 /**
  * @brief Helper function to buffer reclustering
  */
-void KGeoMapWidget::slotLazyReclusteringRequestCallBack()
+void MapWidget::slotLazyReclusteringRequestCallBack()
 {
     if (!d->lazyReclusteringRequested)
         return;
@@ -1378,7 +1378,7 @@ void KGeoMapWidget::slotLazyReclusteringRequestCallBack()
 /**
  * @todo Clicking on several clusters at once is not actually possible
  */
-void KGeoMapWidget::slotClustersClicked(const QIntList& clusterIndices)
+void MapWidget::slotClustersClicked(const QIntList& clusterIndices)
 {
     qCDebug(LIBKGEOMAP_LOG)<<clusterIndices;
 
@@ -1488,7 +1488,7 @@ void KGeoMapWidget::slotClustersClicked(const QIntList& clusterIndices)
     }
 }
 
-void KGeoMapWidget::dragEnterEvent(QDragEnterEvent* event)
+void MapWidget::dragEnterEvent(QDragEnterEvent* event)
 {
     /// @todo ignore drops if no marker tiler or model can accept them
     if (!d->dragDropHandler)
@@ -1510,7 +1510,7 @@ void KGeoMapWidget::dragEnterEvent(QDragEnterEvent* event)
 //         d->currentBackend->updateDragDropMarker(event->pos(), dragData);
 }
 
-void KGeoMapWidget::dragMoveEvent(QDragMoveEvent* event)
+void MapWidget::dragMoveEvent(QDragMoveEvent* event)
 {
     Q_UNUSED(event);
 
@@ -1519,7 +1519,7 @@ void KGeoMapWidget::dragMoveEvent(QDragMoveEvent* event)
 //         d->currentBackend->updateDragDropMarkerPosition(event->pos());
 }
 
-void KGeoMapWidget::dropEvent(QDropEvent* event)
+void MapWidget::dropEvent(QDropEvent* event)
 {
     // remove the drag marker:
 //     d->currentBackend->updateDragDropMarker(QPoint(), 0);
@@ -1542,7 +1542,7 @@ void KGeoMapWidget::dropEvent(QDropEvent* event)
     }
 }
 
-void KGeoMapWidget::dragLeaveEvent(QDragLeaveEvent* event)
+void MapWidget::dragLeaveEvent(QDragLeaveEvent* event)
 {
     Q_UNUSED(event);
 
@@ -1550,17 +1550,17 @@ void KGeoMapWidget::dragLeaveEvent(QDragLeaveEvent* event)
 //     d->currentBackend->updateDragDropMarker(QPoint(), 0);
 }
 
-void KGeoMapWidget::markClustersAsDirty()
+void MapWidget::markClustersAsDirty()
 {
     s->tileGrouper->setClustersDirty();
 }
 
-void KGeoMapWidget::setDragDropHandler(DragDropHandler* const dragDropHandler)
+void MapWidget::setDragDropHandler(DragDropHandler* const dragDropHandler)
 {
     d->dragDropHandler = dragDropHandler;
 }
 
-QVariant KGeoMapWidget::getClusterRepresentativeMarker(const int clusterIndex, const int sortKey)
+QVariant MapWidget::getClusterRepresentativeMarker(const int clusterIndex, const int sortKey)
 {
     if (!s->markerModel)
         return QVariant();
@@ -1584,7 +1584,7 @@ QVariant KGeoMapWidget::getClusterRepresentativeMarker(const int clusterIndex, c
     return clusterRepresentative;
 }
 
-void KGeoMapWidget::slotItemDisplaySettingsChanged()
+void MapWidget::slotItemDisplaySettingsChanged()
 {
     s->previewSingleItems  = d->actionPreviewSingleItems->isChecked();
     s->previewGroupedItems = d->actionPreviewGroupedItems->isChecked();
@@ -1596,14 +1596,14 @@ void KGeoMapWidget::slotItemDisplaySettingsChanged()
     slotRequestLazyReclustering();
 }
 
-void KGeoMapWidget::setSortOptionsMenu(QMenu* const sortMenu)
+void MapWidget::setSortOptionsMenu(QMenu* const sortMenu)
 {
     d->sortMenu = sortMenu;
 
     rebuildConfigurationMenu();
 }
 
-void KGeoMapWidget::setSortKey(const int sortKey)
+void MapWidget::setSortKey(const int sortKey)
 {
     s->sortKey = sortKey;
 
@@ -1612,7 +1612,7 @@ void KGeoMapWidget::setSortKey(const int sortKey)
     slotRequestLazyReclustering();
 }
 
-QPixmap KGeoMapWidget::getDecoratedPixmapForCluster(const int clusterId, const GroupState* const selectedStateOverride,
+QPixmap MapWidget::getDecoratedPixmapForCluster(const int clusterId, const GroupState* const selectedStateOverride,
                                                     const int* const countOverride, QPoint* const centerPoint)
 {
     KGeoMapCluster& cluster      = s->clusterList[clusterId];
@@ -1845,7 +1845,7 @@ QPixmap KGeoMapWidget::getDecoratedPixmapForCluster(const int clusterId, const G
     return circlePixmap;
 }
 
-void KGeoMapWidget::setThumnailSize(const int newThumbnailSize)
+void MapWidget::setThumnailSize(const int newThumbnailSize)
 {
     s->thumbnailSize = qMax(KGeoMapMinThumbnailSize, newThumbnailSize);
 
@@ -1864,7 +1864,7 @@ void KGeoMapWidget::setThumnailSize(const int newThumbnailSize)
     slotUpdateActionsEnabled();
 }
 
-void KGeoMapWidget::setThumbnailGroupingRadius(const int newGroupingRadius)
+void MapWidget::setThumbnailGroupingRadius(const int newGroupingRadius)
 {
     s->thumbnailGroupingRadius = qMax(KGeoMapMinThumbnailGroupingRadius, newGroupingRadius);
 
@@ -1882,7 +1882,7 @@ void KGeoMapWidget::setThumbnailGroupingRadius(const int newGroupingRadius)
     slotUpdateActionsEnabled();
 }
 
-void KGeoMapWidget::setMarkerGroupingRadius(const int newGroupingRadius)
+void MapWidget::setMarkerGroupingRadius(const int newGroupingRadius)
 {
     s->markerGroupingRadius = qMax(KGeoMapMinMarkerGroupingRadius, newGroupingRadius);
 
@@ -1894,7 +1894,7 @@ void KGeoMapWidget::setMarkerGroupingRadius(const int newGroupingRadius)
     slotUpdateActionsEnabled();
 }
 
-void KGeoMapWidget::slotDecreaseThumbnailSize()
+void MapWidget::slotDecreaseThumbnailSize()
 {
     if (!s->showThumbnails)
         return;
@@ -1909,7 +1909,7 @@ void KGeoMapWidget::slotDecreaseThumbnailSize()
     }
 }
 
-void KGeoMapWidget::slotIncreaseThumbnailSize()
+void MapWidget::slotIncreaseThumbnailSize()
 {
     if (!s->showThumbnails)
         return;
@@ -1917,17 +1917,17 @@ void KGeoMapWidget::slotIncreaseThumbnailSize()
     setThumnailSize(s->thumbnailSize+5);
 }
 
-int KGeoMapWidget::getThumbnailSize() const
+int MapWidget::getThumbnailSize() const
 {
     return s->thumbnailSize;
 }
 
-int KGeoMapWidget::getUndecoratedThumbnailSize() const
+int MapWidget::getUndecoratedThumbnailSize() const
 {
     return s->thumbnailSize-2;
 }
 
-void KGeoMapWidget::setRegionSelection(const GeoCoordinates::Pair& region)
+void MapWidget::setRegionSelection(const GeoCoordinates::Pair& region)
 {
     s->selectionRectangle = region;
 
@@ -1936,7 +1936,7 @@ void KGeoMapWidget::setRegionSelection(const GeoCoordinates::Pair& region)
     slotUpdateActionsEnabled();
 }
 
-void KGeoMapWidget::clearRegionSelection()
+void MapWidget::clearRegionSelection()
 {
     s->selectionRectangle.first.clear();
 
@@ -1945,7 +1945,7 @@ void KGeoMapWidget::clearRegionSelection()
     slotUpdateActionsEnabled();
 }
 
-void KGeoMapWidget::slotNewSelectionFromMap(const KGeoMap::GeoCoordinates::Pair& sel)
+void MapWidget::slotNewSelectionFromMap(const KGeoMap::GeoCoordinates::Pair& sel)
 {
     /// @todo Should the backend update s on its own?
     s->selectionRectangle = sel;
@@ -1954,7 +1954,7 @@ void KGeoMapWidget::slotNewSelectionFromMap(const KGeoMap::GeoCoordinates::Pair&
     emit(signalRegionSelectionChanged());
 }
 
-void KGeoMapWidget::slotRemoveCurrentRegionSelection()
+void MapWidget::slotRemoveCurrentRegionSelection()
 {
     clearRegionSelection();
     d->currentBackend->regionSelectionChanged();
@@ -1963,7 +1963,7 @@ void KGeoMapWidget::slotRemoveCurrentRegionSelection()
     emit(signalRegionSelectionChanged());
 }
 
-void KGeoMapWidget::slotUngroupedModelChanged()
+void MapWidget::slotUngroupedModelChanged()
 {
     // determine the index under which we handle this model
     QObject* const senderObject           = sender();
@@ -2016,7 +2016,7 @@ void KGeoMapWidget::slotUngroupedModelChanged()
     }
 }
 
-void KGeoMapWidget::addWidgetToControlWidget(QWidget* const newWidget)
+void MapWidget::addWidgetToControlWidget(QWidget* const newWidget)
 {
     // make sure the control widget exists
     if (!d->controlWidget)
@@ -2032,17 +2032,17 @@ void KGeoMapWidget::addWidgetToControlWidget(QWidget* const newWidget)
 
 // Static methods ---------------------------------------------------------
 
-QString KGeoMapWidget::MarbleWidgetVersion()
+QString MapWidget::MarbleWidgetVersion()
 {
     return QString(Marble::MARBLE_VERSION_STRING);
 }
 
-QString KGeoMapWidget::version()
+QString MapWidget::version()
 {
     return QString::fromLatin1(KGEOMAP_VERSION_STRING);
 }
 
-void KGeoMapWidget::setActive(const bool state)
+void MapWidget::setActive(const bool state)
 {
     const bool oldState = s->activeState;
     s->activeState      = state;
@@ -2082,12 +2082,12 @@ void KGeoMapWidget::setActive(const bool state)
     }
 }
 
-bool KGeoMapWidget::getActiveState()
+bool MapWidget::getActiveState()
 {
     return s->activeState;
 }
 
-void KGeoMapWidget::setVisibleMouseModes(const MouseModes mouseModes)
+void MapWidget::setVisibleMouseModes(const MouseModes mouseModes)
 {
     s->visibleMouseModes = mouseModes;
 
@@ -2105,23 +2105,23 @@ void KGeoMapWidget::setVisibleMouseModes(const MouseModes mouseModes)
     }
 }
 
-void KGeoMapWidget::setAvailableMouseModes(const MouseModes mouseModes)
+void MapWidget::setAvailableMouseModes(const MouseModes mouseModes)
 {
     s->availableMouseModes = mouseModes;
 }
 
-bool KGeoMapWidget::getStickyModeState() const
+bool MapWidget::getStickyModeState() const
 {
     return d->actionStickyMode->isChecked();
 }
 
-void KGeoMapWidget::setStickyModeState(const bool state)
+void MapWidget::setStickyModeState(const bool state)
 {
     d->actionStickyMode->setChecked(state);
     slotUpdateActionsEnabled();
 }
 
-void KGeoMapWidget::setVisibleExtraActions(const ExtraActions actions)
+void MapWidget::setVisibleExtraActions(const ExtraActions actions)
 {
     d->visibleExtraActions = actions;
 
@@ -2133,20 +2133,20 @@ void KGeoMapWidget::setVisibleExtraActions(const ExtraActions actions)
     slotUpdateActionsEnabled();
 }
 
-void KGeoMapWidget::setEnabledExtraActions(const ExtraActions actions)
+void MapWidget::setEnabledExtraActions(const ExtraActions actions)
 {
     d->availableExtraActions = actions;
 
     slotUpdateActionsEnabled();
 }
 
-void KGeoMapWidget::slotStickyModeChanged()
+void MapWidget::slotStickyModeChanged()
 {
     slotUpdateActionsEnabled();
     emit(signalStickyModeChanged());
 }
 
-void KGeoMapWidget::setAllowModifications(const bool state)
+void MapWidget::setAllowModifications(const bool state)
 {
     s->modificationsAllowed = state;
 
@@ -2162,7 +2162,7 @@ void KGeoMapWidget::setAllowModifications(const bool state)
  *
  * @param useSaneZoomLevel Stop zooming at a sane level, if markers are too close together.
  */
-void KGeoMapWidget::adjustBoundariesToGroupedMarkers(const bool useSaneZoomLevel)
+void MapWidget::adjustBoundariesToGroupedMarkers(const bool useSaneZoomLevel)
 {
     if ( (!s->activeState) || (!s->markerModel) || (!currentBackendReady()) )
     {
@@ -2195,12 +2195,12 @@ void KGeoMapWidget::adjustBoundariesToGroupedMarkers(const bool useSaneZoomLevel
     d->currentBackend->centerOn(latLonBox, useSaneZoomLevel);
 }
 
-void KGeoMapWidget::refreshMap()
+void MapWidget::refreshMap()
 {
     slotRequestLazyReclustering();
 }
 
-void KGeoMapWidget::setShowPlaceholderWidget(const bool state)
+void MapWidget::setShowPlaceholderWidget(const bool state)
 {
     if (state)
     {
@@ -2218,7 +2218,7 @@ void KGeoMapWidget::setShowPlaceholderWidget(const bool state)
 /**
  * @brief Set @p widgetForFrame as the widget in the frame, but does not show it.
  */
-void KGeoMapWidget::setMapWidgetInFrame(QWidget* const widgetForFrame)
+void MapWidget::setMapWidgetInFrame(QWidget* const widgetForFrame)
 {
     if (d->stackedLayout->count()>1)
     {
@@ -2236,7 +2236,7 @@ void KGeoMapWidget::setMapWidgetInFrame(QWidget* const widgetForFrame)
     d->stackedLayout->addWidget(widgetForFrame);
 }
 
-void KGeoMapWidget::removeMapWidgetFromFrame()
+void MapWidget::removeMapWidgetFromFrame()
 {
     if (d->stackedLayout->count()>1)
     {
@@ -2246,7 +2246,7 @@ void KGeoMapWidget::removeMapWidgetFromFrame()
     d->stackedLayout->setCurrentIndex(0);
 }
 
-void KGeoMapWidget::slotMouseModeChanged(QAction* triggeredAction)
+void MapWidget::slotMouseModeChanged(QAction* triggeredAction)
 {
     // determine the new mouse mode:
     const QVariant triggeredActionData = triggeredAction->data();
@@ -2270,7 +2270,7 @@ void KGeoMapWidget::slotMouseModeChanged(QAction* triggeredAction)
     /// @todo Update action availability?
 }
 
-bool KGeoMapWidget::currentBackendReady() const
+bool MapWidget::currentBackendReady() const
 {
     if (!d->currentBackend)
     {
@@ -2280,7 +2280,7 @@ bool KGeoMapWidget::currentBackendReady() const
     return d->currentBackend->isReady();
 }
 
-void KGeoMapWidget::setMouseMode(const MouseModes mouseMode)
+void MapWidget::setMouseMode(const MouseModes mouseMode)
 {
     s->currentMouseMode = mouseMode;
 
@@ -2292,7 +2292,7 @@ void KGeoMapWidget::setMouseMode(const MouseModes mouseMode)
     slotUpdateActionsEnabled();
 }
 
-void KGeoMapWidget::setTrackManager(TrackManager* const trackManager)
+void MapWidget::setTrackManager(TrackManager* const trackManager)
 {
     s->trackManager = trackManager;
     

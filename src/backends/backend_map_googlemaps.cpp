@@ -45,7 +45,7 @@
 // local includes
 
 #include "html_widget.h"
-#include "kgeomap_widget.h"
+#include "mapwidget.h"
 #include "abstractmarkertiler.h"
 #include "modelhelper.h"
 #include "libkgeomap_debug.h"

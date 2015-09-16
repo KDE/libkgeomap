@@ -19,12 +19,12 @@ set(widget_LIB_SRCS abstractmarkertiler.cpp
                     geocoordinates.cpp
                     groupstatecomputer.cpp
                     itemmarkertiler.cpp
-                    kgeomap_widget.cpp
                     kgeomap_common.cpp
                     libkgeomap_debug.cpp
                     lookup_altitude.cpp
                     lookup_altitude_geonames.cpp
                     lookup_factory.cpp
+                    mapwidget.cpp
                     modelhelper.cpp
                     placeholderwidget.cpp
                     tilegrouper.cpp
@@ -41,13 +41,13 @@ ecm_generate_headers(kgeomap_CamelCase_HEADERS
                      GeoCoordinates
                      GroupState
                      ItemMarkerTiler
+                     MapWidget
                      ModelHelper
                      Lookup_Altitude
                      Lookup_Factory
                      TileIndex
                      Tracks
                      Track_Reader
-                     KGeoMap_Widget
                      KGeoMap_Primitives
 
                      PREFIX           KGeoMap

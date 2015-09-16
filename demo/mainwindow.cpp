@@ -65,7 +65,7 @@
 
 #include "src/lookup_altitude.h"
 #include "src/lookup_factory.h"
-#include "src/kgeomap_widget.h"
+#include "src/mapwidget.h"
 #include "src/itemmarkertiler.h"
 #include "src/kgeomap_common.h"
 
@@ -206,7 +206,7 @@ public:
     }
 
     QSplitter*                          splitter;
-    KGeoMapWidget*                      mapWidget;
+    MapWidget*                      mapWidget;
     QList<LookupAltitude*>              lookupAltitudeList;
     MyTreeWidget*                       treeWidget;
     QPointer<QProgressBar>              progressBar;
@@ -263,7 +263,7 @@ MainWindow::MainWindow(QCommandLineParser* const cmdLineArgs, QWidget* const par
     d->splitter = new QSplitter(Qt::Vertical, this);
     setCentralWidget(d->splitter);
 
-    d->mapWidget = new KGeoMapWidget(d->splitter);
+    d->mapWidget = new MapWidget(d->splitter);
     d->mapWidget->setGroupedModel(mm);
     d->mapWidget->setActive(true);
     d->mapWidget->setDragDropHandler(new DemoDragDropHandler(d->displayMarkersModel, d->mapWidget));

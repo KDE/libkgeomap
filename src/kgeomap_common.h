@@ -48,7 +48,7 @@ namespace KGeoMap
 {
 
 class AbstractMarkerTiler;
-class KGeoMapWidget;
+class MapWidget;
 class MapBackend;
 class ModelHelper;
 class TileGrouper;
@@ -235,7 +235,7 @@ public:
 
     /// @name Objects
     //@{
-    KGeoMapWidget*            worldMapWidget;
+    MapWidget*            worldMapWidget;
     TileGrouper*              tileGrouper;
     AbstractMarkerTiler*      markerModel;
     KGeoMapCluster::List      clusterList;

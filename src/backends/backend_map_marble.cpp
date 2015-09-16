@@ -57,7 +57,7 @@
 #endif // KGEOMAP_MARBLE_ADD_LAYER
 
 #include "abstractmarkertiler.h"
-#include "kgeomap_widget.h"
+#include "mapwidget.h"
 #include "modelhelper.h"
 #include "tracks.h"
 #include "libkgeomap_debug.h"
