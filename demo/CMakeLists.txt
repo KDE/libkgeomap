@@ -57,10 +57,14 @@ if(KF5KExiv2_FOUND)
     add_executable(libkgeomap_demo ${demo_SRCS})
 
     target_link_libraries(libkgeomap_demo
-                          Qt5::Gui
-                          KF5KGeoMap
-                          ${KF5KExiv2_LIBRARIES}
-                         )
+        KF5KGeoMap
+        ${KF5KExiv2_LIBRARIES}
+
+        KF5::ConfigCore
+
+        Qt5::Gui
+        Qt5::Concurrent
+    )
 
     install(TARGETS libkgeomap_demo ${INSTALL_TARGETS_DEFAULT_ARGS})
 
