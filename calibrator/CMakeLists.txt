@@ -7,12 +7,16 @@
 include_directories(BEFORE ${CMAKE_CURRENT_SOURCE_DIR}/../ ${CMAKE_CURRENT_BINARY_DIR}/../)
 
 set(calibrator_sources
-        calibrator.cpp
+    calibrator.cpp
 )
 
 add_executable(libkgeomap_calibrator ${calibrator_sources})
 
 target_link_libraries(libkgeomap_calibrator
-                      Qt5::Gui
-                      KF5KGeoMap
+    PUBLIC
+        Qt5::Widgets
+        KF5KGeoMap
+    PRIVATE
+        KF5::CoreAddons
+        KF5::I18n
 )

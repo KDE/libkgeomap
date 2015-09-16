@@ -25,7 +25,7 @@
 #ifndef CALIBRATOR_H
 #define CALIBRATOR_H
 
-// KDE includes
+// Qt includes
 
 #include <QMainWindow>
 
