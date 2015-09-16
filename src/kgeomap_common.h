@@ -31,11 +31,12 @@
 
 // Qt includes
 
-#include <QtGui/QPixmap>
 #include <QtCore/QPoint>
 #include <QtCore/QPointer>
 #include <QtCore/QSharedData>
 #include <QtCore/QSize>
+#include <QtWidgets/QWidget>
+#include <QtGui/QPixmap>
 
 // libkgeomap includes
 
