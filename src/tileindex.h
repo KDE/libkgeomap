@@ -37,7 +37,7 @@
 // local includes
 
 #include "geocoordinates.h"
-#include "kgeomap_primitives.h"
+#include "types.h"
 #include "libkgeomap_export.h"
 
 namespace KGeoMap
@@ -107,10 +107,10 @@ private:
     int m_indices[MaxIndexCount];
 };
 
-} /* namespace KGeoMap */
+} // namespace KGeoMap
 
 KGEOMAP_EXPORT QDebug operator<<(QDebug debugOut, const KGeoMap::TileIndex& tileIndex);
 
 Q_DECLARE_TYPEINFO(KGeoMap::TileIndex, Q_MOVABLE_TYPE);
 
-#endif /* KGEOMAP_TILEINDEX_H */
+#endif // KGEOMAP_TILEINDEX_H

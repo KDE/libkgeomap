@@ -63,8 +63,8 @@
 
 // libkgeomap includes
 
-#include "src/lookup_altitude.h"
-#include "src/lookup_factory.h"
+#include "src/lookupaltitude.h"
+#include "src/lookupfactory.h"
 #include "src/mapwidget.h"
 #include "src/itemmarkertiler.h"
 #include "src/kgeomap_common.h"

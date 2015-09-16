@@ -27,7 +27,7 @@
 // Local includes
 
 #include "groupstatecomputer.h"
-#include "kgeomap_primitives.h"
+#include "types.h"
 // #include "geocoordinates.h"
 #include "libkgeomap_debug.h"
 

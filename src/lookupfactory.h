@@ -22,24 +22,26 @@
  *
  * ============================================================ */
 
-#include "lookup_factory.h"
+#ifndef KGEOMAP_LOOKUP_FACTORY_H
+#define KGEOMAP_LOOKUP_FACTORY_H
 
 // local includes
 
-#include "lookup_altitude_geonames.h"
+#include "types.h"
+#include "libkgeomap_export.h"
 
 namespace KGeoMap
 {
 
-LookupAltitude* LookupFactory::getAltitudeLookup(const QString& backendName, QObject* const parent)
+class LookupAltitude;
+
+class KGEOMAP_EXPORT LookupFactory
 {
-    if (backendName == QLatin1String("geonames"))
-    {
-        return new LookupAltitudeGeonames(parent);
-    }
+public:
 
-    return 0;
-}
+    static LookupAltitude* getAltitudeLookup(const QString& backendName, QObject* const parent);
+};
 
-} /* namespace KGeoMap */
+} // namespace KGeoMap
 
+#endif // KGEOMAP_LOOKUP_FACTORY_H

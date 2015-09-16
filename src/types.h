@@ -5,7 +5,7 @@
  * <a href="http://www.digikam.org">http://www.digikam.org</a>
  *
  * @date   2009-12-01
- * @brief  Base-class for backends for KGeoMap
+ * @brief  Primitive datatypes for KGeoMap
  *
  * @author Copyright (C) 2009-2010 by Michael G. Hansen
  *         <a href="mailto:mike at mghansen dot de">mike at mghansen dot de</a>
@@ -24,28 +24,44 @@
  *
  * ============================================================ */
 
-#include "backend_map.h"
+#ifndef KGEOMAP_TYPES_H
+#define KGEOMAP_TYPES_H
+
+// Qt includes
+
+#include <QtCore/QPersistentModelIndex>
+
+Q_DECLARE_METATYPE(QPersistentModelIndex)
 
 namespace KGeoMap
 {
 
-MapBackend::MapBackend(const QExplicitlySharedDataPointer<KGeoMapSharedData>& sharedData, QObject* const parent)
-    : QObject(parent), s(sharedData)
+enum MouseMode
 {
-}
+    MouseModePan                     = 1,
+    MouseModeRegionSelection         = 2,
+    MouseModeRegionSelectionFromIcon = 4,
+    MouseModeFilter                  = 8,
+    MouseModeSelectThumbnail         = 16,
+    MouseModeZoomIntoGroup           = 32,
+    MouseModeLast                    = 32
+};
 
-MapBackend::~MapBackend()
+Q_DECLARE_FLAGS(MouseModes, MouseMode)
+Q_DECLARE_OPERATORS_FOR_FLAGS(MouseModes)
+
+enum ExtraAction
 {
-}
+    ExtraActionSticky = 1
+};
 
-void MapBackend::slotThumbnailAvailableForIndex(const QVariant& index, const QPixmap& pixmap)
-{
-    Q_UNUSED(index)
-    Q_UNUSED(pixmap)
-}
+Q_DECLARE_FLAGS(ExtraActions, ExtraAction)
+Q_DECLARE_OPERATORS_FOR_FLAGS(ExtraActions)
 
-void MapBackend::slotTrackManagerChanged()
-{
-}
+typedef QList<int> QIntList;
 
-} /* namespace KGeoMap */
+} // namespace KGeoMap
+
+Q_DECLARE_METATYPE(KGeoMap::MouseModes)
+
+#endif // KGEOMAP_TYPES_H

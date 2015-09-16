@@ -24,8 +24,8 @@
  *
  * ============================================================ */
 
-#ifndef KGEOMAP_MODELHELPER
-#define KGEOMAP_MODELHELPER
+#ifndef KGEOMAP_MODELHELPER_H
+#define KGEOMAP_MODELHELPER_H
 
 // Qt includes
 
@@ -39,7 +39,7 @@
 // local includes
 
 #include "libkgeomap_export.h"
-#include "kgeomap_primitives.h"
+#include "types.h"
 #include "geocoordinates.h"
 
 namespace KGeoMap
@@ -94,8 +94,8 @@ Q_SIGNALS:
     void signalModelChangedDrastically();
 };
 
-} /* namespace KGeoMap */
+} // namespace KGeoMap
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(KGeoMap::ModelHelper::Flags)
 
-#endif /* KGEOMAP_MODELHELPER */
+#endif // KGEOMAP_MODELHELPER_H

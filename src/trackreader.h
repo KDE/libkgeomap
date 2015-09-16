@@ -24,8 +24,8 @@
  *
  * ============================================================ */
 
-#ifndef TRACK_READER_H
-#define TRACK_READER_H
+#ifndef KGEOMAP_TRACK_READER_H
+#define KGEOMAP_TRACK_READER_H
 
 // Qt includes
 
@@ -86,6 +86,6 @@ private:
     friend class ::TestTracks;
 };
 
-} /* namespace KGeoMap */
+} // namespace KGeoMap
 
-#endif /* TRACK_READER_H */
+#endif // KGEOMAP_TRACK_READER_H

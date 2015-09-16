@@ -21,15 +21,15 @@ set(widget_LIB_SRCS abstractmarkertiler.cpp
                     itemmarkertiler.cpp
                     kgeomap_common.cpp
                     libkgeomap_debug.cpp
-                    lookup_altitude.cpp
-                    lookup_altitude_geonames.cpp
-                    lookup_factory.cpp
+                    lookupaltitude.cpp
+                    lookupaltitudegeonames.cpp
+                    lookupfactory.cpp
                     mapwidget.cpp
                     modelhelper.cpp
                     placeholderwidget.cpp
                     tilegrouper.cpp
                     tileindex.cpp
-                    track_reader.cpp
+                    trackreader.cpp
                     tracks.cpp
 )
 
@@ -43,11 +43,11 @@ ecm_generate_headers(kgeomap_CamelCase_HEADERS
                      ItemMarkerTiler
                      MapWidget
                      ModelHelper
-                     Lookup_Altitude
-                     Lookup_Factory
+                     LookupAltitude
+                     LookupFactory
                      TileIndex
                      Tracks
-                     Track_Reader
+                     TrackReader
                      KGeoMap_Primitives
 
                      PREFIX           KGeoMap

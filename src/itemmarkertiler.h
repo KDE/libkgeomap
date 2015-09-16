@@ -25,8 +25,8 @@
  *
  * ============================================================ */
 
-#ifndef ITEMMARKERTILER_H
-#define ITEMMARKERTILER_H
+#ifndef KGEOMAP_ITEMMARKERTILER_H
+#define KGEOMAP_ITEMMARKERTILER_H
 
 // Qt includes
 
@@ -100,4 +100,4 @@ private:
 
 } // namespace KGeoMap
 
-#endif /* ITEMMARKERTILER_H */
+#endif // KGEOMAP_ITEMMARKERTILER_H

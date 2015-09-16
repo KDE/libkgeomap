@@ -27,7 +27,7 @@
 // local includes
 
 #include "abstractmarkertiler.h"
-#include "backend_map.h"
+#include "mapbackend.h"
 #include "libkgeomap_debug.h"
 
 namespace KGeoMap

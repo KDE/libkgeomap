@@ -4,11 +4,13 @@
  * This file is a part of digiKam project
  * <a href="http://www.digikam.org">http://www.digikam.org</a>
  *
- * @date   2011-05-05
- * @brief  Factory to create instances of Lookup backends
+ * @date   2011-04-30
+ * @brief  Base class for altitude lookup jobs
  *
- * @author Copyright (C) 2011 by Michael G. Hansen
+ * @author Copyright (C) 2010-2011 by Michael G. Hansen
  *         <a href="mailto:mike at mghansen dot de">mike at mghansen dot de</a>
+ * @author Copyright (C) 2010-2015 by Gilles Caulier
+ *         <a href="mailto:caulier dot gilles at gmail dot com">caulier dot gilles at gmail dot com</a>
  *
  * This program is free software; you can redistribute it
  * and/or modify it under the terms of the GNU General
@@ -22,26 +24,18 @@
  *
  * ============================================================ */
 
-#ifndef LOOKUP_FACTORY_H
-#define LOOKUP_FACTORY_H
-
-// local includes
-
-#include "kgeomap_primitives.h"
-#include "libkgeomap_export.h"
+#include "lookupaltitude.h"
 
 namespace KGeoMap
 {
 
-class LookupAltitude;
-
-class KGEOMAP_EXPORT LookupFactory
+LookupAltitude::LookupAltitude(QObject* const parent)
+    : QObject(parent)
 {
-public:
+}
 
-    static LookupAltitude* getAltitudeLookup(const QString& backendName, QObject* const parent);
-};
+LookupAltitude::~LookupAltitude()
+{
+}
 
 } /* namespace KGeoMap */
-
-#endif /* LOOKUP_FACTORY_H */

@@ -26,7 +26,7 @@
  *
  * ============================================================ */
 
-#include "html_widget.h"
+#include "htmlwidget.h"
 
 // Qt includes
 
@@ -38,7 +38,7 @@
 // local includes
 
 #include "kgeomap_common.h"
-#include "kgeomap_primitives.h"
+#include "types.h"
 #include "libkgeomap_debug.h"
 
 namespace KGeoMap

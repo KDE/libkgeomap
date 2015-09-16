@@ -69,8 +69,8 @@
 #include "libkgeomap_version.h"
 #include "libkgeomap_debug.h"
 #include "abstractmarkertiler.h"
-#include "backend_map_googlemaps.h"
-#include "backend_map_marble.h"
+#include "backendgooglemaps.h"
+#include "backendmarble.h"
 // #include "backend_map_osm.h"
 
 namespace KGeoMap

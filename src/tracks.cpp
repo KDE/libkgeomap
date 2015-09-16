@@ -38,7 +38,7 @@
 
 // local includes
 
-#include "track_reader.h"
+#include "trackreader.h"
 
 namespace KGeoMap
 {

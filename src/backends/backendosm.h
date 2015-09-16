@@ -29,7 +29,7 @@
 
 // local includes
 
-#include "backend_map.h"
+#include "mapbackend.h"
 
 namespace KGeoMap
 {

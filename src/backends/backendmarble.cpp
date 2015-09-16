@@ -26,7 +26,7 @@
  *
  * ============================================================ */
 
-#include "backend_map_marble.h"
+#include "backendmarble.h"
 
 // Qt includes
 

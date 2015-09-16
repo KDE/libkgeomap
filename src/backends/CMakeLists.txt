@@ -1,12 +1,12 @@
 
 add_definitions(-DKGEOMAP_MARBLE_ADD_LAYER)
 set(backend_map_marble_LIB_SRCS
-    backend_map_marble.cpp
+    backendmarble.cpp
     backend_map_marble_layer.cpp
 )
 
 set(backend_map_googlemaps_LIB_SRCS
-    backend_map_googlemaps.cpp
+    backendgooglemaps.cpp
 )
 
 set(backend_map_osm_LIB_SRCS
@@ -14,8 +14,8 @@ set(backend_map_osm_LIB_SRCS
 )
 
 add_library(mapbackends STATIC
-    backend_map.cpp
-    html_widget.cpp
+    mapbackend.cpp
+    htmlwidget.cpp
     ${backend_map_marble_LIB_SRCS}
     ${backend_map_googlemaps_LIB_SRCS}
     ${backend_map_osm_LIB_SRCS}

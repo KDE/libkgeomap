@@ -31,7 +31,7 @@
 
 // libkgeomap includes
 
-#include "src/kgeomap_primitives.h"
+#include "src/types.h"
 
 // local includes
 

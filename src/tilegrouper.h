@@ -22,8 +22,8 @@
  *
  * ============================================================ */
 
-#ifndef TILEGROUPER_H
-#define TILEGROUPER_H
+#ifndef KGEOMAP_TILEGROUPER_H
+#define KGEOMAP_TILEGROUPER_H
 
 // local includes
 
@@ -60,6 +60,6 @@ private:
     const QExplicitlySharedDataPointer<KGeoMapSharedData> s;
 };
 
-} /* namespace KGeoMap */
+} // namespace KGeoMap
 
-#endif /* TILEGROUPER_H */
+#endif // KGEOMAP_TILEGROUPER_H

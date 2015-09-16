@@ -24,12 +24,12 @@
  *
  * ============================================================ */
 
-#ifndef LOOKUP_ALTITUDE_GEONAMES_H
-#define LOOKUP_ALTITUDE_GEONAMES_H
+#ifndef KGEOMAP_LOOKUP_ALTITUDE_GEONAMES_H
+#define KGEOMAP_LOOKUP_ALTITUDE_GEONAMES_H
 
 // local includes
 
-#include "lookup_altitude.h"
+#include "lookupaltitude.h"
 
 /// @cond false
 namespace KIO
@@ -79,6 +79,6 @@ private:
     const QScopedPointer<Private> d;
 };
 
-} /* namespace KGeoMap */
+} // namespace KGeoMap
 
-#endif /* LOOKUP_ALTITUDE_GEONAMES_H */
+#endif // KGEOMAP_LOOKUP_ALTITUDE_GEONAMES_H

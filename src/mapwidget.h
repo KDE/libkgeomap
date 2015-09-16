@@ -26,8 +26,8 @@
  *
  * ============================================================ */
 
-#ifndef KGEOMAP_WIDGET_H
-#define KGEOMAP_WIDGET_H
+#ifndef KGEOMAP_MAPWIDGET_H
+#define KGEOMAP_MAPWIDGET_H
 
 // Qt includes
 
@@ -36,7 +36,7 @@
 
 // local includes
 
-#include "kgeomap_primitives.h"
+#include "types.h"
 #include "libkgeomap_export.h"
 #include "geocoordinates.h"
 #include "groupstate.h"
@@ -234,6 +234,6 @@ private:
     Q_DISABLE_COPY(MapWidget)
 };
 
-} /* namespace KGeoMap */
+} // namespace KGeoMap
 
-#endif /* KGEOMAP_WIDGET_H */
+#endif // KGEOMAP_MAPWIDGET_H

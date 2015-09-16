@@ -33,7 +33,7 @@
 
 // libkgeomap includes
 
-#include "kgeomap_primitives.h"
+#include "types.h"
 #include "modelhelper.h"
 #include "tracks.h"
 

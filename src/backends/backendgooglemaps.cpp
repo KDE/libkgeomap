@@ -26,7 +26,7 @@
  *
  * ============================================================ */
 
-#include "backend_map_googlemaps.h"
+#include "backendgooglemaps.h"
 
 // Qt includes
 
@@ -44,7 +44,7 @@
 
 // local includes
 
-#include "html_widget.h"
+#include "htmlwidget.h"
 #include "mapwidget.h"
 #include "abstractmarkertiler.h"
 #include "modelhelper.h"

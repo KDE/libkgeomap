@@ -22,8 +22,8 @@
  *
  * ============================================================ */
 
-#ifndef PLACEHOLDERWIDGET_H
-#define PLACEHOLDERWIDGET_H
+#ifndef KGEOMAP_PLACEHOLDERWIDGET_H
+#define KGEOMAP_PLACEHOLDERWIDGET_H
 
 // Qt includes
 
@@ -51,6 +51,6 @@ private:
     const QScopedPointer<Private> d;
 };
 
-} /* namespace KGeoMap */
+} // namespace KGeoMap
 
-#endif /* PLACEHOLDERWIDGET_H */
+#endif // KGEOMAP_PLACEHOLDERWIDGET_H

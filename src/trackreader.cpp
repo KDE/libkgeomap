@@ -24,7 +24,7 @@
  *
  * ============================================================ */
 
-#include "track_reader.h"
+#include "trackreader.h"
 
 // Qt includes
 

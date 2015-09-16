@@ -35,7 +35,7 @@
 
 // local includes
 
-#include "kgeomap_primitives.h"
+#include "types.h"
 #include "geocoordinates.h"
 
 namespace KGeoMap

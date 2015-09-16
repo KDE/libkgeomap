@@ -31,7 +31,7 @@
 
 // local includes
 
-#include "backend_map.h"
+#include "mapbackend.h"
 #include "tracks.h"
 
 /// @cond false

@@ -24,8 +24,8 @@
  *
  * ============================================================ */
 
-#ifndef ABSTRACTMARKERTILER_H
-#define ABSTRACTMARKERTILER_H
+#ifndef KGEOMAP_ABSTRACTMARKERTILER_H
+#define KGEOMAP_ABSTRACTMARKERTILER_H
 
 // Qt includes
 
@@ -36,7 +36,7 @@
 // local includes
 
 #include "tileindex.h"
-#include "kgeomap_primitives.h"
+#include "types.h"
 #include "libkgeomap_export.h"
 #include "groupstate.h"
 
@@ -203,8 +203,8 @@ private:
     Private* const d;
 };
 
-} /* namespace KGeoMap */
+} // namespace KGeoMap
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(KGeoMap::AbstractMarkerTiler::Flags)
 
-#endif /* ABSTRACTMARKERTILER_H */
+#endif // KGEOMAP_ABSTRACTMARKERTILER_H

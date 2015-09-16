@@ -24,8 +24,8 @@
  *
  * ============================================================ */
 
-#include "lookup_altitude_geonames.h"
-#include "kgeomap_primitives.h"
+#include "lookupaltitudegeonames.h"
+#include "types.h"
 
 // Qt includes
 

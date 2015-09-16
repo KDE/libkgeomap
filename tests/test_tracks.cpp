@@ -34,7 +34,7 @@
 
 #include "test_tracks.h"
 #include "../src/tracks.h"
-#include "../src/track_reader.h"
+#include "../src/trackreader.h"
 
 using namespace KGeoMap;
 

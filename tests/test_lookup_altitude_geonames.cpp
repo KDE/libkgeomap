@@ -25,8 +25,8 @@
 
 // local includes
 
-#include "lookup_altitude_geonames.h"
-#include "lookup_factory.h"
+#include "lookupaltitudegeonames.h"
+#include "lookupfactory.h"
 #include "kgeomap_common.h"
 
 using namespace KGeoMap;

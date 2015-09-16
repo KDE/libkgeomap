@@ -24,8 +24,8 @@
  *
  * ============================================================ */
 
-#ifndef TRACKS_H
-#define TRACKS_H
+#ifndef KGEOMAP_TRACKS_H
+#define KGEOMAP_TRACKS_H
 
 // Qt includes
 
@@ -35,7 +35,7 @@
 
 // local includes
 
-#include "kgeomap_primitives.h"
+#include "types.h"
 #include "libkgeomap_export.h"
 #include "geocoordinates.h"
 
@@ -168,4 +168,4 @@ private:
 
 } // namespace KGeoMap
 
-#endif  // TRACKS_H
+#endif // KGEOMAP_TRACKS_H

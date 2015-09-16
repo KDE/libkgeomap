@@ -25,7 +25,7 @@
 
 // local includes
 
-#include "kgeomap_primitives.h"
+#include "types.h"
 #include "kgeomap_common.h"
 
 using namespace KGeoMap;

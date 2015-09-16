@@ -40,7 +40,7 @@
 
 // libkgeomap includes
 
-#include "kgeomap_primitives.h"
+#include "types.h"
 #include "tileindex.h"
 #include "groupstatecomputer.h"
 
@@ -276,8 +276,8 @@ GeoCoordinates::PairList KGeoMapHelperNormalizeBounds(const GeoCoordinates::Pair
 
 void KGeoMap_assert(const char* const condition, const char* const filename, const int lineNumber);
 
-} /* namespace KGeoMap */
+} // namespace KGeoMap
 
 #define KGEOMAP_ASSERT(cond) ((!(cond)) ? KGeoMap::KGeoMap_assert(#cond,__FILE__,__LINE__) : qt_noop())
 
-#endif /* KGEOMAP_COMMON_H */
+#endif // KGEOMAP_COMMON_H

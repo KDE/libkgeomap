@@ -4,10 +4,10 @@
  * This file is a part of digiKam project
  * <a href="http://www.digikam.org">http://www.digikam.org</a>
  *
- * @date   2011-04-30
- * @brief  Base class for altitude lookup jobs
+ * @date   2009-12-01
+ * @brief  Base-class for backends for KGeoMap
  *
- * @author Copyright (C) 2010-2011 by Michael G. Hansen
+ * @author Copyright (C) 2009-2010 by Michael G. Hansen
  *         <a href="mailto:mike at mghansen dot de">mike at mghansen dot de</a>
  * @author Copyright (C) 2010-2015 by Gilles Caulier
  *         <a href="mailto:caulier dot gilles at gmail dot com">caulier dot gilles at gmail dot com</a>
@@ -24,17 +24,27 @@
  *
  * ============================================================ */
 
-#include "lookup_altitude.h"
+#include "mapbackend.h"
 
 namespace KGeoMap
 {
 
-LookupAltitude::LookupAltitude(QObject* const parent)
-    : QObject(parent)
+MapBackend::MapBackend(const QExplicitlySharedDataPointer<KGeoMapSharedData>& sharedData, QObject* const parent)
+    : QObject(parent), s(sharedData)
 {
 }
 
-LookupAltitude::~LookupAltitude()
+MapBackend::~MapBackend()
+{
+}
+
+void MapBackend::slotThumbnailAvailableForIndex(const QVariant& index, const QPixmap& pixmap)
+{
+    Q_UNUSED(index)
+    Q_UNUSED(pixmap)
+}
+
+void MapBackend::slotTrackManagerChanged()
 {
 }
 

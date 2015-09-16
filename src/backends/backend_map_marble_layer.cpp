@@ -32,7 +32,7 @@
 
 // local includes
 
-#include "backend_map_marble.h"
+#include "backendmarble.h"
 
 namespace KGeoMap
 {

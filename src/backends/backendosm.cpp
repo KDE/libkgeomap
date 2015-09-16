@@ -39,7 +39,7 @@
 
 // local includes
 
-#include "html_widget.h"
+#include "htmlwidget.h"
 #include "kgeomap.h"
 #include "markermodel.h"
 #include "libkgeomap_debug.h"

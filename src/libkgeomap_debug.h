@@ -17,11 +17,11 @@
     Boston, MA 02110-1301, USA.
 */
 
-#ifndef LIBKGEOMAP_DEBUG_H
-#define LIBKGEOMAP_DEBUG_H
+#ifndef KGEOMAP_DEBUG_H
+#define KGEOMAP_DEBUG_H
 
 #include <QLoggingCategory>
 
 Q_DECLARE_LOGGING_CATEGORY(LIBKGEOMAP_LOG)
 
-#endif // LIBKGEOMAP_DEBUG_H
+#endif // KGEOMAP_DEBUG_H

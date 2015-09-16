@@ -24,8 +24,8 @@
  *
  * ============================================================ */
 
-#ifndef LOOKUP_ALTITUDE_H
-#define LOOKUP_ALTITUDE_H
+#ifndef KGEOMAP_LOOKUP_ALTITUDE_H
+#define KGEOMAP_LOOKUP_ALTITUDE_H
 
 #include <QtCore/QObject>
 
@@ -95,8 +95,8 @@ Q_SIGNALS:
     void signalDone();
 };
 
-} /* namespace KGeoMap */
+} // namespace KGeoMap
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(KGeoMap::LookupAltitude::Status)
 
-#endif /* LOOKUP_ALTITUDE_H */
+#endif // KGEOMAP_LOOKUP_ALTITUDE_H
