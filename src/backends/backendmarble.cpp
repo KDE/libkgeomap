@@ -77,7 +77,7 @@ public:
     }
 
 #ifdef KGEOMAP_MARBLE_ADD_LAYER
-    BMLayer* bmLayer;
+    BackendMarbleLayer* bmLayer;
 #endif
 };
 
@@ -169,7 +169,7 @@ public:
     QHash<quint64, Marble::GeoDataLineString> trackCache;
 
 #ifdef KGEOMAP_MARBLE_ADD_LAYER
-    BMLayer*                                  bmLayer;
+    BackendMarbleLayer*                       bmLayer;
 #endif
 };
 
@@ -236,7 +236,7 @@ QWidget* BackendMarble::mapWidget()
         {
 #ifdef KGEOMAP_MARBLE_ADD_LAYER
             d->marbleWidget = new Marble::MarbleWidget();
-            d->bmLayer      = new BMLayer(this);
+            d->bmLayer      = new BackendMarbleLayer(this);
 
 #if MARBLE_VERSION>=0x000c00
             d->marbleWidget->addLayer(d->bmLayer);

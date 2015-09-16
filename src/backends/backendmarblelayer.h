@@ -49,12 +49,12 @@ namespace KGeoMap
 
 class BackendMarble;
 
-class BMLayer : public Marble::LayerInterface
+class BackendMarbleLayer : public Marble::LayerInterface
 {
 public:
 
-    explicit BMLayer(BackendMarble* const pMarbleBackend);
-    virtual ~BMLayer();
+    explicit BackendMarbleLayer(BackendMarble* const pMarbleBackend);
+    virtual ~BackendMarbleLayer();
 
     virtual bool render(Marble::GeoPainter* painter, Marble::ViewportParams* viewport,
                         const QString& renderPos = QLatin1String( "NONE"), Marble::GeoSceneLayer* layer = 0);

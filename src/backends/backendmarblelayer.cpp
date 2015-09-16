@@ -37,16 +37,16 @@
 namespace KGeoMap
 {
 
-BMLayer::BMLayer(BackendMarble* const pMarbleBackend)
+BackendMarbleLayer::BackendMarbleLayer(BackendMarble* const pMarbleBackend)
     : marbleBackend(pMarbleBackend)
 {
 }
 
-BMLayer::~BMLayer()
+BackendMarbleLayer::~BackendMarbleLayer()
 {
 }
 
-bool BMLayer::render(Marble::GeoPainter* painter, Marble::ViewportParams* /*viewport*/,
+bool BackendMarbleLayer::render(Marble::GeoPainter* painter, Marble::ViewportParams* /*viewport*/,
                      const QString& renderPos, Marble::GeoSceneLayer* /*layer*/)
 {
     if (marbleBackend && (renderPos == QLatin1String("HOVERS_ABOVE_SURFACE")))
@@ -58,14 +58,14 @@ bool BMLayer::render(Marble::GeoPainter* painter, Marble::ViewportParams* /*view
     return false;
 }
 
-QStringList BMLayer::renderPosition () const
+QStringList BackendMarbleLayer::renderPosition () const
 {
     QStringList layerNames;
     layerNames << QLatin1String("HOVERS_ABOVE_SURFACE" );
     return layerNames;
 }
 
-void BMLayer::setBackend(BackendMarble* const pMarbleBackend)
+void BackendMarbleLayer::setBackend(BackendMarble* const pMarbleBackend)
 {
     marbleBackend = pMarbleBackend;
 }
