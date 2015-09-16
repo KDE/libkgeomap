@@ -2,7 +2,7 @@
 add_definitions(-DKGEOMAP_MARBLE_ADD_LAYER)
 set(backend_map_marble_LIB_SRCS
     backendmarble.cpp
-    backend_map_marble_layer.cpp
+    backendmarblelayer.cpp
 )
 
 set(backend_map_googlemaps_LIB_SRCS

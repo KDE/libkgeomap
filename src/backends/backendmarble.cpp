@@ -51,7 +51,7 @@
 // local includes
 
 #ifdef KGEOMAP_MARBLE_ADD_LAYER
-#include "backend_map_marble_layer.h"
+#include "backendmarblelayer.h"
 #else
 #include "backend_map_marble_subwidget.h"
 #endif // KGEOMAP_MARBLE_ADD_LAYER

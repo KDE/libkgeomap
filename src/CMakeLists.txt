@@ -48,7 +48,7 @@ ecm_generate_headers(kgeomap_CamelCase_HEADERS
                      TileIndex
                      Tracks
                      TrackReader
-                     KGeoMap_Primitives
+                     Types
 
                      PREFIX           KGeoMap
                      REQUIRED_HEADERS kgeomap_HEADERS

@@ -24,7 +24,7 @@
  *
  * ============================================================ */
 
-#include "backend_map_marble_layer.h"
+#include "backendmarblelayer.h"
 
 // Marble includes
 
