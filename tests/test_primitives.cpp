@@ -199,74 +199,74 @@ void TestPrimitives::testGroupStateComputer()
 {
     {
         // test selected state:
-        KGeoMapGroupStateComputer c1;
-        QCOMPARE(c1.getState(), KGeoMapSelectedNone);
-        c1.addSelectedState(KGeoMapSelectedNone);
-        QCOMPARE(c1.getState(), KGeoMapSelectedNone);
-        c1.addSelectedState(KGeoMapSelectedSome);
-        QCOMPARE(c1.getState(), KGeoMapSelectedSome);
-        c1.addSelectedState(KGeoMapSelectedAll);
-        QCOMPARE(c1.getState(), KGeoMapSelectedSome);
+        GroupStateComputer c1;
+        QCOMPARE(c1.getState(), SelectedNone);
+        c1.addSelectedState(SelectedNone);
+        QCOMPARE(c1.getState(), SelectedNone);
+        c1.addSelectedState(SelectedSome);
+        QCOMPARE(c1.getState(), SelectedSome);
+        c1.addSelectedState(SelectedAll);
+        QCOMPARE(c1.getState(), SelectedSome);
         c1.clear();
-        QCOMPARE(c1.getState(), KGeoMapSelectedNone);
-        c1.addSelectedState(KGeoMapSelectedAll);
-        QCOMPARE(c1.getState(), KGeoMapSelectedAll);
-        c1.addSelectedState(KGeoMapSelectedSome);
-        QCOMPARE(c1.getState(), KGeoMapSelectedSome);
+        QCOMPARE(c1.getState(), SelectedNone);
+        c1.addSelectedState(SelectedAll);
+        QCOMPARE(c1.getState(), SelectedAll);
+        c1.addSelectedState(SelectedSome);
+        QCOMPARE(c1.getState(), SelectedSome);
         c1.clear();
-        QCOMPARE(c1.getState(), KGeoMapSelectedNone);
-        c1.addSelectedState(KGeoMapSelectedAll);
-        QCOMPARE(c1.getState(), KGeoMapSelectedAll);
-        c1.addSelectedState(KGeoMapSelectedNone);
-        QCOMPARE(c1.getState(), KGeoMapSelectedSome);
+        QCOMPARE(c1.getState(), SelectedNone);
+        c1.addSelectedState(SelectedAll);
+        QCOMPARE(c1.getState(), SelectedAll);
+        c1.addSelectedState(SelectedNone);
+        QCOMPARE(c1.getState(), SelectedSome);
     }
 
     {
         // test selected state:
-        KGeoMapGroupStateComputer c1;
-        QCOMPARE(c1.getState(), KGeoMapFilteredPositiveNone);
-        c1.addFilteredPositiveState(KGeoMapFilteredPositiveNone);
-        QCOMPARE(c1.getState(), KGeoMapFilteredPositiveNone);
-        c1.addFilteredPositiveState(KGeoMapFilteredPositiveSome);
-        QCOMPARE(c1.getState(), KGeoMapFilteredPositiveSome);
-        c1.addFilteredPositiveState(KGeoMapFilteredPositiveAll);
-        QCOMPARE(c1.getState(), KGeoMapFilteredPositiveSome);
+        GroupStateComputer c1;
+        QCOMPARE(c1.getState(), FilteredPositiveNone);
+        c1.addFilteredPositiveState(FilteredPositiveNone);
+        QCOMPARE(c1.getState(), FilteredPositiveNone);
+        c1.addFilteredPositiveState(FilteredPositiveSome);
+        QCOMPARE(c1.getState(), FilteredPositiveSome);
+        c1.addFilteredPositiveState(FilteredPositiveAll);
+        QCOMPARE(c1.getState(), FilteredPositiveSome);
         c1.clear();
-        QCOMPARE(c1.getState(), KGeoMapFilteredPositiveNone);
-        c1.addFilteredPositiveState(KGeoMapFilteredPositiveAll);
-        QCOMPARE(c1.getState(), KGeoMapFilteredPositiveAll);
-        c1.addFilteredPositiveState(KGeoMapFilteredPositiveSome);
-        QCOMPARE(c1.getState(), KGeoMapFilteredPositiveSome);
+        QCOMPARE(c1.getState(), FilteredPositiveNone);
+        c1.addFilteredPositiveState(FilteredPositiveAll);
+        QCOMPARE(c1.getState(), FilteredPositiveAll);
+        c1.addFilteredPositiveState(FilteredPositiveSome);
+        QCOMPARE(c1.getState(), FilteredPositiveSome);
         c1.clear();
-        QCOMPARE(c1.getState(), KGeoMapFilteredPositiveNone);
-        c1.addFilteredPositiveState(KGeoMapFilteredPositiveAll);
-        QCOMPARE(c1.getState(), KGeoMapFilteredPositiveAll);
-        c1.addFilteredPositiveState(KGeoMapFilteredPositiveNone);
-        QCOMPARE(c1.getState(), KGeoMapFilteredPositiveSome);
+        QCOMPARE(c1.getState(), FilteredPositiveNone);
+        c1.addFilteredPositiveState(FilteredPositiveAll);
+        QCOMPARE(c1.getState(), FilteredPositiveAll);
+        c1.addFilteredPositiveState(FilteredPositiveNone);
+        QCOMPARE(c1.getState(), FilteredPositiveSome);
     }
 
     {
         // test selected state:
-        KGeoMapGroupStateComputer c1;
-        QCOMPARE(c1.getState(), KGeoMapRegionSelectedNone);
-        c1.addRegionSelectedState(KGeoMapRegionSelectedNone);
-        QCOMPARE(c1.getState(), KGeoMapRegionSelectedNone);
-        c1.addRegionSelectedState(KGeoMapRegionSelectedSome);
-        QCOMPARE(c1.getState(), KGeoMapRegionSelectedSome);
-        c1.addRegionSelectedState(KGeoMapRegionSelectedAll);
-        QCOMPARE(c1.getState(), KGeoMapRegionSelectedSome);
+        GroupStateComputer c1;
+        QCOMPARE(c1.getState(), RegionSelectedNone);
+        c1.addRegionSelectedState(RegionSelectedNone);
+        QCOMPARE(c1.getState(), RegionSelectedNone);
+        c1.addRegionSelectedState(RegionSelectedSome);
+        QCOMPARE(c1.getState(), RegionSelectedSome);
+        c1.addRegionSelectedState(RegionSelectedAll);
+        QCOMPARE(c1.getState(), RegionSelectedSome);
         c1.clear();
-        QCOMPARE(c1.getState(), KGeoMapRegionSelectedNone);
-        c1.addRegionSelectedState(KGeoMapRegionSelectedAll);
-        QCOMPARE(c1.getState(), KGeoMapRegionSelectedAll);
-        c1.addRegionSelectedState(KGeoMapRegionSelectedSome);
-        QCOMPARE(c1.getState(), KGeoMapRegionSelectedSome);
+        QCOMPARE(c1.getState(), RegionSelectedNone);
+        c1.addRegionSelectedState(RegionSelectedAll);
+        QCOMPARE(c1.getState(), RegionSelectedAll);
+        c1.addRegionSelectedState(RegionSelectedSome);
+        QCOMPARE(c1.getState(), RegionSelectedSome);
         c1.clear();
-        QCOMPARE(c1.getState(), KGeoMapRegionSelectedNone);
-        c1.addRegionSelectedState(KGeoMapRegionSelectedAll);
-        QCOMPARE(c1.getState(), KGeoMapRegionSelectedAll);
-        c1.addRegionSelectedState(KGeoMapRegionSelectedNone);
-        QCOMPARE(c1.getState(), KGeoMapRegionSelectedSome);
+        QCOMPARE(c1.getState(), RegionSelectedNone);
+        c1.addRegionSelectedState(RegionSelectedAll);
+        QCOMPARE(c1.getState(), RegionSelectedAll);
+        c1.addRegionSelectedState(RegionSelectedNone);
+        QCOMPARE(c1.getState(), RegionSelectedSome);
     }
 
     /// @todo Test addState

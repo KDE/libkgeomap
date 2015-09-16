@@ -40,6 +40,7 @@
 
 #include "libkgeomap_export.h"
 #include "kgeomap_primitives.h"
+#include "geocoordinates.h"
 
 namespace KGeoMap
 {

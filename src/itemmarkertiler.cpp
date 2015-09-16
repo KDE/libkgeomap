@@ -433,7 +433,7 @@ int ItemMarkerTiler::getTileSelectedCount(const TileIndex& tileIndex)
     return myTile->selectedCount;
 }
 
-KGeoMapGroupState ItemMarkerTiler::getTileGroupState(const TileIndex& tileIndex)
+GroupState ItemMarkerTiler::getTileGroupState(const TileIndex& tileIndex)
 {
     if (isDirty())
     {
@@ -446,21 +446,21 @@ KGeoMapGroupState ItemMarkerTiler::getTileGroupState(const TileIndex& tileIndex)
 
     if (!myTile)
     {
-        return KGeoMapSelectedNone;
+        return SelectedNone;
     }
 
     const int selectedCount = myTile->selectedCount;
 
     if (selectedCount == 0)
     {
-        return KGeoMapSelectedNone;
+        return SelectedNone;
     }
-    else if (selectedCount==myTile->markerIndices.count())
+    else if (selectedCount == myTile->markerIndices.count())
     {
-        return KGeoMapSelectedAll;
+        return SelectedAll;
     }
 
-    return KGeoMapSelectedSome;
+    return SelectedSome;
 }
 
 AbstractMarkerTiler::Tile* ItemMarkerTiler::getTile(const TileIndex& tileIndex, const bool stopIfEmpty)
@@ -665,7 +665,7 @@ void ItemMarkerTiler::onIndicesClicked(const ClickInfo& clickInfo)
 
     if (clickInfo.currentMouseMode == MouseModeSelectThumbnail && d->selectionModel)
     {
-        const bool doSelect = (clickInfo.groupSelectionState & KGeoMapSelectedMask) != KGeoMapSelectedAll;
+        const bool doSelect = (clickInfo.groupSelectionState & SelectedMask) != SelectedAll;
 
         const QItemSelectionModel::SelectionFlags selectionFlags = (doSelect ? QItemSelectionModel::Select
                                                                              : QItemSelectionModel::Deselect) |
@@ -764,17 +764,17 @@ AbstractMarkerTiler::Flags ItemMarkerTiler::tilerFlags() const
     return resultFlags;
 }
 
-KGeoMapGroupState ItemMarkerTiler::getGlobalGroupState()
+GroupState ItemMarkerTiler::getGlobalGroupState()
 {
     if (d->selectionModel)
     {
         if (d->selectionModel->hasSelection())
         {
-            return KGeoMapSelectedMask;
+            return SelectedMask;
         }
     }
 
-    return KGeoMapSelectedNone;
+    return SelectedNone;
 }
 
 } // namespace KGeoMap

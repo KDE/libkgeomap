@@ -336,12 +336,12 @@ void TileGrouper::updateClusters()
     {
         KGeoMapCluster& cluster  = s->clusterList[i];
         int clusterSelectedCount = 0;
-        KGeoMapGroupStateComputer clusterStateComputer;
+        GroupStateComputer clusterStateComputer;
 
         for (int iTile = 0; (iTile < cluster.tileIndicesList.count()); ++iTile)
         {
             const TileIndex tileIndex              = cluster.tileIndicesList.at(iTile);
-            const KGeoMapGroupState tileGroupState = s->markerModel->getTileGroupState(tileIndex);
+            const GroupState tileGroupState = s->markerModel->getTileGroupState(tileIndex);
             clusterStateComputer.addState(tileGroupState);
             clusterSelectedCount                  += s->markerModel->getTileSelectedCount(tileIndex);
         }

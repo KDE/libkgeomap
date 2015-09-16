@@ -29,6 +29,7 @@
 
 // local includes
 
+#include "geocoordinates.h"
 #include "kgeomap_primitives.h"
 #include "libkgeomap_export.h"
 

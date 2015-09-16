@@ -904,7 +904,7 @@ void KGeoMapWidget::slotUpdateActionsEnabled()
 
     if (clearRegionSelectionAvailable && s->markerModel)
     {
-        clearRegionSelectionAvailable = s->markerModel->getGlobalGroupState() & KGeoMapRegionSelectedMask;
+        clearRegionSelectionAvailable = s->markerModel->getGlobalGroupState() & RegionSelectedMask;
     }
 
     d->actionRemoveCurrentRegionSelection->setEnabled(clearRegionSelectionAvailable);
@@ -912,7 +912,7 @@ void KGeoMapWidget::slotUpdateActionsEnabled()
 
     if (clearFilterAvailable && s->markerModel)
     {
-        clearFilterAvailable = s->markerModel->getGlobalGroupState() & KGeoMapFilteredPositiveMask;
+        clearFilterAvailable = s->markerModel->getGlobalGroupState() & FilteredPositiveMask;
     }
 
     d->actionRemoveFilter->setEnabled(clearFilterAvailable);
@@ -986,7 +986,7 @@ void KGeoMapWidget::slotClustersNeedUpdating()
  */
 void KGeoMapWidget::getColorInfos(const int clusterIndex, QColor* fillColor, QColor* strokeColor,
                                     Qt::PenStyle* strokeStyle, QString* labelText, QColor* labelColor,
-                                    const KGeoMapGroupState* const overrideSelection,
+                                    const GroupState* const overrideSelection,
                                     const int* const overrideCount) const
 {
     /// @todo Call the new getColorInfos function!
@@ -1000,7 +1000,7 @@ void KGeoMapWidget::getColorInfos(const int clusterIndex, QColor* fillColor, QCo
                   fillColor, strokeColor, strokeStyle, labelText, labelColor);
 }
 
-void KGeoMapWidget::getColorInfos(const KGeoMapGroupState groupState,
+void KGeoMapWidget::getColorInfos(const GroupState groupState,
                        const int nMarkers,
                        QColor* fillColor, QColor* strokeColor,
                        Qt::PenStyle* strokeStyle, QString* labelText, QColor* labelColor) const
@@ -1038,17 +1038,17 @@ void KGeoMapWidget::getColorInfos(const KGeoMapGroupState groupState,
     *strokeStyle = Qt::NoPen;
 
     /// @todo On my system, digikam uses QColor(67, 172, 232) as the selection color. Or should we just use blue?
-    switch (groupState & KGeoMapSelectedMask)
+    switch (groupState & SelectedMask)
     {
-        case KGeoMapSelectedNone:
+        case SelectedNone:
             *strokeStyle = Qt::SolidLine;
             *strokeColor = QColor(Qt::black);
             break;
-        case KGeoMapSelectedSome:
+        case SelectedSome:
             *strokeStyle = Qt::DotLine;
             *strokeColor = QColor(Qt::blue);//67, 172, 232);
             break;
-        case KGeoMapSelectedAll:
+        case SelectedAll:
             *strokeStyle = Qt::SolidLine;
             *strokeColor = QColor(Qt::blue);//67, 172, 232);
             break;
@@ -1219,7 +1219,7 @@ void KGeoMapWidget::slotClustersMoved(const QIntList& clusterIndices, const QPai
     GeoCoordinates  targetCoordinates = s->clusterList.at(clusterIndex).coordinates;
     TileIndex::List movedTileIndices;
 
-    if (s->clusterList.at(clusterIndex).groupState == KGeoMapSelectedNone)
+    if (s->clusterList.at(clusterIndex).groupState == SelectedNone)
     {
         // a not-selected marker was moved. update all of its items:
         const KGeoMapCluster& cluster = s->clusterList.at(clusterIndex);
@@ -1612,12 +1612,12 @@ void KGeoMapWidget::setSortKey(const int sortKey)
     slotRequestLazyReclustering();
 }
 
-QPixmap KGeoMapWidget::getDecoratedPixmapForCluster(const int clusterId, const KGeoMapGroupState* const selectedStateOverride,
+QPixmap KGeoMapWidget::getDecoratedPixmapForCluster(const int clusterId, const GroupState* const selectedStateOverride,
                                                     const int* const countOverride, QPoint* const centerPoint)
 {
     KGeoMapCluster& cluster      = s->clusterList[clusterId];
     int markerCount              = cluster.markerCount;
-    KGeoMapGroupState groupState = cluster.groupState;
+    GroupState groupState = cluster.groupState;
 
     if (selectedStateOverride)
     {
@@ -1625,7 +1625,7 @@ QPixmap KGeoMapWidget::getDecoratedPixmapForCluster(const int clusterId, const K
         markerCount = *countOverride;
     }
 
-    const KGeoMapGroupState selectedState = groupState & KGeoMapSelectedMask;
+    const GroupState selectedState = groupState & SelectedMask;
 
     // first determine all the color and style values
     QColor       fillColor;
@@ -1644,11 +1644,11 @@ QPixmap KGeoMapWidget::getDecoratedPixmapForCluster(const int clusterId, const K
         /// @todo Handle positive filtering and region selection!
         QString pixmapName = fillColor.name().mid(1);
 
-        if (selectedState == KGeoMapSelectedAll)
+        if (selectedState == SelectedAll)
         {
             pixmapName += QLatin1String("-selected");
         }
-        if (selectedState == KGeoMapSelectedSome)
+        if (selectedState == SelectedSome)
         {
             pixmapName += QLatin1String("-someselected");
         }
@@ -1699,18 +1699,18 @@ QPixmap KGeoMapWidget::getDecoratedPixmapForCluster(const int clusterId, const K
             QPainter painter(&resultPixmap);
 //             painter.setRenderHint(QPainter::Antialiasing);
 
-            const int borderWidth = (groupState&KGeoMapSelectedSome) ? 2 : 1;
+            const int borderWidth = (groupState&SelectedSome) ? 2 : 1;
             QPen borderPen;
             borderPen.setWidth(borderWidth);
             borderPen.setJoinStyle(Qt::MiterJoin);
 
-            KGeoMapGroupState globalState = s->markerModel->getGlobalGroupState();
+            GroupState globalState = s->markerModel->getGlobalGroupState();
 
             /// @todo What about partially in the region or positively filtered?
-            const bool clusterIsNotInRegionSelection  = (globalState & KGeoMapRegionSelectedMask) &&
-                                                        ((groupState & KGeoMapRegionSelectedMask) == KGeoMapRegionSelectedNone);
-            const bool clusterIsNotPositivelyFiltered = (globalState & KGeoMapFilteredPositiveMask) &&
-                                                        ((groupState & KGeoMapFilteredPositiveMask) == KGeoMapFilteredPositiveNone);
+            const bool clusterIsNotInRegionSelection  = (globalState & RegionSelectedMask) &&
+                                                        ((groupState & RegionSelectedMask) == RegionSelectedNone);
+            const bool clusterIsNotPositivelyFiltered = (globalState & FilteredPositiveMask) &&
+                                                        ((groupState & FilteredPositiveMask) == FilteredPositiveNone);
 
             const bool shouldGrayOut                  = clusterIsNotInRegionSelection || clusterIsNotPositivelyFiltered;
             const bool shouldCrossOut                 = clusterIsNotInRegionSelection;

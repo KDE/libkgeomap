@@ -38,6 +38,7 @@
 #include "tileindex.h"
 #include "kgeomap_primitives.h"
 #include "libkgeomap_export.h"
+#include "groupstate.h"
 
 namespace KGeoMap
 {
@@ -64,7 +65,7 @@ public:
 
         TileIndex::List   tileIndicesList;
         QVariant          representativeIndex;
-        KGeoMapGroupState groupSelectionState;
+        GroupState        groupSelectionState;
         MouseModes        currentMouseMode;
     };
 
@@ -169,8 +170,8 @@ public:
     virtual QVariant bestRepresentativeIndexFromList(const QList<QVariant>& indices, const int sortKey) = 0;
     virtual QPixmap pixmapFromRepresentativeIndex(const QVariant& index, const QSize& size) = 0;
     virtual bool indicesEqual(const QVariant& a, const QVariant& b) const = 0;
-    virtual KGeoMapGroupState getTileGroupState(const TileIndex& tileIndex) = 0;
-    virtual KGeoMapGroupState getGlobalGroupState() = 0;
+    virtual GroupState getTileGroupState(const TileIndex& tileIndex) = 0;
+    virtual GroupState getGlobalGroupState() = 0;
 
     // these can be implemented if you want to react to actions in kgeomap
     virtual void onIndicesClicked(const ClickInfo& clickInfo);

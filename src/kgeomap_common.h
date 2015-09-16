@@ -42,6 +42,7 @@
 
 #include "kgeomap_primitives.h"
 #include "tileindex.h"
+#include "groupstatecomputer.h"
 
 namespace KGeoMap
 {
@@ -148,7 +149,7 @@ public:
           markerSelectedCount(0),
           coordinates(),
           pixelPos(),
-          groupState(KGeoMapSelectedNone),
+          groupState(SelectedNone),
           representativeMarkers(),
           pixmapType(PixmapMarker),
           pixmapSize(),
@@ -161,7 +162,7 @@ public:
     int                 markerSelectedCount;
     GeoCoordinates      coordinates;
     QPoint              pixelPos;
-    KGeoMapGroupState   groupState;
+    GroupState          groupState;
     QMap<int, QVariant> representativeMarkers;
 
     enum PixmapType

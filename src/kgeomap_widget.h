@@ -38,6 +38,8 @@
 
 #include "kgeomap_primitives.h"
 #include "libkgeomap_export.h"
+#include "geocoordinates.h"
+#include "groupstate.h"
 
 class QAction;
 class KConfigGroup;
@@ -137,16 +139,16 @@ public:
 
     void getColorInfos(const int clusterIndex, QColor* fillColor, QColor* strokeColor,
                        Qt::PenStyle* strokeStyle, QString* labelText, QColor* labelColor,
-                       const KGeoMapGroupState* const overrideSelection = 0,
+                       const GroupState* const overrideSelection = 0,
                        const int* const overrideCount = 0) const;
 
-    void getColorInfos(const KGeoMapGroupState groupState,
+    void getColorInfos(const GroupState groupState,
                        const int nMarkers,
                        QColor* fillColor, QColor* strokeColor,
                        Qt::PenStyle* strokeStyle, QString* labelText, QColor* labelColor) const;
 
     QString convertZoomToBackendZoom(const QString& someZoom, const QString& targetBackend) const;
-    QPixmap getDecoratedPixmapForCluster(const int clusterId, const KGeoMapGroupState* const selectedStateOverride, const int* const countOverride, QPoint* const centerPoint);
+    QPixmap getDecoratedPixmapForCluster(const int clusterId, const GroupState* const selectedStateOverride, const int* const countOverride, QPoint* const centerPoint);
     QVariant getClusterRepresentativeMarker(const int clusterIndex, const int sortKey);
     //@}
 

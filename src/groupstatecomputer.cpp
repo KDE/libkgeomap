@@ -26,73 +26,71 @@
 
 // Local includes
 
+#include "groupstatecomputer.h"
 #include "kgeomap_primitives.h"
-
-// Local includes
-
-#include "geocoordinates.h"
+// #include "geocoordinates.h"
 #include "libkgeomap_debug.h"
 
 namespace KGeoMap
 {
 
-class Q_DECL_HIDDEN KGeoMapGroupStateComputer::Private
+class Q_DECL_HIDDEN GroupStateComputer::Private
 {
 public:
 
     Private()
-      : state(KGeoMapSelectedNone),
-        stateMask(KGeoMapSelectedNone)
+      : state(SelectedNone),
+        stateMask(SelectedNone)
     {
     }
 
-    KGeoMapGroupState state;
-    KGeoMapGroupState stateMask;
+    GroupState state;
+    GroupState stateMask;
 };
 
-KGeoMapGroupStateComputer::KGeoMapGroupStateComputer()
+GroupStateComputer::GroupStateComputer()
     : d(new Private)
 {
 }
 
-KGeoMapGroupStateComputer::~KGeoMapGroupStateComputer()
+GroupStateComputer::~GroupStateComputer()
 {
 }
 
-KGeoMapGroupState KGeoMapGroupStateComputer::getState() const
+GroupState GroupStateComputer::getState() const
 {
     return d->state;
 }
 
-void KGeoMapGroupStateComputer::clear()
+void GroupStateComputer::clear()
 {
-    d->state     = KGeoMapSelectedNone;
-    d->stateMask = KGeoMapSelectedNone;
+    d->state     = SelectedNone;
+    d->stateMask = SelectedNone;
 }
 
-void KGeoMapGroupStateComputer::addState(const KGeoMapGroupState state)
+void GroupStateComputer::addState(const GroupState state)
 {
     addSelectedState(state);
     addFilteredPositiveState(state);
     addRegionSelectedState(state);
 }
 
-void KGeoMapGroupStateComputer::addSelectedState(const KGeoMapGroupState state)
+void GroupStateComputer::addSelectedState(const GroupState state)
 {
-    if (!(d->stateMask & KGeoMapSelectedMask))
+    if (!(d->stateMask & SelectedMask))
     {
         d->state     |= state;
-        d->stateMask |= KGeoMapSelectedMask;
+        d->stateMask |= SelectedMask;
     }
     else
     {
-        if ((state&KGeoMapSelectedMask) == KGeoMapSelectedAll)
+        if ((state&SelectedMask) == SelectedAll)
         {
-            d->state |= KGeoMapSelectedAll;
+            d->state |= SelectedAll;
         }
-        else if ((d->state&KGeoMapSelectedMask) == KGeoMapSelectedAll)
+        else if ((d->state&SelectedMask) == SelectedAll)
         {
-            d->state |= KGeoMapSelectedSome;
+            d->state |= SelectedSome;
         }
         else
         {
@@ -101,22 +99,22 @@ void KGeoMapGroupStateComputer::addSelectedState(const KGeoMapGroupState state)
     }
 }
 
-void KGeoMapGroupStateComputer::addFilteredPositiveState(const KGeoMapGroupState state)
+void GroupStateComputer::addFilteredPositiveState(const GroupState state)
 {
-    if (!(d->stateMask & KGeoMapFilteredPositiveMask))
+    if (!(d->stateMask & FilteredPositiveMask))
     {
         d->state     |= state;
-        d->stateMask |= KGeoMapFilteredPositiveMask;
+        d->stateMask |= FilteredPositiveMask;
     }
     else
     {
-        if ((state&KGeoMapFilteredPositiveMask) == KGeoMapFilteredPositiveAll)
+        if ((state&FilteredPositiveMask) == FilteredPositiveAll)
         {
-            d->state |= KGeoMapFilteredPositiveAll;
+            d->state |= FilteredPositiveAll;
         }
-        else if ((d->state&KGeoMapFilteredPositiveMask) == KGeoMapFilteredPositiveAll)
+        else if ((d->state&FilteredPositiveMask) == FilteredPositiveAll)
         {
-            d->state |= KGeoMapFilteredPositiveSome;
+            d->state |= FilteredPositiveSome;
         }
         else
         {
@@ -125,22 +123,22 @@ void KGeoMapGroupStateComputer::addFilteredPositiveState(const KGeoMapGroupState
     }
 }
 
-void KGeoMapGroupStateComputer::addRegionSelectedState(const KGeoMapGroupState state)
+void GroupStateComputer::addRegionSelectedState(const GroupState state)
 {
-    if (!(d->stateMask & KGeoMapRegionSelectedMask))
+    if (!(d->stateMask & RegionSelectedMask))
     {
         d->state     |= state;
-        d->stateMask |= KGeoMapRegionSelectedMask;
+        d->stateMask |= RegionSelectedMask;
     }
     else
     {
-        if ((state&KGeoMapRegionSelectedMask) == KGeoMapRegionSelectedAll)
+        if ((state&RegionSelectedMask) == RegionSelectedAll)
         {
-            d->state |= KGeoMapRegionSelectedAll;
+            d->state |= RegionSelectedAll;
         }
-        else if ((d->state&KGeoMapRegionSelectedMask) == KGeoMapRegionSelectedAll)
+        else if ((d->state&RegionSelectedMask) == RegionSelectedAll)
         {
-            d->state |= KGeoMapRegionSelectedSome;
+            d->state |= RegionSelectedSome;
         }
         else
         {

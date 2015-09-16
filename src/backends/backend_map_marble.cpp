@@ -770,17 +770,17 @@ void BackendMarble::marbleCustomPaint(Marble::GeoPainter* painter)
             const KGeoMapCluster& cluster            = s->clusterList.at(i);
             GeoCoordinates clusterCoordinates        = cluster.coordinates;
             int markerCountOverride                  = cluster.markerCount;
-            KGeoMapGroupState selectionStateOverride = cluster.groupState;
+            GroupState selectionStateOverride = cluster.groupState;
 
             if (d->haveMouseMovingObject&&(d->mouseMoveClusterIndex>=0))
             {
-                bool movingSelectedMarkers = s->clusterList.at(d->mouseMoveClusterIndex).groupState!=KGeoMapSelectedNone;
+                bool movingSelectedMarkers = s->clusterList.at(d->mouseMoveClusterIndex).groupState != SelectedNone;
 
                 if (movingSelectedMarkers)
                 {
                     markersInMovingCluster += cluster.markerSelectedCount;
                     markerCountOverride    -= cluster.markerSelectedCount;
-                    selectionStateOverride  = KGeoMapSelectedNone;
+                    selectionStateOverride  = SelectedNone;
                 }
                 else if (d->mouseMoveClusterIndex == i)
                 {
@@ -813,7 +813,7 @@ void BackendMarble::marbleCustomPaint(Marble::GeoPainter* painter)
         const KGeoMapCluster& cluster            = s->clusterList.at(d->mouseMoveClusterIndex);
         GeoCoordinates clusterCoordinates        = d->mouseMoveObjectCoordinates;
         int markerCountOverride                  = (markersInMovingCluster>0)?markersInMovingCluster:cluster.markerCount;
-        KGeoMapGroupState selectionStateOverride = cluster.groupState;
+        GroupState selectionStateOverride = cluster.groupState;
         QPoint clusterPoint;
 
         if (screenCoordinates(clusterCoordinates, &clusterPoint))
@@ -831,14 +831,14 @@ void BackendMarble::marbleCustomPaint(Marble::GeoPainter* painter)
 
             QString pixmapName = fillColor.name().mid(1);
 
-            if (cluster.groupState==KGeoMapSelectedAll)
+            if (cluster.groupState == SelectedAll)
             {
-                pixmapName+=QLatin1String("-selected");
+                pixmapName += QLatin1String("-selected");
             }
 
-            if (cluster.groupState==KGeoMapSelectedSome)
+            if (cluster.groupState == SelectedSome)
             {
-                pixmapName+=QLatin1String("-someselected");
+                pixmapName += QLatin1String("-someselected");
             }
 
             const QPixmap& markerPixmap = KGeoMapGlobalObject::instance()->getMarkerPixmap(pixmapName);
@@ -855,9 +855,9 @@ void BackendMarble::marbleCustomPaint(Marble::GeoPainter* painter)
         Qt::PenStyle strokeStyle;
         QColor       labelColor;
         QString      labelText;
-        s->worldMapWidget->getColorInfos(KGeoMapSelectedAll, d->dragDropMarkerCount,
-                            &fillColor, &strokeColor,
-                            &strokeStyle, &labelText, &labelColor);
+        s->worldMapWidget->getColorInfos(SelectedAll, d->dragDropMarkerCount,
+                                         &fillColor, &strokeColor,
+                                         &strokeStyle, &labelText, &labelColor);
 
         QString pixmapName          = fillColor.name().mid(1);
         pixmapName                 += QLatin1String("-selected");

@@ -16,6 +16,7 @@ find_package(Qt5Test REQUIRED)
 
 set(test_primitives_sources
     test_primitives.cpp
+    ../src/groupstatecomputer.cpp
     ../src/kgeomap_common.cpp
     ../src/libkgeomap_debug.cpp
     ../src/backends/backend_map.cpp

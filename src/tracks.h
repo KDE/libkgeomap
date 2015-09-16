@@ -37,6 +37,7 @@
 
 #include "kgeomap_primitives.h"
 #include "libkgeomap_export.h"
+#include "geocoordinates.h"
 
 class TestGPXParsing;
 

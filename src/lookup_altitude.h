@@ -27,9 +27,12 @@
 #ifndef LOOKUP_ALTITUDE_H
 #define LOOKUP_ALTITUDE_H
 
+#include <QtCore/QObject>
+
 // local includes
 
-#include "kgeomap_primitives.h"
+#include "libkgeomap_export.h"
+#include "geocoordinates.h"
 
 namespace KGeoMap
 {

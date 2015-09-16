@@ -17,10 +17,10 @@ add_subdirectory(backends)
 set(widget_LIB_SRCS abstractmarkertiler.cpp
                     dragdrophandler.cpp
                     geocoordinates.cpp
+                    groupstatecomputer.cpp
                     itemmarkertiler.cpp
                     kgeomap_widget.cpp
                     kgeomap_common.cpp
-                    kgeomap_primitives.cpp
                     libkgeomap_debug.cpp
                     lookup_altitude.cpp
                     lookup_altitude_geonames.cpp
@@ -39,6 +39,7 @@ ecm_generate_headers(kgeomap_CamelCase_HEADERS
                      AbstractMarkerTiler
                      DragDropHandler
                      GeoCoordinates
+                     GroupState
                      ItemMarkerTiler
                      ModelHelper
                      Lookup_Altitude
