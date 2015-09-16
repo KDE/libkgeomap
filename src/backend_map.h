@@ -32,7 +32,6 @@
 // Qt includes
 
 #include <QtCore/QModelIndex>
-#include <QtWidgets/QWidget>
 
 // Marble Widget includes
 
@@ -43,6 +42,7 @@
 #include "kgeomap_common.h"
 
 class QMenu;
+class QWidget;
 class KConfigGroup;
 
 namespace KGeoMap
