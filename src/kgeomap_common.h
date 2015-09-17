@@ -153,14 +153,14 @@ public:
 public:
 
     KGeoMapCluster()
-        : tileIndicesList(),
+        : pixmapType(PixmapMarker),
+          tileIndicesList(),
           markerCount(0),
           markerSelectedCount(0),
           coordinates(),
           pixelPos(),
           groupState(SelectedNone),
           representativeMarkers(),
-          pixmapType(PixmapMarker),
           pixmapSize(),
           pixmapOffset()
     {
