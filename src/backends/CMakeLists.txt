@@ -24,6 +24,7 @@ add_library(mapbackends STATIC
 target_link_libraries(mapbackends
     PRIVATE
         KF5::ConfigCore
+        KF5::I18n
 
         Qt5::Core
         Qt5::Gui # TBD: Remove Qt5::Gui after Marble is fixed to export it as public link library
