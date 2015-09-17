@@ -28,8 +28,8 @@
 
 #include "groupstatecomputer.h"
 #include "types.h"
-// #include "geocoordinates.h"
 #include "libkgeomap_debug.h"
+// #include "geocoordinates.h"
 
 namespace KGeoMap
 {

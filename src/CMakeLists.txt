@@ -40,6 +40,7 @@ ecm_generate_headers(kgeomap_CamelCase_HEADERS
                      DragDropHandler
                      GeoCoordinates
                      GroupState
+                     GroupStateComputer
                      ItemMarkerTiler
                      MapWidget
                      ModelHelper

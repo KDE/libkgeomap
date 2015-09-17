@@ -33,8 +33,6 @@
 #include <QtCore/QStringList>
 #include <QtCore/QDebug>
 
-// Kde includes
-
 // local includes
 
 #include "libkgeomap_export.h"
@@ -75,7 +73,7 @@ public:
     ~GeoCoordinates();
 
     bool operator==(const GeoCoordinates& other) const;
-    
+
     double lat() const;
     double lon() const ;
     double alt() const;

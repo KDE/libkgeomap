@@ -29,12 +29,18 @@
 
 #include "groupstate.h"
 
+// Qt includes
+
 #include <QtCore/QScopedPointer>
+
+// local includes
+
+#include "libkgeomap_export.h"
 
 namespace KGeoMap
 {
 
-class GroupStateComputer
+class KGEOMAP_EXPORT GroupStateComputer
 {
 public:
 
