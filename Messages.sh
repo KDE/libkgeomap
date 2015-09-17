@@ -1,2 +1,2 @@
 #! /bin/sh
-$XGETTEXT src/*.cpp -o $podir/libkgeomap.pot
+$XGETTEXT `find src -name '*.cpp'` -o $podir/libkgeomap.pot
