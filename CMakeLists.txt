@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010-2014, Gilles Caulier, <caulier dot gilles at gmail dot com>
+# Copyright (c) 2010-2015, Gilles Caulier, <caulier dot gilles at gmail dot com>
 #
 # Redistribution and use is allowed according to the terms of the BSD license.
 # For details see the accompanying COPYING-CMAKE-SCRIPTS file.
@@ -89,7 +89,9 @@ ecm_setup_version(${LIBKGEOMAP_LIB_VERSION}
 add_definitions(-DTRANSLATION_DOMAIN=\"libkgeomap\")
 add_definitions(-DQT_USE_QSTRINGBUILDER -DQT_USE_FAST_OPERATOR_PLUS)
 
-include_directories(${CMAKE_SOURCE_DIR} ${CMAKE_BINARY_DIR})
+include_directories(${CMAKE_SOURCE_DIR}
+                    ${CMAKE_BINARY_DIR}
+                    ${CMAKE_CURRENT_BINARY_DIR})
 
 add_subdirectory(data)
 add_subdirectory(src)
