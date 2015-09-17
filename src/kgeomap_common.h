@@ -141,7 +141,16 @@ class KGeoMapCluster
 
 public:
 
+    enum PixmapType
+    {
+        PixmapMarker,
+        PixmapCircle,
+        PixmapImage
+    } pixmapType;
+
     typedef QList<KGeoMapCluster> List;
+
+public:
 
     KGeoMapCluster()
         : tileIndicesList(),
@@ -164,13 +173,6 @@ public:
     QPoint              pixelPos;
     GroupState          groupState;
     QMap<int, QVariant> representativeMarkers;
-
-    enum PixmapType
-    {
-        PixmapMarker,
-        PixmapCircle,
-        PixmapImage
-    } pixmapType;
 
     QSize               pixmapSize;
 
@@ -235,7 +237,7 @@ public:
 
     /// @name Objects
     //@{
-    MapWidget*            worldMapWidget;
+    MapWidget*                worldMapWidget;
     TileGrouper*              tileGrouper;
     AbstractMarkerTiler*      markerModel;
     KGeoMapCluster::List      clusterList;
