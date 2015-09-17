@@ -62,10 +62,12 @@ if(KF5KExiv2_FOUND)
         KF5KGeoMap
         ${KF5KExiv2_LIBRARIES}
 
-        KF5::ConfigCore
-
         Qt5::Gui
         Qt5::Concurrent
+
+        KF5::ConfigCore
+        KF5::CoreAddons
+        KF5::I18n
     )
 
     install(TARGETS libkgeomap_demo ${INSTALL_TARGETS_DEFAULT_ARGS})
