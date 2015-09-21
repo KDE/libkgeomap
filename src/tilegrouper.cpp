@@ -53,6 +53,7 @@ TileGrouper::TileGrouper(const QExplicitlySharedDataPointer<KGeoMapSharedData>& 
       d(new Private),
       s(sharedData)
 {
+    qRegisterMetaType<QVector<int>>("QVector<int>");
 }
 
 TileGrouper::~TileGrouper()
