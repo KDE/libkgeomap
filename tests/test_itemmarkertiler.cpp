@@ -679,4 +679,4 @@ void TestItemMarkerTiler::benchmarkIteratorWholeWorld()
 #endif
 }
 
-QTEST_MAIN(TestItemMarkerTiler)
+QTEST_GUILESS_MAIN(TestItemMarkerTiler)

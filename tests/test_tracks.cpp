@@ -38,7 +38,7 @@
 
 using namespace KGeoMap;
 
-QTEST_MAIN(TestTracks)
+QTEST_GUILESS_MAIN(TestTracks)
 
 /**
  * @brief Return the path of the directory containing the test data
