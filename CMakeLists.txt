@@ -72,7 +72,6 @@ find_package(KF5 ${KF5_VERSION} REQUIRED COMPONENTS
              I18n
              Config
              KIO
-             TextWidgets
 )
 
 find_package(Marble REQUIRED)
