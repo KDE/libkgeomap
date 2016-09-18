@@ -54,6 +54,7 @@ if(NOT WIN32)
         test_itemmarkertiler.cpp
         ../src/kgeomap_common.cpp
         ../src/libkgeomap_debug.cpp
+        ../src/backends/mapbackend.cpp
     )
     add_executable(kgeomap_test_itemmarkertiler ${test_itemmarkertiler_sources})
     target_link_libraries(kgeomap_test_itemmarkertiler KF5KGeoMap Qt5::Core Qt5::Test KF5::WidgetsAddons)

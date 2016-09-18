@@ -54,6 +54,7 @@ if(KF5KExiv2_FOUND)
         mainwindow.cpp
         ../src/kgeomap_common.cpp
         ../src/libkgeomap_debug.cpp
+        ../src/backends/mapbackend.cpp
     )
 
     add_executable(libkgeomap_demo ${demo_SRCS})
