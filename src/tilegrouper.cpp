@@ -24,6 +24,10 @@
 
 #include "tilegrouper.h"
 
+// stdlib includes
+
+#include <math.h>
+
 // local includes
 
 #include "abstractmarkertiler.h"

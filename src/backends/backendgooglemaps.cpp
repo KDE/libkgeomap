@@ -37,6 +37,10 @@
 #include <QResizeEvent>
 #include <QAction>
 
+// Marble Widget includes
+
+#include <marble/GeoDataLatLonBox.h>
+
 // KDE includes
 
 #include <kconfiggroup.h>
