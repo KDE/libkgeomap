@@ -74,7 +74,7 @@ find_package(KF5 ${KF5_VERSION} REQUIRED COMPONENTS
              KIO
 )
 
-find_package(Marble REQUIRED)
+find_package(Marble CONFIG REQUIRED)
 
 ecm_setup_version(${LIBKGEOMAP_LIB_VERSION}
                   VARIABLE_PREFIX      KGEOMAP
@@ -90,8 +90,7 @@ add_definitions(-DQT_USE_QSTRINGBUILDER -DQT_USE_FAST_OPERATOR_PLUS)
 
 include_directories(${CMAKE_SOURCE_DIR}
                     ${CMAKE_BINARY_DIR}
-                    ${CMAKE_CURRENT_BINARY_DIR}
-                    ${MARBLE_INCLUDE_DIR})
+                    ${CMAKE_CURRENT_BINARY_DIR})
 
 add_subdirectory(data)
 add_subdirectory(src)

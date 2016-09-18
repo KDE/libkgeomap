@@ -22,6 +22,8 @@ add_library(mapbackends STATIC
 )
 
 target_link_libraries(mapbackends
+    PUBLIC
+        Marble
     PRIVATE
         KF5::ConfigCore
         KF5::I18n
