@@ -55,6 +55,9 @@ ecm_generate_headers(kgeomap_CamelCase_HEADERS
                      REQUIRED_HEADERS kgeomap_HEADERS
 )
 
+# Marble translations need explicit loading
+ecm_create_qm_loader(widget_LIB_SRCS marble_qt)
+
 add_library(KF5KGeoMap SHARED ${widget_LIB_SRCS})
 
 add_library(KF5::KGeoMap ALIAS KF5KGeoMap)
