@@ -1,8 +1,8 @@
 /** ===========================================================
  * @file
  *
- * This file is a part of digiKam project
- * <a href="http://www.digikam.org">http://www.digikam.org</a>
+ * This file is a part of KDE project
+ *
  *
  * @date   2009-12-01
  * @brief  world map widget library
@@ -1038,7 +1038,6 @@ void MapWidget::getColorInfos(const GroupState groupState,
     *labelColor  = QColor(Qt::black);
     *strokeStyle = Qt::NoPen;
 
-    /// @todo On my system, digikam uses QColor(67, 172, 232) as the selection color. Or should we just use blue?
     switch (groupState & SelectedMask)
     {
         case SelectedNone:

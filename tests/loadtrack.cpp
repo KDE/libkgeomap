@@ -2,7 +2,7 @@
  * @file
  *
  * This file is a part of kipi-plugins project
- * <a href="http://www.digikam.org">http://www.digikam.org</a>
+ *
  *
  * @date   2014-07-02
  * @brief  Simple program to load a track for timing tests.

@@ -6,29 +6,13 @@
 
 macro(DETECT_LIBKEXIV2 MIN_VERSION)
 
-    if (NOT DIGIKAMSC_COMPILE_LIBKEXIV2)
+    message(STATUS "libkexiv2 : search system based library")
+    find_package(KF5KExiv2 ${MIN_VERSION})
 
-        message(STATUS "libkexiv2 : search system based library")
-        find_package(KF5KExiv2 ${MIN_VERSION})
-
-        if(KF5KExiv2_FOUND)
-            set(KF5KExiv2_LIBRARIES KF5::KExiv2)
-        else()
-            set(KF5KExiv2_FOUND FALSE)
-        endif()
-
+    if(KF5KExiv2_FOUND)
+        set(KF5KExiv2_LIBRARIES KF5::KExiv2)
     else()
-
-        message(STATUS "libkexiv2 : use local library from ${CMAKE_SOURCE_DIR}/extra/libkexiv2/")
-        find_file(KF5KExiv2_FOUND CMakeLists.txt PATHS ${CMAKE_SOURCE_DIR}/extra/libkexiv2/)
-
-        if(NOT KF5KExiv2_FOUND)
-            message(ERROR "libkexiv2 : local library not found")
-        endif()
-
-        set(KF5KExiv2_INCLUDE_DIRS ${CMAKE_SOURCE_DIR}/extra/libkexiv2/src ${CMAKE_BINARY_DIR}/extra/libkexiv2/src ${CMAKE_BINARY_DIR}/extra/libkexiv2)
-        set(KF5KExiv2_LIBRARIES KF5KExiv2)
-
+        set(KF5KExiv2_FOUND FALSE)
     endif()
 
     message(STATUS "libkexiv2 found       : ${KF5KExiv2_FOUND}")

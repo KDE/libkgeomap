@@ -2,7 +2,7 @@
  * @file
  *
  * This file is a part of kipi-plugins project
- * <a href="http://www.digikam.org">http://www.digikam.org</a>
+ *
  *
  * @date   2006-09-19
  * @brief  Track file reader

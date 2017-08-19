@@ -1,8 +1,8 @@
 /** ===========================================================
  * @file
  *
- * This file is a part of digiKam project
- * <a href="http://www.digikam.org">http://www.digikam.org</a>
+ * This file is a part of KDE project
+ *
  *
  * @date   2010-09-18
  * @brief  A tool to calibrate the tiling levels used in libkgeomap

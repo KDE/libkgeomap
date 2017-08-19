@@ -21,8 +21,8 @@ cmake_minimum_required(VERSION ${CMAKE_MIN_VERSION})
 
 # Library version history:
 # API      ABI
-# 0.1.0 => 0.1.0     (During digiKam GoSC2010)
-# 2.0.0 => 1.0.0     (Included into digiKam 2.0.0 Software Collection)
+# 0.1.0 => 0.1.0     (During GoSC2010)
+# 2.0.0 => 1.0.0     (Included into 2.0.0 Software Collection)
 # 3.0.0 => 2.0.0     (Including track manager, see bug #333622)
 # 3.1.0 => 2.1.0     (Clean up API to reduce broken binary compatibility. Prepare code for KF5 port)
 # 5.0.0 => 10.0.0    (Released with KDE 5.x)

@@ -1,8 +1,8 @@
 /** ===========================================================
  * @file
  *
- * This file is a part of digiKam project
- * <a href="http://www.digikam.org">http://www.digikam.org</a>
+ * This file is a part of KDE project
+ *
  *
  * @date   2010-09-18
  * @brief  A tool to calibrate the tiling levels used in libkgeomap
@@ -418,7 +418,7 @@ int main(int argc, char* argv[])
     aboutData.setShortDescription(i18n("Used to calibrate the KGeoMap library tiling level"));
     aboutData.setLicense(KAboutLicense::GPL);
     aboutData.setCopyrightStatement(i18n("(c) 2010 Michael G. Hansen"));
-    aboutData.setHomepage(QString::fromLatin1("http://www.digikam.org/sharedlibs"));
+    aboutData.setHomepage(QString::fromLatin1("http://www.kde.org/"));
 
     aboutData.addAuthor(i18n("Michael G. Hansen"),
                         i18n("KGeoMap library"),

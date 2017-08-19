@@ -1,7 +1,7 @@
 /** ===========================================================
  *
- * This file is a part of digiKam project
- * <a href="http://www.digikam.org">http://www.digikam.org</a>
+ * This file is a part of KDE project
+ *
  *
  * @date   2010-01-16
  * @brief  test for the model holding markers

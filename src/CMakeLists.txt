@@ -99,27 +99,22 @@ install(TARGETS KF5KGeoMap
         EXPORT  KF5KGeoMapTargets ${KF5_INSTALL_TARGETS_DEFAULT_ARGS}
 )
 
-# Check if compilation is done through digiKam SC or not. If yes, do not install header files.
-if (NOT DIGIKAMSC_COMPILE_LIBKGEOMAP)
+install(FILES       ${kgeomap_CamelCase_HEADERS}
+        DESTINATION ${KF5_INCLUDE_INSTALL_DIR}/KGeoMap/KGeoMap
+        COMPONENT   Devel
+)
 
-    install(FILES       ${kgeomap_CamelCase_HEADERS}
-            DESTINATION ${KF5_INCLUDE_INSTALL_DIR}/KGeoMap/KGeoMap
-            COMPONENT   Devel
-    )
+install(FILES       ${kgeomap_HEADERS}
+        DESTINATION ${KF5_INCLUDE_INSTALL_DIR}/KGeoMap/kgeomap
+        COMPONENT   Devel
+)
 
-    install(FILES       ${kgeomap_HEADERS}
-            DESTINATION ${KF5_INCLUDE_INSTALL_DIR}/KGeoMap/kgeomap
-            COMPONENT   Devel
-    )
+install(FILES       ${CMAKE_CURRENT_BINARY_DIR}/libkgeomap_export.h
+        DESTINATION ${KF5_INCLUDE_INSTALL_DIR}/KGeoMap/kgeomap
+        COMPONENT   Devel
+)
 
-    install(FILES       ${CMAKE_CURRENT_BINARY_DIR}/libkgeomap_export.h
-            DESTINATION ${KF5_INCLUDE_INSTALL_DIR}/KGeoMap/kgeomap
-            COMPONENT   Devel
-    )
-
-    install(FILES       "${CMAKE_BINARY_DIR}/libkgeomap_version.h"
-            DESTINATION "${KF5_INCLUDE_INSTALL_DIR}"
-            COMPONENT   Devel
-    )
-
-endif()
+install(FILES       "${CMAKE_BINARY_DIR}/libkgeomap_version.h"
+        DESTINATION "${KF5_INCLUDE_INSTALL_DIR}"
+        COMPONENT   Devel
+)

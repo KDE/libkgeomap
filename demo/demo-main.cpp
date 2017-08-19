@@ -1,7 +1,7 @@
 /** ===========================================================
  *
- * This file is a part of digiKam project
- * <a href="http://www.digikam.org">http://www.digikam.org</a>
+ * This file is a part of KDE project
+ *
  *
  * @date   2009-12-01
  * @brief  demo-program for KGeoMap
@@ -49,7 +49,7 @@ int main(int argc, char* argv[])
     aboutData.setShortDescription(i18n("Presents the World Map Widget Interface"));
     aboutData.setLicense(KAboutLicense::GPL);
     aboutData.setCopyrightStatement(i18n("(c) 2009-2010 Michael G. Hansen"));
-    aboutData.setHomepage(QString::fromLatin1("http://www.digikam.org/sharedlibs"));
+    aboutData.setHomepage(QString::fromLatin1("http://www.kde.org/"));
 
     aboutData.addAuthor(i18n("Michael G. Hansen"),
                         i18n("KGeoMap library"),

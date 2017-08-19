@@ -4,8 +4,8 @@ libdir=${LIB_INSTALL_DIR}
 includedir=${INCLUDE_INSTALL_DIR}
 
 Name: libkgeomap
-Description: A world map library. This library is used by digiKam and kipi-plugins.
-URL: http://www.digikam.org
+Description: A world map library.
+URL: https://cgit.kde.org/libkgeomap.git/
 Requires:
 Version: ${KGEOMAP_LIB_VERSION_STRING}
 Libs: -L${LIB_INSTALL_DIR} -lkgeomap
