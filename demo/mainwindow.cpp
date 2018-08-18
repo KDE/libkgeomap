@@ -48,7 +48,6 @@
 #include <QFileDialog>
 #include <QStatusBar>
 #include <QPointer>
-#include <QProgressBar>
 #include <QDebug>
 
 // KDE includes
