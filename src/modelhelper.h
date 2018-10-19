@@ -65,7 +65,7 @@ public:
 public:
 
     explicit ModelHelper(QObject* const parent = nullptr);
-    virtual ~ModelHelper();
+    ~ModelHelper() override;
 
     void snapItemsTo(const QModelIndex& targetIndex, const QList<QPersistentModelIndex>& snappedIndices);
 

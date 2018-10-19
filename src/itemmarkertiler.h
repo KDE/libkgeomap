@@ -48,33 +48,33 @@ class KGEOMAP_EXPORT ItemMarkerTiler : public AbstractMarkerTiler
 public:
 
     explicit ItemMarkerTiler(ModelHelper* const modelHelper, QObject* const parent = nullptr);
-    virtual ~ItemMarkerTiler();
+    ~ItemMarkerTiler() override;
 
-    virtual Flags tilerFlags() const;
-    virtual Tile* tileNew();
-    virtual void tileDeleteInternal(Tile* const tile);
-    virtual void prepareTiles(const GeoCoordinates& upperLeft, const GeoCoordinates& lowerRight, int level);
-    virtual void regenerateTiles();
-    virtual Tile* getTile(const TileIndex& tileIndex, const bool stopIfEmpty = false);
-    virtual int getTileMarkerCount(const TileIndex& tileIndex);
-    virtual int getTileSelectedCount(const TileIndex& tileIndex);
+    Flags tilerFlags() const override;
+    Tile* tileNew() override;
+    void tileDeleteInternal(Tile* const tile) override;
+    void prepareTiles(const GeoCoordinates& upperLeft, const GeoCoordinates& lowerRight, int level) override;
+    void regenerateTiles() override;
+    Tile* getTile(const TileIndex& tileIndex, const bool stopIfEmpty = false) override;
+    int getTileMarkerCount(const TileIndex& tileIndex) override;
+    int getTileSelectedCount(const TileIndex& tileIndex) override;
 
-    virtual QVariant getTileRepresentativeMarker(const TileIndex& tileIndex, const int sortKey);
-    virtual QVariant bestRepresentativeIndexFromList(const QList<QVariant>& indices, const int sortKey);
-    virtual QPixmap pixmapFromRepresentativeIndex(const QVariant& index, const QSize& size);
-    virtual bool indicesEqual(const QVariant& a, const QVariant& b) const;
-    virtual GroupState getTileGroupState(const TileIndex& tileIndex);
-    virtual GroupState getGlobalGroupState();
+    QVariant getTileRepresentativeMarker(const TileIndex& tileIndex, const int sortKey) override;
+    QVariant bestRepresentativeIndexFromList(const QList<QVariant>& indices, const int sortKey) override;
+    QPixmap pixmapFromRepresentativeIndex(const QVariant& index, const QSize& size) override;
+    bool indicesEqual(const QVariant& a, const QVariant& b) const override;
+    GroupState getTileGroupState(const TileIndex& tileIndex) override;
+    GroupState getGlobalGroupState() override;
 
-    virtual void onIndicesClicked(const ClickInfo& clickInfo);
-    virtual void onIndicesMoved(const TileIndex::List& tileIndicesList, const GeoCoordinates& targetCoordinates,
-                                const QPersistentModelIndex& targetSnapIndex);
+    void onIndicesClicked(const ClickInfo& clickInfo) override;
+    void onIndicesMoved(const TileIndex::List& tileIndicesList, const GeoCoordinates& targetCoordinates,
+                                const QPersistentModelIndex& targetSnapIndex) override;
 
     void setMarkerModelHelper(ModelHelper* const modelHelper);
     void removeMarkerIndexFromGrid(const QModelIndex& markerIndex, const bool ignoreSelection = false);
     void addMarkerIndexToGrid(const QPersistentModelIndex& markerIndex);
 
-    void setActive(const bool state);
+    void setActive(const bool state) override;
 
 private Q_SLOTS:
 

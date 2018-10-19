@@ -51,29 +51,29 @@ class BackendMarble : public MapBackend
 public:
 
     explicit BackendMarble(const QExplicitlySharedDataPointer<KGeoMapSharedData>& sharedData, QObject* const parent = nullptr);
-    virtual ~BackendMarble();
+    ~BackendMarble() override;
 
-    virtual QString backendName() const;
-    virtual QString backendHumanName() const;
-    virtual QWidget* mapWidget();
-    virtual void releaseWidget(KGeoMapInternalWidgetInfo* const info);
-    virtual void mapWidgetDocked(const bool state);
+    QString backendName() const override;
+    QString backendHumanName() const override;
+    QWidget* mapWidget() override;
+    void releaseWidget(KGeoMapInternalWidgetInfo* const info) override;
+    void mapWidgetDocked(const bool state) override;
 
-    virtual GeoCoordinates getCenter() const;
-    virtual void setCenter(const GeoCoordinates& coordinate);
+    GeoCoordinates getCenter() const override;
+    void setCenter(const GeoCoordinates& coordinate) override;
 
-    virtual bool isReady() const;
+    bool isReady() const override;
 
-    virtual void zoomIn();
-    virtual void zoomOut();
+    void zoomIn() override;
+    void zoomOut() override;
 
-    virtual void saveSettingsToGroup(KConfigGroup* const group);
-    virtual void readSettingsFromGroup(const KConfigGroup* const group);
+    void saveSettingsToGroup(KConfigGroup* const group) override;
+    void readSettingsFromGroup(const KConfigGroup* const group) override;
 
-    virtual void addActionsToConfigurationMenu(QMenu* const configurationMenu);
+    void addActionsToConfigurationMenu(QMenu* const configurationMenu) override;
 
-    virtual void updateMarkers();
-    virtual void updateClusters();
+    void updateMarkers() override;
+    void updateClusters() override;
 
     QString getMapTheme() const;
     void setMapTheme(const QString& newMapTheme);
@@ -81,42 +81,42 @@ public:
     QString getProjection() const;
     void setProjection(const QString& newProjection);
 
-    virtual bool screenCoordinates(const GeoCoordinates& coordinates, QPoint* const point);
-    virtual bool geoCoordinates(const QPoint& point, GeoCoordinates* const coordinates) const;
-    virtual QSize mapSize() const;
+    bool screenCoordinates(const GeoCoordinates& coordinates, QPoint* const point) override;
+    bool geoCoordinates(const QPoint& point, GeoCoordinates* const coordinates) const override;
+    QSize mapSize() const override;
 
-    virtual void setZoom(const QString& newZoom);
-    virtual QString getZoom() const;
+    void setZoom(const QString& newZoom) override;
+    QString getZoom() const override;
 
-    virtual int getMarkerModelLevel();
-    virtual GeoCoordinates::PairList getNormalizedBounds();
+    int getMarkerModelLevel() override;
+    GeoCoordinates::PairList getNormalizedBounds() override;
 
 //     virtual void updateDragDropMarker(const QPoint& pos, const KGeoMapDragData* const dragData);
 //     virtual void updateDragDropMarkerPosition(const QPoint& pos);
 
-    virtual void updateActionAvailability();
+    void updateActionAvailability() override;
 
     void marbleCustomPaint(Marble::GeoPainter* painter);
     void setShowCompass(const bool state);
     void setShowOverviewMap(const bool state);
     void setShowScaleBar(const bool state);
 
-    virtual void regionSelectionChanged();
-    virtual void mouseModeChanged();
+    void regionSelectionChanged() override;
+    void mouseModeChanged() override;
 
-    virtual void centerOn(const Marble::GeoDataLatLonBox& box, const bool useSaneZoomLevel); 
-    virtual void setActive(const bool state);
+    void centerOn(const Marble::GeoDataLatLonBox& box, const bool useSaneZoomLevel) override;
+    void setActive(const bool state) override;
 
 public Q_SLOTS:
 
-    virtual void slotClustersNeedUpdating();
-    virtual void slotThumbnailAvailableForIndex(const QVariant& index, const QPixmap& pixmap);
+    void slotClustersNeedUpdating() override;
+    void slotThumbnailAvailableForIndex(const QVariant& index, const QPixmap& pixmap) override;
     void slotUngroupedModelChanged(const int index);
-    void slotTrackManagerChanged();
+    void slotTrackManagerChanged() override;
 
 protected:
 
-    bool eventFilter(QObject* object, QEvent* event);
+    bool eventFilter(QObject* object, QEvent* event) override;
     void createActions();
     bool findSnapPoint(const QPoint& actualPoint, QPoint* const snapPoint, GeoCoordinates* const snapCoordinates, QPair<int, QModelIndex>* const snapTargetIndex);
     void GeoPainter_drawPixmapAtCoordinates(Marble::GeoPainter* const painter, const QPixmap& pixmap, const GeoCoordinates& coordinates, const QPoint& basePoint);

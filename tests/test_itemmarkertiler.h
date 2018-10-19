@@ -40,11 +40,11 @@ Q_OBJECT
 public:
 
     MarkerModelHelper(QAbstractItemModel* const itemModel, QItemSelectionModel* const itemSelectionModel);
-    ~MarkerModelHelper();
+    ~MarkerModelHelper() override;
 
-    virtual QAbstractItemModel*  model()          const;
-    virtual QItemSelectionModel* selectionModel() const;
-    virtual bool itemCoordinates(const QModelIndex& index, KGeoMap::GeoCoordinates* const coordinates) const;
+    QAbstractItemModel*  model()          const override;
+    QItemSelectionModel* selectionModel() const override;
+    bool itemCoordinates(const QModelIndex& index, KGeoMap::GeoCoordinates* const coordinates) const override;
 
 private Q_SLOTS:
 

@@ -59,7 +59,7 @@ Q_OBJECT
 public:
 
     MapBackend(const QExplicitlySharedDataPointer<KGeoMapSharedData>& sharedData, QObject* const parent);
-    virtual ~MapBackend();
+    ~MapBackend() override;
 
     virtual QString backendName() const = 0;
     virtual QString backendHumanName() const = 0;

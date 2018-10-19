@@ -50,19 +50,19 @@ class LookupAltitudeGeonames : public LookupAltitude
 public:
 
     explicit LookupAltitudeGeonames(QObject* const parent);
-    virtual ~LookupAltitudeGeonames();
+    ~LookupAltitudeGeonames() override;
 
-    virtual QString backendName() const;
-    virtual QString backendHumanName() const;
+    QString backendName() const override;
+    QString backendHumanName() const override;
 
-    virtual void addRequests(const Request::List& requests);
-    virtual Request::List getRequests() const;
-    virtual Request getRequest(const int index) const;
+    void addRequests(const Request::List& requests) override;
+    Request::List getRequests() const override;
+    Request getRequest(const int index) const override;
 
-    virtual void startLookup();
-    virtual Status getStatus() const;
-    virtual QString errorMessage() const;
-    virtual void cancel();
+    void startLookup() override;
+    Status getStatus() const override;
+    QString errorMessage() const override;
+    void cancel() override;
 
 private Q_SLOTS:
 

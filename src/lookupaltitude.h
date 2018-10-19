@@ -75,7 +75,7 @@ public:
 public:
 
     explicit LookupAltitude(QObject* const parent);
-    virtual ~LookupAltitude();
+    ~LookupAltitude() override;
 
     virtual QString backendName() const = 0;
     virtual QString backendHumanName() const = 0;

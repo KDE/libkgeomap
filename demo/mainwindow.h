@@ -46,13 +46,13 @@ class MarkerModelHelper : public KGeoMap::ModelHelper
 public:
 
     MarkerModelHelper(QAbstractItemModel* const itemModel, QItemSelectionModel* const itemSelectionModel);
-    ~MarkerModelHelper();
+    ~MarkerModelHelper() override;
 
-    virtual QAbstractItemModel*  model()          const;
-    virtual QItemSelectionModel* selectionModel() const;
-    virtual Flags                modelFlags()     const;
-    virtual bool itemCoordinates(const QModelIndex& index, KGeoMap::GeoCoordinates* const coordinates) const;
-    virtual void onIndicesMoved(const QList<QPersistentModelIndex>& movedIndices, const KGeoMap::GeoCoordinates& targetCoordinates, const QPersistentModelIndex& targetSnapIndex);
+    QAbstractItemModel*  model()          const override;
+    QItemSelectionModel* selectionModel() const override;
+    Flags                modelFlags()     const override;
+    bool itemCoordinates(const QModelIndex& index, KGeoMap::GeoCoordinates* const coordinates) const override;
+    void onIndicesMoved(const QList<QPersistentModelIndex>& movedIndices, const KGeoMap::GeoCoordinates& targetCoordinates, const QPersistentModelIndex& targetSnapIndex) override;
 
 private:
 
@@ -99,7 +99,7 @@ class MainWindow : public QMainWindow
 public:
 
     explicit MainWindow(QCommandLineParser* const cmdLineArgs, QWidget* const parent = nullptr);
-    ~MainWindow();
+    ~MainWindow() override;
 
 public Q_SLOTS:
 
@@ -109,7 +109,7 @@ protected:
 
     void readSettings();
     void saveSettings();
-    void closeEvent(QCloseEvent* e);
+    void closeEvent(QCloseEvent* e) override;
     void createMenus();
 
 private Q_SLOTS:

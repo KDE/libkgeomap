@@ -45,7 +45,7 @@ class KGEOMAP_EXPORT DragDropHandler : public QObject
 public:
 
     explicit DragDropHandler(QObject* const parent = nullptr);
-    virtual ~DragDropHandler();
+    ~DragDropHandler() override;
 
     virtual Qt::DropAction accepts(const QDropEvent* e) = 0;
     virtual bool dropEvent(const QDropEvent* e, const GeoCoordinates& dropCoordinates) = 0;

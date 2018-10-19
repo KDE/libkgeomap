@@ -63,7 +63,7 @@ class KGEOMAP_EXPORT MapWidget : public QWidget
 public:
 
     explicit MapWidget(QWidget* const parent = nullptr);
-    ~MapWidget();
+    ~MapWidget() override;
 
     void saveSettingsToGroup(KConfigGroup* const group);
     void readSettingsFromGroup(const KConfigGroup* const group);
@@ -194,10 +194,10 @@ protected:
     void applyCacheToBackend();
     void saveBackendToCache();
     void rebuildConfigurationMenu();
-    void dropEvent(QDropEvent* event);
-    void dragMoveEvent(QDragMoveEvent* event);
-    void dragEnterEvent(QDragEnterEvent* event);
-    void dragLeaveEvent(QDragLeaveEvent* event);
+    void dropEvent(QDropEvent* event) override;
+    void dragMoveEvent(QDragMoveEvent* event) override;
+    void dragEnterEvent(QDragEnterEvent* event) override;
+    void dragLeaveEvent(QDragLeaveEvent* event) override;
     void createActions();
     void createActionsForBackendSelection();
     void setShowPlaceholderWidget(const bool state);

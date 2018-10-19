@@ -131,7 +131,7 @@ public:
 public:
 
     explicit TrackManager(QObject* const parent = nullptr);
-    virtual ~TrackManager();
+    ~TrackManager() override;
 
     void loadTrackFiles(const QList<QUrl>& urls);
     QList<QPair<QUrl, QString> > readLoadErrors();

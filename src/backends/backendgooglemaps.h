@@ -44,44 +44,44 @@ class BackendGoogleMaps : public MapBackend
 public:
 
     explicit BackendGoogleMaps(const QExplicitlySharedDataPointer<KGeoMapSharedData>& sharedData, QObject* const parent = nullptr);
-    virtual ~BackendGoogleMaps();
+    ~BackendGoogleMaps() override;
 
-    virtual QString backendName() const;
-    virtual QString backendHumanName() const;
-    virtual QWidget* mapWidget();
-    virtual void releaseWidget(KGeoMapInternalWidgetInfo* const info);
-    virtual void mapWidgetDocked(const bool state);
+    QString backendName() const override;
+    QString backendHumanName() const override;
+    QWidget* mapWidget() override;
+    void releaseWidget(KGeoMapInternalWidgetInfo* const info) override;
+    void mapWidgetDocked(const bool state) override;
 
-    virtual GeoCoordinates getCenter() const;
-    virtual void setCenter(const GeoCoordinates& coordinate);
+    GeoCoordinates getCenter() const override;
+    void setCenter(const GeoCoordinates& coordinate) override;
 
-    virtual bool isReady() const;
+    bool isReady() const override;
 
-    virtual void zoomIn();
-    virtual void zoomOut();
+    void zoomIn() override;
+    void zoomOut() override;
 
-    virtual void saveSettingsToGroup(KConfigGroup* const group);
-    virtual void readSettingsFromGroup(const KConfigGroup* const group);
+    void saveSettingsToGroup(KConfigGroup* const group) override;
+    void readSettingsFromGroup(const KConfigGroup* const group) override;
 
-    virtual void addActionsToConfigurationMenu(QMenu* const configurationMenu);
+    void addActionsToConfigurationMenu(QMenu* const configurationMenu) override;
 
-    virtual void updateMarkers();
-    virtual void updateClusters();
+    void updateMarkers() override;
+    void updateClusters() override;
 
-    virtual bool screenCoordinates(const GeoCoordinates& coordinates, QPoint* const point);
-    virtual bool geoCoordinates(const QPoint& point, GeoCoordinates* const coordinates) const;
-    virtual QSize mapSize() const;
+    bool screenCoordinates(const GeoCoordinates& coordinates, QPoint* const point) override;
+    bool geoCoordinates(const QPoint& point, GeoCoordinates* const coordinates) const override;
+    QSize mapSize() const override;
 
-    virtual void setZoom(const QString& newZoom);
-    virtual QString getZoom() const;
+    void setZoom(const QString& newZoom) override;
+    QString getZoom() const override;
 
-    virtual int getMarkerModelLevel();
-    virtual GeoCoordinates::PairList getNormalizedBounds();
+    int getMarkerModelLevel() override;
+    GeoCoordinates::PairList getNormalizedBounds() override;
 
 //     virtual void updateDragDropMarker(const QPoint& pos, const KGeoMapDragData* const dragData);
 //     virtual void updateDragDropMarkerPosition(const QPoint& pos);
 
-    virtual void updateActionAvailability();
+    void updateActionAvailability() override;
 
     QString getMapType() const;
     void setMapType(const QString& newMapType);
@@ -89,21 +89,21 @@ public:
     void setShowScaleControl(const bool state);
     void setShowNavigationControl(const bool state);
 
-    virtual void regionSelectionChanged();
-    virtual void mouseModeChanged();
+    void regionSelectionChanged() override;
+    void mouseModeChanged() override;
 
-    virtual void centerOn(const Marble::GeoDataLatLonBox& latLonBox, const bool useSaneZoomLevel);
-    virtual void setActive(const bool state);
+    void centerOn(const Marble::GeoDataLatLonBox& latLonBox, const bool useSaneZoomLevel) override;
+    void setActive(const bool state) override;
 
 public Q_SLOTS:
 
-    virtual void slotClustersNeedUpdating();
-    virtual void slotThumbnailAvailableForIndex(const QVariant& index, const QPixmap& pixmap);
+    void slotClustersNeedUpdating() override;
+    void slotThumbnailAvailableForIndex(const QVariant& index, const QPixmap& pixmap) override;
     void slotUngroupedModelChanged(const int mindex);
   
 protected:
 
-    bool eventFilter(QObject* object, QEvent* event);
+    bool eventFilter(QObject* object, QEvent* event) override;
     void createActions();
     void setClusterPixmap(const int clusterId, const QPoint& centerPoint, const QPixmap& clusterPixmap);
     void setMarkerPixmap(const int modelId, const int markerId, const QPoint& centerPoint, const QPixmap& markerPixmap);
@@ -117,7 +117,7 @@ private Q_SLOTS:
     void slotHTMLEvents(const QStringList& eventStrings);
     void slotFloatSettingsTriggered(QAction* action);
     void slotSelectionHasBeenMade(const KGeoMap::GeoCoordinates::Pair& searchCoordinates);
-    void slotTrackManagerChanged();
+    void slotTrackManagerChanged() override;
     void slotTracksChanged(const QList<TrackManager::TrackChanges> trackChanges);
     void slotTrackVisibilityChanged(const bool newState);
 

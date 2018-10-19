@@ -149,7 +149,7 @@ public:
 public:
 
     explicit AbstractMarkerTiler(QObject* const parent = nullptr);
-    virtual ~AbstractMarkerTiler();
+    ~AbstractMarkerTiler() override;
 
     void tileDeleteChildren(Tile* const tile);
     void tileDelete(Tile* const tile);

@@ -126,7 +126,7 @@ public:
 private:
 
     KGeoMapGlobalObject();
-    ~KGeoMapGlobalObject();
+    ~KGeoMapGlobalObject() override;
 
     class Private;
     Private* const d;

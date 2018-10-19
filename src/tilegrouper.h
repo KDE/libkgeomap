@@ -41,7 +41,7 @@ class TileGrouper : public QObject
 public:
 
     TileGrouper(const QExplicitlySharedDataPointer<KGeoMapSharedData>& sharedData, QObject* const parent);
-    ~TileGrouper();
+    ~TileGrouper() override;
 
     void setClustersDirty();
     bool getClustersDirty() const;

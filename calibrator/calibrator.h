@@ -42,15 +42,15 @@ class CalibratorModelHelper : public KGeoMap::ModelHelper
 public:
 
     explicit CalibratorModelHelper(QStandardItemModel* const model, QObject* const parent = nullptr);
-    ~CalibratorModelHelper();
+    ~CalibratorModelHelper() override;
 
     void setItemCoordinates(const QModelIndex& index, const KGeoMap::GeoCoordinates& coordinates);
 
     // these are necessary for grouped and ungrouped models
-    virtual QAbstractItemModel*  model()          const;
-    virtual QItemSelectionModel* selectionModel() const;
-    virtual Flags                modelFlags()     const;
-    virtual bool itemCoordinates(const QModelIndex& index, KGeoMap::GeoCoordinates* const coordinates) const;
+    QAbstractItemModel*  model()          const override;
+    QItemSelectionModel* selectionModel() const override;
+    Flags                modelFlags()     const override;
+    bool itemCoordinates(const QModelIndex& index, KGeoMap::GeoCoordinates* const coordinates) const override;
 
 private:
 
@@ -69,7 +69,7 @@ class Calibrator : public QMainWindow
 public:
 
     Calibrator();
-    ~Calibrator();
+    ~Calibrator() override;
 
 private:
 

@@ -54,11 +54,11 @@ class BackendMarbleLayer : public Marble::LayerInterface
 public:
 
     explicit BackendMarbleLayer(BackendMarble* const pMarbleBackend);
-    virtual ~BackendMarbleLayer();
+    ~BackendMarbleLayer() override;
 
-    virtual bool render(Marble::GeoPainter* painter, Marble::ViewportParams* viewport,
-                        const QString& renderPos = QLatin1String( "NONE"), Marble::GeoSceneLayer* layer = nullptr);
-    virtual QStringList renderPosition () const;
+    bool render(Marble::GeoPainter* painter, Marble::ViewportParams* viewport,
+                        const QString& renderPos = QLatin1String( "NONE"), Marble::GeoSceneLayer* layer = nullptr) override;
+    QStringList renderPosition () const override;
 
     void setBackend(BackendMarble* const pMarbleBackend);
 
