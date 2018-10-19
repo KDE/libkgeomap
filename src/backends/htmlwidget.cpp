@@ -49,7 +49,7 @@ class HTMLWidget::Private
 public:
 
     Private()
-      : parent(0),
+      : parent(nullptr),
         isReady(false),
         selectionStatus(false),
         firstSelectionPoint(),
@@ -70,7 +70,7 @@ public:
 };
 
 HTMLWidget::HTMLWidget(QWidget* const parent)
-    : QWebView(parent), d(new Private()), s(0)
+    : QWebView(parent), d(new Private()), s(nullptr)
 {
     d->parent = parent;
     setFocusPolicy(Qt::WheelFocus);

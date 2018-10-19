@@ -43,7 +43,7 @@ public:
 
     Private()
         : clustersDirty(true),
-          currentBackend(0)
+          currentBackend(nullptr)
     {
 
     }

@@ -385,7 +385,7 @@ void KGeoMapGlobalObject::updatePooledWidgetState(const QWidget* const widget, c
 
             if (newState == KGeoMapInternalWidgetInfo::InternalWidgetReleased)
             {
-                info.currentOwner = 0;
+                info.currentOwner = nullptr;
             }
 
             break;

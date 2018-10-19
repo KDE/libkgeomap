@@ -72,5 +72,5 @@ bool DemoDragDropHandler::dropEvent(const QDropEvent* e, const KGeoMap::GeoCoord
 
 QMimeData* DemoDragDropHandler::createMimeData(const QList<QPersistentModelIndex>& /*modelIndices*/)
 {
-    return 0;
+    return nullptr;
 }

@@ -55,7 +55,7 @@ class DemoDragDropHandler : public KGeoMap::DragDropHandler
 
 public:
 
-    explicit DemoDragDropHandler(QAbstractItemModel* const pModel, QObject* const parent = 0);
+    explicit DemoDragDropHandler(QAbstractItemModel* const pModel, QObject* const parent = nullptr);
     virtual ~DemoDragDropHandler();
 
     virtual Qt::DropAction accepts(const QDropEvent* e);

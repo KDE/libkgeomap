@@ -101,9 +101,9 @@ class Q_DECL_HIDDEN ItemMarkerTiler::Private
 public:
 
     Private()
-      : modelHelper(0),
-        selectionModel(0),
-        markerModel(0),
+      : modelHelper(nullptr),
+        selectionModel(nullptr),
+        markerModel(nullptr),
         activeState(false)
     {
     }
@@ -136,7 +136,7 @@ void ItemMarkerTiler::setMarkerModelHelper(ModelHelper* const modelHelper)
     d->markerModel    = modelHelper->model();
     d->selectionModel = modelHelper->selectionModel();
 
-    if (d->markerModel != 0)
+    if (d->markerModel != nullptr)
     {
         // TODO: disconnect the old model if there was one
         connect(d->markerModel, &QAbstractItemModel::rowsInserted, this, &ItemMarkerTiler::slotSourceModelRowsInserted);
@@ -477,7 +477,7 @@ AbstractMarkerTiler::Tile* ItemMarkerTiler::getTile(const TileIndex& tileIndex, 
     for (int level = 0; level < tileIndex.indexCount(); ++level)
     {
         const int currentIndex = tileIndex.linearIndex(level);
-        MyTile* childTile      = 0;
+        MyTile* childTile      = nullptr;
 
         if (tile->childrenEmpty())
         {
@@ -501,7 +501,7 @@ AbstractMarkerTiler::Tile* ItemMarkerTiler::getTile(const TileIndex& tileIndex, 
 
                     MyTile* newTile = static_cast<MyTile*>(tile->getChild(newTileIndex));
 
-                    if (newTile == 0)
+                    if (newTile == nullptr)
                     {
                         newTile = static_cast<MyTile*>(tileNew());
                         tile->addChild(newTileIndex, newTile);
@@ -522,12 +522,12 @@ AbstractMarkerTiler::Tile* ItemMarkerTiler::getTile(const TileIndex& tileIndex, 
 
         childTile = static_cast<MyTile*>(tile->getChild(currentIndex));
 
-        if (childTile == 0)
+        if (childTile == nullptr)
         {
             if (stopIfEmpty)
             {
                 // there will be no markers in this tile, therefore stop
-                return 0;
+                return nullptr;
             }
 
             childTile = static_cast<MyTile*>(tileNew());
@@ -603,7 +603,7 @@ void ItemMarkerTiler::addMarkerIndexToGrid(const QPersistentModelIndex& markerIn
         const int nextIndex = tileIndex.linearIndex(l);
         MyTile* nextTile    = static_cast<MyTile*>(currentTile->getChild(nextIndex));
 
-        if (nextTile == 0)
+        if (nextTile == nullptr)
         {
             // we have to create the tile:
             nextTile = static_cast<MyTile*>(tileNew());

@@ -62,7 +62,7 @@ class KGEOMAP_EXPORT MapWidget : public QWidget
 
 public:
 
-    explicit MapWidget(QWidget* const parent = 0);
+    explicit MapWidget(QWidget* const parent = nullptr);
     ~MapWidget();
 
     void saveSettingsToGroup(KConfigGroup* const group);
@@ -139,8 +139,8 @@ public:
 
     void getColorInfos(const int clusterIndex, QColor* fillColor, QColor* strokeColor,
                        Qt::PenStyle* strokeStyle, QString* labelText, QColor* labelColor,
-                       const GroupState* const overrideSelection = 0,
-                       const int* const overrideCount = 0) const;
+                       const GroupState* const overrideSelection = nullptr,
+                       const int* const overrideCount = nullptr) const;
 
     void getColorInfos(const GroupState groupState,
                        const int nMarkers,

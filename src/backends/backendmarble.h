@@ -50,7 +50,7 @@ class BackendMarble : public MapBackend
 
 public:
 
-    explicit BackendMarble(const QExplicitlySharedDataPointer<KGeoMapSharedData>& sharedData, QObject* const parent = 0);
+    explicit BackendMarble(const QExplicitlySharedDataPointer<KGeoMapSharedData>& sharedData, QObject* const parent = nullptr);
     virtual ~BackendMarble();
 
     virtual QString backendName() const;

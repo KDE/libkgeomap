@@ -43,7 +43,7 @@ class BackendGoogleMaps : public MapBackend
 
 public:
 
-    explicit BackendGoogleMaps(const QExplicitlySharedDataPointer<KGeoMapSharedData>& sharedData, QObject* const parent = 0);
+    explicit BackendGoogleMaps(const QExplicitlySharedDataPointer<KGeoMapSharedData>& sharedData, QObject* const parent = nullptr);
     virtual ~BackendGoogleMaps();
 
     virtual QString backendName() const;

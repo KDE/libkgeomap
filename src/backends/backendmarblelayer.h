@@ -57,7 +57,7 @@ public:
     virtual ~BackendMarbleLayer();
 
     virtual bool render(Marble::GeoPainter* painter, Marble::ViewportParams* viewport,
-                        const QString& renderPos = QLatin1String( "NONE"), Marble::GeoSceneLayer* layer = 0);
+                        const QString& renderPos = QLatin1String( "NONE"), Marble::GeoSceneLayer* layer = nullptr);
     virtual QStringList renderPosition () const;
 
     void setBackend(BackendMarble* const pMarbleBackend);

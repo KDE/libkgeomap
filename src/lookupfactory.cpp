@@ -38,7 +38,7 @@ LookupAltitude* LookupFactory::getAltitudeLookup(const QString& backendName, QOb
         return new LookupAltitudeGeonames(parent);
     }
 
-    return 0;
+    return nullptr;
 }
 
 } /* namespace KGeoMap */

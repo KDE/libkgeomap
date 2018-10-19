@@ -42,7 +42,7 @@ public:
 
     Private()
     {
-        messageLabel = 0;
+        messageLabel = nullptr;
     }
 
     QLabel* messageLabel;

@@ -47,7 +47,7 @@ class KGEOMAP_EXPORT ItemMarkerTiler : public AbstractMarkerTiler
 
 public:
 
-    explicit ItemMarkerTiler(ModelHelper* const modelHelper, QObject* const parent = 0);
+    explicit ItemMarkerTiler(ModelHelper* const modelHelper, QObject* const parent = nullptr);
     virtual ~ItemMarkerTiler();
 
     virtual Flags tilerFlags() const;

@@ -43,7 +43,7 @@ class AbstractMarkerTiler::Private
 public:
 
     Private()
-        : rootTile(0),
+        : rootTile(nullptr),
           isDirty(true)
     {
     }
@@ -166,7 +166,7 @@ AbstractMarkerTiler::Flags AbstractMarkerTiler::tilerFlags() const
 void AbstractMarkerTiler::clear()
 {
     tileDelete(d->rootTile);
-    d->rootTile = 0;
+    d->rootTile = nullptr;
 }
 
 // -------------------------------------------------------------------------
@@ -176,7 +176,7 @@ class Q_DECL_HIDDEN AbstractMarkerTiler::NonEmptyIterator::Private
 public:
 
     Private()
-        : model(0),
+        : model(nullptr),
           level(0),
           startIndex(),
           endIndex(),
@@ -524,7 +524,7 @@ AbstractMarkerTiler::Tile* AbstractMarkerTiler::Tile::getChild(const int linearI
 {
     if (children.isEmpty())
     {
-        return 0;
+        return nullptr;
     }
 
     return children.at(linearIndex);
@@ -532,7 +532,7 @@ AbstractMarkerTiler::Tile* AbstractMarkerTiler::Tile::getChild(const int linearI
 
 void AbstractMarkerTiler::Tile::addChild(const int linearIndex, Tile* const tilePointer)
 {
-    if ( (tilePointer==0) && children.isEmpty() )
+    if ( (tilePointer==nullptr) && children.isEmpty() )
     {
         return;
     }
@@ -549,7 +549,7 @@ void AbstractMarkerTiler::Tile::clearChild(const int linearIndex)
         return;
     }
 
-    children[linearIndex] = 0;
+    children[linearIndex] = nullptr;
 }
 
 int AbstractMarkerTiler::Tile::indexOfChildTile(Tile* const tile)
@@ -576,7 +576,7 @@ void AbstractMarkerTiler::Tile::prepareForChildren()
         return;
     }
 
-    children = QVector<Tile*>(maxChildCount(), 0);
+    children = QVector<Tile*>(maxChildCount(), nullptr);
 }
 
 } /* namespace KGeoMap */

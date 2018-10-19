@@ -44,7 +44,7 @@ class KGEOMAP_EXPORT DragDropHandler : public QObject
 
 public:
 
-    explicit DragDropHandler(QObject* const parent = 0);
+    explicit DragDropHandler(QObject* const parent = nullptr);
     virtual ~DragDropHandler();
 
     virtual Qt::DropAction accepts(const QDropEvent* e) = 0;
