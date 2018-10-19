@@ -11,9 +11,8 @@ project(libkgeomap)
 message(STATUS "----------------------------------------------------------------------------------")
 message(STATUS "Starting CMake configuration for: ${PROJECT_NAME}")
 
-set(ECM_MIN_VERSION     "1.1.0")
-set(KF5_VERSION         "5.0.0")
-set(REQUIRED_QT_VERSION "5.2.0")
+set(REQUIRED_KF_VERSION "5.18.0")
+set(REQUIRED_QT_VERSION "5.7.0")
 
 
 # =======================================================
@@ -43,18 +42,18 @@ set(LIBKGEOMAP_SO_VERSION  "${KGEOMAP_LIB_SO_CUR_VERSION}.${KGEOMAP_LIB_SO_REV_V
 
 ############## ECM setup ######################
 
-find_package(ECM ${ECM_MIN_VERSION} CONFIG REQUIRED)
+find_package(ECM ${REQUIRED_KF_VERSION} CONFIG REQUIRED)
 set(CMAKE_MODULE_PATH ${libkgeomap_SOURCE_DIR}/cmake/modules ${ECM_MODULE_PATH})
 
+include(KDEInstallDirs)
+include(KDECMakeSettings)
+include(KDEFrameworkCompilerSettings NO_POLICY_SCOPE)
 include(ECMGenerateHeaders)
 include(ECMGeneratePriFile)
 include(ECMPackageConfigHelpers)
 include(ECMSetupVersion)
 include(ECMMarkNonGuiExecutable)
 include(ECMPoQmTools)
-include(KDEInstallDirs)
-include(KDECMakeSettings)
-include(KDEFrameworkCompilerSettings NO_POLICY_SCOPE)
 include(GenerateExportHeader)
 include(FeatureSummary)
 
@@ -69,7 +68,7 @@ find_package(Qt5 ${REQUIRED_QT_VERSION} REQUIRED NO_MODULE COMPONENTS
              Concurrent
 )
 
-find_package(KF5 ${KF5_VERSION} REQUIRED COMPONENTS
+find_package(KF5 ${REQUIRED_KF_VERSION} REQUIRED COMPONENTS
              I18n
              Config
              KIO
