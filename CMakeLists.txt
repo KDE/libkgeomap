@@ -50,10 +50,10 @@ include(KDECMakeSettings)
 include(KDEFrameworkCompilerSettings NO_POLICY_SCOPE)
 include(ECMGenerateHeaders)
 include(ECMGeneratePriFile)
-include(ECMPackageConfigHelpers)
 include(ECMSetupVersion)
 include(ECMMarkNonGuiExecutable)
 include(ECMPoQmTools)
+include(CMakePackageConfigHelpers)
 include(GenerateExportHeader)
 include(FeatureSummary)
 
@@ -106,7 +106,7 @@ endif()
 message("${CMAKECONFIG_INSTALL_DIR}")
 set(CMAKECONFIG_INSTALL_DIR "${CMAKECONFIG_INSTALL_PREFIX}/KF5KGeoMap")
 
-ecm_configure_package_config_file(
+configure_package_config_file(
     "${CMAKE_CURRENT_SOURCE_DIR}/cmake/templates/KF5KGeoMapConfig.cmake.in"
     "${CMAKE_CURRENT_BINARY_DIR}/KF5KGeoMapConfig.cmake"
     INSTALL_DESTINATION ${CMAKECONFIG_INSTALL_DIR}
