@@ -1,3 +1,5 @@
+cmake_minimum_required(VERSION 3.0)
+
 #
 # Copyright (c) 2010-2015, Gilles Caulier, <caulier dot gilles at gmail dot com>
 #
@@ -9,12 +11,10 @@ project(libkgeomap)
 message(STATUS "----------------------------------------------------------------------------------")
 message(STATUS "Starting CMake configuration for: ${PROJECT_NAME}")
 
-set(CMAKE_MIN_VERSION   "2.8.12")
 set(ECM_MIN_VERSION     "1.1.0")
 set(KF5_VERSION         "5.0.0")
 set(REQUIRED_QT_VERSION "5.2.0")
 
-cmake_minimum_required(VERSION ${CMAKE_MIN_VERSION})
 
 # =======================================================
 # Information to update before to release this library.
