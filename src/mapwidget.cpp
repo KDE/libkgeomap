@@ -1503,7 +1503,7 @@ void MapWidget::dragEnterEvent(QDragEnterEvent* event)
         return;
     }
 
-    /// @todo need data about the dragged object: #markers, selected, icon, ...
+    /// @todo need data about the dragged object: markers, selected, icon, ...
     event->accept();
 
 //     if (!dragData->haveDragPixmap)

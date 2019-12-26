@@ -1196,7 +1196,7 @@ void BackendGoogleMaps::setActive(const bool state)
             setShowNavigationControl(d->cacheShowNavigationControl);
             setShowScaleControl(d->cacheShowScaleControl);
 
-            /// @TODO update tracks more gently
+            /// @todo update tracks more gently
             slotTracksChanged(d->trackChangeTracker);
             d->trackChangeTracker.clear();
         }

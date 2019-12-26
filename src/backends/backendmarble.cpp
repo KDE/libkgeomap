@@ -685,7 +685,7 @@ void BackendMarble::marbleCustomPaint(Marble::GeoPainter* painter)
                     d->trackCache.insert(track.id, lineString);
                 }
 
-                /// @TODO 5 looks a bit too thick IMHO when you zoom out.
+                /// @todo 5 looks a bit too thick IMHO when you zoom out.
                 ///       Maybe adjust to zoom level?
                 QColor trackColor = track.color;
                 trackColor.setAlpha(180);
@@ -1824,7 +1824,7 @@ void BackendMarble::slotScheduleUpdate()
 {
     if (d->marbleWidget && d->activeState)
     {
-        /// @TODO Put this onto the eventloop to collect update calls into one.
+        /// @todo Put this onto the eventloop to collect update calls into one.
         d->marbleWidget->update();
     }
 }

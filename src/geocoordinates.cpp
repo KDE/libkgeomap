@@ -255,7 +255,7 @@ Marble::GeoDataCoordinates GeoCoordinates::toMarbleCoordinates() const
 
 GeoCoordinates GeoCoordinates::fromMarbleCoordinates(const Marble::GeoDataCoordinates& marbleCoordinates)
 {
-    /// @TODO looks like Marble does not differentiate between having and not having altitude..
+    /// @todo looks like Marble does not differentiate between having and not having altitude..
     return GeoCoordinates(
             marbleCoordinates.latitude(Marble::GeoDataCoordinates::Degree),
             marbleCoordinates.longitude(Marble::GeoDataCoordinates::Degree),

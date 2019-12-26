@@ -106,7 +106,7 @@ void TrackManager::setVisibility(const bool value)
 
 void TrackManager::clear()
 {
-    /// @TODO send a signal
+    /// @todo send a signal
     d->trackList.clear();
 }
 
